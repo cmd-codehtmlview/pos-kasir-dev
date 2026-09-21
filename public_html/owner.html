@@ -66,6 +66,16 @@
     .stat-card-glow {
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
     }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .touch-scroll {
+      -webkit-overflow-scrolling: touch;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-alfa-yellow selection:text-slate-900 pb-12">
@@ -257,42 +267,46 @@
     <!-- WRAPPER BODY DASHBOARD PEMILIK -->
     <div id="owner-dashboard-body" class="space-y-6">
     <!-- BAR FILTER TANGGAL & STATUS TOKO -->
-    <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="text-xs font-bold text-slate-400">Periode Data:</span>
-        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-          <button onclick="setDateFilter('today')" id="filter-btn-today" class="px-3 py-1 rounded-lg font-bold transition-all bg-alfa-red text-white">Hari Ini</button>
-          <button onclick="setDateFilter('7days')" id="filter-btn-7days" class="px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white">7 Hari</button>
-          <button onclick="setDateFilter('30days')" id="filter-btn-30days" class="px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white">30 Hari</button>
-          <button onclick="setDateFilter('custom')" id="filter-btn-custom" class="px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white flex items-center gap-1.5 cursor-pointer" title="Pilih rentang tanggal spesifik (tanggal, bulan, tahun)">
-            <span>📅</span>
-            <span id="filter-custom-label">Pilih Periode</span>
-          </button>
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full lg:w-auto">
+        
+        <!-- Pilihan Periode Scrollable Pills (Anti-Patah / Anti-Tumpang Tindih di Layar HP 9:16 & 9:18) -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 max-w-full flex-nowrap -mx-1 px-1">
+          <span class="text-xs font-bold text-slate-400 whitespace-nowrap flex-shrink-0 mr-1 hidden sm:inline">Periode:</span>
+          <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs flex-nowrap">
+            <button onclick="setDateFilter('today')" id="filter-btn-today" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all bg-alfa-red text-white whitespace-nowrap flex-shrink-0 cursor-pointer text-xs">Hari Ini</button>
+            <button onclick="setDateFilter('7days')" id="filter-btn-7days" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white whitespace-nowrap flex-shrink-0 cursor-pointer text-xs">7 Hari</button>
+            <button onclick="setDateFilter('30days')" id="filter-btn-30days" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white whitespace-nowrap flex-shrink-0 cursor-pointer text-xs">30 Hari</button>
+            <button onclick="setDateFilter('custom')" id="filter-btn-custom" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white whitespace-nowrap flex-shrink-0 cursor-pointer text-xs flex items-center gap-1" title="Pilih rentang tanggal spesifik (tanggal, bulan, tahun)">
+              <span>📅</span>
+              <span id="filter-custom-label">Pilih Periode</span>
+            </button>
+          </div>
         </div>
 
-        <!-- Custom Date Range Picker Container (Tanggal Mulai s/d Tanggal Selesai) -->
-        <div id="custom-date-box" class="hidden flex flex-wrap items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/50 text-xs shadow-lg">
-          <div class="flex items-center gap-1.5">
-            <span class="text-[11px] text-amber-300 font-bold uppercase">Dari:</span>
+        <!-- Custom Date Range Picker Container (Responsif Penuh di Mobile 9:16 & Tablet) -->
+        <div id="custom-date-box" class="hidden w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-slate-950 p-2.5 sm:px-3 sm:py-1.5 rounded-xl border border-amber-500/50 text-xs shadow-lg">
+          <div class="flex items-center justify-between sm:justify-start gap-1.5 flex-1">
+            <span class="text-[11px] text-amber-300 font-bold uppercase whitespace-nowrap">Dari:</span>
             <input 
               type="date" 
               id="filter-date-start" 
-              class="bg-slate-900 text-amber-200 border border-slate-700 rounded-lg px-2 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-400"
+              class="w-full sm:w-auto bg-slate-900 text-amber-200 border border-slate-700 rounded-lg px-2 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-400"
             />
           </div>
-          <span class="text-slate-500 text-xs font-bold">s/d</span>
-          <div class="flex items-center gap-1.5">
-            <span class="text-[11px] text-amber-300 font-bold uppercase">Sampai:</span>
+          <span class="text-slate-500 text-xs font-bold text-center sm:text-left">s/d</span>
+          <div class="flex items-center justify-between sm:justify-start gap-1.5 flex-1">
+            <span class="text-[11px] text-amber-300 font-bold uppercase whitespace-nowrap">Sampai:</span>
             <input 
               type="date" 
               id="filter-date-end" 
-              class="bg-slate-900 text-amber-200 border border-slate-700 rounded-lg px-2 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-400"
+              class="w-full sm:w-auto bg-slate-900 text-amber-200 border border-slate-700 rounded-lg px-2 py-1 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-400"
             />
           </div>
           <button 
             type="button" 
             onclick="applyCustomDateFilter()" 
-            class="px-3 py-1 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-lg text-xs transition cursor-pointer shadow flex items-center gap-1 active:scale-95"
+            class="w-full sm:w-auto px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-lg text-xs transition cursor-pointer shadow flex items-center justify-center gap-1 active:scale-95"
           >
             <span>🔍</span>
             <span>Terapkan</span>
@@ -300,31 +314,33 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <!-- Quick Dummy Data Buttons -->
-        <button 
-          type="button"
-          onclick="seedRealisticOwnerData(true)" 
-          id="btn-seed-dummy"
-          class="px-2.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition cursor-pointer active:scale-95"
-          title="Isi data simulasi 30 hari & produk untuk melihat grafik & laporan realtime"
-        >
-          <span>⚡</span>
-          <span>Isi Dummy 30 Hari</span>
-        </button>
-        <button 
-          type="button"
-          onclick="clearDummyData()" 
-          class="px-2 py-1.5 bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-300 font-bold rounded-xl text-xs border border-slate-700 hover:border-rose-800 flex items-center gap-1 transition cursor-pointer"
-          title="Kosongkan data simulasi demo"
-        >
-          <span>🗑️</span>
-          <span class="hidden sm:inline">Reset</span>
-        </button>
+      <!-- Quick Dummy & Kasir Aktif (Tier Bersih Bawah di Layar HP) -->
+      <div class="flex items-center justify-between sm:justify-end gap-2 w-full lg:w-auto pt-2 lg:pt-0 border-t border-slate-800/60 lg:border-t-0">
+        <div class="flex items-center gap-1.5">
+          <button 
+            type="button"
+            onclick="seedRealisticOwnerData(true)" 
+            id="btn-seed-dummy"
+            class="px-2.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs flex items-center gap-1 shadow-md transition cursor-pointer active:scale-95 whitespace-nowrap"
+            title="Isi data simulasi 30 hari & produk untuk melihat grafik & laporan realtime"
+          >
+            <span>⚡</span>
+            <span class="text-[11px] sm:text-xs">Isi Dummy 30 Hari</span>
+          </button>
+          <button 
+            type="button"
+            onclick="clearDummyData()" 
+            class="px-2 py-1.5 bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-300 font-bold rounded-xl text-xs border border-slate-700 hover:border-rose-800 flex items-center gap-1 transition cursor-pointer"
+            title="Kosongkan data simulasi demo"
+          >
+            <span>🗑️</span>
+            <span class="text-[11px] sm:text-xs">Reset</span>
+          </button>
+        </div>
 
-        <div class="flex items-center gap-2 text-xs text-slate-400 ml-1">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-          <span>Kasir Toko Aktif: <strong class="text-white font-mono" id="active-cashier-label">POS 01 (Kasir 1)</strong></span>
+        <div class="flex items-center gap-1.5 text-xs text-slate-400 flex-shrink-0">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span class="text-[10px] sm:text-xs"><span class="hidden sm:inline">Kasir Aktif: </span><strong class="text-white font-mono" id="active-cashier-label">POS 01</strong></span>
         </div>
       </div>
     </div>
@@ -343,70 +359,70 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
         <!-- VALUASI 1: MODAL HPP TERTANAM -->
-        <div class="bg-gradient-to-br from-indigo-950/80 via-slate-900 to-slate-950 p-4 rounded-2xl border border-indigo-500/30 stat-card-glow flex flex-col justify-between">
-          <div>
+        <div class="bg-gradient-to-br from-indigo-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-indigo-500/30 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
             <div class="flex items-center justify-between text-indigo-400 text-xs">
-              <span class="font-bold uppercase tracking-wider text-[10px]">Nilai Modal Aset Barang (HPP)</span>
-              <span class="text-lg">💰</span>
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Nilai Modal Aset Barang (HPP)</span>
+              <span class="text-base sm:text-lg flex-shrink-0">💰</span>
             </div>
-            <div id="kpi-inventory-asset-cost" class="text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-2">
+            <div id="kpi-inventory-asset-cost" class="text-lg sm:text-2xl font-black font-mono text-emerald-400 mt-1.5 sm:mt-2 truncate">
               Rp 0
             </div>
           </div>
-          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-            <span>Uang Modal Tertanam di Rak</span>
-            <span class="text-indigo-300 font-semibold font-mono">Modal Fisik</span>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span class="truncate">Uang Modal Tertanam di Rak</span>
+            <span class="text-indigo-300 font-semibold font-mono flex-shrink-0">Modal Fisik</span>
           </div>
         </div>
 
         <!-- VALUASI 2: TOTAL FISIK STOK (QTY & SKU) -->
-        <div class="bg-gradient-to-br from-cyan-950/80 via-slate-900 to-slate-950 p-4 rounded-2xl border border-cyan-500/30 stat-card-glow flex flex-col justify-between">
-          <div>
+        <div class="bg-gradient-to-br from-cyan-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-cyan-500/30 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
             <div class="flex items-center justify-between text-cyan-400 text-xs">
-              <span class="font-bold uppercase tracking-wider text-[10px]">Total Fisik Stok Barang</span>
-              <span class="text-lg">📦</span>
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Total Fisik Stok Barang</span>
+              <span class="text-base sm:text-lg flex-shrink-0">📦</span>
             </div>
-            <div id="kpi-inventory-qty" class="text-xl sm:text-2xl font-black font-mono text-cyan-300 mt-2">
+            <div id="kpi-inventory-qty" class="text-lg sm:text-2xl font-black font-mono text-cyan-300 mt-1.5 sm:mt-2 truncate">
               0 Pcs
             </div>
           </div>
-          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-            <span id="kpi-inventory-sku-count">0 Jenis Produk (SKU)</span>
-            <span class="text-cyan-400 font-semibold">Toko & Gudang</span>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span id="kpi-inventory-sku-count" class="truncate">0 Jenis Produk (SKU)</span>
+            <span class="text-cyan-400 font-semibold flex-shrink-0">Toko & Gudang</span>
           </div>
         </div>
 
         <!-- VALUASI 3: POTENSI OMZET PENJUALAN -->
-        <div class="bg-gradient-to-br from-amber-950/80 via-slate-900 to-slate-950 p-4 rounded-2xl border border-amber-500/30 stat-card-glow flex flex-col justify-between">
-          <div>
+        <div class="bg-gradient-to-br from-amber-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-amber-500/30 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
             <div class="flex items-center justify-between text-amber-400 text-xs">
-              <span class="font-bold uppercase tracking-wider text-[10px]">Potensi Nilai Penjualan</span>
-              <span class="text-lg">🏷️</span>
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Potensi Nilai Penjualan</span>
+              <span class="text-base sm:text-lg flex-shrink-0">🏷️</span>
             </div>
-            <div id="kpi-inventory-asset-retail" class="text-xl sm:text-2xl font-black font-mono text-amber-400 mt-2">
+            <div id="kpi-inventory-asset-retail" class="text-lg sm:text-2xl font-black font-mono text-amber-400 mt-1.5 sm:mt-2 truncate">
               Rp 0
             </div>
           </div>
-          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-            <span>Jika Semua Stok Habis Terjual</span>
-            <span class="text-amber-400 font-semibold font-mono">Gross Retail</span>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span class="truncate">Jika Semua Stok Terjual</span>
+            <span class="text-amber-400 font-semibold font-mono flex-shrink-0">Gross Retail</span>
           </div>
         </div>
 
         <!-- VALUASI 4: PROYEKSI LABA KOTOR INVENTORI -->
-        <div class="bg-gradient-to-br from-emerald-950/80 via-slate-900 to-slate-950 p-4 rounded-2xl border border-emerald-500/30 stat-card-glow flex flex-col justify-between">
-          <div>
+        <div class="bg-gradient-to-br from-emerald-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-emerald-500/30 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
             <div class="flex items-center justify-between text-emerald-400 text-xs">
-              <span class="font-bold uppercase tracking-wider text-[10px]">Proyeksi Laba dari Stok</span>
-              <span class="text-lg">📈</span>
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Proyeksi Laba dari Stok</span>
+              <span class="text-base sm:text-lg flex-shrink-0">📈</span>
             </div>
-            <div id="kpi-inventory-profit-projection" class="text-xl sm:text-2xl font-black font-mono text-emerald-300 mt-2">
+            <div id="kpi-inventory-profit-projection" class="text-lg sm:text-2xl font-black font-mono text-emerald-300 mt-1.5 sm:mt-2 truncate">
               Rp 0
             </div>
           </div>
-          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-            <span id="kpi-inventory-margin-projection">Potensi Margin: 0%</span>
-            <span class="text-emerald-400 font-semibold">Estimasi Bersih</span>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span id="kpi-inventory-margin-projection" class="truncate">Potensi Margin: 0%</span>
+            <span class="text-emerald-400 font-semibold flex-shrink-0">Estimasi Bersih</span>
           </div>
         </div>
 
@@ -416,158 +432,158 @@
     <!-- ========================================== -->
     <!-- 9 KARTU KPI UTAMA (METRICS) -->
     <!-- ========================================== -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-9 gap-3 sm:gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-9 gap-2.5 sm:gap-4">
       
       <!-- KPI 1: TOTAL OMZET -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
-        <div>
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+        <div class="min-w-0">
           <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px]">Total Omzet</span>
-            <span class="text-lg">💰</span>
+            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Total Omzet</span>
+            <span class="text-base sm:text-lg flex-shrink-0">💰</span>
           </div>
-          <div id="kpi-omzet" class="text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-2">
+          <div id="kpi-omzet" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-emerald-400 mt-1.5 sm:mt-2 truncate">
             Rp 0
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-          <span>Gross Revenue</span>
-          <span id="kpi-omzet-sub" class="text-emerald-500 font-semibold">Tercatat</span>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+          <span class="truncate">Gross Revenue</span>
+          <span id="kpi-omzet-sub" class="text-emerald-500 font-semibold flex-shrink-0">Tercatat</span>
         </div>
       </div>
 
       <!-- KPI 2: LABA BERSIH TOKO -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
-        <div>
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+        <div class="min-w-0">
           <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px]">Laba Bersih (Net)</span>
-            <span class="text-lg">📈</span>
+            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Laba Bersih</span>
+            <span class="text-base sm:text-lg flex-shrink-0">📈</span>
           </div>
-          <div id="kpi-profit" class="text-xl sm:text-2xl font-black font-mono text-blue-400 mt-2">
+          <div id="kpi-profit" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-blue-400 mt-1.5 sm:mt-2 truncate">
             Rp 0
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-          <span>Margin Bersih</span>
-          <span id="kpi-margin-pct" class="font-bold text-blue-400">0%</span>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+          <span class="truncate">Margin Bersih</span>
+          <span id="kpi-margin-pct" class="font-bold text-blue-400 flex-shrink-0">0%</span>
         </div>
       </div>
 
       <!-- KPI 3: SELISIH STOK OPNAME -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
-        <div>
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+        <div class="min-w-0">
           <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px]">Selisih Stok Opname</span>
-            <span class="text-lg">⚖️</span>
+            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Selisih SO</span>
+            <span class="text-base sm:text-lg flex-shrink-0">⚖️</span>
           </div>
-          <div id="kpi-so-diff-amount" class="text-xl sm:text-2xl font-black font-mono text-purple-400 mt-2">
+          <div id="kpi-so-diff-amount" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-purple-400 mt-1.5 sm:mt-2 truncate">
             Rp 0
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-          <span id="kpi-so-unit-diff" class="text-slate-400 font-semibold text-[10px]">Audit Fisik (0 SO)</span>
-          <button onclick="scrollToSection('section-so-history')" class="text-purple-400 font-bold hover:underline">Audit &rarr;</button>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+          <span id="kpi-so-unit-diff" class="text-slate-400 font-semibold text-[10px] truncate">Audit (0 SO)</span>
+          <button onclick="scrollToSection('section-so-history')" class="text-purple-400 font-bold hover:underline flex-shrink-0">Audit &rarr;</button>
         </div>
       </div>
 
       <!-- KPI 4: STRUK TRANSAKSI & PCS -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
-        <div>
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+        <div class="min-w-0">
           <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px]">Struk Belanja</span>
-            <span class="text-lg">🧾</span>
+            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Struk Belanja</span>
+            <span class="text-base sm:text-lg flex-shrink-0">🧾</span>
           </div>
-          <div id="kpi-transactions" class="text-xl sm:text-2xl font-black font-mono text-white mt-2">
+          <div id="kpi-transactions" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-white mt-1.5 sm:mt-2 truncate">
             0 Struk
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-          <span>Total Item Terjual</span>
-          <span id="kpi-items-sold" class="font-bold text-yellow-400">0 pcs</span>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+          <span class="truncate">Item Terjual</span>
+          <span id="kpi-items-sold" class="font-bold text-yellow-400 flex-shrink-0">0 pcs</span>
         </div>
       </div>
 
       <!-- KPI 5: STOK KRITIS / MENIPIS -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
-        <div>
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+        <div class="min-w-0">
           <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px]">Perlu Kulakan (PO) Qty</span>
-            <span class="text-lg">⚠️</span>
+            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Perlu Kulakan</span>
+            <span class="text-base sm:text-lg flex-shrink-0">⚠️</span>
           </div>
-          <div id="kpi-low-stock-count" class="text-xl sm:text-2xl font-black font-mono text-rose-400 mt-2">
+          <div id="kpi-low-stock-count" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-rose-400 mt-1.5 sm:mt-2 truncate">
             0 Produk
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-          <span>Sisa Stok &le; 5 pcs</span>
-          <button onclick="scrollToSection('section-low-stock')" class="text-rose-400 font-bold hover:underline">Lihat &rarr;</button>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+          <span class="truncate">Stok &le; 5</span>
+          <button onclick="scrollToSection('section-low-stock')" class="text-rose-400 font-bold hover:underline flex-shrink-0">Lihat &rarr;</button>
         </div>
       </div>
 
       <!-- KPI 6: TOTAL RETUR PELANGGAN -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
-        <div>
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+        <div class="min-w-0">
           <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px]">Retur Barang</span>
-            <span class="text-lg">🔄</span>
+            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Retur Barang</span>
+            <span class="text-base sm:text-lg flex-shrink-0">🔄</span>
           </div>
-          <div id="kpi-refund-amount" class="text-xl sm:text-2xl font-black font-mono text-amber-400 mt-2">
+          <div id="kpi-refund-amount" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-amber-400 mt-1.5 sm:mt-2 truncate">
             Rp 0
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-          <span>Total Refund Dana</span>
-          <span id="kpi-retur-count" class="font-bold text-amber-400">0 retur</span>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+          <span class="truncate">Total Refund</span>
+          <span id="kpi-retur-count" class="font-bold text-amber-400 flex-shrink-0">0 retur</span>
         </div>
       </div>
 
       <!-- KPI 7: DAY SALES INVENTORY (DSI) -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
-        <div>
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+        <div class="min-w-0">
           <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px]">DSI Rata-rata Toko</span>
-            <span class="text-lg">⏳</span>
+            <span class="font-bold uppercase tracking-wider text-[10px] truncate">DSI Rata-rata</span>
+            <span class="text-base sm:text-lg flex-shrink-0">⏳</span>
           </div>
-          <div id="kpi-store-dsi" class="text-xl sm:text-2xl font-black font-mono text-cyan-400 mt-2">
+          <div id="kpi-store-dsi" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-cyan-400 mt-1.5 sm:mt-2 truncate">
             - Hari
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-          <span id="kpi-dsi-status" class="text-slate-400 font-semibold text-[10px]">Ketahanan Stok</span>
-          <button onclick="scrollToSection('section-dsi-analysis')" class="text-cyan-400 font-bold hover:underline">Analisis &rarr;</button>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+          <span id="kpi-dsi-status" class="text-slate-400 font-semibold text-[10px] truncate">Ketahanan</span>
+          <button onclick="scrollToSection('section-dsi-analysis')" class="text-cyan-400 font-bold hover:underline flex-shrink-0">Analisis &rarr;</button>
         </div>
       </div>
 
       <!-- KPI 8: TOTAL PENERIMAAN BARANG (LPB) -->
-      <div class="bg-gradient-to-br from-emerald-950 to-slate-950 p-4 rounded-2xl border border-emerald-900/50 stat-card-glow flex flex-col justify-between">
-        <div>
+      <div class="bg-gradient-to-br from-emerald-950 to-slate-950 p-3 sm:p-4 rounded-2xl border border-emerald-900/50 stat-card-glow flex flex-col justify-between min-w-0">
+        <div class="min-w-0">
           <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px] text-emerald-400">Penerimaan Barang</span>
-            <span class="text-lg">📦</span>
+            <span class="font-bold uppercase tracking-wider text-[10px] text-emerald-400 truncate">Terima Barang</span>
+            <span class="text-base sm:text-lg flex-shrink-0">📦</span>
           </div>
-          <div id="kpi-lpb-count" class="text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-2">
+          <div id="kpi-lpb-count" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-emerald-400 mt-1.5 sm:mt-2 truncate">
             0 LPB
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-emerald-900/50 text-[10px] text-slate-400 flex items-center justify-between">
-          <span id="kpi-lpb-value" class="font-bold text-emerald-300 font-mono">Rp 0</span>
-          <button onclick="scrollToSection('section-lpb-history')" class="text-emerald-400 font-bold hover:underline">LPB →</button>
+        <div class="pt-2 mt-2 border-t border-emerald-900/50 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+          <span id="kpi-lpb-value" class="font-bold text-emerald-300 font-mono truncate">Rp 0</span>
+          <button onclick="scrollToSection('section-lpb-history')" class="text-emerald-400 font-bold hover:underline flex-shrink-0">LPB &rarr;</button>
         </div>
       </div>
 
       <!-- KPI 9: TOTAL MEMBER & LOYALITAS -->
-      <div class="bg-gradient-to-br from-indigo-950 to-slate-950 p-4 rounded-2xl border border-indigo-900/50 stat-card-glow flex flex-col justify-between">
-        <div>
+      <div class="bg-gradient-to-br from-indigo-950 to-slate-950 p-3 sm:p-4 rounded-2xl border border-indigo-900/50 stat-card-glow flex flex-col justify-between min-w-0">
+        <div class="min-w-0">
           <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px] text-indigo-400">Member Pelanggan</span>
-            <span class="text-lg">👤</span>
+            <span class="font-bold uppercase tracking-wider text-[10px] text-indigo-400 truncate">Member Toko</span>
+            <span class="text-base sm:text-lg flex-shrink-0">👤</span>
           </div>
-          <div id="kpi-member-count" class="text-xl sm:text-2xl font-black font-mono text-indigo-400 mt-2">
+          <div id="kpi-member-count" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-indigo-400 mt-1.5 sm:mt-2 truncate">
             0 Member
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-indigo-900/50 text-[10px] text-slate-400 flex items-center justify-between">
-          <span id="kpi-member-points" class="font-bold text-indigo-300 font-mono">0 Poin Aktif</span>
-          <button onclick="scrollToSection('section-members-management')" class="text-indigo-400 font-bold hover:underline">Member &rarr;</button>
+        <div class="pt-2 mt-2 border-t border-indigo-900/50 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+          <span id="kpi-member-points" class="font-bold text-indigo-300 font-mono truncate">0 Poin</span>
+          <button onclick="scrollToSection('section-members-management')" class="text-indigo-400 font-bold hover:underline flex-shrink-0">Member &rarr;</button>
         </div>
       </div>
 
@@ -669,7 +685,7 @@
         </div>
 
         <div class="overflow-x-auto max-h-[380px] custom-scrollbar">
-          <table class="w-full text-left border-collapse text-xs">
+          <table class="w-full text-left border-collapse text-xs min-w-[620px]">
             <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
               <tr>
                 <th class="py-2.5 px-3">No. Struk</th>
@@ -708,7 +724,7 @@
       </div>
 
       <div class="overflow-x-auto max-h-[300px] custom-scrollbar">
-        <table class="w-full text-left border-collapse text-xs">
+        <table class="w-full text-left border-collapse text-xs min-w-[620px]">
           <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
             <tr>
               <th class="py-2.5 px-3">Nama Produk</th>
@@ -789,7 +805,7 @@
       </div>
 
       <div class="overflow-x-auto max-h-[380px] custom-scrollbar">
-        <table class="w-full text-left border-collapse text-xs">
+        <table class="w-full text-left border-collapse text-xs min-w-[620px]">
           <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
             <tr>
               <th class="py-2.5 px-3">Produk</th>
@@ -827,7 +843,7 @@
       </div>
 
       <div class="overflow-x-auto max-h-[260px] custom-scrollbar">
-        <table class="w-full text-left border-collapse text-xs">
+        <table class="w-full text-left border-collapse text-xs min-w-[620px]">
           <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
             <tr>
               <th class="py-2.5 px-3">No. Retur</th>
@@ -864,7 +880,7 @@
       </div>
 
       <div class="overflow-x-auto max-h-[280px] custom-scrollbar">
-        <table class="w-full text-left border-collapse text-xs">
+        <table class="w-full text-left border-collapse text-xs min-w-[620px]">
           <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
             <tr>
               <th class="py-2.5 px-3">No. SO / Ref</th>
@@ -901,7 +917,7 @@
       </div>
 
       <div class="overflow-x-auto max-h-[280px] custom-scrollbar">
-        <table class="w-full text-left border-collapse text-xs">
+        <table class="w-full text-left border-collapse text-xs min-w-[620px]">
           <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
             <tr>
               <th class="py-2.5 px-3">No. Klerk</th>
@@ -982,7 +998,7 @@
       </div>
 
       <div class="overflow-x-auto max-h-[360px] custom-scrollbar">
-        <table class="w-full text-left border-collapse text-xs">
+        <table class="w-full text-left border-collapse text-xs min-w-[620px]">
           <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
             <tr>
               <th class="py-2.5 px-3">No. Ref / Mutasi</th>
@@ -1042,7 +1058,7 @@
 
       <!-- Tabel LPB -->
       <div class="overflow-x-auto max-h-[400px] custom-scrollbar">
-        <table class="w-full text-left border-collapse text-xs">
+        <table class="w-full text-left border-collapse text-xs min-w-[620px]">
           <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
             <tr>
               <th class="py-2.5 px-3">No. LPB</th>
@@ -1143,7 +1159,7 @@
 
       <!-- Tabel Member Online -->
       <div class="overflow-x-auto max-h-[450px] custom-scrollbar">
-        <table class="w-full text-left border-collapse text-xs">
+        <table class="w-full text-left border-collapse text-xs min-w-[620px]">
           <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
             <tr>
               <th class="py-2.5 px-3">No & ID Member</th>
@@ -3512,7 +3528,7 @@
           </div>
 
           <div class="overflow-x-auto rounded-xl border border-slate-800">
-            <table class="w-full text-left border-collapse text-xs">
+            <table class="w-full text-left border-collapse text-xs min-w-[500px]">
               <thead class="bg-slate-900 text-[10px] font-bold text-slate-400 uppercase">
                 <tr>
                   <th class="py-2 px-3">No</th>

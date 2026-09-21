@@ -114,74 +114,74 @@
         </button>
       </div>
 
-      <!-- Tabel Daftar Belanja Kasir -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col h-[520px]">
+      <!-- Tabel Daftar Belanja Kasir (Tinggi Adaptif di Layar HP 9:16 & 9:18) -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col h-[300px] sm:h-[380px] lg:h-[calc(100vh-210px)] lg:min-h-[460px]">
         
-        <!-- Header Tabel -->
+        <!-- Header Tabel (Kolom Ringkas di Mobile) -->
         <div class="bg-slate-800 text-white text-xs font-bold px-3 py-2.5 grid grid-cols-12 gap-2 uppercase tracking-wider">
-          <span class="col-span-1 text-center">No</span>
-          <span class="col-span-5">Nama Barang & PLU</span>
-          <span class="col-span-2 text-center">Qty</span>
-          <span class="col-span-2 text-right">Harga</span>
-          <span class="col-span-2 text-right">Total</span>
+          <span class="col-span-1 text-center hidden sm:inline">No</span>
+          <span class="col-span-6 sm:col-span-5">Nama Barang & PLU</span>
+          <span class="col-span-3 sm:col-span-2 text-center">Qty</span>
+          <span class="col-span-2 text-right hidden sm:inline">Harga</span>
+          <span class="col-span-3 sm:col-span-2 text-right">Total</span>
         </div>
 
         <!-- Isi Item Belanja (Scrollable) -->
         <div id="mock-cart-table" class="flex-1 overflow-y-auto divide-y divide-slate-100">
           <!-- Item 1 -->
-          <div class="p-3 grid grid-cols-12 gap-2 items-center hover:bg-slate-50 text-xs transition">
-            <span class="col-span-1 text-center font-bold text-slate-400">1</span>
-            <div class="col-span-5 min-w-0">
-              <h4 class="font-extrabold text-slate-900 text-sm truncate">Chitato Sapi Panggang 68g</h4>
-              <p class="text-[10px] text-slate-400 font-mono">8992761111001 • Snack</p>
+          <div class="p-2.5 sm:p-3 grid grid-cols-12 gap-1.5 sm:gap-2 items-center hover:bg-slate-50 text-xs transition">
+            <span class="col-span-1 text-center font-bold text-slate-400 hidden sm:inline">1</span>
+            <div class="col-span-6 sm:col-span-5 min-w-0">
+              <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">Chitato Sapi Panggang 68g</h4>
+              <p class="text-[10px] text-slate-400 font-mono truncate">@11.500 • 8992761111001</p>
             </div>
-            <div class="col-span-2 flex items-center justify-center gap-1.5">
-              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">-</button>
-              <span class="font-black text-sm w-5 text-center">2</span>
-              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">+</button>
+            <div class="col-span-3 sm:col-span-2 flex items-center justify-center gap-1">
+              <button class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+              <span class="font-black text-xs sm:text-sm w-4 sm:w-5 text-center">2</span>
+              <button class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
             </div>
-            <span class="col-span-2 text-right font-mono font-semibold text-slate-600">11.500</span>
-            <div class="col-span-2 text-right font-mono font-extrabold text-slate-900 text-sm flex items-center justify-end gap-1">
-              <span>23.000</span>
-              <button class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-1" title="Hapus item">✕</button>
+            <span class="col-span-2 text-right font-mono font-semibold text-slate-600 hidden sm:inline">11.500</span>
+            <div class="col-span-3 sm:col-span-2 text-right font-mono font-extrabold text-slate-900 text-xs sm:text-sm flex items-center justify-end gap-1">
+              <span class="truncate">23.000</span>
+              <button class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-0.5 cursor-pointer" title="Hapus item">✕</button>
             </div>
           </div>
 
           <!-- Item 2 -->
-          <div class="p-3 grid grid-cols-12 gap-2 items-center hover:bg-slate-50 text-xs transition">
-            <span class="col-span-1 text-center font-bold text-slate-400">2</span>
-            <div class="col-span-5 min-w-0">
-              <h4 class="font-extrabold text-slate-900 text-sm truncate">Aqua Botol 600ml</h4>
-              <p class="text-[10px] text-slate-400 font-mono">8999908001201 • Minuman</p>
+          <div class="p-2.5 sm:p-3 grid grid-cols-12 gap-1.5 sm:gap-2 items-center hover:bg-slate-50 text-xs transition">
+            <span class="col-span-1 text-center font-bold text-slate-400 hidden sm:inline">2</span>
+            <div class="col-span-6 sm:col-span-5 min-w-0">
+              <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">Aqua Botol 600ml</h4>
+              <p class="text-[10px] text-slate-400 font-mono truncate">@3.500 • 8999908001201</p>
             </div>
-            <div class="col-span-2 flex items-center justify-center gap-1.5">
-              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">-</button>
-              <span class="font-black text-sm w-5 text-center">3</span>
-              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">+</button>
+            <div class="col-span-3 sm:col-span-2 flex items-center justify-center gap-1">
+              <button class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+              <span class="font-black text-xs sm:text-sm w-4 sm:w-5 text-center">3</span>
+              <button class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
             </div>
-            <span class="col-span-2 text-right font-mono font-semibold text-slate-600">3.500</span>
-            <div class="col-span-2 text-right font-mono font-extrabold text-slate-900 text-sm flex items-center justify-end gap-1">
-              <span>10.500</span>
-              <button class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-1" title="Hapus item">✕</button>
+            <span class="col-span-2 text-right font-mono font-semibold text-slate-600 hidden sm:inline">3.500</span>
+            <div class="col-span-3 sm:col-span-2 text-right font-mono font-extrabold text-slate-900 text-xs sm:text-sm flex items-center justify-end gap-1">
+              <span class="truncate">10.500</span>
+              <button class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-0.5 cursor-pointer" title="Hapus item">✕</button>
             </div>
           </div>
 
           <!-- Item 3 -->
-          <div class="p-3 grid grid-cols-12 gap-2 items-center hover:bg-slate-50 text-xs transition">
-            <span class="col-span-1 text-center font-bold text-slate-400">3</span>
-            <div class="col-span-5 min-w-0">
-              <h4 class="font-extrabold text-slate-900 text-sm truncate">Beng Beng Cokelat Wafer</h4>
-              <p class="text-[10px] text-slate-400 font-mono">8998866200112 • Biskuit</p>
+          <div class="p-2.5 sm:p-3 grid grid-cols-12 gap-1.5 sm:gap-2 items-center hover:bg-slate-50 text-xs transition">
+            <span class="col-span-1 text-center font-bold text-slate-400 hidden sm:inline">3</span>
+            <div class="col-span-6 sm:col-span-5 min-w-0">
+              <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">Beng Beng Cokelat Wafer</h4>
+              <p class="text-[10px] text-slate-400 font-mono truncate">@3.000 • 8998866200112</p>
             </div>
-            <div class="col-span-2 flex items-center justify-center gap-1.5">
-              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">-</button>
-              <span class="font-black text-sm w-5 text-center">5</span>
-              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">+</button>
+            <div class="col-span-3 sm:col-span-2 flex items-center justify-center gap-1">
+              <button class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+              <span class="font-black text-xs sm:text-sm w-4 sm:w-5 text-center">5</span>
+              <button class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
             </div>
-            <span class="col-span-2 text-right font-mono font-semibold text-slate-600">3.000</span>
-            <div class="col-span-2 text-right font-mono font-extrabold text-slate-900 text-sm flex items-center justify-end gap-1">
-              <span>15.000</span>
-              <button class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-1" title="Hapus item">✕</button>
+            <span class="col-span-2 text-right font-mono font-semibold text-slate-600 hidden sm:inline">3.000</span>
+            <div class="col-span-3 sm:col-span-2 text-right font-mono font-extrabold text-slate-900 text-xs sm:text-sm flex items-center justify-end gap-1">
+              <span class="truncate">15.000</span>
+              <button class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-0.5 cursor-pointer" title="Hapus item">✕</button>
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@
         <!-- Footer Ringkasan Item di Bawah Tabel -->
         <div class="p-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600 font-bold">
           <span>📦 Total: <strong>3 Item (10 pcs)</strong></span>
-          <span class="text-emerald-700">Potongan / Diskon: <strong>Rp 0</strong></span>
+          <span class="text-emerald-700">Diskon: <strong>Rp 0</strong></span>
         </div>
 
       </div>
@@ -197,61 +197,61 @@
     </div>
 
     <!-- KOLOM KANAN (5/12): JUMBO DISPLAY TOTAL & TOMBOL KASIR CEPAT -->
-    <div class="lg:col-span-4 flex flex-col gap-3">
+    <div class="lg:col-span-4 flex flex-col gap-3 w-full">
       
       <!-- JUMBO LED DISPLAY TOTAL BELANJA -->
-      <div class="bg-slate-900 rounded-2xl p-4 sm:p-5 border-2 border-slate-800 shadow-md text-right relative overflow-hidden">
+      <div class="bg-slate-900 rounded-2xl p-3.5 sm:p-5 border-2 border-slate-800 shadow-md text-right relative overflow-hidden">
         <div class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
           <span class="flex items-center gap-1 text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> KASIR AKTIF</span>
           <span>TOTAL BELANJA</span>
         </div>
         <!-- Angka Bebas Neue Raksasa -->
-        <div class="font-bebas text-5xl sm:text-6xl text-amber-400 tracking-wider font-bold leading-none">
+        <div class="font-bebas text-4xl sm:text-6xl text-amber-400 tracking-wider font-bold leading-none truncate">
           Rp 48.500
         </div>
-        <p class="text-[11px] text-slate-400 mt-1 font-mono">Subtotal: Rp 48.500 • Pajak: Rp 0</p>
+        <p class="text-[10px] sm:text-[11px] text-slate-400 mt-1 font-mono truncate">Subtotal: Rp 48.500 • Pajak: Rp 0</p>
       </div>
 
       <!-- Member Card Kasir -->
-      <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">👤</span>
-          <div>
-            <div class="text-xs font-extrabold text-slate-800">Pelanggan Member</div>
-            <p class="text-[10px] text-slate-400 font-mono">0851-5637-xxxx • 150 Poin</p>
+      <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-xl flex-shrink-0">👤</span>
+          <div class="min-w-0">
+            <div class="text-xs font-extrabold text-slate-800 truncate">Pelanggan Member</div>
+            <p class="text-[10px] text-slate-400 font-mono truncate">0851-5637-xxxx • 150 Poin</p>
           </div>
         </div>
-        <button class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold border border-indigo-200 transition">
+        <button class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold border border-indigo-200 transition flex-shrink-0 cursor-pointer">
           Ganti
         </button>
       </div>
 
       <!-- Tombol Tender / Uang Pas Cepat -->
-      <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
+      <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200 shadow-xs">
         <label class="text-[10px] font-black uppercase text-slate-400 tracking-wider block mb-2">Pecahan Cepat Kasir</label>
         <div class="grid grid-cols-4 gap-1.5">
-          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition">Uang Pas</button>
-          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition">50.000</button>
-          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition">70.000</button>
-          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition">100.000</button>
+          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition cursor-pointer">Uang Pas</button>
+          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition cursor-pointer">50.000</button>
+          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition cursor-pointer">70.000</button>
+          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition cursor-pointer">100.000</button>
         </div>
       </div>
 
       <!-- 3 TOMBOL BESAR KASIR (BERSIH & ANTI-SALAH PENCET) -->
       <div class="flex flex-col gap-2">
         <!-- 1. BAYAR SEKARANG (Hijau Raksasa) -->
-        <button class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-lg shadow-lg flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer border-2 border-emerald-400">
+        <button class="w-full py-3.5 sm:py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-base sm:text-lg shadow-lg flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer border-2 border-emerald-400">
           <span>💳</span>
           <span>[F1 / SPASI] BAYAR SEKARANG</span>
         </button>
 
         <!-- 2. TAHAN & VOID -->
         <div class="grid grid-cols-2 gap-2">
-          <button class="py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-extrabold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer">
+          <button class="py-2.5 sm:py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-extrabold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer">
             <span>⏸️</span>
             <span>[F2] PENDING (1)</span>
           </button>
-          <button class="py-3 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-extrabold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer border border-rose-300">
+          <button class="py-2.5 sm:py-3 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-extrabold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer border border-rose-300">
             <span>🗑️</span>
             <span>[F3] VOID / BATAL</span>
           </button>
@@ -261,6 +261,25 @@
     </div>
 
   </main>
+
+  <!-- ================= STICKY BOTTOM BAR KHUSUS HP (9:16 & 9:18 PORTRAIT) ================= -->
+  <div class="lg:hidden sticky bottom-0 left-0 right-0 z-30 bg-slate-900/95 backdrop-blur-md border-t-2 border-slate-700 px-3 sm:px-4 py-2.5 shadow-2xl flex items-center justify-between gap-3 text-white">
+    <div class="min-w-0">
+      <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider truncate">TOTAL TAGIHAN (3 ITEM)</div>
+      <div class="font-bebas text-2xl sm:text-3xl text-amber-400 tracking-wider font-bold leading-none truncate">
+        Rp 48.500
+      </div>
+    </div>
+    <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+      <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 cursor-pointer">
+        Tender ▼
+      </button>
+      <button class="px-4 sm:px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black text-xs sm:text-sm shadow-lg flex items-center gap-1.5 active:scale-95 border border-emerald-400 cursor-pointer">
+        <span>💳</span>
+        <span>BAYAR [F1]</span>
+      </button>
+    </div>
+  </div>
 
   <!-- ================= SIS DRAWER (SISTEM INFORMASI TOKO GAYA ALFAGIFT) ================= -->
   <!-- Drawer Panel yang hanya muncul saat tombol [MENU SIS] ditekan -->
@@ -286,31 +305,31 @@
     <div class="flex-1 overflow-y-auto p-4 space-y-4">
       
       <!-- FITUR BARU EKSKLUSIF: KARTU VALUASI ASET INVENTORI TOKO -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-md border border-slate-700">
-        <div class="flex items-center justify-between mb-3 border-b border-slate-700 pb-2">
-          <span class="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+      <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-3.5 sm:p-4 shadow-md border border-slate-700">
+        <div class="flex items-center justify-between mb-2.5 border-b border-slate-700/80 pb-2">
+          <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5 truncate">
             <span>💎</span>
             <span>VALUASI ASET INVENTORI TOKO (REAL-TIME)</span>
           </span>
-          <span class="text-[10px] text-slate-400 font-mono">145 Jenis SKU</span>
+          <span class="text-[10px] text-slate-400 font-mono flex-shrink-0 ml-1">145 Jenis SKU</span>
         </div>
         
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-            <span class="text-[10px] text-slate-400 font-bold block uppercase">💰 Nilai Modal Aset (HPP)</span>
-            <span class="font-bebas text-2xl text-emerald-400 tracking-wider">Rp 28.650.000</span>
-            <span class="text-[9px] text-slate-400 block mt-0.5">Uang modal tertanam di rak</span>
+        <div class="grid grid-cols-2 gap-2 sm:gap-3">
+          <div class="bg-slate-800/80 p-2 sm:p-2.5 rounded-xl border border-slate-700 min-w-0">
+            <span class="text-[9px] sm:text-[10px] text-slate-400 font-bold block uppercase truncate">💰 Modal Aset (HPP)</span>
+            <span class="font-bebas text-xl sm:text-2xl text-emerald-400 tracking-wider truncate block">Rp 28.650.000</span>
+            <span class="text-[8px] sm:text-[9px] text-slate-400 block mt-0.5 truncate">Modal tertanam di rak</span>
           </div>
-          <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
-            <span class="text-[10px] text-slate-400 font-bold block uppercase">📦 Total Fisik Stok</span>
-            <span class="font-bebas text-2xl text-cyan-400 tracking-wider">3.420 PCS</span>
-            <span class="text-[9px] text-slate-400 block mt-0.5">Seluruh unit barang toko</span>
+          <div class="bg-slate-800/80 p-2 sm:p-2.5 rounded-xl border border-slate-700 min-w-0">
+            <span class="text-[9px] sm:text-[10px] text-slate-400 font-bold block uppercase truncate">📦 Total Fisik Stok</span>
+            <span class="font-bebas text-xl sm:text-2xl text-cyan-400 tracking-wider truncate block">3.420 PCS</span>
+            <span class="text-[8px] sm:text-[9px] text-slate-400 block mt-0.5 truncate">Seluruh unit toko</span>
           </div>
         </div>
 
-        <div class="mt-2.5 pt-2.5 border-t border-slate-700/60 flex items-center justify-between text-xs">
-          <span class="text-slate-300">Potensi Omzet: <strong>Rp 37.800.000</strong></span>
-          <span class="text-amber-400 font-extrabold">Proyeksi Laba: +Rp 9.150.000 (24%)</span>
+        <div class="mt-2.5 pt-2.5 border-t border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] sm:text-xs">
+          <span class="text-slate-300 truncate">Potensi Omzet: <strong>Rp 37.800.000</strong></span>
+          <span class="text-amber-400 font-extrabold truncate">Proyeksi Laba: +Rp 9.150.000 (24%)</span>
         </div>
       </div>
 
