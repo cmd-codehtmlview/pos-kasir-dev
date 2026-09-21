@@ -625,11 +625,11 @@
               🏪
             </div>
             <div class="min-w-0">
-              <h4 class="font-black text-sm text-slate-900">SnackPOS Cloud Retail Edition</h4>
-              <p class="text-[11px] text-slate-500 font-mono mt-0.5">
+              <h4 id="mockup-about-name" class="font-black text-sm text-slate-900">SnackPOS Cloud Retail Edition</h4>
+              <p id="mockup-about-ver" class="text-[11px] text-slate-500 font-mono mt-0.5">
                 Versi: <strong class="text-indigo-600">v2.4.2</strong> • Build: <strong class="text-slate-800">2026.09.22</strong>
               </p>
-              <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] rounded-full uppercase border border-emerald-200">
+              <span id="mockup-about-license" class="inline-block mt-1 px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] rounded-full uppercase border border-emerald-200">
                 Lifetime VPS Enterprise
               </span>
             </div>
@@ -638,7 +638,7 @@
           <div class="grid grid-cols-2 gap-2 text-[11px]">
             <div class="p-2.5 bg-white border border-slate-200 rounded-xl">
               <span class="text-[9px] text-slate-400 font-bold uppercase block">Tim Pengembang</span>
-              <span class="font-extrabold text-slate-800 mt-0.5 block">SnackPOS Engineering Team</span>
+              <span id="mockup-about-dev" class="font-extrabold text-slate-800 mt-0.5 block">SnackPOS Engineering Team</span>
               <span class="text-[9px] text-slate-500 block">Retail System Architecture</span>
             </div>
             <div class="p-2.5 bg-white border border-slate-200 rounded-xl">
@@ -649,7 +649,7 @@
           </div>
 
           <!-- Highlight Fitur Rilis Ini -->
-          <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl space-y-1">
+          <div id="mockup-about-notes" class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl space-y-1">
             <span class="text-[10px] font-bold text-indigo-950 uppercase tracking-wider block">
               ✨ Pembaruan Rilis v2.4.2 (2026.09.22):
             </span>
@@ -670,7 +670,7 @@
             <p class="text-[10px] text-emerald-900/90 leading-relaxed">
               Jika mengalami kendala teknis saat jam operasional toko, hubungi tim support resmi toko via WhatsApp.
             </p>
-            <a href="https://wa.me/6281234567890?text=Halo%20Support%20SnackPOS,%20saya%20butuh%20bantuan%20operasional%20kasir" target="_blank" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition">
+            <a id="mockup-about-wa-link" href="https://wa.me/6281234567890?text=Halo%20Support%20SnackPOS,%20saya%20butuh%20bantuan%20operasional%20kasir" target="_blank" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition">
               <span>💬</span>
               <span>Hubungi WhatsApp Helpdesk Toko</span>
             </a>
@@ -900,6 +900,53 @@
     function openMockupAboutModal() {
       const modal = document.getElementById('mockup-about-modal');
       if (modal) modal.classList.remove('hidden');
+
+      // Sinkronkan data branding dari localStorage jika ada
+      try {
+        const stored = localStorage.getItem("snackpos_about_config");
+        if (stored) {
+          const cfg = JSON.parse(stored);
+          const nameEl = document.getElementById('mockup-about-name');
+          if (nameEl && cfg.appName) nameEl.textContent = cfg.appName;
+
+          const verEl = document.getElementById('mockup-about-ver');
+          if (verEl && cfg.appVersion) {
+            const vMatch = cfg.appVersion.match(/^(v[^\s(]+)(?:\s*\((?:Build\s*)?([^)]+)\))?/i);
+            const verPart = vMatch ? vMatch[1] : cfg.appVersion;
+            const buildPart = vMatch && vMatch[2] ? vMatch[2] : "2026.09.22";
+            verEl.innerHTML = `Versi: <strong class="text-indigo-600">${verPart}</strong> • Build: <strong class="text-slate-800">${buildPart}</strong>`;
+          }
+
+          const devEl = document.getElementById('mockup-about-dev');
+          if (devEl && cfg.devName) devEl.textContent = cfg.devName;
+
+          const licEl = document.getElementById('mockup-about-license');
+          if (licEl && cfg.licenseStatus) licEl.textContent = cfg.licenseStatus;
+
+          const waLink = document.getElementById('mockup-about-wa-link');
+          if (waLink && cfg.helpdeskWa) {
+            const cleanWa = cfg.helpdeskWa.replace(/[^0-9]/g, '');
+            waLink.href = `https://wa.me/${cleanWa}?text=Halo%20Support%20SnackPOS,%20saya%20butuh%20bantuan%20operasional%20kasir`;
+          }
+
+          const notesEl = document.getElementById('mockup-about-notes');
+          if (notesEl && cfg.releaseNotes) {
+            const lines = cfg.releaseNotes.split("\n").filter(l => l.trim().length > 0);
+            const listHtml = lines.map(l => `<li>${l.replace(/^[-*•]\s*/, '')}</li>`).join("");
+            notesEl.innerHTML = `
+              <span class="text-[10px] font-bold text-indigo-950 uppercase tracking-wider block">
+                ✨ Pembaruan Rilis ${cfg.appVersion || 'Terbaru'}:
+              </span>
+              <ul class="text-[10px] text-indigo-900/90 space-y-0.5 list-disc list-inside">
+                ${listHtml}
+              </ul>
+            `;
+          }
+        }
+      } catch (e) {
+        console.warn("Mockup about sync:", e);
+      }
+
       switchMockupAboutTab('info');
     }
 

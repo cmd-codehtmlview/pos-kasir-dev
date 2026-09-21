@@ -456,6 +456,15 @@ async function syncToSupabase(silent = false) {
       console.warn("Gagal tarik member cloud:", pullMbrErr);
     }
 
+    // 6. Tarik Konfigurasi Master Branding & Tentang Aplikasi dari app_config (Pusat Komando Vendor)
+    if (typeof fetchAndApplyAboutConfig === 'function') {
+      try {
+        await fetchAndApplyAboutConfig(supabaseClient);
+      } catch (aboutSyncErr) {
+        console.warn("About config sync skipped:", aboutSyncErr.message);
+      }
+    }
+
     const syncTimeStr = new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     pos.settings.lastSyncTime = syncTimeStr;
     pos.saveSettings();

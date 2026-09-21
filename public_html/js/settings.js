@@ -203,6 +203,7 @@ function loadSettingsToForm() {
   // Tampilkan status lisensi produk
   renderLicenseStatus();
   updateSettingsStatusBadges();
+  if (typeof applyAboutConfigToUI === 'function') applyAboutConfigToUI();
 }
 
 function saveStoreSettings() {
@@ -383,9 +384,12 @@ const ALL_SETTING_SECTIONS = [
 ];
 
 function contactHelpdeskWhatsApp() {
-  const waNum = (pos && pos.settings && pos.settings.helpdeskWa) ? pos.settings.helpdeskWa.replace(/[^0-9]/g, '') : "6281234567890";
+  const currentCfg = (typeof getActiveAboutConfig === 'function') ? getActiveAboutConfig() : null;
+  const configuredWa = document.getElementById("setting-helpdesk-wa")?.value || (pos && pos.settings && pos.settings.helpdeskWa) || (currentCfg ? currentCfg.helpdeskWa : "6281234567890");
+  const waNum = configuredWa.replace(/[^0-9]/g, '') || "6281234567890";
   const storeName = (pos && pos.settings && pos.settings.storeName) ? pos.settings.storeName : "Toko SnackPOS";
-  const text = encodeURIComponent(`Halo Tim Support SnackPOS, saya dari ${storeName} (Terminal POS: v2.4.2). Mohon bantuan teknis operasional kasir.`);
+  const appVer = currentCfg ? currentCfg.appVersion : "v2.4.2";
+  const text = encodeURIComponent(`Halo Tim Support SnackPOS, saya dari ${storeName} (Terminal POS: ${appVer}). Mohon bantuan teknis operasional kasir.`);
   window.open(`https://wa.me/${waNum}?text=${text}`, '_blank');
 }
 
@@ -721,4 +725,129 @@ function jumpToPaymentSettings() {
     setTimeout(() => container.classList.remove('ring-2', 'ring-indigo-500'), 2000);
   }
 }
+
+// ==========================================
+// MASTER BRANDING & ABOUT APLIKASI (CLOUD SYNC)
+// ==========================================
+const DEFAULT_APP_ABOUT_CONFIG = {
+  appName: "SnackPOS Cloud Retail Edition",
+  appVersion: "v2.4.2 (Build 2026.09.22)",
+  devName: "SnackPOS Engineering Team",
+  licenseStatus: "LIFETIME ENTERPRISE",
+  helpdeskWa: "6281234567890",
+  helpdeskEmail: "support@snackpos.local",
+  releaseNotes: "• Fitur Sinkronisasi Otomatis 30 Detik ke Cloud (Indikator Hijau & Manual Push)\n• Pencarian Cepat Produk (Live Typing, Lihat Semua, & Barcode Camera)\n• Valuasi Toko Rapi & Responsif (1 Baris Collapsible)\n• Panduan Lengkap SOP Kasir & Pintasan F1-F12",
+  updatedAt: "2026-09-22T00:00:00.000Z"
+};
+
+function getActiveAboutConfig() {
+  const stored = localStorage.getItem("snackpos_about_config");
+  if (stored) {
+    try {
+      return { ...DEFAULT_APP_ABOUT_CONFIG, ...JSON.parse(stored) };
+    } catch(e) {}
+  }
+  return { ...DEFAULT_APP_ABOUT_CONFIG };
+}
+
+function applyAboutConfigToUI(cfg) {
+  const c = cfg || getActiveAboutConfig();
+
+  // 1. Badge versi di tombol accordion menu setting
+  const badgeVer = document.getElementById("about-badge-version");
+  if (badgeVer) badgeVer.textContent = c.appVersion || DEFAULT_APP_ABOUT_CONFIG.appVersion;
+
+  // 2. Display nama aplikasi & versi di dalam sec-about
+  const nameEl = document.getElementById("about-display-app-name");
+  if (nameEl) nameEl.textContent = c.appName || DEFAULT_APP_ABOUT_CONFIG.appName;
+
+  const verBuildEl = document.getElementById("about-display-version-build");
+  if (verBuildEl) {
+    const vMatch = (c.appVersion || "").match(/^(v[^\s(]+)(?:\s*\((?:Build\s*)?([^)]+)\))?/i);
+    const verPart = vMatch ? vMatch[1] : (c.appVersion || "v2.4.2");
+    const buildPart = vMatch && vMatch[2] ? vMatch[2] : "2026.09.22";
+    verBuildEl.innerHTML = `Versi: <strong class="text-indigo-600">${verPart}</strong> • Build: <strong class="text-slate-700">${buildPart}</strong>`;
+  }
+
+  const licEl = document.getElementById("about-display-license");
+  if (licEl) licEl.textContent = c.licenseStatus || DEFAULT_APP_ABOUT_CONFIG.licenseStatus;
+
+  const devEl = document.getElementById("about-display-dev-name");
+  if (devEl) devEl.textContent = c.devName || DEFAULT_APP_ABOUT_CONFIG.devName;
+
+  // 3. Release Notes
+  const notesContainer = document.getElementById("about-display-release-notes");
+  if (notesContainer && c.releaseNotes) {
+    const lines = c.releaseNotes.split("\n").filter(l => l.trim().length > 0);
+    const listHtml = lines.map(l => `<li>${l.replace(/^[-*•]\s*/, '')}</li>`).join("");
+    notesContainer.innerHTML = `
+      <span class="text-[11px] font-bold text-indigo-950 uppercase tracking-wider block mb-1">
+        ✨ Pembaruan Rilis ${c.appVersion || 'Terbaru'}:
+      </span>
+      <ul class="text-[11px] text-indigo-900/90 space-y-0.5 list-disc list-inside">
+        ${listHtml}
+      </ul>
+    `;
+  }
+
+  // 4. Input kontak WhatsApp & Email Helpdesk di form settings
+  const inputWa = document.getElementById("setting-helpdesk-wa");
+  if (inputWa && (!inputWa.value || inputWa.value === DEFAULT_APP_ABOUT_CONFIG.helpdeskWa)) {
+    if (pos && pos.settings && pos.settings.helpdeskWa) {
+      inputWa.value = pos.settings.helpdeskWa;
+    } else if (c.helpdeskWa) {
+      inputWa.value = c.helpdeskWa;
+    }
+  }
+  const inputEmail = document.getElementById("setting-helpdesk-email");
+  if (inputEmail && (!inputEmail.value || inputEmail.value === DEFAULT_APP_ABOUT_CONFIG.helpdeskEmail)) {
+    if (pos && pos.settings && pos.settings.helpdeskEmail) {
+      inputEmail.value = pos.settings.helpdeskEmail;
+    } else if (c.helpdeskEmail) {
+      inputEmail.value = c.helpdeskEmail;
+    }
+  }
+
+  // 5. Update di mockup-pos.html jika elemen ada
+  const mockupName = document.getElementById("mockup-about-name");
+  if (mockupName) mockupName.textContent = c.appName;
+  const mockupVer = document.getElementById("mockup-about-ver");
+  if (mockupVer) mockupVer.textContent = c.appVersion;
+  const mockupDev = document.getElementById("mockup-about-dev");
+  if (mockupDev) mockupDev.textContent = c.devName;
+}
+
+async function fetchAndApplyAboutConfig(providedClient = null) {
+  applyAboutConfigToUI();
+  const client = providedClient || (typeof supabaseClient !== 'undefined' && supabaseClient) || (typeof window !== 'undefined' && window.supabaseClient);
+  if (!client || !navigator.onLine) return;
+
+  try {
+    const { data, error } = await client
+      .from('app_config')
+      .select('value, updated_at')
+      .eq('key', 'app_about_config')
+      .maybeSingle();
+
+    if (!error && data && data.value) {
+      const merged = { ...DEFAULT_APP_ABOUT_CONFIG, ...data.value };
+      if (data.updated_at) merged.updatedAt = data.updated_at;
+      localStorage.setItem("snackpos_about_config", JSON.stringify(merged));
+      applyAboutConfigToUI(merged);
+    }
+  } catch (e) {
+    console.warn("[About Config] Gagal fetch dari Supabase:", e.message);
+  }
+}
+
+// Inisialisasi awal saat settings.js dimuat
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', () => {
+    applyAboutConfigToUI();
+    setTimeout(() => {
+      fetchAndApplyAboutConfig();
+    }, 1500);
+  });
+}
+
 

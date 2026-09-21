@@ -387,6 +387,80 @@
           </div>
         </div>
 
+        <!-- MASTER BRANDING & ABOUT APLIKASI (CLOUD PUSH KE SELURUH KASIR) -->
+        <div class="p-5 bg-slate-950 border border-slate-800 rounded-2xl space-y-4">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+            <div>
+              <div class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <span>📦</span>
+                <span>Master Branding & Tentang Aplikasi (Cloud Push)</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5">
+                Konfigurasi ini otomatis tersinkron ke seluruh terminal kasir toko (POS Desktop & Mobile SIS).
+              </p>
+            </div>
+            <span id="badge-about-sync-status" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+              Cloud Ready
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+            <div>
+              <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Nama Aplikasi Kasir *</label>
+              <input type="text" id="vendor-app-name" placeholder="SnackPOS Cloud Retail Edition"
+                class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" />
+            </div>
+
+            <div>
+              <label class="block font-bold text-indigo-400 uppercase tracking-wider text-[10px] mb-1">Versi Aplikasi (Format Hibrida) *</label>
+              <input type="text" id="vendor-app-version" placeholder="v2.4.2 (Build 2026.09.22)"
+                class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-emerald-400 font-mono font-bold focus:outline-none focus:border-indigo-500" />
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Nama Tim Pengembang / Vendor *</label>
+              <input type="text" id="vendor-dev-name" placeholder="SnackPOS Engineering Team"
+                class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" />
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Status Lisensi Bawaan</label>
+              <input type="text" id="vendor-license-status" placeholder="LIFETIME ENTERPRISE"
+                class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 font-mono focus:outline-none focus:border-indigo-500" />
+            </div>
+
+            <div>
+              <label class="block font-bold text-emerald-400 uppercase tracking-wider text-[10px] mb-1">Nomor WhatsApp Helpdesk Vendor *</label>
+              <input type="text" id="vendor-helpdesk-wa" placeholder="Contoh: 6281234567890"
+                class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-emerald-400 font-mono focus:outline-none focus:border-emerald-500" />
+              <span class="text-[9px] text-slate-500 mt-0.5 block">Format: diawali 62 tanpa spasi / tanda hubung.</span>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Email Dukungan Teknis</label>
+              <input type="email" id="vendor-helpdesk-email" placeholder="support@snackpos.local"
+                class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Catatan Rilis / Pengumuman Fitur Baru (Tampil di Kasir)</label>
+            <textarea id="vendor-release-notes" rows="4" placeholder="• Fitur 1&#10;• Fitur 2..."
+              class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 font-mono leading-relaxed"></textarea>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+            <span id="vendor-about-last-updated" class="text-[10px] text-slate-500 font-mono">
+              Terakhir diperbarui: Memuat...
+            </span>
+            <button type="button" id="btn-save-about-config" onclick="saveAboutConfigToSupabase()"
+              class="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2 cursor-pointer">
+              <span>💾</span>
+              <span>Simpan & Rilis ke Seluruh Kasir</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Backup & Restore -->
         <div class="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3">
           <div class="text-xs font-bold text-white uppercase tracking-wider">Backup & Export Database Merchant</div>
@@ -1165,6 +1239,7 @@
         activeBtn.className = "tab-btn px-4 py-3 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 flex items-center gap-2 cursor-pointer";
       }
       if (tabId === "whatsapp") renderSelectedTemplate();
+      if (tabId === "settings") loadAboutConfigFromSupabase();
     }
 
     // Helper: Auto Generate Store ID
@@ -1833,6 +1908,160 @@
     }
 
     // ==========================================
+    // MASTER BRANDING & ABOUT APLIKASI (CLOUD PUSH KE SELURUH KASIR)
+    // ==========================================
+    const DEFAULT_ABOUT_CONFIG = {
+      appName: "SnackPOS Cloud Retail Edition",
+      appVersion: "v2.4.2 (Build 2026.09.22)",
+      devName: "SnackPOS Engineering Team",
+      licenseStatus: "LIFETIME ENTERPRISE",
+      helpdeskWa: "6281234567890",
+      helpdeskEmail: "support@snackpos.local",
+      releaseNotes: "• Fitur Sinkronisasi Otomatis 30 Detik ke Cloud (Indikator Hijau & Manual Push)\n• Pencarian Cepat Produk (Live Typing, Lihat Semua, & Barcode Camera)\n• Valuasi Toko Rapi & Responsif (1 Baris Collapsible)\n• Panduan Lengkap SOP Kasir & Pintasan F1-F12",
+      updatedAt: new Date().toISOString()
+    };
+
+    function getLocalAboutConfig() {
+      const stored = localStorage.getItem("snackpos_about_config");
+      if (stored) {
+        try { return { ...DEFAULT_ABOUT_CONFIG, ...JSON.parse(stored) }; } catch(e) {}
+      }
+      return { ...DEFAULT_ABOUT_CONFIG };
+    }
+
+    function renderAboutConfigForm(cfg) {
+      const c = cfg || getLocalAboutConfig();
+      const nameEl = document.getElementById("vendor-app-name");
+      const verEl = document.getElementById("vendor-app-version");
+      const devEl = document.getElementById("vendor-dev-name");
+      const licEl = document.getElementById("vendor-license-status");
+      const waEl = document.getElementById("vendor-helpdesk-wa");
+      const emailEl = document.getElementById("vendor-helpdesk-email");
+      const notesEl = document.getElementById("vendor-release-notes");
+      const updatedEl = document.getElementById("vendor-about-last-updated");
+
+      if (nameEl) nameEl.value = c.appName || DEFAULT_ABOUT_CONFIG.appName;
+      if (verEl) verEl.value = c.appVersion || DEFAULT_ABOUT_CONFIG.appVersion;
+      if (devEl) devEl.value = c.devName || DEFAULT_ABOUT_CONFIG.devName;
+      if (licEl) licEl.value = c.licenseStatus || DEFAULT_ABOUT_CONFIG.licenseStatus;
+      if (waEl) waEl.value = c.helpdeskWa || DEFAULT_ABOUT_CONFIG.helpdeskWa;
+      if (emailEl) emailEl.value = c.helpdeskEmail || DEFAULT_ABOUT_CONFIG.helpdeskEmail;
+      if (notesEl) notesEl.value = c.releaseNotes || DEFAULT_ABOUT_CONFIG.releaseNotes;
+      if (updatedEl) {
+        updatedEl.textContent = c.updatedAt 
+          ? `Terakhir diperbarui: ${new Date(c.updatedAt).toLocaleString('id-ID')}`
+          : `Terakhir diperbarui: Bawaan Sistem`;
+      }
+    }
+
+    async function loadAboutConfigFromSupabase() {
+      renderAboutConfigForm();
+      const client = getSupabaseClientIfAvailable();
+      if (!client || !navigator.onLine) return;
+
+      try {
+        const badge = document.getElementById("badge-about-sync-status");
+        if (badge) badge.textContent = "Checking Cloud...";
+
+        const { data, error } = await client
+          .from('app_config')
+          .select('value, updated_at')
+          .eq('key', 'app_about_config')
+          .maybeSingle();
+
+        if (!error && data && data.value) {
+          const merged = { ...DEFAULT_ABOUT_CONFIG, ...data.value };
+          if (data.updated_at) merged.updatedAt = data.updated_at;
+          localStorage.setItem("snackpos_about_config", JSON.stringify(merged));
+          renderAboutConfigForm(merged);
+          if (badge) {
+            badge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+            badge.textContent = "Synced with Cloud";
+          }
+        } else {
+          if (badge) {
+            badge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30";
+            badge.textContent = "Using Local Defaults";
+          }
+        }
+      } catch (err) {
+        console.warn("[Vendor About] Gagal load dari cloud:", err);
+      }
+    }
+
+    async function saveAboutConfigToSupabase() {
+      const btn = document.getElementById("btn-save-about-config");
+      const origBtnText = btn ? btn.innerHTML : "";
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>⏳</span><span>Menyimpan ke Cloud...</span>`;
+      }
+
+      const appName = document.getElementById("vendor-app-name")?.value.trim() || DEFAULT_ABOUT_CONFIG.appName;
+      const appVersion = document.getElementById("vendor-app-version")?.value.trim() || DEFAULT_ABOUT_CONFIG.appVersion;
+      const devName = document.getElementById("vendor-dev-name")?.value.trim() || DEFAULT_ABOUT_CONFIG.devName;
+      const licenseStatus = document.getElementById("vendor-license-status")?.value.trim() || DEFAULT_ABOUT_CONFIG.licenseStatus;
+      const helpdeskWa = (document.getElementById("vendor-helpdesk-wa")?.value || "").replace(/[^0-9]/g, '') || DEFAULT_ABOUT_CONFIG.helpdeskWa;
+      const helpdeskEmail = document.getElementById("vendor-helpdesk-email")?.value.trim() || DEFAULT_ABOUT_CONFIG.helpdeskEmail;
+      const releaseNotes = document.getElementById("vendor-release-notes")?.value.trim() || DEFAULT_ABOUT_CONFIG.releaseNotes;
+
+      const configObj = {
+        appName,
+        appVersion,
+        devName,
+        licenseStatus,
+        helpdeskWa,
+        helpdeskEmail,
+        releaseNotes,
+        updatedAt: new Date().toISOString()
+      };
+
+      localStorage.setItem("snackpos_about_config", JSON.stringify(configObj));
+      renderAboutConfigForm(configObj);
+
+      const client = getSupabaseClientIfAvailable();
+      let cloudOk = false;
+
+      if (client && navigator.onLine) {
+        try {
+          const { error } = await client.from('app_config').upsert({
+            key: 'app_about_config',
+            value: configObj,
+            updated_at: configObj.updatedAt
+          }, { onConflict: 'key' });
+
+          if (error) {
+            console.warn("[Vendor About] Gagal upsert ke app_config:", error.message);
+          } else {
+            cloudOk = true;
+          }
+        } catch (err) {
+          console.warn("[Vendor About] Exception upsert:", err.message);
+        }
+      }
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origBtnText;
+      }
+
+      const badge = document.getElementById("badge-about-sync-status");
+      if (cloudOk) {
+        if (badge) {
+          badge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+          badge.textContent = "Pushed to Cloud";
+        }
+        showToast("✅ Berhasil! Konfigurasi Tentang Aplikasi berhasil dipublikasikan ke seluruh kasir!", "success");
+      } else {
+        if (badge) {
+          badge.className = "px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30";
+          badge.textContent = "Saved Locally";
+        }
+        showToast("Disimpan lokal di browser vendor (Supabase offline/belum terhubung).", "info");
+      }
+    }
+
+    // ==========================================
     // PAYMENT & WHATSAPP VENDOR MANAGEMENT (SUPABASE CLOUD SYNCED)
     // ==========================================
     let cachedPaymentConfig = null;
@@ -2390,6 +2619,7 @@
       updateGatewayHeaderButton();
       fetchPaymentConfigFromSupabase();
       loadCloudPricingIfAvailable();
+      loadAboutConfigFromSupabase();
       syncFromSupabaseIfAvailable(true);
     }
 
