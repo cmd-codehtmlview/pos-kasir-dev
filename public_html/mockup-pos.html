@@ -45,33 +45,38 @@
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col select-none">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col select-none">
 
-  <!-- ================= TOP HEADER ================= -->
-  <header class="bg-[#c1121f] text-white shadow-xs sticky top-0 z-30 border-b border-red-800/40">
+  <!-- ================= TOP HEADER (Clean White & Modern SaaS Palette) ================= -->
+  <header class="bg-white text-slate-800 shadow-xs sticky top-0 z-30 border-b border-slate-200/90">
     <div class="max-w-7xl mx-auto px-2.5 sm:px-4 py-2 flex items-center justify-between gap-2">
       
       <!-- Kiri: Brand & Info Kasir Aktif -->
-      <div class="flex items-center gap-2 min-w-0">
-        <div class="w-8 h-8 rounded-xl bg-white text-retail-red flex items-center justify-center font-black text-sm shadow-xs border border-red-200 flex-shrink-0">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm shadow-xs flex-shrink-0">
           🛍️
         </div>
         <div class="min-w-0">
-          <h1 class="font-black text-xs sm:text-sm tracking-tight leading-tight truncate">TOKO SNACK BERKAH</h1>
-          <p class="text-[10px] text-red-100/90 flex items-center gap-1 font-medium leading-tight truncate">
-            <span>👤 Budi</span>
-            <span class="opacity-40">•</span>
+          <div class="flex items-center gap-2">
+            <h1 class="font-black text-xs sm:text-sm tracking-tight text-slate-900 leading-tight truncate">TOKO SNACK BERKAH</h1>
+            <span class="hidden md:inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[9px] font-bold border border-emerald-200/80">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> DB Aktif
+            </span>
+          </div>
+          <p class="text-[10px] text-slate-500 flex items-center gap-1 font-medium leading-tight truncate mt-0.5">
+            <span class="font-semibold text-slate-700">👤 Budi</span>
+            <span class="text-slate-300">•</span>
             <span>Shift 1</span>
           </p>
         </div>
       </div>
 
       <!-- Tengah: Jam Digital, Hari, Tanggal, Bulan, Tahun & Detik Bahasa Indonesia -->
-      <div class="flex flex-col items-center justify-center text-center px-2.5 py-1 rounded-xl bg-black/20 border border-white/20 shadow-xs flex-shrink-0">
-        <span id="header-date" class="text-[9px] sm:text-[10px] text-red-100 font-semibold tracking-tight leading-none">
+      <div class="flex flex-col items-center justify-center text-center px-3 py-1 rounded-xl bg-slate-100/90 border border-slate-200/80 shadow-2xs flex-shrink-0">
+        <span id="header-date" class="text-[9px] sm:text-[10px] text-slate-500 font-semibold tracking-tight leading-none">
           --
         </span>
-        <span id="header-clock" class="text-xs sm:text-sm font-mono font-black text-white tracking-widest leading-tight mt-0.5">
+        <span id="header-clock" class="text-xs sm:text-sm font-mono font-black text-slate-900 tracking-widest leading-tight mt-0.5">
           --:--:--
         </span>
       </div>
@@ -83,11 +88,11 @@
         <div 
           id="status-indicator" 
           onclick="triggerMockupManualSync()" 
-          class="h-8 px-2.5 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-[10px] font-semibold text-white cursor-pointer active:scale-95 transition flex items-center gap-1.5 shadow-xs" 
+          class="h-8 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-700 cursor-pointer active:scale-95 transition flex items-center gap-1.5 shadow-2xs" 
           title="Cloud Terhubung • Klik untuk Update Data"
         >
-          <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
-          <span id="status-label" class="hidden sm:inline text-[10px] font-mono font-bold text-emerald-300">AUTO 30s</span>
+          <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"></span>
+          <span id="status-label" class="hidden sm:inline text-[10px] font-mono font-bold text-emerald-700">AUTO 30s</span>
         </div>
 
         <!-- Ikon Flat Printer Thermal Minimalis (Klik untuk Rekonek Cepat) -->
@@ -95,7 +100,7 @@
           id="header-printer-btn"
           type="button"
           onclick="triggerQuickPrinterReconnect()"
-          class="h-8 w-8 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-white/90 hover:text-white transition active:scale-95 flex items-center justify-center cursor-pointer shadow-xs relative"
+          class="h-8 w-8 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-700 hover:text-slate-900 transition active:scale-95 flex items-center justify-center cursor-pointer shadow-2xs relative"
           title="Printer Bluetooth • Klik untuk Sambungkan Kembali (Rekonek)"
         >
           <!-- Flat Clean SVG Printer Icon -->
@@ -105,16 +110,19 @@
             <rect x="6" y="14" width="12" height="8"></rect>
           </svg>
           <!-- Micro Dot Status -->
-          <span id="printer-status-dot" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-1.5 ring-red-600 animate-pulse"></span>
+          <span id="printer-status-dot" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-1.5 ring-white animate-pulse"></span>
         </button>
 
         <!-- Tombol SIS Minimalis -->
         <button 
           onclick="toggleSisDrawer()" 
-          class="h-8 px-3 bg-white/20 hover:bg-white text-white hover:text-retail-red rounded-xl font-black text-xs transition active:scale-95 border border-white/40 cursor-pointer flex items-center justify-center tracking-wider shadow-xs" 
+          class="h-8 px-3 bg-slate-900 hover:bg-black text-white rounded-xl font-black text-xs transition active:scale-95 shadow-xs cursor-pointer flex items-center gap-1.5 tracking-wider" 
           title="Buka Menu Sistem Informasi Toko (SIS)"
         >
-          SIS
+          <svg class="w-3.5 h-3.5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <span>SIS</span>
         </button>
 
       </div>
@@ -1846,25 +1854,25 @@
       if (!dot) return;
 
       if (status === "online") {
-        dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
+        dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0";
         if (labelEl) {
           labelEl.textContent = label || "AUTO 30s";
-          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300";
+          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-700";
         }
         if (container) container.title = `Cloud Terhubung • Auto-Sync Tiap 30 Detik • Terakhir: ${mockupLastSyncTime} • Klik untuk Sinkron Manual`;
         if (drawerSync) drawerSync.textContent = `Sync: ${mockupLastSyncTime}`;
       } else if (status === "syncing") {
-        dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
+        dot.className = "w-2 h-2 rounded-full bg-amber-500 animate-ping flex-shrink-0";
         if (labelEl) {
           labelEl.textContent = "SYNC...";
-          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-amber-300";
+          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-amber-700";
         }
         if (container) container.title = "Sedang menyinkronkan data penjualan, LPB, retur & stock opname...";
       } else {
         dot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.8)]";
         if (labelEl) {
           labelEl.textContent = "OFFLINE";
-          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-rose-300";
+          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-rose-600";
         }
         if (container) container.title = "Status: Terputus / Offline (Mode Kasir Standalone)";
       }
@@ -1878,7 +1886,7 @@
       const toast = document.createElement("div");
       toast.id = "mockup-pos-toast";
       const bgClass = type === "success" 
-        ? "bg-emerald-950 text-emerald-200 border-emerald-500/50" 
+        ? "bg-slate-900 text-emerald-300 border-slate-700" 
         : type === "info"
         ? "bg-slate-900 text-slate-100 border-slate-700"
         : "bg-rose-950 text-rose-200 border-rose-500/50";
@@ -1900,16 +1908,16 @@
       if (isPrinterReconnecting) return;
       isPrinterReconnecting = true;
       const dot = document.getElementById('printer-status-dot');
-      if (dot) dot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-1.5 ring-red-600 animate-ping";
+      if (dot) dot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-500 ring-1.5 ring-white animate-ping";
       showMockupToast("Menghubungkan ke printer...", "info");
 
       try {
         // Simulasi auto-reconnect ke Bluetooth device ID terakhir yang tersimpan
         await new Promise(r => setTimeout(r, 800));
-        if (dot) dot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-1.5 ring-red-600 animate-pulse";
+        if (dot) dot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-1.5 ring-white animate-pulse";
         showMockupToast("Printer terhubung", "success");
       } catch (err) {
-        if (dot) dot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500 ring-1.5 ring-red-600";
+        if (dot) dot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500 ring-1.5 ring-white";
         showMockupToast("Gagal menyambungkan ke printer", "error");
       } finally {
         isPrinterReconnecting = false;
