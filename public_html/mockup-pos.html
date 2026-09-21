@@ -82,9 +82,9 @@
         <!-- Dot Status Online (Hijau 30s) / Offline (Merah) -->
         <div 
           id="status-indicator" 
-          onclick="triggerMockupManualSync()" 
+          onclick="openSisModal('sis-modal-sync')" 
           class="h-8 px-2.5 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-[10px] font-semibold text-white cursor-pointer active:scale-95 transition flex items-center gap-1.5 shadow-xs" 
-          title="Cloud Terhubung • Sinkron Otomatis Tiap 30 Detik • Klik untuk Sinkron Manual Sekarang"
+          title="Status Sinkronisasi Cloud • Klik untuk Buka Status Sinkron"
         >
           <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
           <span id="status-label" class="hidden sm:inline text-[10px] font-mono font-bold text-emerald-300">AUTO 30s</span>
@@ -1788,6 +1788,72 @@
     </div>
   </div>
 
+  <!-- ================= 17. MODAL SINKRONISASI DATA CLOUD (SIMPEL) ================= -->
+  <div id="sis-modal-sync" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-[60] hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <!-- Header -->
+      <div class="p-4 bg-gradient-to-r from-emerald-700 to-teal-800 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">☁️</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Sinkronisasi Cloud</h3>
+            <p class="text-[11px] text-emerald-100">Status Data Toko & Server</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-sync')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <!-- Body Simpel -->
+      <div class="p-4 space-y-3 text-xs">
+        <!-- Status Banner -->
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+            <div>
+              <span class="block font-black text-emerald-950 text-xs uppercase">Database Online</span>
+              <span class="text-[10px] text-emerald-700 font-medium">Terhubung ke Cloud Server</span>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-lg border border-emerald-300">
+            AUTO 30s
+          </span>
+        </div>
+
+        <!-- Info Waktu & Antrean Data -->
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5 font-mono text-[11px]">
+          <div class="flex justify-between text-slate-600">
+            <span>Terakhir Sinkron:</span>
+            <strong id="sync-modal-last-time" class="text-slate-900 font-bold">Baru Saja</strong>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Antrean Offline:</span>
+            <strong class="text-emerald-700 font-bold">0 Pending (Aman)</strong>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Katalog & Harga:</span>
+            <strong class="text-indigo-700 font-bold">Up-to-date</strong>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi Sinkron Manual -->
+        <button 
+          id="btn-sync-modal-action"
+          type="button" 
+          onclick="runModalManualSync()" 
+          class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <span id="sync-icon-spinner">🔄</span>
+          <span id="sync-btn-text">Sinkronkan Data Sekarang</span>
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeSisModal('sis-modal-sync')" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs cursor-pointer">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
     const INDO_DAYS = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -1893,6 +1959,24 @@
       } finally {
         isMockupSyncing = false;
       }
+    }
+
+    async function runModalManualSync() {
+      const btn = document.getElementById('btn-sync-modal-action');
+      const icon = document.getElementById('sync-icon-spinner');
+      const text = document.getElementById('sync-btn-text');
+      const timeEl = document.getElementById('sync-modal-last-time');
+
+      if (icon) icon.className = "inline-block animate-spin";
+      if (text) text.textContent = "Menyinkronkan data cloud...";
+      if (btn) btn.disabled = true;
+
+      await triggerMockupManualSync();
+
+      if (icon) icon.className = "";
+      if (text) text.textContent = "Sinkronkan Data Sekarang";
+      if (btn) btn.disabled = false;
+      if (timeEl) timeEl.textContent = mockupLastSyncTime || "Baru Saja";
     }
 
     // Auto-Sync Otomatis Tiap 30 Detik (Di Latar Belakang)
@@ -2176,6 +2260,14 @@
         // Jika membuka klerk, reset form ke mode input fisik
         if (modalId === 'sis-modal-klerk') {
           resetKlerkForm();
+        }
+
+        // Jika membuka modal sinkronisasi, perbarui info waktu
+        if (modalId === 'sis-modal-sync') {
+          const timeEl = document.getElementById('sync-modal-last-time');
+          if (timeEl && mockupLastSyncTime !== "--:--:--") {
+            timeEl.textContent = mockupLastSyncTime;
+          }
         }
       }
     }
