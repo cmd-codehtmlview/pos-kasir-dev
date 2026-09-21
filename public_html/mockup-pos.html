@@ -560,9 +560,15 @@
             <span class="text-base">💳</span>
             <span>QRIS & Pembayaran</span>
           </button>
-          <button class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800">
-            <span class="text-base">🔐</span>
-            <span>PIN Kasir & Akses</span>
+          <button onclick="openMockupAboutModal()" class="col-span-2 p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center justify-between text-xs font-bold text-slate-800 cursor-pointer">
+            <div class="flex items-center gap-2">
+              <span class="text-base">ℹ️</span>
+              <div>
+                <span class="block text-xs font-bold text-slate-900">Tentang Aplikasi & Panduan Kasir</span>
+                <span class="text-[10px] text-slate-400 font-mono font-normal">v2.4.2 (Build 2026.09.22)</span>
+              </div>
+            </div>
+            <span class="text-slate-400 text-xs font-bold">›</span>
           </button>
         </div>
       </div>
@@ -581,6 +587,161 @@
       </button>
     </div>
 
+  </div>
+
+  <!-- ================= MODAL TENTANG APLIKASI & PANDUAN KASIR ================= -->
+  <div id="mockup-about-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <!-- Modal Header -->
+      <div class="p-4 bg-gradient-to-r from-retail-red to-red-700 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">ℹ️</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Tentang SnackPOS & Panduan</h3>
+            <p class="text-[11px] text-red-100">Informasi Sistem Ritel & Panduan Penggunaan Kasir</p>
+          </div>
+        </div>
+        <button onclick="closeMockupAboutModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="p-2 bg-slate-100 border-b border-slate-200 flex gap-1">
+        <button id="tab-btn-about-info" onclick="switchMockupAboutTab('info')" class="flex-1 py-2 rounded-xl text-xs font-black transition bg-white text-retail-red shadow-xs cursor-pointer">
+          ℹ️ Tentang Aplikasi
+        </button>
+        <button id="tab-btn-about-guide" onclick="switchMockupAboutTab('guide')" class="flex-1 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer">
+          📖 Panduan Kasir (F1-F12)
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-4 overflow-y-auto space-y-4 flex-1 text-xs">
+        
+        <!-- PANEL 1: INFORMASI APLIKASI & PENGEMBANG -->
+        <div id="panel-about-info" class="space-y-3">
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-retail-red to-red-700 text-white flex items-center justify-center text-2xl font-black shadow-xs shrink-0">
+              🏪
+            </div>
+            <div class="min-w-0">
+              <h4 class="font-black text-sm text-slate-900">SnackPOS Cloud Retail Edition</h4>
+              <p class="text-[11px] text-slate-500 font-mono mt-0.5">
+                Versi: <strong class="text-indigo-600">v2.4.2</strong> • Build: <strong class="text-slate-800">2026.09.22</strong>
+              </p>
+              <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] rounded-full uppercase border border-emerald-200">
+                Lifetime VPS Enterprise
+              </span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div class="p-2.5 bg-white border border-slate-200 rounded-xl">
+              <span class="text-[9px] text-slate-400 font-bold uppercase block">Tim Pengembang</span>
+              <span class="font-extrabold text-slate-800 mt-0.5 block">SnackPOS Engineering Team</span>
+              <span class="text-[9px] text-slate-500 block">Retail System Architecture</span>
+            </div>
+            <div class="p-2.5 bg-white border border-slate-200 rounded-xl">
+              <span class="text-[9px] text-slate-400 font-bold uppercase block">Konektivitas</span>
+              <span class="font-extrabold text-slate-800 mt-0.5 block">Cloud & Offline-First</span>
+              <span class="text-[9px] text-emerald-600 font-bold block">Auto-Sync 30s Aktif</span>
+            </div>
+          </div>
+
+          <!-- Highlight Fitur Rilis Ini -->
+          <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl space-y-1">
+            <span class="text-[10px] font-bold text-indigo-950 uppercase tracking-wider block">
+              ✨ Pembaruan Rilis v2.4.2 (2026.09.22):
+            </span>
+            <ul class="text-[10px] text-indigo-900/90 space-y-0.5 list-disc list-inside">
+              <li>Auto-sync cloud realtime setiap 30 detik untuk seluruh transaksi.</li>
+              <li>Pencarian produk live & tombol minimalis scan kamera (📷) / katalog (📋).</li>
+              <li>Tombol tambah produk ergonomis tepat di samping nama produk.</li>
+              <li>Sub-menu Valuasi Inventori 1-baris expandable bertema putih bersih.</li>
+            </ul>
+          </div>
+
+          <!-- Bantuan & Helpdesk WhatsApp -->
+          <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-emerald-950 text-[11px]">Layanan Bantuan & Dukungan Teknis:</span>
+              <span class="text-[9px] text-emerald-800 font-mono">Helpdesk Siaga</span>
+            </div>
+            <p class="text-[10px] text-emerald-900/90 leading-relaxed">
+              Jika mengalami kendala teknis saat jam operasional toko, hubungi tim support resmi toko via WhatsApp.
+            </p>
+            <a href="https://wa.me/6281234567890?text=Halo%20Support%20SnackPOS,%20saya%20butuh%20bantuan%20operasional%20kasir" target="_blank" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition">
+              <span>💬</span>
+              <span>Hubungi WhatsApp Helpdesk Toko</span>
+            </a>
+          </div>
+
+          <div class="text-center text-[10px] text-slate-400 pt-1">
+            © 2026 SnackPOS Retail System. All rights reserved.
+          </div>
+        </div>
+
+        <!-- PANEL 2: PANDUAN KASIR & SHORTCUT KEYBOARD -->
+        <div id="panel-about-guide" class="space-y-3 hidden">
+          <span class="text-[11px] font-black text-slate-700 uppercase tracking-wider block">
+            ⌨️ Shortcut Keyboard Kasir (F1 - F12):
+          </span>
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+              <span class="px-2 py-0.5 bg-emerald-600 text-white font-mono font-bold text-[10px] rounded">[F1]</span>
+              <span class="font-bold text-slate-800">Bayar / Tender</span>
+            </div>
+            <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+              <span class="px-2 py-0.5 bg-amber-500 text-slate-950 font-mono font-bold text-[10px] rounded">[F2]</span>
+              <span class="font-bold text-slate-800">Pending Belanja</span>
+            </div>
+            <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+              <span class="px-2 py-0.5 bg-rose-600 text-white font-mono font-bold text-[10px] rounded">[F3]</span>
+              <span class="font-bold text-slate-800">Void / Batal</span>
+            </div>
+            <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+              <span class="px-2 py-0.5 bg-blue-600 text-white font-mono font-bold text-[10px] rounded">[F4]</span>
+              <span class="font-bold text-slate-800">Tambah Member</span>
+            </div>
+            <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+              <span class="px-2 py-0.5 bg-teal-600 text-white font-mono font-bold text-[10px] rounded">[F9]</span>
+              <span class="font-bold text-slate-800">Manual Sync</span>
+            </div>
+            <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+              <span class="px-2 py-0.5 bg-purple-600 text-white font-mono font-bold text-[10px] rounded">[F10]</span>
+              <span class="font-bold text-slate-800">Laporan Omzet</span>
+            </div>
+            <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2 col-span-2">
+              <span class="px-2 py-0.5 bg-slate-800 text-white font-mono font-bold text-[10px] rounded">[F11]</span>
+              <span class="font-bold text-slate-800">Closing Kasir (Klerk Shift)</span>
+            </div>
+          </div>
+
+          <!-- 5 Langkah SOP Operasional Kasir -->
+          <div class="pt-2 border-t border-slate-100 space-y-1.5">
+            <span class="text-[11px] font-black text-slate-700 uppercase tracking-wider block">
+              📋 5 Langkah Cepat Transaksi Kasir:
+            </span>
+            <div class="p-2 bg-slate-50 rounded-xl border border-slate-200 text-[10px] text-slate-700 space-y-1">
+              <p><strong>1. Awal Shift:</strong> Input modal awal kasir sebelum melayani pembeli.</p>
+              <p><strong>2. Scan Produk:</strong> Arahkan barcode ke pemindai atau ketik nama pada live search.</p>
+              <p><strong>3. Input Member:</strong> Tekan F4 atau tombol member jika ada kartu/nomor HP pelanggan.</p>
+              <p><strong>4. Pembayaran [F1]:</strong> Pilih Tunai, QRIS, atau Transfer, lalu input uang diterima.</p>
+              <p><strong>5. Akhir Shift [F11]:</strong> Hitung fisik uang kasir, lakukan closing klerk, cetak struk rekap.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeMockupAboutModal()" class="px-5 py-2 bg-slate-800 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer transition">
+          Tutup
+        </button>
+      </div>
+
+    </div>
   </div>
 
   <script>
@@ -732,6 +893,45 @@
           content.classList.add('hidden');
           if (chevron) chevron.style.transform = 'rotate(0deg)';
         }
+      }
+    }
+
+    // Modal Tentang Aplikasi & Panduan Kasir
+    function openMockupAboutModal() {
+      const modal = document.getElementById('mockup-about-modal');
+      if (modal) modal.classList.remove('hidden');
+      switchMockupAboutTab('info');
+    }
+
+    function closeMockupAboutModal() {
+      const modal = document.getElementById('mockup-about-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function switchMockupAboutTab(tab) {
+      const btnInfo = document.getElementById('tab-btn-about-info');
+      const btnGuide = document.getElementById('tab-btn-about-guide');
+      const panelInfo = document.getElementById('panel-about-info');
+      const panelGuide = document.getElementById('panel-about-guide');
+
+      if (tab === 'info') {
+        if (btnInfo) {
+          btnInfo.className = "flex-1 py-2 rounded-xl text-xs font-black transition bg-white text-retail-red shadow-xs cursor-pointer";
+        }
+        if (btnGuide) {
+          btnGuide.className = "flex-1 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer";
+        }
+        if (panelInfo) panelInfo.classList.remove('hidden');
+        if (panelGuide) panelGuide.classList.add('hidden');
+      } else {
+        if (btnGuide) {
+          btnGuide.className = "flex-1 py-2 rounded-xl text-xs font-black transition bg-white text-retail-red shadow-xs cursor-pointer";
+        }
+        if (btnInfo) {
+          btnInfo.className = "flex-1 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer";
+        }
+        if (panelGuide) panelGuide.classList.remove('hidden');
+        if (panelInfo) panelInfo.classList.add('hidden');
       }
     }
 

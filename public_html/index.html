@@ -1791,7 +1791,180 @@
           <span class="text-xs">🔒</span>
           <h3 class="text-xs font-black text-slate-500 uppercase tracking-wider">Sistem, Lisensi & Keamanan Data</h3>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden divide-y divide-slate-100">
+          <!-- SUB-MENU: TENTANG APLIKASI, VERSI & PANDUAN KASIR -->
+          <div id="setting-item-sec-about" class="setting-item transition-colors">
+            
+            <button 
+              type="button" 
+              onclick="toggleSettingSection('sec-about')" 
+              class="w-full px-4 sm:px-5 py-3.5 flex items-center justify-between hover:bg-slate-50/90 transition-colors text-left cursor-pointer focus:outline-none"
+            >
+              <div class="flex items-center gap-3 min-w-0 pr-2">
+                <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base shrink-0">ℹ️</span>
+                <span class="font-black text-xs sm:text-sm text-slate-900 truncate">Tentang Aplikasi, Versi & Panduan Kasir</span>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-100 text-blue-800">v2.4.2 (Build 2026.09.22)</span>
+                <span id="chevron-sec-about" class="text-slate-400 font-bold text-xs transition-transform duration-200">▼</span>
+              </div>
+            </button>
+            
+            <div id="content-sec-about" class="hidden p-4 sm:p-5 bg-slate-50/30 border-t border-slate-100 space-y-4">
+              
+              <!-- INFORMASI IDENTITAS & VERSI APLIKASI -->
+              <div class="p-4 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-3">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                  <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-retail-red to-red-700 text-white flex items-center justify-center text-2xl font-black shadow-xs shrink-0">
+                      🏪
+                    </div>
+                    <div>
+                      <h4 class="text-sm sm:text-base font-black text-slate-900 leading-tight">SnackPOS Cloud Retail Edition</h4>
+                      <p class="text-xs text-slate-500 font-mono mt-0.5">Versi: <strong class="text-indigo-600">v2.4.2</strong> • Build: <strong class="text-slate-700">2026.09.22</strong></p>
+                    </div>
+                  </div>
+                  <span class="px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-black shrink-0">
+                    LIFETIME ENTERPRISE
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                  <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block">Tim Pengembang</span>
+                    <span class="font-extrabold text-slate-800 mt-0.5 block">SnackPOS Engineering Team</span>
+                    <span class="text-[10px] text-slate-500 block mt-0.5">Retail Software Architecture</span>
+                  </div>
+                  <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block">Arsitektur Sistem</span>
+                    <span class="font-extrabold text-slate-800 mt-0.5 block">Real-Time Cloud & Offline-First</span>
+                    <span class="text-[10px] text-emerald-600 font-bold block mt-0.5">Auto-Sync 30 Detik Aktif</span>
+                  </div>
+                  <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block">Hak Cipta</span>
+                    <span class="font-extrabold text-slate-800 mt-0.5 block">© 2026 SnackPOS Retail System</span>
+                    <span class="text-[10px] text-slate-500 block mt-0.5">All Rights Reserved</span>
+                  </div>
+                </div>
+
+                <!-- CATATAN RILIS FITUR TERBARU -->
+                <div class="p-3 bg-indigo-50/60 border border-indigo-100 rounded-xl">
+                  <span class="text-[11px] font-bold text-indigo-950 uppercase tracking-wider block mb-1">
+                    ✨ Pembaruan Rilis v2.4.2 (22 September 2026):
+                  </span>
+                  <ul class="text-[11px] text-indigo-900/90 space-y-0.5 list-disc list-inside">
+                    <li>Sinkronisasi data otomatis ke cloud tiap 30 detik & manual sync F9.</li>
+                    <li>Live search produk dengan tombol minimalis Lihat Semua (📋) dan Scan Kamera (📷).</li>
+                    <li>Tombol tambah produk diletakkan ergonomis di samping nama produk.</li>
+                    <li>Valuasi aset inventori 1-baris expandable dengan tema putih rapi.</li>
+                    <li>Optimasi tampilan kasir mobile rasio 9:16 & 9:18 tanpa tombol ganda.</li>
+                  </ul>
+                </div>
+
+                <!-- KONFIGURASI LAYANAN HELPDESK TOKO (BISA DIEDIT DEVELOPER / OWNER) -->
+                <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                      <span>🎧</span>
+                      <span>Konfigurasi Kontak Bantuan / Helpdesk Toko</span>
+                    </span>
+                    <span class="text-[10px] text-slate-400">Dapat disesuaikan oleh Toko</span>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Bantuan Toko</label>
+                      <input type="text" id="setting-helpdesk-wa" placeholder="Contoh: 6281234567890" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl bg-white font-mono" />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-700 mb-1">Email Dukungan Teknis</label>
+                      <input type="email" id="setting-helpdesk-email" placeholder="helpdesk@toko.com" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl bg-white" />
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between pt-1">
+                    <button type="button" onclick="contactHelpdeskWhatsApp()" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs">
+                      <span>💬</span>
+                      <span>Tes Chat WhatsApp Bantuan</span>
+                    </button>
+                    <button type="button" onclick="saveStoreSettings()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold cursor-pointer shadow-xs">
+                      Simpan Kontak
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PANDUAN PENGGUNAAN KASIR & SHORTCUT KEYBOARD -->
+              <div class="p-4 bg-white border border-slate-200 rounded-2xl shadow-xs space-y-3">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <h4 class="text-xs sm:text-sm font-black text-slate-900 flex items-center gap-1.5">
+                    <span>📖</span>
+                    <span>Panduan Pengoperasian Kasir & Shortcut Keyboard</span>
+                  </h4>
+                  <span class="text-[10px] text-slate-400 font-mono">F1 - F12 Retail Standard</span>
+                </div>
+
+                <!-- DAFTAR SHORTCUT KEYBOARD F-KEYS -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-xs">
+                  <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+                    <span class="px-2 py-1 bg-emerald-600 text-white font-mono font-black text-[11px] rounded-lg">[F1]</span>
+                    <span class="font-bold text-slate-800">Bayar / Tender</span>
+                  </div>
+                  <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+                    <span class="px-2 py-1 bg-amber-500 text-slate-950 font-mono font-black text-[11px] rounded-lg">[F2]</span>
+                    <span class="font-bold text-slate-800">Pending Belanja</span>
+                  </div>
+                  <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+                    <span class="px-2 py-1 bg-rose-600 text-white font-mono font-black text-[11px] rounded-lg">[F3]</span>
+                    <span class="font-bold text-slate-800">Void / Batalkan</span>
+                  </div>
+                  <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+                    <span class="px-2 py-1 bg-blue-600 text-white font-mono font-black text-[11px] rounded-lg">[F4]</span>
+                    <span class="font-bold text-slate-800">Tambah Member</span>
+                  </div>
+                  <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+                    <span class="px-2 py-1 bg-indigo-600 text-white font-mono font-black text-[11px] rounded-lg">[F8]</span>
+                    <span class="font-bold text-slate-800">Simpan Struk</span>
+                  </div>
+                  <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+                    <span class="px-2 py-1 bg-teal-600 text-white font-mono font-black text-[11px] rounded-lg">[F9]</span>
+                    <span class="font-bold text-slate-800">Sinkron Cloud</span>
+                  </div>
+                  <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+                    <span class="px-2 py-1 bg-purple-600 text-white font-mono font-black text-[11px] rounded-lg">[F10]</span>
+                    <span class="font-bold text-slate-800">Laporan & Laba</span>
+                  </div>
+                  <div class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-2">
+                    <span class="px-2 py-1 bg-slate-800 text-white font-mono font-black text-[11px] rounded-lg">[F11]</span>
+                    <span class="font-bold text-slate-800">Closing Klerk</span>
+                  </div>
+                </div>
+
+                <!-- 5 LANGKAH SOP TRANSAKSI KASIR -->
+                <div class="pt-2 border-t border-slate-100">
+                  <span class="text-[11px] font-black text-slate-700 uppercase tracking-wider block mb-2">
+                    📋 SOP Standar Kasir Toko:
+                  </span>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-slate-600">
+                    <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                      <strong>1. Awal Shift:</strong> Buka shift kasir, input nominal modal uang kecil/kembalian di laci.
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                      <strong>2. Scan Produk:</strong> Arahkan barcode ke scanner atau ketik nama pada live search.
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                      <strong>3. Input Member:</strong> Tekan F4 atau klik tombol member jika pelanggan punya kartu/no HP.
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                      <strong>4. Pembayaran:</strong> Tekan F1, pilih Tunai / QRIS / Transfer. Masukkan nominal uang.
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded-lg border border-slate-200 sm:col-span-2">
+                      <strong>5. Akhir Shift (Klerk):</strong> Hitung uang fisik di laci kasir, lakukan closing shift [F11], cetak struk rekap klerk untuk diserahkan ke penanggung jawab toko.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
           <!-- SUB-MENU: STATUS LISENSI & AKUN KASIR POS -->
           <div id="setting-item-sec-license" class="setting-item transition-colors">
             

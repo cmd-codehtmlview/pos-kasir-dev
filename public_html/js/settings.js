@@ -144,6 +144,12 @@ function loadSettingsToForm() {
     updatePrinterStatusBadge();
   }
 
+  // Load Kontak Bantuan Toko
+  const helpdeskWaEl = document.getElementById("setting-helpdesk-wa");
+  if (helpdeskWaEl) helpdeskWaEl.value = pos.settings.helpdeskWa || "6281234567890";
+  const helpdeskEmailEl = document.getElementById("setting-helpdesk-email");
+  if (helpdeskEmailEl) helpdeskEmailEl.value = pos.settings.helpdeskEmail || "helpdesk@snackpos.local";
+
   // Sinkronisasi Kasir Aktif & Shift ke Form Setting
   const activeUserPreview = document.getElementById("setting-active-user-preview");
   if (activeUserPreview) {
@@ -250,6 +256,12 @@ function saveStoreSettings() {
   pos.settings.printerDriverMode = selectedPrinterMode;
   pos.settings.autoPrintReceipt = !!document.getElementById("setting-auto-print-receipt")?.checked;
   pos.settings.printerFeedLines = parseInt(document.getElementById("setting-printer-feed-lines")?.value, 10) || 3;
+
+  // Simpan Kontak Helpdesk Toko
+  const helpdeskWaInput = document.getElementById("setting-helpdesk-wa")?.value.trim();
+  if (helpdeskWaInput) pos.settings.helpdeskWa = helpdeskWaInput;
+  const helpdeskEmailInput = document.getElementById("setting-helpdesk-email")?.value.trim();
+  if (helpdeskEmailInput) pos.settings.helpdeskEmail = helpdeskEmailInput;
 
   pos.saveSettings();
   loadSettingsToForm();
@@ -367,8 +379,15 @@ function toggleScannerAutoEnter(enabled) {
 const ALL_SETTING_SECTIONS = [
   "sec-store", "sec-scanner", "sec-printer", 
   "sec-employees", "sec-attendance", "sec-member-points", 
-  "sec-payment-gateway", "sec-license", "sec-backup"
+  "sec-payment-gateway", "sec-license", "sec-about", "sec-backup"
 ];
+
+function contactHelpdeskWhatsApp() {
+  const waNum = (pos && pos.settings && pos.settings.helpdeskWa) ? pos.settings.helpdeskWa.replace(/[^0-9]/g, '') : "6281234567890";
+  const storeName = (pos && pos.settings && pos.settings.storeName) ? pos.settings.storeName : "Toko SnackPOS";
+  const text = encodeURIComponent(`Halo Tim Support SnackPOS, saya dari ${storeName} (Terminal POS: v2.4.2). Mohon bantuan teknis operasional kasir.`);
+  window.open(`https://wa.me/${waNum}?text=${text}`, '_blank');
+}
 
 function toggleSettingSection(secId) {
   const targetContent = document.getElementById(`content-${secId}`);
