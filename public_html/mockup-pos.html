@@ -57,10 +57,7 @@
           🛍️
         </div>
         <div>
-          <div class="flex items-center gap-2">
-            <h1 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">TOKO SNACK BERKAH</h1>
-            <span class="bg-yellow-400 text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded shadow-2xs">RETAIL POS</span>
-          </div>
+          <h1 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">TOKO SNACK BERKAH</h1>
           <p class="text-[11px] text-red-100 flex items-center gap-1.5 font-medium">
             <span>👤 Kasir: <strong class="text-white">Budi Santoso</strong></span>
             <span class="opacity-50">•</span>
@@ -95,10 +92,10 @@
   <!-- ================= KONTEN UTAMA: LAYAR KASIR POS (COCKPIT TRANSAKSI) ================= -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start">
     
-    <!-- KOLOM KIRI (7/12): SCANNER INPUT & TABEL BELANJA KASIR -->
-    <div class="lg:col-span-8 flex flex-col gap-3">
+    <!-- KOLOM KIRI (7/12): SCANNER INPUT, TAMBAH MEMBER & TABEL BELANJA KASIR -->
+    <div class="lg:col-span-8 flex flex-col gap-3 w-full">
       
-      <!-- Smart Search & Scan Barcode (Hanya 1 Kolom Multifungsi) -->
+      <!-- Smart Search & Scan Barcode (Multifungsi: Barcode / Nama Produk) -->
       <div class="bg-white p-2.5 sm:p-3 rounded-2xl border-2 border-slate-300 shadow-xs flex items-center gap-2">
         <span class="text-xl pl-1">🔍</span>
         <input 
@@ -114,8 +111,44 @@
         </button>
       </div>
 
+      <!-- BARIS INPUT TAMBAH MEMBER (Standar Retail Minimarket: Tambah No. HP / Scan Kartu) -->
+      <div id="mock-member-wrapper" class="bg-white p-2 sm:p-2.5 rounded-2xl border border-slate-200 shadow-xs">
+        <!-- State 1: Input Tambah Member Baru (Default saat belum ada member) -->
+        <div id="mock-member-input-row" class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0 flex-1">
+            <span class="text-base text-indigo-600 flex-shrink-0">👤</span>
+            <input 
+              type="text" 
+              id="mock-member-input" 
+              placeholder="Tambah Member: Ketik No. HP / Scan Kartu Member..." 
+              class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none"
+              onkeydown="if(event.key==='Enter') applyMockMember()"
+            />
+          </div>
+          <button type="button" onclick="applyMockMember()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex-shrink-0 cursor-pointer shadow-xs flex items-center gap-1 active:scale-95">
+            <span>+</span>
+            <span>Tambah Member</span>
+          </button>
+        </div>
+
+        <!-- State 2: Member Terpasang (Muncul setelah nomor HP diinput) -->
+        <div id="mock-member-active-row" class="hidden flex items-center justify-between gap-2 bg-indigo-50/70 p-1.5 rounded-xl border border-indigo-200">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-lg flex-shrink-0">⭐</span>
+            <div class="min-w-0">
+              <span class="text-[10px] text-indigo-700 font-bold uppercase block leading-tight">Member Aktif</span>
+              <p id="mock-member-label" class="text-xs font-extrabold text-slate-900 font-mono truncate">0851-5637-xxxx • 150 Poin</p>
+            </div>
+          </div>
+          <button type="button" onclick="removeMockMember()" class="px-2 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-lg text-xs font-bold transition flex-shrink-0 cursor-pointer flex items-center gap-0.5" title="Hapus Member dari Transaksi">
+            <span>✕</span>
+            <span class="text-[11px]">Lepas</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Tabel Daftar Belanja Kasir (Tinggi Adaptif di Layar HP 9:16 & 9:18) -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col h-[300px] sm:h-[380px] lg:h-[calc(100vh-210px)] lg:min-h-[460px]">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col h-[300px] sm:h-[380px] lg:h-[calc(100vh-250px)] lg:min-h-[440px]">
         
         <!-- Header Tabel (Kolom Ringkas di Mobile) -->
         <div class="bg-slate-800 text-white text-xs font-bold px-3 py-2.5 grid grid-cols-12 gap-2 uppercase tracking-wider">
@@ -194,40 +227,38 @@
 
       </div>
 
+      <!-- Tombol Pending & Void (Hanya muncul di mobile di bawah tabel, agar tidak tumpang tindih) -->
+      <div class="lg:hidden grid grid-cols-2 gap-2 pb-2">
+        <button class="py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-extrabold text-xs shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer">
+          <span>⏸️</span>
+          <span>[F2] PENDING (1)</span>
+        </button>
+        <button class="py-2.5 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-extrabold text-xs shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer border border-rose-300">
+          <span>🗑️</span>
+          <span>[F3] VOID / BATAL</span>
+        </button>
+      </div>
+
     </div>
 
-    <!-- KOLOM KANAN (5/12): JUMBO DISPLAY TOTAL & TOMBOL KASIR CEPAT -->
-    <div class="lg:col-span-4 flex flex-col gap-3 w-full">
+    <!-- KOLOM KANAN (5/12): JUMBO DISPLAY TOTAL & COCKPIT KASIR (HANYA MUNCUL DI DESKTOP / LAYAR LEBAR AGAR TIDAK DOUBLE DI HP) -->
+    <div class="hidden lg:flex lg:col-span-4 flex-col gap-3 w-full">
       
-      <!-- JUMBO LED DISPLAY TOTAL BELANJA -->
-      <div class="bg-slate-900 rounded-2xl p-3.5 sm:p-5 border-2 border-slate-800 shadow-md text-right relative overflow-hidden">
+      <!-- JUMBO LED DISPLAY TOTAL BELANJA (DESKTOP ONLY) -->
+      <div class="bg-slate-900 rounded-2xl p-4 sm:p-5 border-2 border-slate-800 shadow-md text-right relative overflow-hidden">
         <div class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
           <span class="flex items-center gap-1 text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> KASIR AKTIF</span>
           <span>TOTAL BELANJA</span>
         </div>
         <!-- Angka Bebas Neue Raksasa -->
-        <div class="font-bebas text-4xl sm:text-6xl text-amber-400 tracking-wider font-bold leading-none truncate">
+        <div class="font-bebas text-5xl sm:text-6xl text-amber-400 tracking-wider font-bold leading-none truncate">
           Rp 48.500
         </div>
         <p class="text-[10px] sm:text-[11px] text-slate-400 mt-1 font-mono truncate">Subtotal: Rp 48.500 • Pajak: Rp 0</p>
       </div>
 
-      <!-- Member Card Kasir -->
-      <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2 min-w-0">
-          <span class="text-xl flex-shrink-0">👤</span>
-          <div class="min-w-0">
-            <div class="text-xs font-extrabold text-slate-800 truncate">Pelanggan Member</div>
-            <p class="text-[10px] text-slate-400 font-mono truncate">0851-5637-xxxx • 150 Poin</p>
-          </div>
-        </div>
-        <button class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold border border-indigo-200 transition flex-shrink-0 cursor-pointer">
-          Ganti
-        </button>
-      </div>
-
-      <!-- Tombol Tender / Uang Pas Cepat -->
-      <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200 shadow-xs">
+      <!-- Tombol Tender / Pecahan Uang Pas Cepat (DESKTOP ONLY) -->
+      <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
         <label class="text-[10px] font-black uppercase text-slate-400 tracking-wider block mb-2">Pecahan Cepat Kasir</label>
         <div class="grid grid-cols-4 gap-1.5">
           <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition cursor-pointer">Uang Pas</button>
@@ -237,21 +268,21 @@
         </div>
       </div>
 
-      <!-- 3 TOMBOL BESAR KASIR (BERSIH & ANTI-SALAH PENCET) -->
+      <!-- 3 TOMBOL BESAR KASIR (DESKTOP ONLY) -->
       <div class="flex flex-col gap-2">
         <!-- 1. BAYAR SEKARANG (Hijau Raksasa) -->
-        <button class="w-full py-3.5 sm:py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-base sm:text-lg shadow-lg flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer border-2 border-emerald-400">
+        <button class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-lg shadow-lg flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer border-2 border-emerald-400">
           <span>💳</span>
           <span>[F1 / SPASI] BAYAR SEKARANG</span>
         </button>
 
         <!-- 2. TAHAN & VOID -->
         <div class="grid grid-cols-2 gap-2">
-          <button class="py-2.5 sm:py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-extrabold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer">
+          <button class="py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-extrabold text-sm shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer">
             <span>⏸️</span>
             <span>[F2] PENDING (1)</span>
           </button>
-          <button class="py-2.5 sm:py-3 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-extrabold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer border border-rose-300">
+          <button class="py-3 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-extrabold text-sm shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer border border-rose-300">
             <span>🗑️</span>
             <span>[F3] VOID / BATAL</span>
           </button>
@@ -263,22 +294,19 @@
   </main>
 
   <!-- ================= STICKY BOTTOM BAR KHUSUS HP (9:16 & 9:18 PORTRAIT) ================= -->
-  <div class="lg:hidden sticky bottom-0 left-0 right-0 z-30 bg-slate-900/95 backdrop-blur-md border-t-2 border-slate-700 px-3 sm:px-4 py-2.5 shadow-2xl flex items-center justify-between gap-3 text-white">
-    <div class="min-w-0">
+  <!-- Hanya muncul di HP (lg:hidden): Total Tagihan & 1 Tombol Bayar Utama Tanpa Duplikasi -->
+  <div class="lg:hidden sticky bottom-0 left-0 right-0 z-30 bg-slate-900/95 backdrop-blur-md border-t-2 border-slate-700 px-4 py-3 shadow-2xl flex items-center justify-between gap-3 text-white">
+    <div class="min-w-0 flex-1">
       <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider truncate">TOTAL TAGIHAN (3 ITEM)</div>
-      <div class="font-bebas text-2xl sm:text-3xl text-amber-400 tracking-wider font-bold leading-none truncate">
+      <div class="font-bebas text-3xl sm:text-4xl text-amber-400 tracking-wider font-bold leading-none truncate">
         Rp 48.500
       </div>
     </div>
-    <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-      <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 cursor-pointer">
-        Tender ▼
-      </button>
-      <button class="px-4 sm:px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black text-xs sm:text-sm shadow-lg flex items-center gap-1.5 active:scale-95 border border-emerald-400 cursor-pointer">
-        <span>💳</span>
-        <span>BAYAR [F1]</span>
-      </button>
-    </div>
+    <!-- SATU TOMBOL BAYAR UTAMA (TANPA TOMBOL TENDER YANG MEMBINGUNGKAN) -->
+    <button class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl font-black text-sm shadow-lg flex items-center gap-2 border-2 border-emerald-400 cursor-pointer flex-shrink-0">
+      <span>💳</span>
+      <span>BAYAR [F1]</span>
+    </button>
   </div>
 
   <!-- ================= SIS DRAWER (SISTEM INFORMASI TOKO GAYA ALFAGIFT) ================= -->
@@ -501,6 +529,36 @@
       table.appendChild(row);
       input.value = "";
       input.focus();
+    }
+
+    // Tambah & Lepas Member Kasir
+    function applyMockMember() {
+      const input = document.getElementById('mock-member-input');
+      const val = input ? input.value.trim() : '';
+      if (!val) {
+        alert('Silakan ketik nomor HP atau scan barcode kartu member pelanggan.');
+        return;
+      }
+      const inputRow = document.getElementById('mock-member-input-row');
+      const activeRow = document.getElementById('mock-member-active-row');
+      const label = document.getElementById('mock-member-label');
+      if (inputRow && activeRow && label) {
+        label.textContent = val + ' • 150 Poin (Aktif)';
+        inputRow.classList.add('hidden');
+        activeRow.classList.remove('hidden');
+      }
+    }
+
+    function removeMockMember() {
+      const inputRow = document.getElementById('mock-member-input-row');
+      const activeRow = document.getElementById('mock-member-active-row');
+      const input = document.getElementById('mock-member-input');
+      if (input) input.value = '';
+      if (inputRow && activeRow) {
+        activeRow.classList.add('hidden');
+        inputRow.classList.remove('hidden');
+        input.focus();
+      }
     }
   </script>
 
