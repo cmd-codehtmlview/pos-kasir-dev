@@ -726,6 +726,7 @@
   <!-- ================= 1. MODAL CLOSING KASIR (KLERK SHIFT) ================= -->
   <div id="sis-modal-klerk" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <!-- Header -->
       <div class="p-4 bg-gradient-to-r from-blue-700 to-indigo-800 text-white flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <span class="text-2xl">📋</span>
@@ -737,11 +738,13 @@
         <button onclick="closeSisModal('sis-modal-klerk')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
       </div>
 
+      <!-- Klerk Body -->
       <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
-        <div class="grid grid-cols-2 gap-2 bg-blue-50/70 border border-blue-200 p-3 rounded-2xl">
+        <!-- Kasir & Shift Header Info -->
+        <div class="grid grid-cols-2 gap-2 bg-blue-50/80 border border-blue-200 p-3 rounded-2xl">
           <div>
-            <span class="text-[10px] text-blue-800 font-bold uppercase block">Kasir Aktif:</span>
-            <span class="font-black text-slate-900 text-xs">Siti Aminah (KASIR 01)</span>
+            <span class="text-[10px] text-blue-800 font-bold uppercase block">Kasir Aktif (NIK):</span>
+            <span class="font-black text-slate-900 text-xs">1003 • Siti Aminah</span>
           </div>
           <div>
             <span class="text-[10px] text-blue-800 font-bold uppercase block">Shift Kerja:</span>
@@ -752,78 +755,157 @@
             <span class="font-bold text-slate-700 font-mono">Rp 200.000</span>
           </div>
           <div>
-            <span class="text-[10px] text-blue-800 font-bold uppercase block">Penjualan Tunai Sistem:</span>
-            <span class="font-black text-emerald-700 font-mono">Rp 1.650.000</span>
+            <span class="text-[10px] text-blue-800 font-bold uppercase block">No. Terminal:</span>
+            <span class="font-bold text-slate-700 font-mono">POS-01 (Kasir 1)</span>
           </div>
         </div>
 
-        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Hitung Fisik Lembaran Uang Laci:</span>
-            <span class="text-[10px] text-slate-400 font-mono">Input Qty Lembar</span>
+        <!-- 1. SECTION FORM INPUT BLIND KLERK (Sebelum Simpan) -->
+        <div id="klerk-input-section" class="space-y-3">
+          <!-- Banner Blind Balancing -->
+          <div class="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-2 text-amber-900">
+            <span class="text-base shrink-0">🔒</span>
+            <div class="text-[11px] leading-relaxed">
+              <strong class="font-black block uppercase text-amber-950">Sistem Blind Klerk Aktif</strong>
+              Total penjualan sistem dirahasiakan sebelum uang fisik dihitung untuk menjaga integritas kasir dan mencegah klopisasi.
+            </div>
           </div>
-          <div class="grid grid-cols-2 gap-2 text-[11px]">
-            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
-              <span class="font-bold text-slate-700">Rp 100.000</span>
-              <div class="flex items-center gap-1">
-                <input type="number" value="12" class="w-12 px-1.5 py-0.5 text-center font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
-                <span class="text-slate-400 text-[10px]">lbr</span>
-              </div>
+
+          <!-- Single Nominal Input -->
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+            <label for="klerk-input-nominal" class="block font-black text-slate-800 text-xs uppercase tracking-wider">
+              Total Fisik Uang Tunai di Laci Kasir:
+            </label>
+            <p class="text-[11px] text-slate-500">
+              Hitung manual seluruh uang kertas & koin di laci kasir, lalu ketik total nominalnya di bawah ini:
+            </p>
+            <div class="relative mt-1">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-slate-400 text-sm font-mono">Rp</span>
+              <input 
+                type="text" 
+                id="klerk-input-nominal" 
+                placeholder="0" 
+                oninput="handleKlerkInputFormat(this)"
+                class="w-full pl-11 pr-4 py-3 bg-white border-2 border-slate-300 focus:border-blue-600 rounded-xl font-mono font-black text-slate-900 text-lg focus:outline-none transition shadow-inner placeholder:text-slate-300"
+                autofocus
+              />
             </div>
-            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
-              <span class="font-bold text-slate-700">Rp 50.000</span>
-              <div class="flex items-center gap-1">
-                <input type="number" value="8" class="w-12 px-1.5 py-0.5 text-center font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
-                <span class="text-slate-400 text-[10px]">lbr</span>
-              </div>
-            </div>
-            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
-              <span class="font-bold text-slate-700">Rp 20.000</span>
-              <div class="flex items-center gap-1">
-                <input type="number" value="6" class="w-12 px-1.5 py-0.5 text-center font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
-                <span class="text-slate-400 text-[10px]">lbr</span>
-              </div>
-            </div>
-            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
-              <span class="font-bold text-slate-700">Rp 10.000</span>
-              <div class="flex items-center gap-1">
-                <input type="number" value="9" class="w-12 px-1.5 py-0.5 text-center font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
-                <span class="text-slate-400 text-[10px]">lbr</span>
-              </div>
-            </div>
-            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
-              <span class="font-bold text-slate-700">Rp 5.000 & 2.000</span>
-              <div class="flex items-center gap-1">
-                <input type="number" value="7" class="w-12 px-1.5 py-0.5 text-center font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
-                <span class="text-slate-400 text-[10px]">lbr</span>
-              </div>
-            </div>
-            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
-              <span class="font-bold text-slate-700">Koin Logam</span>
-              <div class="flex items-center gap-1">
-                <input type="number" value="5000" class="w-16 px-1.5 py-0.5 text-right font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
-                <span class="text-slate-400 text-[10px]">Rp</span>
-              </div>
-            </div>
+          </div>
+
+          <!-- Catatan Shift (Opsional) -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
+            <label for="klerk-input-notes" class="block font-bold text-slate-700 text-[11px]">
+              Catatan Kasir (Opsional):
+            </label>
+            <input 
+              type="text" 
+              id="klerk-input-notes" 
+              placeholder="Contoh: Ada uang kembalian sobek Rp 2.000 / laci aman..." 
+              class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500"
+            />
           </div>
         </div>
 
-        <div class="p-3 bg-emerald-50 border border-emerald-300 rounded-2xl flex items-center justify-between">
-          <div>
-            <span class="text-[10px] text-emerald-800 font-bold uppercase block">Hasil Audit Kasir:</span>
-            <span class="text-xs font-black text-emerald-950">Fisik Kas Rp 1.850.000</span>
+        <!-- 2. SECTION HASIL REKONSILIASI KLERK (Muncul Setelah Klik Simpan) -->
+        <div id="klerk-result-section" class="hidden space-y-3">
+          <!-- Hasil Rekonsiliasi Kas Laci (TUNAI) -->
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+              <span class="font-black text-slate-900 text-xs uppercase tracking-wider">
+                💵 Rekonsiliasi Kas Fisik Laci (Tunai)
+              </span>
+              <span id="klerk-result-badge" class="px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase">
+                KLOP (PAS)
+              </span>
+            </div>
+
+            <div class="space-y-1.5 font-mono text-xs">
+              <div class="flex justify-between text-slate-600">
+                <span>Modal Awal Laci:</span>
+                <span class="font-bold text-slate-800">Rp 200.000</span>
+              </div>
+              <div class="flex justify-between text-slate-600">
+                <span>Penjualan Tunai (Sistem):</span>
+                <span class="font-bold text-slate-800">Rp 1.850.000</span>
+              </div>
+              <div class="flex justify-between text-slate-900 font-bold border-t border-dashed border-slate-200 pt-1">
+                <span>Target Kas Fisik:</span>
+                <span class="text-blue-700 font-black">Rp 2.050.000</span>
+              </div>
+              <div class="flex justify-between text-slate-900 font-bold">
+                <span>Fisik Kasir (Input):</span>
+                <span id="klerk-result-input-cash" class="text-slate-900 font-black">Rp 2.050.000</span>
+              </div>
+              <div class="flex justify-between items-center border-t border-slate-300 pt-1.5 text-xs font-black">
+                <span>SELISIH KAS LACI:</span>
+                <span id="klerk-result-diff" class="text-sm font-black text-emerald-600">Rp 0 (KLOP)</span>
+              </div>
+            </div>
           </div>
-          <span class="px-3 py-1 bg-emerald-600 text-white font-black text-[11px] rounded-xl uppercase tracking-wider">
-            ✅ MATCH (Rp 0)
-          </span>
+
+          <!-- Laporan Non-Tunai (Informasi Audit - Tidak Mempengaruhi Selisih) -->
+          <div class="p-3.5 bg-indigo-50/70 border border-indigo-200 rounded-2xl space-y-2">
+            <div class="flex items-center justify-between border-b border-indigo-200 pb-1.5">
+              <span class="font-black text-indigo-950 text-xs uppercase tracking-wider">
+                💳 Daftar Penjualan Non-Tunai (Bank)
+              </span>
+              <span class="text-[9px] text-indigo-700 font-bold bg-indigo-100 px-2 py-0.5 rounded-md">
+                Tidak Masuk Laci
+              </span>
+            </div>
+            <div class="space-y-1 font-mono text-[11px] text-indigo-900">
+              <div class="flex justify-between">
+                <span>QRIS Toko (8 Transaksi):</span>
+                <span class="font-bold">Rp 450.000</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Debit EDC (3 Transaksi):</span>
+                <span class="font-bold">Rp 150.000</span>
+              </div>
+              <div class="flex justify-between border-t border-indigo-200 pt-1 font-bold text-indigo-950">
+                <span>Total Non-Tunai Bank:</span>
+                <span>Rp 600.000</span>
+              </div>
+            </div>
+            <p class="text-[10px] text-indigo-600 leading-snug">
+              *Catatan: Nominal non-tunai langsung masuk rekening toko dan tidak mempengaruhi hitungan fisik kas laci.
+            </p>
+          </div>
+
+          <!-- Total Omzet Penjualan Kasir -->
+          <div class="p-3 bg-slate-900 text-white rounded-2xl flex items-center justify-between font-mono">
+            <div>
+              <span class="text-[10px] text-slate-400 font-bold uppercase block">Total Omzet Kasir Shift Ini:</span>
+              <span class="text-[10px] text-slate-300">(Tunai Rp 1.850.000 + Non-Tunai Rp 600.000)</span>
+            </div>
+            <span class="text-base font-black text-amber-400">Rp 2.450.000</span>
+          </div>
         </div>
       </div>
 
+      <!-- Footer Buttons -->
       <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
-        <button onclick="closeSisModal('sis-modal-klerk')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
-        <button onclick="showMockupToast('🖨️ Struk Closing Klerk berhasil dicetak!', 'success'); closeSisModal('sis-modal-klerk');" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
-          🖨️ Kunci & Cetak Struk Klerk
-        </button>
+        <div id="klerk-footer-input" class="w-full flex justify-between gap-2">
+          <button onclick="closeSisModal('sis-modal-klerk')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+          <button onclick="submitBlindKlerk()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md flex items-center gap-1.5 active:scale-95 transition">
+            <span>💾</span>
+            <span>Simpan & Kunci Closing Klerk</span>
+          </button>
+        </div>
+        <div id="klerk-footer-result" class="hidden w-full flex justify-between gap-2">
+          <button onclick="resetKlerkForm()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">
+            ↺ Hitung Ulang
+          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="printKlerkReceipt()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md flex items-center gap-1.5 active:scale-95 transition">
+              <span>🖨️</span>
+              <span>Cetak Struk Klerk</span>
+            </button>
+            <button onclick="closeSisModal('sis-modal-klerk')" class="px-4 py-2 bg-slate-900 hover:bg-black text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+              Selesai
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1928,6 +2010,110 @@
       }
     }
 
+    // ================= LOGIKA BLIND KLERK OPERASIONAL RITEL =================
+    const KLERK_SYSTEM_DATA = {
+      cashier: "1003 • Siti Aminah",
+      shift: "Shift 1 (Pagi)",
+      initialFloat: 200000,    // Modal awal laci kasir
+      systemCashSales: 1850000, // Penjualan tunai tercatat di sistem
+      systemNonCash: [          // Penjualan non-tunai (tidak masuk laci fisik)
+        { method: "QRIS Toko", trxCount: 8, amount: 450000 },
+        { method: "Debit EDC", trxCount: 3, amount: 150000 }
+      ]
+    };
+
+    function handleKlerkInputFormat(el) {
+      // Hanya izinkan angka murni
+      let val = el.value.replace(/[^0-9]/g, '');
+      if (!val) {
+        el.value = '';
+        return;
+      }
+      // Format ribuan dengan titik (contoh: 2.050.000)
+      el.value = parseInt(val, 10).toLocaleString('id-ID');
+    }
+
+    function resetKlerkForm() {
+      const inputNominal = document.getElementById('klerk-input-nominal');
+      const inputNotes = document.getElementById('klerk-input-notes');
+      const inputSection = document.getElementById('klerk-input-section');
+      const resultSection = document.getElementById('klerk-result-section');
+      const footerInput = document.getElementById('klerk-footer-input');
+      const footerResult = document.getElementById('klerk-footer-result');
+
+      if (inputNominal) {
+        inputNominal.value = '';
+        setTimeout(() => inputNominal.focus(), 150);
+      }
+      if (inputNotes) inputNotes.value = '';
+
+      if (inputSection) inputSection.classList.remove('hidden');
+      if (resultSection) resultSection.classList.add('hidden');
+      if (footerInput) footerInput.classList.remove('hidden');
+      if (footerResult) footerResult.classList.add('hidden');
+    }
+
+    function submitBlindKlerk() {
+      const inputEl = document.getElementById('klerk-input-nominal');
+      const rawVal = inputEl ? inputEl.value.replace(/[^0-9]/g, '') : '';
+      
+      if (!rawVal || parseInt(rawVal, 10) < 0) {
+        showMockupToast('⚠️ Mohon input total uang fisik kasir terlebih dahulu!', 'error');
+        if (inputEl) inputEl.focus();
+        return;
+      }
+
+      const inputCash = parseInt(rawVal, 10);
+      const targetCash = KLERK_SYSTEM_DATA.initialFloat + KLERK_SYSTEM_DATA.systemCashSales; // Rp 2.050.000
+      const diff = inputCash - targetCash;
+
+      // Update tampilan hasil rekonsiliasi kas laci
+      const inputCashEl = document.getElementById('klerk-result-input-cash');
+      const diffEl = document.getElementById('klerk-result-diff');
+      const badgeEl = document.getElementById('klerk-result-badge');
+
+      if (inputCashEl) {
+        inputCashEl.textContent = 'Rp ' + inputCash.toLocaleString('id-ID');
+      }
+
+      if (diffEl && badgeEl) {
+        if (diff === 0) {
+          diffEl.textContent = 'Rp 0 (KLOP / PAS)';
+          diffEl.className = 'text-sm font-black text-emerald-600 font-mono';
+          badgeEl.textContent = '✅ KLOP (PAS)';
+          badgeEl.className = 'px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase bg-emerald-100 text-emerald-800 border border-emerald-300';
+        } else if (diff > 0) {
+          diffEl.textContent = '+Rp ' + diff.toLocaleString('id-ID') + ' (LEBIH)';
+          diffEl.className = 'text-sm font-black text-blue-600 font-mono';
+          badgeEl.textContent = '🔵 SELISIH LEBIH';
+          badgeEl.className = 'px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase bg-blue-100 text-blue-800 border border-blue-300';
+        } else {
+          const absDiff = Math.abs(diff);
+          diffEl.textContent = '-Rp ' + absDiff.toLocaleString('id-ID') + ' (KURANG)';
+          diffEl.className = 'text-sm font-black text-rose-600 font-mono';
+          badgeEl.textContent = '⚠️ SELISIH KURANG';
+          badgeEl.className = 'px-2.5 py-0.5 rounded-full font-black text-[10px] uppercase bg-rose-100 text-rose-800 border border-rose-300';
+        }
+      }
+
+      // Alihkan section dari input ke hasil
+      const inputSection = document.getElementById('klerk-input-section');
+      const resultSection = document.getElementById('klerk-result-section');
+      const footerInput = document.getElementById('klerk-footer-input');
+      const footerResult = document.getElementById('klerk-footer-result');
+
+      if (inputSection) inputSection.classList.add('hidden');
+      if (resultSection) resultSection.classList.remove('hidden');
+      if (footerInput) footerInput.classList.add('hidden');
+      if (footerResult) footerResult.classList.remove('hidden');
+
+      showMockupToast('💾 Data fisik klerk terkunci & hasil rekonsiliasi keluar!', 'success');
+    }
+
+    function printKlerkReceipt() {
+      showMockupToast('🖨️ Mencetak Struk Closing Klerk ke printer thermal...', 'success');
+    }
+
     // ================= SIS ACTION SCREEN CONTROLLERS =================
     function openSisModal(modalId) {
       const modal = document.getElementById(modalId);
@@ -1938,6 +2124,11 @@
         const backdrop = document.getElementById('sis-drawer-backdrop');
         if (drawer) drawer.classList.add('translate-x-full');
         if (backdrop) backdrop.classList.add('hidden');
+
+        // Jika membuka klerk, reset form ke mode blind input
+        if (modalId === 'sis-modal-klerk') {
+          resetKlerkForm();
+        }
       }
     }
 
