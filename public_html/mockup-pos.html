@@ -375,17 +375,17 @@
     <!-- Drawer Content (Scrollable) -->
     <div class="flex-1 overflow-y-auto p-4 space-y-4">
       
-      <!-- KATEGORI 1: LAPORAN PENJUALAN & INVENTORY -->
+      <!-- KATEGORI 1: PUSAT LAPORAN & VALUASI TOKO -->
       <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
         <div class="flex items-center justify-between">
-          <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-retail-red">
+          <h3 class="text-xs font-black text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
             <span>📊</span>
-            <span>1. Laporan Penjualan & Inventory</span>
+            <span>1. Pusat Laporan & Valuasi Toko</span>
           </h3>
-          <span class="text-[10px] text-slate-400 font-mono">Real-Time</span>
+          <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full font-mono">Real-Time</span>
         </div>
 
-        <!-- SUB-MENU VALUASI: 1 BARIS COMPACT (EXPANDABLE, TEMA PUTIH SESUAI MENU SETTING & PORTAL OWNER) -->
+        <!-- SUB-MENU VALUASI: 1 BARIS COMPACT (EXPANDABLE) -->
         <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/70 transition">
           <button 
             type="button" 
@@ -409,7 +409,7 @@
             </div>
           </button>
 
-          <!-- KONTEN RINCIAN LENGKAP VALUASI (TEMA PUTIH SESUAI MENU SETTING & PORTAL OWNER) -->
+          <!-- KONTEN RINCIAN LENGKAP VALUASI -->
           <div id="valuation-accordion-content" class="hidden p-3 bg-white border-t border-slate-200 space-y-2.5">
             <div class="flex items-center justify-between pb-1 border-b border-slate-100">
               <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
@@ -473,102 +473,165 @@
           </div>
         </div>
 
+        <!-- 4 Tombol Laporan Ritel Utama (Grid 2 Kolom Rapi) -->
         <div class="grid grid-cols-2 gap-2">
-          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+          <button onclick="openMockupReportsModal('sales')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base">📈</span>
+            <div class="min-w-0">
+              <span class="block truncate">Omzet & Laba</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Laba Bersih & Margin %</span>
+            </div>
+          </button>
+          <button onclick="openMockupReportsModal('top')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base">🏆</span>
+            <div class="min-w-0">
+              <span class="block truncate">Produk Terlaris</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Top 10 Fast-Moving</span>
+            </div>
+          </button>
+          <button onclick="openMockupReportsModal('lowstock')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base">⚠️</span>
+            <div class="min-w-0">
+              <span class="block truncate">Stok Kritis / Habis</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Usulan Order (RO)</span>
+            </div>
+          </button>
+          <button onclick="openMockupReportsModal('lpb')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base">🚚</span>
+            <div class="min-w-0">
+              <span class="block truncate">Rekap Faktur LPB</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Barang Masuk & Utang</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- KATEGORI 2: LOGISTIK, GUDANG & INVENTORI -->
+      <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
+        <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-retail-red">
+          <span>📦</span>
+          <span>2. Logistik, Gudang & Inventori</span>
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base">📋</span>
             <span>Master Produk</span>
           </button>
-          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base">📥</span>
             <span>Penerimaan (LPB)</span>
           </button>
-          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
-            <span class="text-base">🏷️</span>
-            <span>Cetak Label Rak 40x30</span>
-          </button>
-          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base">🔄</span>
             <span>Repack Bal ke Ecer</span>
           </button>
-          <button class="col-span-2 p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base">🏷️</span>
+            <span>Cetak Label Rak 40x30</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base">🔍</span>
-            <span>Stock Opname (Hitungan Fisik vs Komputer)</span>
+            <span>Stock Opname Fisik</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base">🗑️</span>
+            <span>Barang Rusak (BAP)</span>
           </button>
         </div>
       </div>
 
-      <!-- KATEGORI 2: OPERASIONAL & KAS KASIR -->
+      <!-- KATEGORI 3: OPERASIONAL KAS & KASIR -->
       <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
         <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-retail-blue">
-          <span>🔄</span>
-          <span>2. Operasional Kas & Closing Kasir</span>
+          <span>💰</span>
+          <span>3. Operasional Kas & Kasir</span>
         </h3>
         <div class="grid grid-cols-2 gap-2">
-          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
-            <span class="text-base">💵</span>
-            <span>Modal Awal Kasir</span>
-          </button>
-          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base">📋</span>
             <span>Closing Kasir (Klerk)</span>
           </button>
-          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base">🧾</span>
             <span>Riwayat Struk Kasir</span>
           </button>
-          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base">↩️</span>
-            <span>Retur Transaksi Lama</span>
+            <span>Retur Struk Kasir</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base">📥</span>
+            <span>Tarik Kas / Cash Drop</span>
           </button>
         </div>
       </div>
 
-      <!-- KATEGORI 3: MEMBER & PELANGGAN -->
+      <!-- KATEGORI 4: PERSONIL TOKO, OTORISASI & MEMBER -->
       <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
-        <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-amber-600">
+        <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-emerald-600">
           <span>👥</span>
-          <span>3. Pelanggan & Member Toko</span>
+          <span>4. Personil Toko, Otorisasi & Member</span>
         </h3>
         <div class="grid grid-cols-2 gap-2">
-          <button class="p-2.5 bg-slate-50 hover:bg-amber-50 text-left rounded-xl border border-slate-200 hover:border-amber-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
-            <span class="text-base">➕</span>
-            <span>Daftar Member Baru</span>
+          <button onclick="openMockupStaffModal('staff')" class="p-2.5 bg-slate-50 hover:bg-emerald-50 text-left rounded-xl border border-slate-200 hover:border-emerald-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base">👤</span>
+            <div class="min-w-0">
+              <span class="block truncate">Karyawan Toko</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">COS, ACOS, Kasir</span>
+            </div>
           </button>
-          <button class="p-2.5 bg-slate-50 hover:bg-amber-50 text-left rounded-xl border border-slate-200 hover:border-amber-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
-            <span class="text-base">🎁</span>
-            <span>Cek Poin & Tukar Kupon</span>
+          <button onclick="openMockupStaffModal('auth')" class="p-2.5 bg-slate-50 hover:bg-emerald-50 text-left rounded-xl border border-slate-200 hover:border-emerald-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base">🔐</span>
+            <div class="min-w-0">
+              <span class="block truncate">Hak Otorisasi PIN</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Izin Void, Retur, SO</span>
+            </div>
+          </button>
+          <button onclick="openMockupStaffModal('attendance')" class="p-2.5 bg-slate-50 hover:bg-emerald-50 text-left rounded-xl border border-slate-200 hover:border-emerald-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base">⏱️</span>
+            <div class="min-w-0">
+              <span class="block truncate">Presensi & Shift</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Masuk / Pulang</span>
+            </div>
+          </button>
+          <button onclick="openMockupMemberModal()" class="p-2.5 bg-slate-50 hover:bg-emerald-50 text-left rounded-xl border border-slate-200 hover:border-emerald-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base">🎖️</span>
+            <div class="min-w-0">
+              <span class="block truncate">Member & Poin</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Daftar & Kupon</span>
+            </div>
           </button>
         </div>
       </div>
 
-      <!-- KATEGORI 4: PENGATURAN TOKO -->
+      <!-- KATEGORI 5: PENGATURAN SISTEM TOKO -->
       <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
         <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-slate-700">
           <span>⚙️</span>
-          <span>4. Pengaturan Sistem Toko</span>
+          <span>5. Pengaturan Sistem Toko</span>
         </h3>
         <div class="grid grid-cols-2 gap-2">
-          <button class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+          <button class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base">🏪</span>
             <span>Profil Toko & Struk</span>
           </button>
-          <button class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+          <button class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base">🖨️</span>
             <span>Setting Printer 58/80</span>
           </button>
-          <button class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+          <button class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base">💳</span>
             <span>QRIS & Pembayaran</span>
           </button>
-          <button onclick="openMockupAboutModal()" class="col-span-2 p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center justify-between text-xs font-bold text-slate-800 cursor-pointer">
-            <div class="flex items-center gap-2">
-              <span class="text-base">ℹ️</span>
-              <div>
-                <span class="block text-xs font-bold text-slate-900">Tentang Aplikasi & Panduan Kasir</span>
-                <span class="text-[10px] text-slate-400 font-mono font-normal">v2.4.2 (Build 2026.09.22)</span>
+          <button onclick="openMockupAboutModal()" class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center justify-between text-xs font-bold text-slate-800 cursor-pointer">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="text-base shrink-0">ℹ️</span>
+              <div class="min-w-0">
+                <span class="block text-xs font-bold text-slate-900 truncate">Tentang Aplikasi</span>
+                <span class="text-[9px] text-slate-400 font-mono font-normal block truncate">v2.4.2 Panduan F1-F12</span>
               </div>
             </div>
-            <span class="text-slate-400 text-xs font-bold">›</span>
+            <span class="text-slate-400 text-xs font-bold shrink-0">›</span>
           </button>
         </div>
       </div>
@@ -741,6 +804,430 @@
         </button>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ================= MODAL PUSAT LAPORAN & ANALITIK TOKO ================= -->
+  <div id="mockup-reports-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <!-- Modal Header -->
+      <div class="p-4 bg-gradient-to-r from-indigo-700 to-violet-800 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">📊</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Pusat Laporan & Analitik Bisnis</h3>
+            <p class="text-[11px] text-indigo-200">Performa Toko, Penjualan, Top Produk & Stok Kritis</p>
+          </div>
+        </div>
+        <button onclick="closeMockupReportsModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="p-2 bg-slate-100 border-b border-slate-200 flex gap-1 overflow-x-auto">
+        <button id="tab-btn-rep-sales" onclick="switchMockupReportsTab('sales')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-black transition bg-white text-indigo-700 shadow-xs cursor-pointer whitespace-nowrap">
+          📈 Omzet & Laba
+        </button>
+        <button id="tab-btn-rep-top" onclick="switchMockupReportsTab('top')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+          🏆 Top 10 Laris
+        </button>
+        <button id="tab-btn-rep-lowstock" onclick="switchMockupReportsTab('lowstock')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+          ⚠️ Stok Kritis
+        </button>
+        <button id="tab-btn-rep-lpb" onclick="switchMockupReportsTab('lpb')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+          🚚 Rekap LPB
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-4 overflow-y-auto space-y-4 flex-1 text-xs">
+        
+        <!-- PANEL 1: OMZET & LABA -->
+        <div id="panel-rep-sales" class="space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-2xl">
+              <span class="text-[10px] font-bold text-indigo-800 uppercase block">Omzet Bersih Toko</span>
+              <div class="font-bebas text-xl sm:text-2xl text-indigo-950 mt-0.5 tracking-wider">Rp 2.450.000</div>
+              <span class="text-[9px] text-indigo-600 block mt-0.5">34 Transaksi Selesai</span>
+            </div>
+            <div class="p-3 bg-emerald-50/70 border border-emerald-100 rounded-2xl">
+              <span class="text-[10px] font-bold text-emerald-800 uppercase block">Laba Bersih Real</span>
+              <div class="font-bebas text-xl sm:text-2xl text-emerald-950 mt-0.5 tracking-wider">+Rp 630.000</div>
+              <span class="text-[9px] text-emerald-700 font-bold block mt-0.5">Margin Laba: 25.7%</span>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+              <span class="text-[10px] font-bold text-slate-500 uppercase block">Modal Terjual (HPP)</span>
+              <div class="font-bebas text-lg text-slate-800 mt-0.5 tracking-wider">Rp 1.820.000</div>
+              <span class="text-[9px] text-slate-400 block mt-0.5">Beban Pokok Penjualan</span>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+              <span class="text-[10px] font-bold text-slate-500 uppercase block">Retur / Refund</span>
+              <div class="font-bebas text-lg text-rose-700 mt-0.5 tracking-wider">Rp 0</div>
+              <span class="text-[9px] text-slate-400 block mt-0.5">0 Transaksi Diretur</span>
+            </div>
+          </div>
+
+          <!-- Rincian Metode Bayar -->
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+            <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Penerimaan Berdasarkan Metode Pembayaran:</span>
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-[11px] p-2 bg-white rounded-xl border border-slate-100">
+                <span class="font-bold text-slate-800 flex items-center gap-1.5"><span>💵</span> Tunai di Laci Kasir</span>
+                <span class="font-mono font-black text-slate-900">Rp 1.650.000 (23 trx)</span>
+              </div>
+              <div class="flex items-center justify-between text-[11px] p-2 bg-white rounded-xl border border-slate-100">
+                <span class="font-bold text-indigo-700 flex items-center gap-1.5"><span>📱</span> QRIS / Non-Tunai</span>
+                <span class="font-mono font-black text-indigo-900">Rp 800.000 (11 trx)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 2: TOP 10 PRODUK LARIS -->
+        <div id="panel-rep-top" class="hidden space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Paling Cepat Laku (Fast-Moving):</span>
+            <span class="text-[10px] font-mono text-indigo-600 font-bold">Sortir: Qty Terjual</span>
+          </div>
+          <div class="space-y-1.5">
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-950 font-black text-[11px] flex items-center justify-center shrink-0">1</span>
+                <div class="min-w-0">
+                  <span class="font-black text-slate-900 block truncate text-xs">Keripik Singkong Balado 250g</span>
+                  <span class="text-[10px] text-slate-500 block">Harga: Rp 15.000 • Margin Rp 5.000</span>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="font-black font-mono text-indigo-700 text-xs block">42 PCS</span>
+                <span class="text-[9px] text-emerald-600 font-bold block">+Rp 210.000</span>
+              </div>
+            </div>
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0">2</span>
+                <div class="min-w-0">
+                  <span class="font-black text-slate-900 block truncate text-xs">Makaroni Pedas Daun Jeruk 150g</span>
+                  <span class="text-[10px] text-slate-500 block">Harga: Rp 12.000 • Margin Rp 4.000</span>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="font-black font-mono text-indigo-700 text-xs block">35 PCS</span>
+                <span class="text-[9px] text-emerald-600 font-bold block">+Rp 140.000</span>
+              </div>
+            </div>
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-6 h-6 rounded-full bg-amber-600/30 text-amber-900 font-black text-[11px] flex items-center justify-center shrink-0">3</span>
+                <div class="min-w-0">
+                  <span class="font-black text-slate-900 block truncate text-xs">Basreng Pedas Gurih 200g</span>
+                  <span class="text-[10px] text-slate-500 block">Harga: Rp 16.000 • Margin Rp 4.500</span>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="font-black font-mono text-indigo-700 text-xs block">28 PCS</span>
+                <span class="text-[9px] text-emerald-600 font-bold block">+Rp 126.000</span>
+              </div>
+            </div>
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-black text-[11px] flex items-center justify-center shrink-0">4</span>
+                <div class="min-w-0">
+                  <span class="font-black text-slate-900 block truncate text-xs">Kerupuk Seblak Kering 100g</span>
+                  <span class="text-[10px] text-slate-500 block">Harga: Rp 10.000 • Margin Rp 4.000</span>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="font-black font-mono text-indigo-700 text-xs block">22 PCS</span>
+                <span class="text-[9px] text-emerald-600 font-bold block">+Rp 88.000</span>
+              </div>
+            </div>
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-black text-[11px] flex items-center justify-center shrink-0">5</span>
+                <div class="min-w-0">
+                  <span class="font-black text-slate-900 block truncate text-xs">Kacang Bawang Renyah 200g</span>
+                  <span class="text-[10px] text-slate-500 block">Harga: Rp 18.000 • Margin Rp 4.000</span>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="font-black font-mono text-indigo-700 text-xs block">18 PCS</span>
+                <span class="text-[9px] text-emerald-600 font-bold block">+Rp 72.000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 3: STOK KRITIS & USULAN ORDER -->
+        <div id="panel-rep-lowstock" class="hidden space-y-2.5">
+          <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 leading-relaxed flex items-center gap-2">
+            <span class="text-base shrink-0">⚠️</span>
+            <span>Daftar item yang stoknya <strong>di bawah stok minimal</strong> atau sudah habis di rak. Segera buatkan LPB ke distributor.</span>
+          </div>
+          <div class="space-y-1.5">
+            <div class="p-2.5 bg-rose-50 border border-rose-200 rounded-xl flex items-center justify-between">
+              <div class="min-w-0">
+                <span class="font-black text-rose-950 block truncate text-xs">Emping Melinjo Manis 200g</span>
+                <span class="text-[10px] text-rose-700 block">Supplier: Snack Berkah • Min: 5 Bungkus</span>
+              </div>
+              <span class="px-2.5 py-1 bg-rose-600 text-white rounded-lg font-black text-[10px] shrink-0 uppercase">KOSONG (0)</span>
+            </div>
+            <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between">
+              <div class="min-w-0">
+                <span class="font-black text-amber-950 block truncate text-xs">Keripik Pisang Coklat Lumer</span>
+                <span class="text-[10px] text-amber-700 block">Supplier: Aneka Snack Jaya • Min: 10 Bungkus</span>
+              </div>
+              <span class="px-2.5 py-1 bg-amber-500 text-slate-950 rounded-lg font-black text-[10px] shrink-0 font-mono">SISA 2 PCS</span>
+            </div>
+            <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between">
+              <div class="min-w-0">
+                <span class="font-black text-amber-950 block truncate text-xs">Stik Keju Crispy 150g</span>
+                <span class="text-[10px] text-amber-700 block">Supplier: CV Gurih Prima • Min: 8 Bungkus</span>
+              </div>
+              <span class="px-2.5 py-1 bg-amber-500 text-slate-950 rounded-lg font-black text-[10px] shrink-0 font-mono">SISA 3 PCS</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 4: REKAP FAKTUR LPB -->
+        <div id="panel-rep-lpb" class="hidden space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div class="p-3 bg-blue-50/70 border border-blue-200 rounded-2xl">
+              <span class="text-[10px] font-bold text-blue-800 uppercase block">Total Belanja Bulan Ini</span>
+              <div class="font-bebas text-xl text-blue-950 mt-0.5 tracking-wider">Rp 8.450.000</div>
+              <span class="text-[9px] text-blue-600 block mt-0.5">6 Faktur Masuk (LPB)</span>
+            </div>
+            <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-2xl">
+              <span class="text-[10px] font-bold text-amber-800 uppercase block">Sisa Utang Tempo</span>
+              <div class="font-bebas text-xl text-amber-950 mt-0.5 tracking-wider">Rp 3.250.000</div>
+              <span class="text-[9px] text-amber-700 font-bold block mt-0.5">2 Faktur Jatuh Tempo</span>
+            </div>
+          </div>
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+            <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Faktur Terakhir:</span>
+            <div class="space-y-1.5 text-[11px]">
+              <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-100">
+                <div>
+                  <span class="font-bold text-slate-900 block">LPB-2026-003 • Aneka Snack Jaya</span>
+                  <span class="text-[9px] text-slate-400">20/09/2026 • 20 SKU</span>
+                </div>
+                <span class="font-mono font-black text-emerald-700">Rp 3.200.000 (LUNAS)</span>
+              </div>
+              <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-100">
+                <div>
+                  <span class="font-bold text-slate-900 block">LPB-2026-004 • CV Gurih Prima</span>
+                  <span class="text-[9px] text-slate-400">21/09/2026 • 15 SKU</span>
+                </div>
+                <span class="font-mono font-black text-amber-700">Rp 3.250.000 (TEMPO)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeMockupReportsModal()" class="px-5 py-2 bg-slate-800 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer transition">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MODAL PERSONIL TOKO & OTORISASI ================= -->
+  <div id="mockup-staff-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <!-- Modal Header -->
+      <div class="p-4 bg-gradient-to-r from-emerald-600 to-teal-700 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">👥</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Personil Toko & Hak Otorisasi</h3>
+            <p class="text-[11px] text-emerald-100">Manajemen Staf, Hak Akses Kasir & Absensi Shift</p>
+          </div>
+        </div>
+        <button onclick="closeMockupStaffModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="p-2 bg-slate-100 border-b border-slate-200 flex gap-1">
+        <button id="tab-btn-stf-staff" onclick="switchMockupStaffTab('staff')" class="flex-1 py-2 rounded-xl text-xs font-black transition bg-white text-emerald-700 shadow-xs cursor-pointer">
+          👤 Karyawan (Staf)
+        </button>
+        <button id="tab-btn-stf-auth" onclick="switchMockupStaffTab('auth')" class="flex-1 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer">
+          🔐 Hak Otorisasi PIN
+        </button>
+        <button id="tab-btn-stf-attendance" onclick="switchMockupStaffTab('attendance')" class="flex-1 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer">
+          ⏱️ Presensi & Shift
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-4 overflow-y-auto space-y-4 flex-1 text-xs">
+        
+        <!-- PANEL 1: DAFTAR KARYAWAN -->
+        <div id="panel-stf-staff" class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Staf Toko Terdaftar:</span>
+            <button onclick="alert('Buka dialog tambah staf')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold cursor-pointer transition">
+              + Tambah Staf
+            </button>
+          </div>
+          <div class="space-y-2">
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs shrink-0">COS</div>
+                <div>
+                  <span class="font-black text-slate-900 block text-xs">Kepala Toko (Supervisor)</span>
+                  <span class="text-[10px] text-slate-400 font-mono">NIK: SP-001 • Shift 1 (Pagi)</span>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full font-bold text-[9px] uppercase">COS / Full Akses</span>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-bold flex items-center justify-center text-xs shrink-0">ACOS</div>
+                <div>
+                  <span class="font-black text-slate-900 block text-xs">Kasir 1 (Siti Aminah)</span>
+                  <span class="text-[10px] text-slate-400 font-mono">NIK: SP-002 • Shift 1 (Pagi)</span>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 bg-blue-100 text-blue-800 border border-blue-300 rounded-full font-bold text-[9px] uppercase">ACOS / Asisten</span>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs shrink-0">KSR</div>
+                <div>
+                  <span class="font-black text-slate-900 block text-xs">Kasir 2 (Budi Santoso)</span>
+                  <span class="text-[10px] text-slate-400 font-mono">NIK: SP-003 • Shift 2 (Siang)</span>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 bg-slate-200 text-slate-700 border border-slate-300 rounded-full font-bold text-[9px] uppercase">Crew Kasir</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 2: HAK OTORISASI PIN -->
+        <div id="panel-stf-auth" class="hidden space-y-3">
+          <div class="p-3 bg-purple-50/80 border border-purple-200 rounded-xl text-[11px] text-purple-950 leading-relaxed">
+            💡 <strong>Sistem Otorisasi Ritel:</strong> Atur tindakan sensitif di meja kasir. Staf dengan izin mandiri tidak perlu memanggil supervisor saat melayani pembeli.
+          </div>
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
+            <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Matriks Izin Tindakan Kasir:</span>
+            <div class="space-y-2 text-[11px]">
+              <div class="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span class="font-bold text-slate-900 block">Batal Transaksi (Void) [F5]</span>
+                  <span class="text-[10px] text-slate-400">Membatalkan item yang sudah discan</span>
+                </div>
+                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg font-bold text-[10px]">COS & ACOS Boleh</span>
+              </div>
+              <div class="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span class="font-bold text-slate-900 block">Retur Barang Belanja [F3]</span>
+                  <span class="text-[10px] text-slate-400">Pengembalian uang nota belanja</span>
+                </div>
+                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg font-bold text-[10px]">COS & ACOS Boleh</span>
+              </div>
+              <div class="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span class="font-bold text-slate-900 block">Stock Opname Fisik [F6]</span>
+                  <span class="text-[10px] text-slate-400">Penyesuaian selisih stok rak</span>
+                </div>
+                <span class="px-2.5 py-1 bg-purple-100 text-purple-800 rounded-lg font-bold text-[10px]">Khusus COS Toko</span>
+              </div>
+              <div class="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
+                <div>
+                  <span class="font-bold text-slate-900 block">Pengaturan Sistem & Printer</span>
+                  <span class="text-[10px] text-slate-400">Edit profil & backup data</span>
+                </div>
+                <span class="px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg font-bold text-[10px]">Wajib PIN Super Admin</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 3: PRESENSI SHIFT -->
+        <div id="panel-stf-attendance" class="hidden space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Presensi Hari Ini:</span>
+            <div class="flex gap-1.5">
+              <button onclick="alert('Absen Masuk Tercatat')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[10px] cursor-pointer">
+                🟢 Masuk
+              </button>
+              <button onclick="alert('Absen Pulang Tercatat')" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-[10px] cursor-pointer">
+                🔴 Pulang
+              </button>
+            </div>
+          </div>
+          <div class="space-y-1.5 text-[11px]">
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div>
+                <span class="font-bold text-slate-900 block">Siti Aminah (ACOS / Kasir 1)</span>
+                <span class="text-[10px] text-slate-400 font-mono">Shift 1 Pagi • 22/09/2026</span>
+              </div>
+              <span class="font-mono font-bold text-emerald-700 text-[10px]">Masuk: 06:55 WIB</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+              <div>
+                <span class="font-bold text-slate-900 block">Supervisor (COS / Kepala Toko)</span>
+                <span class="text-[10px] text-slate-400 font-mono">Shift 1 Pagi • 22/09/2026</span>
+              </div>
+              <span class="font-mono font-bold text-emerald-700 text-[10px]">Masuk: 07:00 WIB</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeMockupStaffModal()" class="px-5 py-2 bg-slate-800 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer transition">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MODAL MEMBER TOKO ================= -->
+  <div id="mockup-member-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🎖️</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Member Pelanggan Toko</h3>
+            <p class="text-[11px] text-amber-100">Pendaftaran Member & Poin Belanja</p>
+          </div>
+        </div>
+        <button onclick="closeMockupMemberModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+      <div class="p-4 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nama Lengkap Pelanggan *</label>
+          <input type="text" placeholder="Contoh: Ibu Rina Wati" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-900 focus:outline-none focus:border-amber-500" />
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nomor WhatsApp Pelanggan *</label>
+          <input type="text" placeholder="Contoh: 08123456789" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono text-slate-900 focus:outline-none focus:border-amber-500" />
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Alamat / RT RW</label>
+          <input type="text" placeholder="Contoh: Jl. Mawar No. 12" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-amber-500" />
+        </div>
+        <button type="button" onclick="alert('Member Baru Berhasil Didaftarkan!'); closeMockupMemberModal();" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black rounded-xl shadow-md transition cursor-pointer">
+          💾 Simpan & Aktifkan Kartu Member
+        </button>
+      </div>
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeMockupMemberModal()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs cursor-pointer transition">
+          Batal
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1011,6 +1498,79 @@
         if (panelGuide) panelGuide.classList.remove('hidden');
         if (panelInfo) panelInfo.classList.add('hidden');
       }
+    }
+
+    // Modal Pusat Laporan & Analitik Toko (Omzet, Top Laris, Stok Kritis, Rekap LPB)
+    function openMockupReportsModal(defaultTab = 'sales') {
+      const modal = document.getElementById('mockup-reports-modal');
+      if (modal) modal.classList.remove('hidden');
+      switchMockupReportsTab(defaultTab);
+    }
+
+    function closeMockupReportsModal() {
+      const modal = document.getElementById('mockup-reports-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function switchMockupReportsTab(tab) {
+      const tabs = ['sales', 'top', 'lowstock', 'lpb'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-rep-${t}`);
+        const panel = document.getElementById(`panel-rep-${t}`);
+        if (btn) {
+          if (t === tab) {
+            btn.className = "flex-1 py-2 px-2.5 rounded-xl text-xs font-black transition bg-white text-indigo-700 shadow-xs cursor-pointer whitespace-nowrap";
+          } else {
+            btn.className = "flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap";
+          }
+        }
+        if (panel) {
+          if (t === tab) panel.classList.remove('hidden');
+          else panel.classList.add('hidden');
+        }
+      });
+    }
+
+    // Modal Personil Toko & Hak Otorisasi (COS, ACOS, Kasir, PIN & Shift)
+    function openMockupStaffModal(defaultTab = 'staff') {
+      const modal = document.getElementById('mockup-staff-modal');
+      if (modal) modal.classList.remove('hidden');
+      switchMockupStaffTab(defaultTab);
+    }
+
+    function closeMockupStaffModal() {
+      const modal = document.getElementById('mockup-staff-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function switchMockupStaffTab(tab) {
+      const tabs = ['staff', 'auth', 'attendance'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-stf-${t}`);
+        const panel = document.getElementById(`panel-stf-${t}`);
+        if (btn) {
+          if (t === tab) {
+            btn.className = "flex-1 py-2 rounded-xl text-xs font-black transition bg-white text-emerald-700 shadow-xs cursor-pointer";
+          } else {
+            btn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer";
+          }
+        }
+        if (panel) {
+          if (t === tab) panel.classList.remove('hidden');
+          else panel.classList.add('hidden');
+        }
+      });
+    }
+
+    // Modal Member Pelanggan Toko
+    function openMockupMemberModal() {
+      const modal = document.getElementById('mockup-member-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeMockupMemberModal() {
+      const modal = document.getElementById('mockup-member-modal');
+      if (modal) modal.classList.add('hidden');
     }
 
     // Katalog Master Produk Mockup Kasir
