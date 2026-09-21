@@ -90,13 +90,13 @@
           <span id="status-label" class="hidden sm:inline text-[10px] font-mono font-bold text-emerald-300">AUTO 30s</span>
         </div>
 
-        <!-- Ikon Flat Printer Thermal Minimalis -->
+        <!-- Ikon Flat Printer Thermal Minimalis (Klik untuk Rekonek Cepat) -->
         <button 
           id="header-printer-btn"
           type="button"
-          onclick="openSisModal('sis-modal-printer')"
+          onclick="triggerQuickPrinterReconnect()"
           class="h-8 w-8 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-white/90 hover:text-white transition active:scale-95 flex items-center justify-center cursor-pointer shadow-xs relative"
-          title="Printer Bluetooth Thermal • Klik untuk Setting & Sambungkan"
+          title="Printer Bluetooth • Klik untuk Sambungkan Kembali (Rekonek)"
         >
           <!-- Flat Clean SVG Printer Icon -->
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1860,16 +1860,43 @@
 
       const toast = document.createElement("div");
       toast.id = "mockup-pos-toast";
-      toast.className = `fixed top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl shadow-xl border text-xs font-bold flex items-center gap-2 transition-all duration-300 animate-bounce ${
-        type === "success" ? "bg-emerald-950 text-emerald-200 border-emerald-500/50" : "bg-rose-950 text-rose-200 border-rose-500/50"
-      }`;
-      toast.innerHTML = `<span>${type === "success" ? "🟢" : "⚠️"}</span> <span>${msg}</span>`;
+      const bgClass = type === "success" 
+        ? "bg-emerald-950 text-emerald-200 border-emerald-500/50" 
+        : type === "info"
+        ? "bg-slate-900 text-slate-100 border-slate-700"
+        : "bg-rose-950 text-rose-200 border-rose-500/50";
+      const icon = type === "success" ? "🟢" : type === "info" ? "⏳" : "⚠️";
+
+      toast.className = `fixed top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl shadow-xl border text-xs font-bold flex items-center gap-2 transition-all duration-300 animate-bounce ${bgClass}`;
+      toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
       document.body.appendChild(toast);
 
       setTimeout(() => {
         toast.style.opacity = "0";
         setTimeout(() => toast.remove(), 300);
-      }, 3500);
+      }, 3000);
+    }
+
+    // Quick Reconnect Printer Bluetooth (Klik Langsung di Header tanpa Popup)
+    let isPrinterReconnecting = false;
+    async function triggerQuickPrinterReconnect() {
+      if (isPrinterReconnecting) return;
+      isPrinterReconnecting = true;
+      const dot = document.getElementById('printer-status-dot');
+      if (dot) dot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-1.5 ring-red-600 animate-ping";
+      showMockupToast("Menghubungkan ke printer...", "info");
+
+      try {
+        // Simulasi auto-reconnect ke Bluetooth device ID terakhir yang tersimpan
+        await new Promise(r => setTimeout(r, 800));
+        if (dot) dot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-1.5 ring-red-600 animate-pulse";
+        showMockupToast("Printer terhubung", "success");
+      } catch (err) {
+        if (dot) dot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500 ring-1.5 ring-red-600";
+        showMockupToast("Gagal menyambungkan ke printer", "error");
+      } finally {
+        isPrinterReconnecting = false;
+      }
     }
 
     // Fungsi Trigger Sinkronisasi Manual (Bisa diklik dari header dot & Drawer SIS)
