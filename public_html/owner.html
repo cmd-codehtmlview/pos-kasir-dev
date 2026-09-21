@@ -1414,8 +1414,12 @@
              h.startsWith("10.") || 
              h.startsWith("172.") || 
              h.includes(".local") || 
+             h.includes("trycloudflare.com") || 
+             h.includes("pages.dev") || 
+             h.includes("ngrok") || 
              p === "8081" || 
              p === "8082" || 
+             p === "8085" || 
              window.location.protocol === "file:";
     }
 
