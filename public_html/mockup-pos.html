@@ -47,55 +47,55 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col select-none">
 
-  <!-- ================= TOP HEADER (MINIMALIS & ERGONOMIS DI LAYAR HP) ================= -->
+  <!-- ================= TOP HEADER ================= -->
   <header class="bg-gradient-to-r from-retail-red via-red-600 to-retail-red text-white shadow-md sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-2.5 sm:px-4 py-2 flex items-center justify-between gap-2">
       
-      <!-- Kiri: Brand & Info Kasir Aktif (Proporsional & Sejajar) -->
-      <div class="flex items-center gap-2.5 min-w-0 flex-1">
-        <div class="w-[34px] h-[34px] rounded-xl bg-white text-retail-red flex items-center justify-center font-black text-sm shadow-xs border border-red-200 flex-shrink-0">
+      <!-- Kiri: Brand & Info Kasir Aktif -->
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="w-8 h-8 rounded-xl bg-white text-retail-red flex items-center justify-center font-black text-sm shadow-xs border border-red-200 flex-shrink-0">
           🛍️
         </div>
         <div class="min-w-0">
-          <h1 class="font-black text-xs sm:text-sm tracking-tight leading-none text-white truncate">TOKO SNACK BERKAH</h1>
-          <p class="text-[10px] text-red-100/90 flex items-center gap-1 font-medium leading-none mt-1 truncate">
-            <span class="font-semibold">👤 Budi</span>
+          <h1 class="font-black text-xs sm:text-sm tracking-tight leading-tight truncate">TOKO SNACK BERKAH</h1>
+          <p class="text-[10px] text-red-100/90 flex items-center gap-1 font-medium leading-tight truncate">
+            <span>👤 Budi</span>
             <span class="opacity-40">•</span>
-            <span>Shift 1 (Pagi)</span>
+            <span>Shift 1</span>
           </p>
         </div>
       </div>
 
-      <!-- Tengah: Jam Digital, Hari, Tanggal, Bulan, Tahun & Detik Bahasa Indonesia (Center Terkunci) -->
-      <div class="flex flex-col items-center justify-center text-center px-3 h-[34px] rounded-xl bg-black/20 border border-white/20 shadow-xs flex-shrink-0">
+      <!-- Tengah: Jam Digital, Hari, Tanggal, Bulan, Tahun & Detik Bahasa Indonesia -->
+      <div class="flex flex-col items-center justify-center text-center px-2.5 py-1 rounded-xl bg-black/20 border border-white/20 shadow-xs flex-shrink-0">
         <span id="header-date" class="text-[9px] sm:text-[10px] text-red-100 font-semibold tracking-tight leading-none">
           --
         </span>
-        <span id="header-clock" class="text-xs sm:text-[13px] font-mono font-black text-white tracking-widest leading-none mt-0.5">
+        <span id="header-clock" class="text-xs sm:text-sm font-mono font-black text-white tracking-widest leading-tight mt-0.5">
           --:--:--
         </span>
       </div>
 
-      <!-- Kanan: Dot Status (Hijau/Merah), Ikon Printer Flat, Tombol SIS (Tinggi & Style Selaras) -->
-      <div class="flex items-center justify-end gap-1.5 sm:gap-2 flex-1 flex-shrink-0">
+      <!-- Kanan: Dot Status Cloud, Ikon Flat Printer, Tombol SIS -->
+      <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
         
         <!-- Dot Status Online (Hijau 30s) / Offline (Merah) -->
         <div 
           id="status-indicator" 
           onclick="triggerMockupManualSync()" 
-          class="h-[34px] px-2.5 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-[10px] font-semibold text-white cursor-pointer active:scale-95 transition flex items-center gap-1.5 shadow-xs" 
+          class="h-8 px-2.5 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-[10px] font-semibold text-white cursor-pointer active:scale-95 transition flex items-center gap-1.5 shadow-xs" 
           title="Cloud Terhubung • Sinkron Otomatis Tiap 30 Detik • Klik untuk Sinkron Manual Sekarang"
         >
           <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
           <span id="status-label" class="hidden sm:inline text-[10px] font-mono font-bold text-emerald-300">AUTO 30s</span>
         </div>
 
-        <!-- Ikon Flat Printer Thermal Minimalis (Tinggi Selaras h-[34px]) -->
+        <!-- Ikon Flat Printer Thermal Minimalis -->
         <button 
           id="header-printer-btn"
           type="button"
           onclick="openSisModal('sis-modal-printer')"
-          class="h-[34px] w-[34px] rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-white/90 hover:text-white transition active:scale-95 flex items-center justify-center cursor-pointer shadow-xs relative"
+          class="h-8 w-8 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-white/90 hover:text-white transition active:scale-95 flex items-center justify-center cursor-pointer shadow-xs relative"
           title="Printer Bluetooth Thermal • Klik untuk Setting & Sambungkan"
         >
           <!-- Flat Clean SVG Printer Icon -->
@@ -104,14 +104,14 @@
             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
             <rect x="6" y="14" width="12" height="8"></rect>
           </svg>
-          <!-- Micro Dot Status (Hijau = Terhubung, Merah/Abu = Disconnect) -->
+          <!-- Micro Dot Status -->
           <span id="printer-status-dot" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-1.5 ring-red-600 animate-pulse"></span>
         </button>
 
-        <!-- Tombol SIS Minimalis (Tinggi Selaras h-[34px]) -->
+        <!-- Tombol SIS Minimalis -->
         <button 
           onclick="toggleSisDrawer()" 
-          class="h-[34px] px-3 sm:px-3.5 bg-white/20 hover:bg-white text-white hover:text-retail-red rounded-xl font-black text-xs transition active:scale-95 border border-white/40 cursor-pointer flex items-center justify-center tracking-wider shadow-xs"
+          class="h-8 px-3 bg-white/20 hover:bg-white text-white hover:text-retail-red rounded-xl font-black text-xs transition active:scale-95 border border-white/40 cursor-pointer flex items-center justify-center tracking-wider shadow-xs" 
           title="Buka Menu Sistem Informasi Toko (SIS)"
         >
           SIS
