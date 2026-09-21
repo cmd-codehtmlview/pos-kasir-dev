@@ -733,7 +733,6 @@ const DEFAULT_APP_ABOUT_CONFIG = {
   appName: "SnackPOS Cloud Retail Edition",
   appVersion: "v2.4.2 (Build 2026.09.22)",
   devName: "SnackPOS Engineering Team",
-  licenseStatus: "LIFETIME ENTERPRISE",
   helpdeskWa: "6281234567890",
   helpdeskEmail: "support@snackpos.local",
   releaseNotes: "• Fitur Sinkronisasi Otomatis 30 Detik ke Cloud (Indikator Hijau & Manual Push)\n• Pencarian Cepat Produk (Live Typing, Lihat Semua, & Barcode Camera)\n• Valuasi Toko Rapi & Responsif (1 Baris Collapsible)\n• Panduan Lengkap SOP Kasir & Pintasan F1-F12",
@@ -748,6 +747,66 @@ function getActiveAboutConfig() {
     } catch(e) {}
   }
   return { ...DEFAULT_APP_ABOUT_CONFIG };
+}
+
+// Menentukan status & badge lisensi berdasarkan Paket Pembelian Lisensi Toko (snack_pos_license)
+function getStoreLicenseBadgeInfo() {
+  const lic = typeof getStoredLicense === 'function' ? getStoredLicense() : null;
+  if (!lic || !lic.isLicensed) {
+    return {
+      text: "BELUM BERLISENSI",
+      className: "px-3 py-1 bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-black shrink-0"
+    };
+  }
+
+  if (lic.status === "BLOCKED" || lic.status === "EXPIRED") {
+    return {
+      text: "LISENSI KADALUARSA / TERKUNCI",
+      className: "px-3 py-1 bg-rose-100 text-rose-800 border border-rose-300 rounded-xl text-xs font-black shrink-0"
+    };
+  }
+
+  if (lic.type === "LIFETIME" || lic.planType === "PAKET_1") {
+    return {
+      text: "💎 PAKET 1 - LIFETIME ENTERPRISE",
+      className: "px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-black shrink-0"
+    };
+  }
+
+  if (lic.type === "TRIAL") {
+    const exp = lic.expiresAt ? new Date(lic.expiresAt).toLocaleDateString("id-ID") : "";
+    return {
+      text: `🎁 TRIAL 7 HARI${exp ? ' (s/d ' + exp + ')' : ''}`,
+      className: "px-3 py-1 bg-amber-100 text-amber-800 border border-amber-300 rounded-xl text-xs font-black shrink-0"
+    };
+  }
+
+  // PAKET 2 / Langganan Cloud
+  const exp = lic.expiresAt ? new Date(lic.expiresAt).toLocaleDateString("id-ID") : "";
+  let durLabel = "🔄 PAKET 2 - LANGGANAN CLOUD";
+  if (lic.cloudDuration === "365" || lic.planType === "PAKET_2_1Y") durLabel = "👑 PAKET 2 (1 TAHUN)";
+  else if (lic.cloudDuration === "180" || lic.planType === "PAKET_2_6M") durLabel = "🔄 PAKET 2 (6 BULAN)";
+  else if (lic.cloudDuration === "90" || lic.planType === "PAKET_2_3M") durLabel = "🔄 PAKET 2 (3 BULAN)";
+  else if (lic.cloudDuration === "30" || lic.planType === "PAKET_2_1M") durLabel = "🔄 PAKET 2 (1 BULAN)";
+
+  return {
+    text: `${durLabel}${exp ? ' (s/d ' + exp + ')' : ''}`,
+    className: "px-3 py-1 bg-blue-100 text-blue-800 border border-blue-300 rounded-xl text-xs font-black shrink-0"
+  };
+}
+
+function updateAboutLicenseBadge() {
+  const badgeInfo = getStoreLicenseBadgeInfo();
+  const licEl = document.getElementById("about-display-license");
+  if (licEl) {
+    licEl.textContent = badgeInfo.text;
+    licEl.className = badgeInfo.className;
+  }
+  const mockupLic = document.getElementById("mockup-about-license");
+  if (mockupLic) {
+    mockupLic.textContent = badgeInfo.text;
+    mockupLic.className = badgeInfo.className.replace('text-xs', 'text-[9px]');
+  }
 }
 
 function applyAboutConfigToUI(cfg) {
@@ -769,8 +828,8 @@ function applyAboutConfigToUI(cfg) {
     verBuildEl.innerHTML = `Versi: <strong class="text-indigo-600">${verPart}</strong> • Build: <strong class="text-slate-700">${buildPart}</strong>`;
   }
 
-  const licEl = document.getElementById("about-display-license");
-  if (licEl) licEl.textContent = c.licenseStatus || DEFAULT_APP_ABOUT_CONFIG.licenseStatus;
+  // Sinkronkan status lisensi kasir secara otomatis dengan paket pembelian lisensi toko aktif
+  updateAboutLicenseBadge();
 
   const devEl = document.getElementById("about-display-dev-name");
   if (devEl) devEl.textContent = c.devName || DEFAULT_APP_ABOUT_CONFIG.devName;

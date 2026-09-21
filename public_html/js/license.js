@@ -2774,6 +2774,11 @@ function renderLicenseStatus() {
       badge.textContent = `LANGGANAN s/d ${expDate}`;
     }
   }
+
+  // Sinkronkan badge lisensi di menu Tentang Aplikasi
+  if (typeof updateAboutLicenseBadge === 'function') {
+    updateAboutLicenseBadge();
+  }
 }
 
 async function verifyLicenseOnlineQuietly() {

@@ -423,10 +423,12 @@
                 class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" />
             </div>
 
-            <div>
-              <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Status Lisensi Bawaan</label>
-              <input type="text" id="vendor-license-status" placeholder="LIFETIME ENTERPRISE"
-                class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 font-mono focus:outline-none focus:border-indigo-500" />
+            <div class="p-2.5 bg-slate-900/60 border border-slate-800/80 rounded-xl flex items-center gap-2.5">
+              <span class="text-base">🔐</span>
+              <div class="text-[11px] text-slate-400 leading-tight">
+                <span class="font-bold text-slate-300 uppercase text-[10px] block">Status Lisensi Kasir:</span>
+                Sinkron otomatis dengan <strong class="text-indigo-400">Paket Pembelian Lisensi Toko</strong> (Paket 1 Lifetime / Paket 2 Langganan / Trial) di masing-masing kasir.
+              </div>
             </div>
 
             <div>
@@ -1914,7 +1916,6 @@
       appName: "SnackPOS Cloud Retail Edition",
       appVersion: "v2.4.2 (Build 2026.09.22)",
       devName: "SnackPOS Engineering Team",
-      licenseStatus: "LIFETIME ENTERPRISE",
       helpdeskWa: "6281234567890",
       helpdeskEmail: "support@snackpos.local",
       releaseNotes: "• Fitur Sinkronisasi Otomatis 30 Detik ke Cloud (Indikator Hijau & Manual Push)\n• Pencarian Cepat Produk (Live Typing, Lihat Semua, & Barcode Camera)\n• Valuasi Toko Rapi & Responsif (1 Baris Collapsible)\n• Panduan Lengkap SOP Kasir & Pintasan F1-F12",
@@ -1934,7 +1935,6 @@
       const nameEl = document.getElementById("vendor-app-name");
       const verEl = document.getElementById("vendor-app-version");
       const devEl = document.getElementById("vendor-dev-name");
-      const licEl = document.getElementById("vendor-license-status");
       const waEl = document.getElementById("vendor-helpdesk-wa");
       const emailEl = document.getElementById("vendor-helpdesk-email");
       const notesEl = document.getElementById("vendor-release-notes");
@@ -1943,7 +1943,6 @@
       if (nameEl) nameEl.value = c.appName || DEFAULT_ABOUT_CONFIG.appName;
       if (verEl) verEl.value = c.appVersion || DEFAULT_ABOUT_CONFIG.appVersion;
       if (devEl) devEl.value = c.devName || DEFAULT_ABOUT_CONFIG.devName;
-      if (licEl) licEl.value = c.licenseStatus || DEFAULT_ABOUT_CONFIG.licenseStatus;
       if (waEl) waEl.value = c.helpdeskWa || DEFAULT_ABOUT_CONFIG.helpdeskWa;
       if (emailEl) emailEl.value = c.helpdeskEmail || DEFAULT_ABOUT_CONFIG.helpdeskEmail;
       if (notesEl) notesEl.value = c.releaseNotes || DEFAULT_ABOUT_CONFIG.releaseNotes;
@@ -2000,7 +1999,6 @@
       const appName = document.getElementById("vendor-app-name")?.value.trim() || DEFAULT_ABOUT_CONFIG.appName;
       const appVersion = document.getElementById("vendor-app-version")?.value.trim() || DEFAULT_ABOUT_CONFIG.appVersion;
       const devName = document.getElementById("vendor-dev-name")?.value.trim() || DEFAULT_ABOUT_CONFIG.devName;
-      const licenseStatus = document.getElementById("vendor-license-status")?.value.trim() || DEFAULT_ABOUT_CONFIG.licenseStatus;
       const helpdeskWa = (document.getElementById("vendor-helpdesk-wa")?.value || "").replace(/[^0-9]/g, '') || DEFAULT_ABOUT_CONFIG.helpdeskWa;
       const helpdeskEmail = document.getElementById("vendor-helpdesk-email")?.value.trim() || DEFAULT_ABOUT_CONFIG.helpdeskEmail;
       const releaseNotes = document.getElementById("vendor-release-notes")?.value.trim() || DEFAULT_ABOUT_CONFIG.releaseNotes;
@@ -2009,7 +2007,6 @@
         appName,
         appVersion,
         devName,
-        licenseStatus,
         helpdeskWa,
         helpdeskEmail,
         releaseNotes,

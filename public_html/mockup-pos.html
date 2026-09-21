@@ -920,8 +920,39 @@
           const devEl = document.getElementById('mockup-about-dev');
           if (devEl && cfg.devName) devEl.textContent = cfg.devName;
 
+          // Status Lisensi Toko sinkron otomatis dengan Paket Pembelian Lisensi Toko (snack_pos_license)
           const licEl = document.getElementById('mockup-about-license');
-          if (licEl && cfg.licenseStatus) licEl.textContent = cfg.licenseStatus;
+          if (licEl) {
+            let licObj = null;
+            try {
+              const rawLic = localStorage.getItem("snack_pos_license");
+              if (rawLic) licObj = JSON.parse(rawLic);
+            } catch(e) {}
+
+            if (!licObj || !licObj.isLicensed) {
+              licEl.textContent = "BELUM BERLISENSI";
+              licEl.className = "inline-block mt-1 px-2 py-0.5 bg-slate-200 text-slate-700 font-bold text-[9px] rounded-full uppercase border border-slate-300";
+            } else if (licObj.status === "BLOCKED" || licObj.status === "EXPIRED") {
+              licEl.textContent = "LISENSI KADALUARSA";
+              licEl.className = "inline-block mt-1 px-2 py-0.5 bg-rose-100 text-rose-800 font-bold text-[9px] rounded-full uppercase border border-rose-200";
+            } else if (licObj.type === "LIFETIME" || licObj.planType === "PAKET_1") {
+              licEl.textContent = "💎 PAKET 1 - LIFETIME ENTERPRISE";
+              licEl.className = "inline-block mt-1 px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] rounded-full uppercase border border-emerald-200";
+            } else if (licObj.type === "TRIAL") {
+              const exp = licObj.expiresAt ? new Date(licObj.expiresAt).toLocaleDateString("id-ID") : "";
+              licEl.textContent = `🎁 TRIAL 7 HARI${exp ? ' (s/d ' + exp + ')' : ''}`;
+              licEl.className = "inline-block mt-1 px-2 py-0.5 bg-amber-100 text-amber-800 font-bold text-[9px] rounded-full uppercase border border-amber-200";
+            } else {
+              const exp = licObj.expiresAt ? new Date(licObj.expiresAt).toLocaleDateString("id-ID") : "";
+              let durLabel = "🔄 PAKET 2 - LANGGANAN CLOUD";
+              if (licObj.cloudDuration === "365" || licObj.planType === "PAKET_2_1Y") durLabel = "👑 PAKET 2 (1 TAHUN)";
+              else if (licObj.cloudDuration === "180" || licObj.planType === "PAKET_2_6M") durLabel = "🔄 PAKET 2 (6 BULAN)";
+              else if (licObj.cloudDuration === "90" || licObj.planType === "PAKET_2_3M") durLabel = "🔄 PAKET 2 (3 BULAN)";
+              else if (licObj.cloudDuration === "30" || licObj.planType === "PAKET_2_1M") durLabel = "🔄 PAKET 2 (1 BULAN)";
+              licEl.textContent = `${durLabel}${exp ? ' (s/d ' + exp + ')' : ''}`;
+              licEl.className = "inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-800 font-bold text-[9px] rounded-full uppercase border border-blue-200";
+            }
+          }
 
           const waLink = document.getElementById('mockup-about-wa-link');
           if (waLink && cfg.helpdeskWa) {
