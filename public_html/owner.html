@@ -275,6 +275,90 @@
     </div>
 
     <!-- ========================================== -->
+    <!-- RINGKASAN VALUASI ASET INVENTORI TOKO -->
+    <!-- ========================================== -->
+    <div class="mb-5">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+          <span>💎</span>
+          <span>VALUASI ASET INVENTORI TOKO (REAL-TIME STOK & RUPIAH)</span>
+        </h3>
+        <span class="text-[10px] text-slate-400 font-mono" id="kpi-inventory-sku-badge">Memuat Aset...</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        
+        <!-- VALUASI 1: MODAL HPP TERTANAM -->
+        <div class="bg-gradient-to-br from-indigo-950/80 via-slate-900 to-slate-950 p-4 rounded-2xl border border-indigo-500/30 stat-card-glow flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-indigo-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px]">Nilai Modal Aset Barang (HPP)</span>
+              <span class="text-lg">💰</span>
+            </div>
+            <div id="kpi-inventory-asset-cost" class="text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-2">
+              Rp 0
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+            <span>Uang Modal Tertanam di Rak</span>
+            <span class="text-indigo-300 font-semibold font-mono">Modal Fisik</span>
+          </div>
+        </div>
+
+        <!-- VALUASI 2: TOTAL FISIK STOK (QTY & SKU) -->
+        <div class="bg-gradient-to-br from-cyan-950/80 via-slate-900 to-slate-950 p-4 rounded-2xl border border-cyan-500/30 stat-card-glow flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-cyan-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px]">Total Fisik Stok Barang</span>
+              <span class="text-lg">📦</span>
+            </div>
+            <div id="kpi-inventory-qty" class="text-xl sm:text-2xl font-black font-mono text-cyan-300 mt-2">
+              0 Pcs
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+            <span id="kpi-inventory-sku-count">0 Jenis Produk (SKU)</span>
+            <span class="text-cyan-400 font-semibold">Toko & Gudang</span>
+          </div>
+        </div>
+
+        <!-- VALUASI 3: POTENSI OMZET PENJUALAN -->
+        <div class="bg-gradient-to-br from-amber-950/80 via-slate-900 to-slate-950 p-4 rounded-2xl border border-amber-500/30 stat-card-glow flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-amber-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px]">Potensi Nilai Penjualan</span>
+              <span class="text-lg">🏷️</span>
+            </div>
+            <div id="kpi-inventory-asset-retail" class="text-xl sm:text-2xl font-black font-mono text-amber-400 mt-2">
+              Rp 0
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+            <span>Jika Semua Stok Habis Terjual</span>
+            <span class="text-amber-400 font-semibold font-mono">Gross Retail</span>
+          </div>
+        </div>
+
+        <!-- VALUASI 4: PROYEKSI LABA KOTOR INVENTORI -->
+        <div class="bg-gradient-to-br from-emerald-950/80 via-slate-900 to-slate-950 p-4 rounded-2xl border border-emerald-500/30 stat-card-glow flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-emerald-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px]">Proyeksi Laba dari Stok</span>
+              <span class="text-lg">📈</span>
+            </div>
+            <div id="kpi-inventory-profit-projection" class="text-xl sm:text-2xl font-black font-mono text-emerald-300 mt-2">
+              Rp 0
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+            <span id="kpi-inventory-margin-projection">Potensi Margin: 0%</span>
+            <span class="text-emerald-400 font-semibold">Estimasi Bersih</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================== -->
     <!-- 9 KARTU KPI UTAMA (METRICS) -->
     <!-- ========================================== -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-9 gap-3 sm:gap-4">
@@ -2414,6 +2498,36 @@
       if (kpiMbrCountEl) kpiMbrCountEl.textContent = `${formatAngka(totalMembersCount)} Member`;
       if (kpiMbrPtsEl) kpiMbrPtsEl.textContent = `${formatAngka(totalMemberPoints)} Poin Aktif`;
       if (badgeMbrCountEl) badgeMbrCountEl.textContent = `${formatAngka(totalMembersCount)} Terdaftar`;
+
+      // Update Ringkasan Valuasi Aset Inventori Toko (Real-Time Stok & Rupiah)
+      const prodList = dashboardData.products || [];
+      const totalInventorySku = prodList.length;
+      const totalInventoryQty = prodList.reduce((sum, p) => sum + Math.max(0, Number(p.stock) || 0), 0);
+      const totalInventoryRetail = prodList.reduce((sum, p) => {
+        const price = Number(p.price) || 0;
+        const stock = Math.max(0, Number(p.stock) || 0);
+        return sum + (stock * price);
+      }, 0);
+      const totalInventoryProfit = Math.max(0, totalInventoryRetail - totalInventoryCost);
+      const totalInventoryMargin = totalInventoryRetail > 0 
+        ? Math.round((totalInventoryProfit / totalInventoryRetail) * 100) 
+        : 0;
+
+      const kpiAssetCostEl = document.getElementById("kpi-inventory-asset-cost");
+      const kpiAssetQtyEl = document.getElementById("kpi-inventory-qty");
+      const kpiAssetSkuCountEl = document.getElementById("kpi-inventory-sku-count");
+      const kpiAssetSkuBadgeEl = document.getElementById("kpi-inventory-sku-badge");
+      const kpiAssetRetailEl = document.getElementById("kpi-inventory-asset-retail");
+      const kpiAssetProfitEl = document.getElementById("kpi-inventory-profit-projection");
+      const kpiAssetMarginEl = document.getElementById("kpi-inventory-margin-projection");
+
+      if (kpiAssetCostEl) kpiAssetCostEl.textContent = formatRupiah(totalInventoryCost);
+      if (kpiAssetQtyEl) kpiAssetQtyEl.textContent = `${formatAngka(totalInventoryQty)} Pcs`;
+      if (kpiAssetSkuCountEl) kpiAssetSkuCountEl.textContent = `${formatAngka(totalInventorySku)} Jenis Produk (SKU)`;
+      if (kpiAssetSkuBadgeEl) kpiAssetSkuBadgeEl.textContent = `Total ${formatAngka(totalInventorySku)} SKU Terdaftar`;
+      if (kpiAssetRetailEl) kpiAssetRetailEl.textContent = formatRupiah(totalInventoryRetail);
+      if (kpiAssetProfitEl) kpiAssetProfitEl.textContent = formatRupiah(totalInventoryProfit);
+      if (kpiAssetMarginEl) kpiAssetMarginEl.textContent = `Potensi Margin: ${totalInventoryMargin}%`;
 
       // Top 10 Products
       renderTopProducts(transactions);

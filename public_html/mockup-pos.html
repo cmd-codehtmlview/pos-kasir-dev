@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SnackPOS - Mockup Retail Modern (Alfagift x POS)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            retail: {
+              red: '#d61823',
+              'red-dark': '#b91c1c',
+              yellow: '#ffcc00',
+              amber: '#f59e0b',
+              blue: '#0055a5',
+              navy: '#0f172a',
+            }
+          },
+          fontFamily: {
+            display: ['Bebas Neue', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-bebas { font-family: 'Bebas Neue', sans-serif; }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col select-none">
+
+  <!-- ================= TOP HEADER (GAYA ALFAGIFT MODERN) ================= -->
+  <header class="bg-gradient-to-r from-retail-red via-red-600 to-retail-red text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-3">
+      
+      <!-- Kiri: Brand & Info Kasir Aktif -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-white rounded-xl shadow-xs flex items-center justify-center text-retail-red font-black text-lg border border-red-200">
+          🛍️
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">TOKO SNACK BERKAH</h1>
+            <span class="bg-yellow-400 text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded shadow-2xs">RETAIL POS</span>
+          </div>
+          <p class="text-[11px] text-red-100 flex items-center gap-1.5 font-medium">
+            <span>👤 Kasir: <strong class="text-white">Budi Santoso</strong></span>
+            <span class="opacity-50">•</span>
+            <span>Shift 1</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Kanan: Status Dot & Tombol Menu SIS Utama -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Status Indikator Minimalis -->
+        <div class="hidden sm:flex items-center gap-2 bg-black/25 px-2.5 py-1 rounded-xl border border-white/15 text-[11px] font-semibold text-red-100">
+          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Cloud</span>
+          <span class="opacity-40">•</span>
+          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> BT 58mm</span>
+          <span class="opacity-40">•</span>
+          <span id="header-clock" class="font-mono text-white font-bold">14:35:10</span>
+        </div>
+
+        <!-- TOMBOL PINTU MASUK KE SIS (SISTEM INFORMASI TOKO) -->
+        <button onclick="toggleSisDrawer()" class="px-3 sm:px-4 py-2 bg-white hover:bg-yellow-100 text-retail-red rounded-xl font-extrabold text-xs sm:text-sm shadow-sm flex items-center gap-2 transition active:scale-95 cursor-pointer">
+          <span class="text-base">🏢</span>
+          <span class="hidden sm:inline">MENU SIS TOKO</span>
+          <span class="sm:hidden">SIS</span>
+          <span class="bg-retail-red text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">4</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= KONTEN UTAMA: LAYAR KASIR POS (COCKPIT TRANSAKSI) ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start">
+    
+    <!-- KOLOM KIRI (7/12): SCANNER INPUT & TABEL BELANJA KASIR -->
+    <div class="lg:col-span-8 flex flex-col gap-3">
+      
+      <!-- Smart Search & Scan Barcode (Hanya 1 Kolom Multifungsi) -->
+      <div class="bg-white p-2.5 sm:p-3 rounded-2xl border-2 border-slate-300 shadow-xs flex items-center gap-2">
+        <span class="text-xl pl-1">🔍</span>
+        <input 
+          type="text" 
+          id="mock-barcode-input" 
+          placeholder="Scan Barcode atau Ketik Nama Produk (Enter untuk tambah)..." 
+          class="w-full text-xs sm:text-sm font-bold text-slate-800 placeholder-slate-400 focus:outline-none"
+          autofocus
+          onkeydown="if(event.key==='Enter') addSampleItem()"
+        />
+        <button onclick="addSampleItem()" class="px-3 py-1.5 bg-retail-red hover:bg-red-700 text-white rounded-xl text-xs font-black transition flex-shrink-0 cursor-pointer shadow-xs">
+          + Tambah
+        </button>
+      </div>
+
+      <!-- Tabel Daftar Belanja Kasir -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col h-[520px]">
+        
+        <!-- Header Tabel -->
+        <div class="bg-slate-800 text-white text-xs font-bold px-3 py-2.5 grid grid-cols-12 gap-2 uppercase tracking-wider">
+          <span class="col-span-1 text-center">No</span>
+          <span class="col-span-5">Nama Barang & PLU</span>
+          <span class="col-span-2 text-center">Qty</span>
+          <span class="col-span-2 text-right">Harga</span>
+          <span class="col-span-2 text-right">Total</span>
+        </div>
+
+        <!-- Isi Item Belanja (Scrollable) -->
+        <div id="mock-cart-table" class="flex-1 overflow-y-auto divide-y divide-slate-100">
+          <!-- Item 1 -->
+          <div class="p-3 grid grid-cols-12 gap-2 items-center hover:bg-slate-50 text-xs transition">
+            <span class="col-span-1 text-center font-bold text-slate-400">1</span>
+            <div class="col-span-5 min-w-0">
+              <h4 class="font-extrabold text-slate-900 text-sm truncate">Chitato Sapi Panggang 68g</h4>
+              <p class="text-[10px] text-slate-400 font-mono">8992761111001 • Snack</p>
+            </div>
+            <div class="col-span-2 flex items-center justify-center gap-1.5">
+              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">-</button>
+              <span class="font-black text-sm w-5 text-center">2</span>
+              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">+</button>
+            </div>
+            <span class="col-span-2 text-right font-mono font-semibold text-slate-600">11.500</span>
+            <div class="col-span-2 text-right font-mono font-extrabold text-slate-900 text-sm flex items-center justify-end gap-1">
+              <span>23.000</span>
+              <button class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-1" title="Hapus item">✕</button>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="p-3 grid grid-cols-12 gap-2 items-center hover:bg-slate-50 text-xs transition">
+            <span class="col-span-1 text-center font-bold text-slate-400">2</span>
+            <div class="col-span-5 min-w-0">
+              <h4 class="font-extrabold text-slate-900 text-sm truncate">Aqua Botol 600ml</h4>
+              <p class="text-[10px] text-slate-400 font-mono">8999908001201 • Minuman</p>
+            </div>
+            <div class="col-span-2 flex items-center justify-center gap-1.5">
+              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">-</button>
+              <span class="font-black text-sm w-5 text-center">3</span>
+              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">+</button>
+            </div>
+            <span class="col-span-2 text-right font-mono font-semibold text-slate-600">3.500</span>
+            <div class="col-span-2 text-right font-mono font-extrabold text-slate-900 text-sm flex items-center justify-end gap-1">
+              <span>10.500</span>
+              <button class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-1" title="Hapus item">✕</button>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="p-3 grid grid-cols-12 gap-2 items-center hover:bg-slate-50 text-xs transition">
+            <span class="col-span-1 text-center font-bold text-slate-400">3</span>
+            <div class="col-span-5 min-w-0">
+              <h4 class="font-extrabold text-slate-900 text-sm truncate">Beng Beng Cokelat Wafer</h4>
+              <p class="text-[10px] text-slate-400 font-mono">8998866200112 • Biskuit</p>
+            </div>
+            <div class="col-span-2 flex items-center justify-center gap-1.5">
+              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">-</button>
+              <span class="font-black text-sm w-5 text-center">5</span>
+              <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">+</button>
+            </div>
+            <span class="col-span-2 text-right font-mono font-semibold text-slate-600">3.000</span>
+            <div class="col-span-2 text-right font-mono font-extrabold text-slate-900 text-sm flex items-center justify-end gap-1">
+              <span>15.000</span>
+              <button class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-1" title="Hapus item">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Ringkasan Item di Bawah Tabel -->
+        <div class="p-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600 font-bold">
+          <span>📦 Total: <strong>3 Item (10 pcs)</strong></span>
+          <span class="text-emerald-700">Potongan / Diskon: <strong>Rp 0</strong></span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- KOLOM KANAN (5/12): JUMBO DISPLAY TOTAL & TOMBOL KASIR CEPAT -->
+    <div class="lg:col-span-4 flex flex-col gap-3">
+      
+      <!-- JUMBO LED DISPLAY TOTAL BELANJA -->
+      <div class="bg-slate-900 rounded-2xl p-4 sm:p-5 border-2 border-slate-800 shadow-md text-right relative overflow-hidden">
+        <div class="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between">
+          <span class="flex items-center gap-1 text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> KASIR AKTIF</span>
+          <span>TOTAL BELANJA</span>
+        </div>
+        <!-- Angka Bebas Neue Raksasa -->
+        <div class="font-bebas text-5xl sm:text-6xl text-amber-400 tracking-wider font-bold leading-none">
+          Rp 48.500
+        </div>
+        <p class="text-[11px] text-slate-400 mt-1 font-mono">Subtotal: Rp 48.500 • Pajak: Rp 0</p>
+      </div>
+
+      <!-- Member Card Kasir -->
+      <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">👤</span>
+          <div>
+            <div class="text-xs font-extrabold text-slate-800">Pelanggan Member</div>
+            <p class="text-[10px] text-slate-400 font-mono">0851-5637-xxxx • 150 Poin</p>
+          </div>
+        </div>
+        <button class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold border border-indigo-200 transition">
+          Ganti
+        </button>
+      </div>
+
+      <!-- Tombol Tender / Uang Pas Cepat -->
+      <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
+        <label class="text-[10px] font-black uppercase text-slate-400 tracking-wider block mb-2">Pecahan Cepat Kasir</label>
+        <div class="grid grid-cols-4 gap-1.5">
+          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition">Uang Pas</button>
+          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition">50.000</button>
+          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition">70.000</button>
+          <button class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition">100.000</button>
+        </div>
+      </div>
+
+      <!-- 3 TOMBOL BESAR KASIR (BERSIH & ANTI-SALAH PENCET) -->
+      <div class="flex flex-col gap-2">
+        <!-- 1. BAYAR SEKARANG (Hijau Raksasa) -->
+        <button class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black text-lg shadow-lg flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer border-2 border-emerald-400">
+          <span>💳</span>
+          <span>[F1 / SPASI] BAYAR SEKARANG</span>
+        </button>
+
+        <!-- 2. TAHAN & VOID -->
+        <div class="grid grid-cols-2 gap-2">
+          <button class="py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-extrabold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer">
+            <span>⏸️</span>
+            <span>[F2] PENDING (1)</span>
+          </button>
+          <button class="py-3 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-xl font-extrabold text-xs sm:text-sm shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer border border-rose-300">
+            <span>🗑️</span>
+            <span>[F3] VOID / BATAL</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= SIS DRAWER (SISTEM INFORMASI TOKO GAYA ALFAGIFT) ================= -->
+  <!-- Drawer Panel yang hanya muncul saat tombol [MENU SIS] ditekan -->
+  <div id="sis-drawer-backdrop" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden transition-opacity" onclick="toggleSisDrawer()"></div>
+  
+  <div id="sis-drawer" class="fixed top-0 right-0 bottom-0 w-full max-w-xl bg-slate-50 z-50 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out border-l-2 border-slate-300">
+    
+    <!-- Drawer Header -->
+    <div class="p-4 bg-gradient-to-r from-retail-red to-red-700 text-white flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">🏢</span>
+        <div>
+          <h2 class="font-black text-base tracking-tight">STORE INFORMATION SYSTEM (SIS)</h2>
+          <p class="text-xs text-red-100">Pusat Operasional Toko, Gudang & Pembukuan</p>
+        </div>
+      </div>
+      <button onclick="toggleSisDrawer()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">
+        ✕
+      </button>
+    </div>
+
+    <!-- Drawer Content (Scrollable) -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-4">
+      
+      <!-- FITUR BARU EKSKLUSIF: KARTU VALUASI ASET INVENTORI TOKO -->
+      <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-4 shadow-md border border-slate-700">
+        <div class="flex items-center justify-between mb-3 border-b border-slate-700 pb-2">
+          <span class="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+            <span>💎</span>
+            <span>VALUASI ASET INVENTORI TOKO (REAL-TIME)</span>
+          </span>
+          <span class="text-[10px] text-slate-400 font-mono">145 Jenis SKU</span>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+            <span class="text-[10px] text-slate-400 font-bold block uppercase">💰 Nilai Modal Aset (HPP)</span>
+            <span class="font-bebas text-2xl text-emerald-400 tracking-wider">Rp 28.650.000</span>
+            <span class="text-[9px] text-slate-400 block mt-0.5">Uang modal tertanam di rak</span>
+          </div>
+          <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+            <span class="text-[10px] text-slate-400 font-bold block uppercase">📦 Total Fisik Stok</span>
+            <span class="font-bebas text-2xl text-cyan-400 tracking-wider">3.420 PCS</span>
+            <span class="text-[9px] text-slate-400 block mt-0.5">Seluruh unit barang toko</span>
+          </div>
+        </div>
+
+        <div class="mt-2.5 pt-2.5 border-t border-slate-700/60 flex items-center justify-between text-xs">
+          <span class="text-slate-300">Potensi Omzet: <strong>Rp 37.800.000</strong></span>
+          <span class="text-amber-400 font-extrabold">Proyeksi Laba: +Rp 9.150.000 (24%)</span>
+        </div>
+      </div>
+
+      <!-- KATEGORI 1: GUDANG & INVENTORI BARANG -->
+      <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
+        <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-retail-red">
+          <span>📦</span>
+          <span>1. Manajemen Gudang & Produk (Inventory)</span>
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">📋</span>
+            <span>Master Produk</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">📥</span>
+            <span>Penerimaan (LPB)</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">🏷️</span>
+            <span>Cetak Label Rak 40x30</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">🔄</span>
+            <span>Repack Bal ke Ecer</span>
+          </button>
+          <button class="col-span-2 p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">🔍</span>
+            <span>Stock Opname (Hitungan Fisik vs Komputer)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KATEGORI 2: OPERASIONAL & KAS KASIR -->
+      <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
+        <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-retail-blue">
+          <span>🔄</span>
+          <span>2. Operasional Kas & Closing Kasir</span>
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">💵</span>
+            <span>Modal Awal Kasir</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">📋</span>
+            <span>Closing Kasir (Klerk)</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">🧾</span>
+            <span>Riwayat Struk Kasir</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">↩️</span>
+            <span>Retur Transaksi Lama</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KATEGORI 3: MEMBER & PELANGGAN -->
+      <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
+        <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-amber-600">
+          <span>👥</span>
+          <span>3. Pelanggan & Member Toko</span>
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button class="p-2.5 bg-slate-50 hover:bg-amber-50 text-left rounded-xl border border-slate-200 hover:border-amber-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">➕</span>
+            <span>Daftar Member Baru</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-amber-50 text-left rounded-xl border border-slate-200 hover:border-amber-300 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">🎁</span>
+            <span>Cek Poin & Tukar Kupon</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- KATEGORI 4: PENGATURAN TOKO (BERSIH & MODERN) -->
+      <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
+        <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-slate-700">
+          <span>⚙️</span>
+          <span>4. Pengaturan Sistem Toko (Clean Settings)</span>
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">🏪</span>
+            <span>Profil Toko & Struk</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">🖨️</span>
+            <span>Setting Printer 58/80</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">💳</span>
+            <span>QRIS & Pembayaran</span>
+          </button>
+          <button class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800">
+            <span class="text-base">🔐</span>
+            <span>PIN Kasir & Akses</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Shortcut Link ke Dashboard Owner -->
+      <a href="owner.html" target="_blank" class="block p-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-xs text-center border border-slate-700 transition shadow-sm">
+        📊 Buka Portal Owner Lengkap (Analisis HP) ↗
+      </a>
+
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="p-3 bg-white border-t border-slate-200 text-center">
+      <button onclick="toggleSisDrawer()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-xs rounded-xl transition">
+        🛒 Kembali ke Layar Kasir
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    // Live digital clock
+    function updateClock() {
+      const now = new Date();
+      const el = document.getElementById('header-clock');
+      if (el) el.textContent = now.toTimeString().split(' ')[0];
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Toggle SIS Drawer
+    function toggleSisDrawer() {
+      const drawer = document.getElementById('sis-drawer');
+      const backdrop = document.getElementById('sis-drawer-backdrop');
+      if (drawer.classList.contains('translate-x-full')) {
+        drawer.classList.remove('translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        drawer.classList.add('translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    // Add dummy item sample
+    function addSampleItem() {
+      const input = document.getElementById('mock-barcode-input');
+      const table = document.getElementById('mock-cart-table');
+      const val = input.value.trim() || 'Keripik Tempe Renyah 150g';
+      
+      const count = table.children.length + 1;
+      const row = document.createElement('div');
+      row.className = "p-3 grid grid-cols-12 gap-2 items-center hover:bg-slate-50 text-xs transition bg-amber-50/40 animate-pulse";
+      row.innerHTML = `
+        <span class="col-span-1 text-center font-bold text-slate-400">${count}</span>
+        <div class="col-span-5 min-w-0">
+          <h4 class="font-extrabold text-slate-900 text-sm truncate">${val}</h4>
+          <p class="text-[10px] text-slate-400 font-mono">899${Math.floor(1000000000 + Math.random() * 9000000000)} • Baru</p>
+        </div>
+        <div class="col-span-2 flex items-center justify-center gap-1.5">
+          <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">-</button>
+          <span class="font-black text-sm w-5 text-center">1</span>
+          <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">+</button>
+        </div>
+        <span class="col-span-2 text-right font-mono font-semibold text-slate-600">12.000</span>
+        <div class="col-span-2 text-right font-mono font-extrabold text-slate-900 text-sm flex items-center justify-end gap-1">
+          <span>12.000</span>
+          <button onclick="this.closest('.grid').remove()" class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-1">✕</button>
+        </div>
+      `;
+      table.appendChild(row);
+      input.value = "";
+      input.focus();
+    }
+  </script>
+
+</body>
+</html>
+
