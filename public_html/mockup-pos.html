@@ -375,185 +375,167 @@
     <!-- Drawer Content (Scrollable) -->
     <div class="flex-1 overflow-y-auto p-4 space-y-4">
       
-      <!-- KATEGORI 1: PUSAT LAPORAN & VALUASI TOKO (2x2 GRID = 4 TOMBOL) -->
-      <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-black text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
-            <span>📊</span>
-            <span>1. Pusat Laporan & Valuasi Toko</span>
-          </h3>
-          <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full font-mono">Real-Time</span>
-        </div>
-
-        <!-- 4 Tombol Laporan Ritel Utama (Grid 2 Kolom Rapi 2x2) -->
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" onclick="openMockupReportsModal('sales')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">📈</span>
-            <div class="min-w-0">
-              <span class="block truncate">Omzet & Laba Real</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Laba Bersih & Margin %</span>
-            </div>
-          </button>
-          <button type="button" onclick="openMockupReportsModal('top')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">🏆</span>
-            <div class="min-w-0">
-              <span class="block truncate">Produk Terlaris</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Top 10 Fast-Moving</span>
-            </div>
-          </button>
-          <button type="button" onclick="openMockupReportsModal('valuation')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">💎</span>
-            <div class="min-w-0">
-              <span class="block truncate">Valuasi Stok Toko</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Modal HPP & Nilai Jual</span>
-            </div>
-          </button>
-          <button type="button" onclick="openMockupReportsModal('lowstock')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">⚠️</span>
-            <div class="min-w-0">
-              <span class="block truncate">Stok Kritis / Habis</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Alert Out-of-Stock</span>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      <!-- KATEGORI 2: LOGISTIK, GUDANG & INVENTORI (3x2 GRID = 6 TOMBOL) -->
-      <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
-        <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-retail-red">
-          <span>📦</span>
-          <span>2. Logistik, Gudang & Inventori</span>
-        </h3>
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">📋</span>
-            <span class="truncate">Master Produk</span>
-          </button>
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">📥</span>
-            <span class="truncate">Penerimaan (LPB)</span>
-          </button>
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">🔄</span>
-            <span class="truncate">Repack Bal ke Ecer</span>
-          </button>
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">🏷️</span>
-            <span class="truncate">Cetak Label Rak</span>
-          </button>
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">🔍</span>
-            <span class="truncate">Stock Opname Fisik</span>
-          </button>
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">🗑️</span>
-            <span class="truncate">Barang Rusak (BAP)</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- KATEGORI 3: OPERASIONAL KAS & KASIR (2x2 GRID = 4 TOMBOL, MODAL AWAL DIHAPUS) -->
+      <!-- KATEGORI 1: OPERASIONAL KAS & KASIR (2x2 GRID = 4 TOMBOL) -->
       <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
         <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-retail-blue">
           <span>💰</span>
-          <span>3. Operasional Kas & Kasir</span>
+          <span>1. Operasional Kas & Meja Kasir</span>
         </h3>
         <div class="grid grid-cols-2 gap-2">
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+          <button type="button" onclick="openSisModal('sis-modal-klerk')" class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base shrink-0">📋</span>
             <div class="min-w-0">
               <span class="block truncate">Closing Kasir (Klerk)</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Shift & Hitung Fisik</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">[F11] Hitung Fisik Uang</span>
             </div>
           </button>
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+          <button type="button" onclick="openSisModal('sis-modal-receipts')" class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base shrink-0">🧾</span>
             <div class="min-w-0">
               <span class="block truncate">Riwayat Struk Kasir</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Cari & Cetak Ulang</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">[F2] Cari & Cetak Ulang</span>
             </div>
           </button>
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+          <button type="button" onclick="openSisModal('sis-modal-retur')" class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base shrink-0">↩️</span>
             <div class="min-w-0">
-              <span class="block truncate">Retur Struk Kasir</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Pengembalian Belanja</span>
+              <span class="block truncate">Retur Belanja Konsumen</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">[F3] Pengembalian Item</span>
             </div>
           </button>
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+          <button type="button" onclick="openSisModal('sis-modal-cashdrop')" class="p-2.5 bg-slate-50 hover:bg-blue-50 text-left rounded-xl border border-slate-200 hover:border-blue-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base shrink-0">📥</span>
             <div class="min-w-0">
               <span class="block truncate">Tarik Kas / Cash Drop</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Setoran ke Brankas</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Setor Laci ke Brankas</span>
             </div>
           </button>
         </div>
       </div>
 
-      <!-- KATEGORI 4: PERSONIL TOKO, OTORISASI & MEMBER (2x2 GRID = 4 TOMBOL) -->
+      <!-- KATEGORI 2: LOGISTIK, GUDANG & BARANG (3x2 GRID = 6 TOMBOL) -->
+      <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
+        <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-retail-red">
+          <span>📦</span>
+          <span>2. Logistik, Gudang & Barang</span>
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="openSisModal('sis-modal-lpb')" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base shrink-0">📥</span>
+            <div class="min-w-0">
+              <span class="block truncate">Penerimaan (LPB)</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">[F7] Faktur & Barang Masuk</span>
+            </div>
+          </button>
+          <button type="button" onclick="openSisModal('sis-modal-products')" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base shrink-0">📋</span>
+            <div class="min-w-0">
+              <span class="block truncate">Master Produk & Stok</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">[F4] Cek Rak & Harga Jual</span>
+            </div>
+          </button>
+          <button type="button" onclick="openSisModal('sis-modal-label')" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base shrink-0">🏷️</span>
+            <div class="min-w-0">
+              <span class="block truncate">Cetak Label Rak</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">[F8] Format Standar 40x30</span>
+            </div>
+          </button>
+          <button type="button" onclick="openSisModal('sis-modal-so')" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base shrink-0">🔍</span>
+            <div class="min-w-0">
+              <span class="block truncate">Stock Opname Fisik</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">[F6] Hitung Fisik vs Komputer</span>
+            </div>
+          </button>
+          <button type="button" onclick="openSisModal('sis-modal-waste')" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base shrink-0">🗑️</span>
+            <div class="min-w-0">
+              <span class="block truncate">Barang Rusak (BAP)</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Bocor, Expired, Cacat</span>
+            </div>
+          </button>
+          <button type="button" onclick="openSisModal('sis-modal-repack')" class="p-2.5 bg-slate-50 hover:bg-red-50 text-left rounded-xl border border-slate-200 hover:border-red-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base shrink-0">🔄</span>
+            <div class="min-w-0">
+              <span class="block truncate">Repack Bal ke Ecer</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Pecah Dus Jadi Eceran Rak</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- KATEGORI 3: PERSONIL TOKO & KEAMANAN (2x1 GRID = 2 TOMBOL) -->
       <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
         <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-emerald-600">
           <span>👥</span>
-          <span>4. Personil Toko, Otorisasi & Member</span>
+          <span>3. Personil Toko & Keamanan</span>
         </h3>
         <div class="grid grid-cols-2 gap-2">
-          <button type="button" onclick="openMockupStaffModal('staff')" class="p-2.5 bg-slate-50 hover:bg-emerald-50 text-left rounded-xl border border-slate-200 hover:border-emerald-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+          <button type="button" onclick="openSisModal('sis-modal-staff')" class="p-2.5 bg-slate-50 hover:bg-emerald-50 text-left rounded-xl border border-slate-200 hover:border-emerald-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base shrink-0">👤</span>
             <div class="min-w-0">
-              <span class="block truncate">Karyawan Toko</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">COS, ACOS, Kasir</span>
+              <span class="block truncate">Karyawan & Presensi</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">COS, ACOS, Absen Shift</span>
             </div>
           </button>
-          <button type="button" onclick="openMockupStaffModal('auth')" class="p-2.5 bg-slate-50 hover:bg-emerald-50 text-left rounded-xl border border-slate-200 hover:border-emerald-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+          <button type="button" onclick="openSisModal('sis-modal-pin')" class="p-2.5 bg-slate-50 hover:bg-emerald-50 text-left rounded-xl border border-slate-200 hover:border-emerald-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base shrink-0">🔐</span>
             <div class="min-w-0">
-              <span class="block truncate">Hak Otorisasi PIN</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Izin Void, Retur, SO</span>
-            </div>
-          </button>
-          <button type="button" onclick="openMockupStaffModal('attendance')" class="p-2.5 bg-slate-50 hover:bg-emerald-50 text-left rounded-xl border border-slate-200 hover:border-emerald-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">⏱️</span>
-            <div class="min-w-0">
-              <span class="block truncate">Presensi & Shift</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Absen Masuk / Pulang</span>
-            </div>
-          </button>
-          <button type="button" onclick="openMockupMemberModal()" class="p-2.5 bg-slate-50 hover:bg-emerald-50 text-left rounded-xl border border-slate-200 hover:border-emerald-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">🎖️</span>
-            <div class="min-w-0">
-              <span class="block truncate">Member & Poin</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Daftar & Cek Kupon</span>
+              <span class="block truncate">PIN Otorisasi Kasir</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Izin Void, Retur, & SO</span>
             </div>
           </button>
         </div>
       </div>
 
-      <!-- KATEGORI 5: PENGATURAN SISTEM TOKO (2x2 GRID = 4 TOMBOL, TENTANG APLIKASI HANYA 1) -->
+      <!-- KATEGORI 4: LAPORAN OPERASIONAL KASIR (1 KARTU UTAMA LENGKAP & ELEGAN) -->
+      <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-black text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+            <span>📈</span>
+            <span>4. Laporan Operasional Kasir</span>
+          </h3>
+          <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full font-mono">Shift Aktif</span>
+        </div>
+        <button type="button" onclick="openSisModal('sis-modal-report')" class="w-full p-3 bg-gradient-to-r from-indigo-50 via-purple-50 to-slate-50 hover:from-indigo-100 hover:to-purple-100 text-left rounded-xl border border-indigo-200 transition flex items-center justify-between text-xs font-bold text-slate-800 cursor-pointer shadow-xs">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="text-xl shrink-0">📊</span>
+            <div class="min-w-0">
+              <span class="block font-black text-slate-900 text-xs">Laporan Penjualan Shift Hari Ini</span>
+              <span class="text-[10px] text-indigo-700 font-normal block">Omzet Rp 2.450.000 • Tunai, QRIS, Transaksi & Top 5 Laris</span>
+            </div>
+          </div>
+          <span class="text-indigo-600 text-sm font-black shrink-0 px-2 py-1 bg-white rounded-lg border border-indigo-200 shadow-xs">Buka ›</span>
+        </button>
+      </div>
+
+      <!-- KATEGORI 5: PENGATURAN SISTEM TOKO (2x2 GRID = 4 TOMBOL) -->
       <div class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs space-y-2.5">
         <h3 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5 text-slate-700">
           <span>⚙️</span>
           <span>5. Pengaturan Sistem Toko</span>
         </h3>
         <div class="grid grid-cols-2 gap-2">
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">🏪</span>
-            <div class="min-w-0">
-              <span class="block truncate">Profil Toko</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Identitas & Struk</span>
-            </div>
-          </button>
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+          <button type="button" onclick="openSisModal('sis-modal-printer')" class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base shrink-0">🖨️</span>
             <div class="min-w-0">
               <span class="block truncate">Setting Printer</span>
               <span class="text-[9px] text-slate-400 font-normal block truncate">Thermal 58 / 80mm</span>
             </div>
           </button>
-          <button type="button" class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+          <button type="button" onclick="openSisModal('sis-modal-profile')" class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base shrink-0">🏪</span>
+            <div class="min-w-0">
+              <span class="block truncate">Profil Toko</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Nama & Footer Struk</span>
+            </div>
+          </button>
+          <button type="button" onclick="openSisModal('sis-modal-qris')" class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base shrink-0">💳</span>
             <div class="min-w-0">
               <span class="block truncate">QRIS & Bayar</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">QRIS & Non-Tunai</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Akun QRIS Toko</span>
             </div>
           </button>
           <button type="button" onclick="openMockupAboutModal()" class="p-2.5 bg-slate-50 hover:bg-slate-100 text-left rounded-xl border border-slate-200 transition flex items-center justify-between text-xs font-bold text-slate-800 cursor-pointer">
@@ -740,449 +722,938 @@
     </div>
   </div>
 
-  <!-- ================= MODAL PUSAT LAPORAN & ANALITIK TOKO ================= -->
-  <div id="mockup-reports-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+
+  <!-- ================= 1. MODAL CLOSING KASIR (KLERK SHIFT) ================= -->
+  <div id="sis-modal-klerk" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-      
-      <!-- Modal Header -->
-      <div class="p-4 bg-gradient-to-r from-indigo-700 to-violet-800 text-white flex items-center justify-between">
+      <div class="p-4 bg-gradient-to-r from-blue-700 to-indigo-800 text-white flex items-center justify-between">
         <div class="flex items-center gap-2.5">
-          <span class="text-2xl">📊</span>
+          <span class="text-2xl">📋</span>
           <div>
-            <h3 class="font-black text-sm uppercase tracking-wider">Pusat Laporan & Analitik Bisnis</h3>
-            <p class="text-[11px] text-indigo-200">Performa Toko, Penjualan, Top Produk & Stok Kritis</p>
+            <h3 class="font-black text-sm uppercase tracking-wider">Closing Kasir (Klerk Shift) [F11]</h3>
+            <p class="text-[11px] text-blue-100">Penghitungan Fisik Laci Kas & Serah Terima Shift</p>
           </div>
         </div>
-        <button onclick="closeMockupReportsModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+        <button onclick="closeSisModal('sis-modal-klerk')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
       </div>
 
-      <!-- Tab Switcher -->
-      <div class="p-2 bg-slate-100 border-b border-slate-200 flex gap-1 overflow-x-auto">
-        <button id="tab-btn-rep-sales" onclick="switchMockupReportsTab('sales')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-black transition bg-white text-indigo-700 shadow-xs cursor-pointer whitespace-nowrap">
-          📈 Omzet & Laba
-        </button>
-        <button id="tab-btn-rep-top" onclick="switchMockupReportsTab('top')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
-          🏆 Top 10 Laris
-        </button>
-        <button id="tab-btn-rep-valuation" onclick="switchMockupReportsTab('valuation')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
-          💎 Valuasi Stok
-        </button>
-        <button id="tab-btn-rep-lowstock" onclick="switchMockupReportsTab('lowstock')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
-          ⚠️ Stok Kritis
-        </button>
-      </div>
-
-      <!-- Modal Body (Scrollable) -->
-      <div class="p-4 overflow-y-auto space-y-4 flex-1 text-xs">
-        
-        <!-- PANEL 1: OMZET & LABA -->
-        <div id="panel-rep-sales" class="space-y-3">
-          <div class="grid grid-cols-2 gap-2">
-            <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-2xl">
-              <span class="text-[10px] font-bold text-indigo-800 uppercase block">Omzet Bersih Toko</span>
-              <div class="font-bebas text-xl sm:text-2xl text-indigo-950 mt-0.5 tracking-wider">Rp 2.450.000</div>
-              <span class="text-[9px] text-indigo-600 block mt-0.5">34 Transaksi Selesai</span>
-            </div>
-            <div class="p-3 bg-emerald-50/70 border border-emerald-100 rounded-2xl">
-              <span class="text-[10px] font-bold text-emerald-800 uppercase block">Laba Bersih Real</span>
-              <div class="font-bebas text-xl sm:text-2xl text-emerald-950 mt-0.5 tracking-wider">+Rp 630.000</div>
-              <span class="text-[9px] text-emerald-700 font-bold block mt-0.5">Margin Laba: 25.7%</span>
-            </div>
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl">
-              <span class="text-[10px] font-bold text-slate-500 uppercase block">Modal Terjual (HPP)</span>
-              <div class="font-bebas text-lg text-slate-800 mt-0.5 tracking-wider">Rp 1.820.000</div>
-              <span class="text-[9px] text-slate-400 block mt-0.5">Beban Pokok Penjualan</span>
-            </div>
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl">
-              <span class="text-[10px] font-bold text-slate-500 uppercase block">Retur / Refund</span>
-              <div class="font-bebas text-lg text-rose-700 mt-0.5 tracking-wider">Rp 0</div>
-              <span class="text-[9px] text-slate-400 block mt-0.5">0 Transaksi Diretur</span>
-            </div>
+      <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
+        <div class="grid grid-cols-2 gap-2 bg-blue-50/70 border border-blue-200 p-3 rounded-2xl">
+          <div>
+            <span class="text-[10px] text-blue-800 font-bold uppercase block">Kasir Aktif:</span>
+            <span class="font-black text-slate-900 text-xs">Siti Aminah (KASIR 01)</span>
           </div>
-
-          <!-- Rincian Metode Bayar -->
-          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-            <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Penerimaan Berdasarkan Metode Pembayaran:</span>
-            <div class="space-y-1.5">
-              <div class="flex items-center justify-between text-[11px] p-2 bg-white rounded-xl border border-slate-100">
-                <span class="font-bold text-slate-800 flex items-center gap-1.5"><span>💵</span> Tunai di Laci Kasir</span>
-                <span class="font-mono font-black text-slate-900">Rp 1.650.000 (23 trx)</span>
-              </div>
-              <div class="flex items-center justify-between text-[11px] p-2 bg-white rounded-xl border border-slate-100">
-                <span class="font-bold text-indigo-700 flex items-center gap-1.5"><span>📱</span> QRIS / Non-Tunai</span>
-                <span class="font-mono font-black text-indigo-900">Rp 800.000 (11 trx)</span>
-              </div>
-            </div>
+          <div>
+            <span class="text-[10px] text-blue-800 font-bold uppercase block">Shift Kerja:</span>
+            <span class="font-black text-slate-900 text-xs font-mono">Shift 1 (Pagi - Sore)</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-blue-800 font-bold uppercase block">Modal Awal Laci:</span>
+            <span class="font-bold text-slate-700 font-mono">Rp 200.000</span>
+          </div>
+          <div>
+            <span class="text-[10px] text-blue-800 font-bold uppercase block">Penjualan Tunai Sistem:</span>
+            <span class="font-black text-emerald-700 font-mono">Rp 1.650.000</span>
           </div>
         </div>
 
-        <!-- PANEL 2: TOP 10 PRODUK LARIS -->
-        <div id="panel-rep-top" class="hidden space-y-2.5">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
           <div class="flex items-center justify-between">
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Paling Cepat Laku (Fast-Moving):</span>
-            <span class="text-[10px] font-mono text-indigo-600 font-bold">Sortir: Qty Terjual</span>
+            <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Hitung Fisik Lembaran Uang Laci:</span>
+            <span class="text-[10px] text-slate-400 font-mono">Input Qty Lembar</span>
           </div>
-          <div class="space-y-1.5">
-            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span class="w-6 h-6 rounded-full bg-amber-400 text-slate-950 font-black text-[11px] flex items-center justify-center shrink-0">1</span>
-                <div class="min-w-0">
-                  <span class="font-black text-slate-900 block truncate text-xs">Keripik Singkong Balado 250g</span>
-                  <span class="text-[10px] text-slate-500 block">Harga: Rp 15.000 • Margin Rp 5.000</span>
-                </div>
-              </div>
-              <div class="text-right shrink-0">
-                <span class="font-black font-mono text-indigo-700 text-xs block">42 PCS</span>
-                <span class="text-[9px] text-emerald-600 font-bold block">+Rp 210.000</span>
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
+              <span class="font-bold text-slate-700">Rp 100.000</span>
+              <div class="flex items-center gap-1">
+                <input type="number" value="12" class="w-12 px-1.5 py-0.5 text-center font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
+                <span class="text-slate-400 text-[10px]">lbr</span>
               </div>
             </div>
-            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0">2</span>
-                <div class="min-w-0">
-                  <span class="font-black text-slate-900 block truncate text-xs">Makaroni Pedas Daun Jeruk 150g</span>
-                  <span class="text-[10px] text-slate-500 block">Harga: Rp 12.000 • Margin Rp 4.000</span>
-                </div>
-              </div>
-              <div class="text-right shrink-0">
-                <span class="font-black font-mono text-indigo-700 text-xs block">35 PCS</span>
-                <span class="text-[9px] text-emerald-600 font-bold block">+Rp 140.000</span>
+            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
+              <span class="font-bold text-slate-700">Rp 50.000</span>
+              <div class="flex items-center gap-1">
+                <input type="number" value="8" class="w-12 px-1.5 py-0.5 text-center font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
+                <span class="text-slate-400 text-[10px]">lbr</span>
               </div>
             </div>
-            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span class="w-6 h-6 rounded-full bg-amber-600/30 text-amber-900 font-black text-[11px] flex items-center justify-center shrink-0">3</span>
-                <div class="min-w-0">
-                  <span class="font-black text-slate-900 block truncate text-xs">Basreng Pedas Gurih 200g</span>
-                  <span class="text-[10px] text-slate-500 block">Harga: Rp 16.000 • Margin Rp 4.500</span>
-                </div>
-              </div>
-              <div class="text-right shrink-0">
-                <span class="font-black font-mono text-indigo-700 text-xs block">28 PCS</span>
-                <span class="text-[9px] text-emerald-600 font-bold block">+Rp 126.000</span>
+            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
+              <span class="font-bold text-slate-700">Rp 20.000</span>
+              <div class="flex items-center gap-1">
+                <input type="number" value="6" class="w-12 px-1.5 py-0.5 text-center font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
+                <span class="text-slate-400 text-[10px]">lbr</span>
               </div>
             </div>
-            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-black text-[11px] flex items-center justify-center shrink-0">4</span>
-                <div class="min-w-0">
-                  <span class="font-black text-slate-900 block truncate text-xs">Kerupuk Seblak Kering 100g</span>
-                  <span class="text-[10px] text-slate-500 block">Harga: Rp 10.000 • Margin Rp 4.000</span>
-                </div>
-              </div>
-              <div class="text-right shrink-0">
-                <span class="font-black font-mono text-indigo-700 text-xs block">22 PCS</span>
-                <span class="text-[9px] text-emerald-600 font-bold block">+Rp 88.000</span>
+            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
+              <span class="font-bold text-slate-700">Rp 10.000</span>
+              <div class="flex items-center gap-1">
+                <input type="number" value="9" class="w-12 px-1.5 py-0.5 text-center font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
+                <span class="text-slate-400 text-[10px]">lbr</span>
               </div>
             </div>
-            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-black text-[11px] flex items-center justify-center shrink-0">5</span>
-                <div class="min-w-0">
-                  <span class="font-black text-slate-900 block truncate text-xs">Kacang Bawang Renyah 200g</span>
-                  <span class="text-[10px] text-slate-500 block">Harga: Rp 18.000 • Margin Rp 4.000</span>
-                </div>
+            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
+              <span class="font-bold text-slate-700">Rp 5.000 & 2.000</span>
+              <div class="flex items-center gap-1">
+                <input type="number" value="7" class="w-12 px-1.5 py-0.5 text-center font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
+                <span class="text-slate-400 text-[10px]">lbr</span>
               </div>
-              <div class="text-right shrink-0">
-                <span class="font-black font-mono text-indigo-700 text-xs block">18 PCS</span>
-                <span class="text-[9px] text-emerald-600 font-bold block">+Rp 72.000</span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
+              <span class="font-bold text-slate-700">Koin Logam</span>
+              <div class="flex items-center gap-1">
+                <input type="number" value="5000" class="w-16 px-1.5 py-0.5 text-right font-mono font-bold border border-slate-300 rounded-md focus:border-blue-500 focus:outline-none" />
+                <span class="text-slate-400 text-[10px]">Rp</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- PANEL 3: STOK KRITIS & USULAN ORDER -->
-        <div id="panel-rep-lowstock" class="hidden space-y-2.5">
-          <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 leading-relaxed flex items-center gap-2">
-            <span class="text-base shrink-0">⚠️</span>
-            <span>Daftar item yang stoknya <strong>di bawah stok minimal</strong> atau sudah habis di rak. Segera buatkan LPB ke distributor.</span>
+        <div class="p-3 bg-emerald-50 border border-emerald-300 rounded-2xl flex items-center justify-between">
+          <div>
+            <span class="text-[10px] text-emerald-800 font-bold uppercase block">Hasil Audit Kasir:</span>
+            <span class="text-xs font-black text-emerald-950">Fisik Kas Rp 1.850.000</span>
           </div>
-          <div class="space-y-1.5">
-            <div class="p-2.5 bg-rose-50 border border-rose-200 rounded-xl flex items-center justify-between">
-              <div class="min-w-0">
-                <span class="font-black text-rose-950 block truncate text-xs">Emping Melinjo Manis 200g</span>
-                <span class="text-[10px] text-rose-700 block">Supplier: Snack Berkah • Min: 5 Bungkus</span>
-              </div>
-              <span class="px-2.5 py-1 bg-rose-600 text-white rounded-lg font-black text-[10px] shrink-0 uppercase">KOSONG (0)</span>
-            </div>
-            <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between">
-              <div class="min-w-0">
-                <span class="font-black text-amber-950 block truncate text-xs">Keripik Pisang Coklat Lumer</span>
-                <span class="text-[10px] text-amber-700 block">Supplier: Aneka Snack Jaya • Min: 10 Bungkus</span>
-              </div>
-              <span class="px-2.5 py-1 bg-amber-500 text-slate-950 rounded-lg font-black text-[10px] shrink-0 font-mono">SISA 2 PCS</span>
-            </div>
-            <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between">
-              <div class="min-w-0">
-                <span class="font-black text-amber-950 block truncate text-xs">Stik Keju Crispy 150g</span>
-                <span class="text-[10px] text-amber-700 block">Supplier: CV Gurih Prima • Min: 8 Bungkus</span>
-              </div>
-              <span class="px-2.5 py-1 bg-amber-500 text-slate-950 rounded-lg font-black text-[10px] shrink-0 font-mono">SISA 3 PCS</span>
-            </div>
-          </div>
+          <span class="px-3 py-1 bg-emerald-600 text-white font-black text-[11px] rounded-xl uppercase tracking-wider">
+            ✅ MATCH (Rp 0)
+          </span>
         </div>
-
-        <!-- PANEL 3: VALUASI STOK & ASET TOKO -->
-        <div id="panel-rep-valuation" class="hidden space-y-3">
-          <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-            <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
-              <span>💎</span>
-              <span>Rincian Valuasi Aset Toko (Real-Time)</span>
-            </span>
-            <span class="text-[10px] text-slate-500 font-mono font-bold bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
-              145 Jenis SKU
-            </span>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2">
-            <div class="bg-indigo-50/60 p-2.5 rounded-xl border border-indigo-100 flex flex-col justify-between min-w-0">
-              <div class="flex items-center justify-between text-indigo-700 text-xs">
-                <span class="font-bold uppercase tracking-wider text-[9px] truncate">Nilai Modal (HPP)</span>
-                <span class="text-sm shrink-0">💰</span>
-              </div>
-              <div class="font-bebas text-lg sm:text-xl text-indigo-950 tracking-wider truncate mt-0.5">
-                Rp 28.650.000
-              </div>
-              <span class="text-[8px] text-indigo-600/90 truncate">Modal Fisik di Rak Toko</span>
-            </div>
-
-            <div class="bg-cyan-50/60 p-2.5 rounded-xl border border-cyan-100 flex flex-col justify-between min-w-0">
-              <div class="flex items-center justify-between text-cyan-700 text-xs">
-                <span class="font-bold uppercase tracking-wider text-[9px] truncate">Total Fisik Stok</span>
-                <span class="text-sm shrink-0">📦</span>
-              </div>
-              <div class="font-bebas text-lg sm:text-xl text-cyan-950 tracking-wider truncate mt-0.5">
-                3.420 PCS
-              </div>
-              <span class="text-[8px] text-cyan-600/90 truncate">145 SKU Toko & Gudang</span>
-            </div>
-
-            <div class="bg-amber-50/60 p-2.5 rounded-xl border border-amber-100 flex flex-col justify-between min-w-0">
-              <div class="flex items-center justify-between text-amber-700 text-xs">
-                <span class="font-bold uppercase tracking-wider text-[9px] truncate">Potensi Nilai Jual</span>
-                <span class="text-sm shrink-0">🏷️</span>
-              </div>
-              <div class="font-bebas text-lg sm:text-xl text-amber-950 tracking-wider truncate mt-0.5">
-                Rp 37.800.000
-              </div>
-              <span class="text-[8px] text-amber-600/90 truncate">Gross Jika Habis Terjual</span>
-            </div>
-
-            <div class="bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-100 flex flex-col justify-between min-w-0">
-              <div class="flex items-center justify-between text-emerald-700 text-xs">
-                <span class="font-bold uppercase tracking-wider text-[9px] truncate">Proyeksi Laba Stok</span>
-                <span class="text-sm shrink-0">📈</span>
-              </div>
-              <div class="font-bebas text-lg sm:text-xl text-emerald-950 tracking-wider truncate mt-0.5">
-                +Rp 9.150.000
-              </div>
-              <span class="text-[8px] text-emerald-700 font-bold truncate">Margin Keuntungan 24.2%</span>
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <!-- Modal Footer -->
-      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
-        <button onclick="closeMockupReportsModal()" class="px-5 py-2 bg-slate-800 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer transition">
-          Tutup
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-klerk')" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+        <button onclick="showMockupToast('🖨️ Struk Closing Klerk berhasil dicetak!', 'success'); closeSisModal('sis-modal-klerk');" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          🖨️ Kunci & Cetak Struk Klerk
         </button>
       </div>
-
     </div>
   </div>
 
-  <!-- ================= MODAL PERSONIL TOKO & OTORISASI ================= -->
-  <div id="mockup-staff-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+  <!-- ================= 2. MODAL RIWAYAT STRUK KASIR [F2] ================= -->
+  <div id="sis-modal-receipts" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-      
-      <!-- Modal Header -->
+      <div class="p-4 bg-gradient-to-r from-blue-700 to-indigo-800 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🧾</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Riwayat Struk Kasir [F2]</h3>
+            <p class="text-[11px] text-blue-100">Pencarian Transaksi Hari Ini & Cetak Ulang Nota</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-receipts')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-3 flex-1 text-xs">
+        <div class="relative">
+          <input type="text" placeholder="Ketik nomor nota (cth: 0034) atau nominal..." class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-500" />
+          <span class="absolute left-2.5 top-2.5 text-slate-400">🔍</span>
+        </div>
+
+        <div class="space-y-2">
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between hover:bg-blue-50/50 transition">
+            <div>
+              <span class="font-black text-slate-900 text-xs block font-mono">TRX-20260922-0034</span>
+              <span class="text-[10px] text-slate-500 block">12:45 WIB • 3 Item • Kasir 01</span>
+              <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] rounded-full">💵 TUNAI</span>
+            </div>
+            <div class="text-right">
+              <span class="font-black text-slate-900 font-mono text-sm block">Rp 45.000</span>
+              <button onclick="showMockupToast('🖨️ Mencetak ulang struk TRX-0034...', 'success');" class="mt-1 px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-[10px] cursor-pointer">
+                🖨️ Cetak Ulang
+              </button>
+            </div>
+          </div>
+
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between hover:bg-blue-50/50 transition">
+            <div>
+              <span class="font-black text-slate-900 text-xs block font-mono">TRX-20260922-0033</span>
+              <span class="text-[10px] text-slate-500 block">12:30 WIB • 8 Item • Kasir 01</span>
+              <span class="inline-block mt-1 px-2 py-0.5 bg-indigo-100 text-indigo-800 font-bold text-[9px] rounded-full">📱 QRIS TOKO</span>
+            </div>
+            <div class="text-right">
+              <span class="font-black text-slate-900 font-mono text-sm block">Rp 120.000</span>
+              <button onclick="showMockupToast('🖨️ Mencetak ulang struk TRX-0033...', 'success');" class="mt-1 px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-[10px] cursor-pointer">
+                🖨️ Cetak Ulang
+              </button>
+            </div>
+          </div>
+
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between hover:bg-blue-50/50 transition">
+            <div>
+              <span class="font-black text-slate-900 text-xs block font-mono">TRX-20260922-0032</span>
+              <span class="text-[10px] text-slate-500 block">12:15 WIB • 2 Item • Kasir 01</span>
+              <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] rounded-full">💵 TUNAI</span>
+            </div>
+            <div class="text-right">
+              <span class="font-black text-slate-900 font-mono text-sm block">Rp 35.000</span>
+              <button onclick="showMockupToast('🖨️ Mencetak ulang struk TRX-0032...', 'success');" class="mt-1 px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-[10px] cursor-pointer">
+                🖨️ Cetak Ulang
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeSisModal('sis-modal-receipts')" class="px-5 py-2 bg-slate-800 text-white font-bold rounded-xl text-xs cursor-pointer">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 3. MODAL RETUR BELANJA KONSUMEN [F3] ================= -->
+  <div id="sis-modal-retur" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-blue-700 to-indigo-800 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">↩️</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Retur Belanja Konsumen [F3]</h3>
+            <p class="text-[11px] text-blue-100">Pengembalian Barang Belanja & Restitusi Kasir</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-retur')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nomor Struk Transaksi Pembeli *</label>
+          <div class="flex gap-2">
+            <input type="text" value="TRX-20260922-0034" class="flex-1 px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:border-blue-500" />
+            <button onclick="showMockupToast('🔍 Nota TRX-0034 ditemukan!', 'success');" class="px-3.5 py-2 bg-blue-600 text-white font-bold rounded-xl cursor-pointer">Cari</button>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+          <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Pilih Item yang Diretur:</span>
+          <div class="space-y-1.5 text-[11px]">
+            <label class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200 cursor-pointer">
+              <div class="flex items-center gap-2">
+                <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded" />
+                <div>
+                  <span class="font-bold text-slate-900 block">Keripik Singkong Balado 250g</span>
+                  <span class="text-[10px] text-slate-400">Harga: Rp 15.000 • Beli 2 PCS</span>
+                </div>
+              </div>
+              <span class="font-mono font-bold text-slate-800">Retur: 1 PCS</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Alasan Retur / Komplain</label>
+          <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-blue-500 bg-white">
+            <option>Kemasan Bocor / Melempem (Cacat Pabrik)</option>
+            <option>Salah Ambil Varian Rasa oleh Pembeli</option>
+            <option>Salah Input Qty Kasir</option>
+          </select>
+        </div>
+
+        <div class="p-3 bg-amber-50 border border-amber-300 rounded-2xl flex items-center justify-between">
+          <div>
+            <span class="text-[10px] text-amber-800 font-bold uppercase block">Uang Kembali ke Konsumen:</span>
+            <span class="font-black text-amber-950 text-sm font-mono">Rp 15.000</span>
+          </div>
+          <span class="text-[10px] text-amber-900 font-bold">Wajib PIN Supervisor</span>
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-retur')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+        <button onclick="showMockupToast('↩️ Retur Berhasil Diproses! Cetak Nota Retur...', 'success'); closeSisModal('sis-modal-retur');" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          💾 Proses Retur & Restitusi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 4. MODAL CASH DROP (SETORAN BRANKAS) ================= -->
+  <div id="sis-modal-cashdrop" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-blue-700 to-indigo-800 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">📥</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Setoran Kas / Cash Drop</h3>
+            <p class="text-[11px] text-blue-100">Amankan Uang Berlebih dari Laci Kasir ke Brankas</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-cashdrop')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 space-y-3.5 text-xs">
+        <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl text-[11px] text-blue-900 leading-relaxed">
+          💡 <strong>Ketentuan Ritel:</strong> Tarik kas dilakukan saat akumulasi tunai di laci kasir melebihi Rp 1.500.000 untuk mencegah risiko keamanan.
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nominal yang Disetor ke Brankas *</label>
+          <input type="text" value="1.000.000" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-black text-slate-900 text-base focus:outline-none focus:border-blue-500" />
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Supervisor / COS Penerima Brankas *</label>
+          <input type="text" value="Ahmad COS (Kepala Toko)" readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-700" />
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Catatan Setoran</label>
+          <input type="text" placeholder="Contoh: Tarik kas shift siang jam 13:00" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-blue-500" />
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-cashdrop')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+        <button onclick="showMockupToast('📥 Setoran Cash Drop Rp 1.000.000 Berhasil Dicatat!', 'success'); closeSisModal('sis-modal-cashdrop');" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          💾 Simpan & Cetak Bukti Setor
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 5. MODAL PENERIMAAN BARANG SUPPLIER (LPB) [F7] ================= -->
+  <div id="sis-modal-lpb" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-red-600 to-rose-700 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">📥</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Penerimaan Barang Supplier (LPB) [F7]</h3>
+            <p class="text-[11px] text-red-100">Input Surat Jalan / Faktur & Tambah Stok Masuk Toko</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-lpb')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nomor Faktur Supplier *</label>
+            <input type="text" value="FAK-2026-8812" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:border-red-500" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nama Supplier / Distributor *</label>
+            <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-red-500 bg-white">
+              <option>Aneka Snack Jaya (Distributor)</option>
+              <option>CV Gurih Prima</option>
+              <option>Snack Berkah UMKM</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Scan Barcode Barang Datang:</span>
+            <button onclick="showMockupToast('📷 Scanner Aktif...', 'success');" class="text-red-600 font-bold text-[10px] cursor-pointer">📷 Scan Barcode</button>
+          </div>
+          <div class="flex gap-2">
+            <input type="text" placeholder="Scan barcode produk datang..." value="8992761111001" class="flex-1 px-3 py-1.5 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs" />
+            <input type="number" value="24" class="w-16 px-2 py-1.5 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center text-xs" />
+            <button onclick="showMockupToast('✅ Item berhasil ditambahkan ke faktur!', 'success');" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs cursor-pointer">+ Tambah</button>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px] block">Rincian Barang Diterima:</span>
+          <div class="p-2.5 bg-white border border-slate-200 rounded-xl flex items-center justify-between text-[11px]">
+            <div>
+              <span class="font-bold text-slate-900 block">Keripik Tempe Renyah 150g</span>
+              <span class="text-[10px] text-slate-400 font-mono">Beli: Rp 9.500 / Bks</span>
+            </div>
+            <div class="text-right">
+              <span class="font-black text-slate-900 font-mono text-xs block">24 Bks</span>
+              <span class="text-[10px] text-emerald-700 font-bold">Rp 228.000</span>
+            </div>
+          </div>
+          <div class="p-2.5 bg-white border border-slate-200 rounded-xl flex items-center justify-between text-[11px]">
+            <div>
+              <span class="font-bold text-slate-900 block">Basreng Pedas Daun Jeruk 200g</span>
+              <span class="text-[10px] text-slate-400 font-mono">Beli: Rp 11.000 / Bks</span>
+            </div>
+            <div class="text-right">
+              <span class="font-black text-slate-900 font-mono text-xs block">12 Bks</span>
+              <span class="text-[10px] text-emerald-700 font-bold">Rp 132.000</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-between">
+          <div>
+            <span class="text-[10px] text-red-800 font-bold uppercase block">Total Nilai Faktur:</span>
+            <span class="font-black text-red-950 text-sm font-mono">Rp 360.000 (2 SKU)</span>
+          </div>
+          <span class="px-2.5 py-1 bg-red-600 text-white font-bold text-[10px] rounded-lg">Stok Otomatis Naik</span>
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-lpb')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+        <button onclick="showMockupToast('📥 Faktur LPB Disimpan & Stok Bertambah!', 'success'); closeSisModal('sis-modal-lpb');" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          💾 Simpan Faktur LPB
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 6. MODAL MASTER PRODUK & CEK STOK [F4] ================= -->
+  <div id="sis-modal-products" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-red-600 to-rose-700 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">📋</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Master Katalog Produk [F4]</h3>
+            <p class="text-[11px] text-red-100">Cek Harga Jual, Modal HPP & Ketersediaan Stok Rak</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-products')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-3 flex-1 text-xs">
+        <div class="relative">
+          <input type="text" placeholder="Cari barcode atau nama snack..." class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-red-500" />
+          <span class="absolute left-2.5 top-2.5 text-slate-400">🔍</span>
+        </div>
+
+        <div class="space-y-1.5">
+          <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <div class="min-w-0">
+              <span class="font-black text-slate-900 block truncate text-xs">Keripik Tempe Renyah 150g</span>
+              <span class="text-[10px] text-slate-400 font-mono block">8992761111001 • Beli: Rp 9.500</span>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="font-black text-red-600 font-mono text-xs block">Rp 12.000</span>
+              <span class="text-[9px] text-emerald-700 font-bold block">Stok: 45 Bks</span>
+            </div>
+          </div>
+          <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <div class="min-w-0">
+              <span class="font-black text-slate-900 block truncate text-xs">Basreng Pedas Daun Jeruk 200g</span>
+              <span class="text-[10px] text-slate-400 font-mono block">8992761111002 • Beli: Rp 11.000</span>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="font-black text-red-600 font-mono text-xs block">Rp 15.000</span>
+              <span class="text-[9px] text-emerald-700 font-bold block">Stok: 32 Bks</span>
+            </div>
+          </div>
+          <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <div class="min-w-0">
+              <span class="font-black text-slate-900 block truncate text-xs">Makaroni Bantet Super Pedas</span>
+              <span class="text-[10px] text-slate-400 font-mono block">8992761111003 • Beli: Rp 6.000</span>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="font-black text-red-600 font-mono text-xs block">Rp 8.500</span>
+              <span class="text-[9px] text-emerald-700 font-bold block">Stok: 60 Bks</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-products')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Tutup</button>
+        <button onclick="showMockupToast('+ Form SKU Baru dibuka', 'success');" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs cursor-pointer">
+          + Tambah Produk Baru
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 7. MODAL CETAK LABEL RAK 40x30 [F8] ================= -->
+  <div id="sis-modal-label" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-red-600 to-rose-700 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🏷️</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Cetak Label Harga Rak [F8]</h3>
+            <p class="text-[11px] text-red-100">Format Standar Minimarket 40x30 mm untuk Thermal Printer</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-label')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+          <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Preview Label Rak Minimarket (40x30 mm):</span>
+          <div class="p-3 bg-white border-2 border-dashed border-slate-400 rounded-xl w-60 mx-auto text-center space-y-1 shadow-xs">
+            <span class="font-black text-slate-900 block text-xs truncate">KERIPIK TEMPE RENYAH</span>
+            <div class="text-[9px] font-mono text-slate-400">P1 • 8992761111001</div>
+            <div class="font-bebas text-2xl text-slate-950 tracking-wider">Rp 12.000</div>
+            <div class="text-[8px] font-mono text-slate-500">TGL: 22/09/2026 • RAK A-01</div>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px] block">Pilih Produk yang Akan Dicetak:</span>
+          <label class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" checked class="w-4 h-4 text-red-600 rounded" />
+              <span class="font-bold text-slate-900">Keripik Tempe Renyah 150g</span>
+            </div>
+            <span class="font-mono font-bold text-red-600">Rp 12.000</span>
+          </label>
+          <label class="p-2 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between cursor-pointer">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" checked class="w-4 h-4 text-red-600 rounded" />
+              <span class="font-bold text-slate-900">Basreng Pedas Daun Jeruk 200g</span>
+            </div>
+            <span class="font-mono font-bold text-red-600">Rp 15.000</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-label')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+        <button onclick="showMockupToast('🖨️ Mencetak 2 label harga ke printer thermal rak...', 'success'); closeSisModal('sis-modal-label');" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          🖨️ Cetak ke Thermal Rak
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 8. MODAL STOCK OPNAME FISIK (SO) [F6] ================= -->
+  <div id="sis-modal-so" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-red-600 to-rose-700 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🔍</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Stock Opname Fisik (SO) [F6]</h3>
+            <p class="text-[11px] text-red-100">Pencocokan Stok Fisik di Rak vs Database Komputer</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-so')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
+        <div class="flex gap-2">
+          <input type="text" placeholder="Scan barcode barang di lorong rak..." value="8992761111002" class="flex-1 px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900" />
+          <button onclick="showMockupToast('🔍 SKU Basreng dimuat', 'success');" class="px-3.5 py-2 bg-red-600 text-white font-bold rounded-xl cursor-pointer">Cari</button>
+        </div>
+
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
+          <span class="font-black text-slate-900 text-xs block">Basreng Pedas Daun Jeruk 200g</span>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="p-2 bg-white rounded-xl border border-slate-200">
+              <span class="text-[9px] text-slate-400 font-bold block uppercase">Stok Sistem</span>
+              <span class="font-mono font-black text-slate-800 text-sm">32 PCS</span>
+            </div>
+            <div class="p-2 bg-white rounded-xl border border-red-300 bg-red-50/50">
+              <span class="text-[9px] text-red-800 font-bold block uppercase">Fisik Rak</span>
+              <input type="number" value="30" class="w-full text-center font-mono font-black text-red-600 text-sm border-0 bg-transparent focus:outline-none" />
+            </div>
+            <div class="p-2 bg-rose-100 rounded-xl border border-rose-300">
+              <span class="text-[9px] text-rose-800 font-bold block uppercase">Selisih</span>
+              <span class="font-mono font-black text-rose-700 text-sm">-2 PCS</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900">
+          ⚠️ Selisih minus 2 PCS akan dicatat dalam laporan audit kehilangan toko dan butuh approval COS.
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-so')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+        <button onclick="showMockupToast('💾 Hasil Stock Opname Berhasil Disimpan!', 'success'); closeSisModal('sis-modal-so');" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          💾 Simpan Hasil SO
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 9. MODAL BARANG RUSAK (BAP WASTE) ================= -->
+  <div id="sis-modal-waste" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-red-600 to-rose-700 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🗑️</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Barang Rusak / BAP Waste</h3>
+            <p class="text-[11px] text-red-100">Pencatatan Barang Kadaluarsa / Rusak Kemasan</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-waste')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Pilih Produk Rusak *</label>
+          <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 bg-white">
+            <option>Keripik Tempe Renyah 150g (Kemasan Bocor)</option>
+            <option>Emping Melinjo Manis 200g (Kadaluarsa)</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Jumlah Rusak (Qty)</label>
+            <input type="number" value="1" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Jenis Tindakan</label>
+            <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 bg-white">
+              <option>Pemusnahan Toko</option>
+              <option>Retur ke Supplier</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Keterangan Tambahan</label>
+          <input type="text" placeholder="Kemasan robek saat ditata di rak..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900" />
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-waste')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+        <button onclick="showMockupToast('🗑️ BAP Waste Berhasil Dicatat!', 'success'); closeSisModal('sis-modal-waste');" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          💾 Simpan BAP Waste
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 10. MODAL REPACK BAL KE ECER ================= -->
+  <div id="sis-modal-repack" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-red-600 to-rose-700 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🔄</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Repack Bal ke Ecer</h3>
+            <p class="text-[11px] text-red-100">Pecah Stok Dus / Bal Besar Jadi Kemasan Eceran</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-repack')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Pilih Produk Bal Mentah *</label>
+          <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 bg-white">
+            <option>Keripik Singkong Bal 5 Kg (Stok: 3 Bal)</option>
+            <option>Makaroni Bal 10 Kg (Stok: 2 Bal)</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Jumlah Bal Dipecah</label>
+            <input type="number" value="1" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Hasil Kemasan Ecer</label>
+            <input type="number" value="25" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center" />
+          </div>
+        </div>
+        <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-[11px] text-red-950">
+          ⚙️ Sistem akan otomatis memotong 1 Bal Keripik (5kg) dan menambahkan 25 bungkus kemasan eceran 200g ke stok rak.
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-repack')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+        <button onclick="showMockupToast('🔄 Repack Berhasil Diproses! Stok Eceran Bertambah', 'success'); closeSisModal('sis-modal-repack');" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          💾 Konversi & Update Stok
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 11. MODAL KARYAWAN & PRESENSI SHIFT ================= -->
+  <div id="sis-modal-staff" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
       <div class="p-4 bg-gradient-to-r from-emerald-600 to-teal-700 text-white flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <span class="text-2xl">👥</span>
           <div>
-            <h3 class="font-black text-sm uppercase tracking-wider">Personil Toko & Hak Otorisasi</h3>
-            <p class="text-[11px] text-emerald-100">Manajemen Staf, Hak Akses Kasir & Absensi Shift</p>
+            <h3 class="font-black text-sm uppercase tracking-wider">Karyawan & Presensi Shift</h3>
+            <p class="text-[11px] text-emerald-100">Daftar Personil Toko & Rekam Absensi Shift</p>
           </div>
         </div>
-        <button onclick="closeMockupStaffModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+        <button onclick="closeSisModal('sis-modal-staff')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
       </div>
 
-      <!-- Tab Switcher -->
-      <div class="p-2 bg-slate-100 border-b border-slate-200 flex gap-1">
-        <button id="tab-btn-stf-staff" onclick="switchMockupStaffTab('staff')" class="flex-1 py-2 rounded-xl text-xs font-black transition bg-white text-emerald-700 shadow-xs cursor-pointer">
-          👤 Karyawan (Staf)
-        </button>
-        <button id="tab-btn-stf-auth" onclick="switchMockupStaffTab('auth')" class="flex-1 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer">
-          🔐 Hak Otorisasi PIN
-        </button>
-        <button id="tab-btn-stf-attendance" onclick="switchMockupStaffTab('attendance')" class="flex-1 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer">
-          ⏱️ Presensi & Shift
-        </button>
-      </div>
-
-      <!-- Modal Body (Scrollable) -->
-      <div class="p-4 overflow-y-auto space-y-4 flex-1 text-xs">
-        
-        <!-- PANEL 1: DAFTAR KARYAWAN -->
-        <div id="panel-stf-staff" class="space-y-2.5">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Staf Toko Terdaftar:</span>
-            <button onclick="alert('Buka dialog tambah staf')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold cursor-pointer transition">
-              + Tambah Staf
-            </button>
-          </div>
-          <div class="space-y-2">
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-              <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs shrink-0">COS</div>
-                <div>
-                  <span class="font-black text-slate-900 block text-xs">Kepala Toko (Supervisor)</span>
-                  <span class="text-[10px] text-slate-400 font-mono">NIK: SP-001 • Shift 1 (Pagi)</span>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full font-bold text-[9px] uppercase">COS / Full Akses</span>
-            </div>
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-              <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-bold flex items-center justify-center text-xs shrink-0">ACOS</div>
-                <div>
-                  <span class="font-black text-slate-900 block text-xs">Kasir 1 (Siti Aminah)</span>
-                  <span class="text-[10px] text-slate-400 font-mono">NIK: SP-002 • Shift 1 (Pagi)</span>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 bg-blue-100 text-blue-800 border border-blue-300 rounded-full font-bold text-[9px] uppercase">ACOS / Asisten</span>
-            </div>
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-              <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs shrink-0">KSR</div>
-                <div>
-                  <span class="font-black text-slate-900 block text-xs">Kasir 2 (Budi Santoso)</span>
-                  <span class="text-[10px] text-slate-400 font-mono">NIK: SP-003 • Shift 2 (Siang)</span>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 bg-slate-200 text-slate-700 border border-slate-300 rounded-full font-bold text-[9px] uppercase">Crew Kasir</span>
-            </div>
+      <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">Personil Toko Terdaftar:</span>
+          <div class="flex gap-1.5">
+            <button onclick="showMockupToast('🟢 Absen Masuk Dicatat: 07:00 WIB', 'success');" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[10px] cursor-pointer">🟢 Absen Masuk</button>
+            <button onclick="showMockupToast('🔴 Absen Pulang Dicatat: 15:00 WIB', 'success');" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-[10px] cursor-pointer">🔴 Absen Pulang</button>
           </div>
         </div>
 
-        <!-- PANEL 2: HAK OTORISASI PIN -->
-        <div id="panel-stf-auth" class="hidden space-y-3">
-          <div class="p-3 bg-purple-50/80 border border-purple-200 rounded-xl text-[11px] text-purple-950 leading-relaxed">
-            💡 <strong>Sistem Otorisasi Ritel:</strong> Atur tindakan sensitif di meja kasir. Staf dengan izin mandiri tidak perlu memanggil supervisor saat melayani pembeli.
-          </div>
-          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
-            <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Matriks Izin Tindakan Kasir:</span>
-            <div class="space-y-2 text-[11px]">
-              <div class="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-                <div>
-                  <span class="font-bold text-slate-900 block">Batal Transaksi (Void) [F5]</span>
-                  <span class="text-[10px] text-slate-400">Membatalkan item yang sudah discan</span>
-                </div>
-                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg font-bold text-[10px]">COS & ACOS Boleh</span>
-              </div>
-              <div class="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-                <div>
-                  <span class="font-bold text-slate-900 block">Retur Barang Belanja [F3]</span>
-                  <span class="text-[10px] text-slate-400">Pengembalian uang nota belanja</span>
-                </div>
-                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg font-bold text-[10px]">COS & ACOS Boleh</span>
-              </div>
-              <div class="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-                <div>
-                  <span class="font-bold text-slate-900 block">Stock Opname Fisik [F6]</span>
-                  <span class="text-[10px] text-slate-400">Penyesuaian selisih stok rak</span>
-                </div>
-                <span class="px-2.5 py-1 bg-purple-100 text-purple-800 rounded-lg font-bold text-[10px]">Khusus COS Toko</span>
-              </div>
-              <div class="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-                <div>
-                  <span class="font-bold text-slate-900 block">Pengaturan Sistem & Printer</span>
-                  <span class="text-[10px] text-slate-400">Edit profil & backup data</span>
-                </div>
-                <span class="px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg font-bold text-[10px]">Wajib PIN Super Admin</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PANEL 3: PRESENSI SHIFT -->
-        <div id="panel-stf-attendance" class="hidden space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Presensi Hari Ini:</span>
-            <div class="flex gap-1.5">
-              <button onclick="alert('Absen Masuk Tercatat')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[10px] cursor-pointer">
-                🟢 Masuk
-              </button>
-              <button onclick="alert('Absen Pulang Tercatat')" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-[10px] cursor-pointer">
-                🔴 Pulang
-              </button>
-            </div>
-          </div>
-          <div class="space-y-1.5 text-[11px]">
-            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+        <div class="space-y-2">
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs shrink-0">COS</div>
               <div>
-                <span class="font-bold text-slate-900 block">Siti Aminah (ACOS / Kasir 1)</span>
-                <span class="text-[10px] text-slate-400 font-mono">Shift 1 Pagi • 22/09/2026</span>
+                <span class="font-black text-slate-900 block text-xs">Ahmad Supervisor</span>
+                <span class="text-[10px] text-slate-400 font-mono">NIK: SP-001 • Masuk 06:55 WIB</span>
               </div>
-              <span class="font-mono font-bold text-emerald-700 text-[10px]">Masuk: 06:55 WIB</span>
             </div>
-            <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full font-bold text-[9px] uppercase">Kepala Toko</span>
+          </div>
+
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-bold flex items-center justify-center text-xs shrink-0">ACOS</div>
               <div>
-                <span class="font-bold text-slate-900 block">Supervisor (COS / Kepala Toko)</span>
-                <span class="text-[10px] text-slate-400 font-mono">Shift 1 Pagi • 22/09/2026</span>
+                <span class="font-black text-slate-900 block text-xs">Siti Aminah</span>
+                <span class="text-[10px] text-slate-400 font-mono">NIK: SP-002 • Masuk 06:58 WIB</span>
               </div>
-              <span class="font-mono font-bold text-emerald-700 text-[10px]">Masuk: 07:00 WIB</span>
             </div>
+            <span class="px-2 py-0.5 bg-blue-100 text-blue-800 border border-blue-300 rounded-full font-bold text-[9px] uppercase">Asisten (Kasir 1)</span>
+          </div>
+
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs shrink-0">KSR</div>
+              <div>
+                <span class="font-black text-slate-900 block text-xs">Budi Santoso</span>
+                <span class="text-[10px] text-slate-400 font-mono">NIK: SP-003 • Shift Siang</span>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 bg-slate-200 text-slate-700 border border-slate-300 rounded-full font-bold text-[9px] uppercase">Crew Kasir</span>
           </div>
         </div>
-
       </div>
 
-      <!-- Modal Footer -->
       <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
-        <button onclick="closeMockupStaffModal()" class="px-5 py-2 bg-slate-800 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer transition">
-          Tutup
-        </button>
+        <button onclick="closeSisModal('sis-modal-staff')" class="px-5 py-2 bg-slate-800 text-white font-bold rounded-xl text-xs cursor-pointer">Tutup</button>
       </div>
-
     </div>
   </div>
 
-  <!-- ================= MODAL MEMBER TOKO ================= -->
-  <div id="mockup-member-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+  <!-- ================= 12. MODAL SETTING PIN OTORISASI ================= -->
+  <div id="sis-modal-pin" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="p-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white flex items-center justify-between">
+      <div class="p-4 bg-gradient-to-r from-emerald-600 to-teal-700 text-white flex items-center justify-between">
         <div class="flex items-center gap-2.5">
-          <span class="text-2xl">🎖️</span>
+          <span class="text-2xl">🔐</span>
           <div>
-            <h3 class="font-black text-sm uppercase tracking-wider">Member Pelanggan Toko</h3>
-            <p class="text-[11px] text-amber-100">Pendaftaran Member & Poin Belanja</p>
+            <h3 class="font-black text-sm uppercase tracking-wider">Setting PIN Otorisasi Kasir</h3>
+            <p class="text-[11px] text-emerald-100">Keamanan Approval Void, Retur, & Stock Opname</p>
           </div>
         </div>
-        <button onclick="closeMockupMemberModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+        <button onclick="closeSisModal('sis-modal-pin')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
       </div>
+
       <div class="p-4 space-y-3.5 text-xs">
         <div>
-          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nama Lengkap Pelanggan *</label>
-          <input type="text" placeholder="Contoh: Ibu Rina Wati" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-900 focus:outline-none focus:border-amber-500" />
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">PIN Pejabat Toko (COS / Supervisor) *</label>
+          <input type="password" value="1234" maxlength="6" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-black text-slate-900 text-center tracking-widest text-base focus:outline-none focus:border-emerald-500" />
         </div>
         <div>
-          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nomor WhatsApp Pelanggan *</label>
-          <input type="text" placeholder="Contoh: 08123456789" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono text-slate-900 focus:outline-none focus:border-amber-500" />
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">PIN Asisten Toko (ACOS) *</label>
+          <input type="password" value="5678" maxlength="6" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-black text-slate-900 text-center tracking-widest text-base focus:outline-none focus:border-emerald-500" />
         </div>
-        <div>
-          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Alamat / RT RW</label>
-          <input type="text" placeholder="Contoh: Jl. Mawar No. 12" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-amber-500" />
+
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+          <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Matriks Tindakan Butuh PIN:</span>
+          <div class="space-y-1 text-[11px]">
+            <div class="flex items-center justify-between p-1.5 bg-white rounded-lg border border-slate-200">
+              <span class="font-bold text-slate-800">Batal Item / Void [F5]</span>
+              <span class="text-emerald-700 font-bold text-[10px]">COS / ACOS</span>
+            </div>
+            <div class="flex items-center justify-between p-1.5 bg-white rounded-lg border border-slate-200">
+              <span class="font-bold text-slate-800">Retur Transaksi [F3]</span>
+              <span class="text-emerald-700 font-bold text-[10px]">COS / ACOS</span>
+            </div>
+            <div class="flex items-center justify-between p-1.5 bg-white rounded-lg border border-slate-200">
+              <span class="font-bold text-slate-800">Stock Opname [F6]</span>
+              <span class="text-purple-700 font-bold text-[10px]">Khusus COS</span>
+            </div>
+          </div>
         </div>
-        <button type="button" onclick="alert('Member Baru Berhasil Didaftarkan!'); closeMockupMemberModal();" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-black rounded-xl shadow-md transition cursor-pointer">
-          💾 Simpan & Aktifkan Kartu Member
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-pin')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+        <button onclick="showMockupToast('🔐 PIN Otorisasi Berhasil Diperbarui!', 'success'); closeSisModal('sis-modal-pin');" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          💾 Simpan PIN Baru
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- ================= 13. MODAL LAPORAN PENJUALAN SHIFT KASIR ================= -->
+  <div id="sis-modal-report" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-indigo-700 to-purple-800 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">📈</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Laporan Penjualan Shift Kasir</h3>
+            <p class="text-[11px] text-indigo-200">Rekapitulasi Omzet, Penerimaan & Produk Laris Hari Ini</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-report')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
+        <div class="grid grid-cols-2 gap-2">
+          <div class="p-3 bg-indigo-50/70 border border-indigo-200 rounded-2xl">
+            <span class="text-[10px] font-bold text-indigo-800 uppercase block">Omzet Bersih Toko</span>
+            <div class="font-bebas text-2xl text-indigo-950 mt-0.5 tracking-wider">Rp 2.450.000</div>
+            <span class="text-[9px] text-indigo-600 block mt-0.5">34 Transaksi Selesai</span>
+          </div>
+          <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-2xl">
+            <span class="text-[10px] font-bold text-emerald-800 uppercase block">Laba Bersih Real</span>
+            <div class="font-bebas text-2xl text-emerald-950 mt-0.5 tracking-wider">+Rp 630.000</div>
+            <span class="text-[9px] text-emerald-700 font-bold block mt-0.5">Margin Laba: 25.7%</span>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+          <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Penerimaan Berdasarkan Cara Bayar:</span>
+          <div class="space-y-1.5 text-[11px]">
+            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
+              <span class="font-bold text-slate-800 flex items-center gap-1.5"><span>💵</span> Tunai di Laci Kasir</span>
+              <span class="font-mono font-black text-slate-900">Rp 1.650.000 (23 nota)</span>
+            </div>
+            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200">
+              <span class="font-bold text-indigo-700 flex items-center gap-1.5"><span>📱</span> QRIS & Non-Tunai</span>
+              <span class="font-mono font-black text-indigo-900">Rp 800.000 (11 nota)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+          <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Top 5 Produk Paling Laku Hari Ini:</span>
+          <div class="space-y-1 text-[11px]">
+            <div class="flex items-center justify-between p-1.5 bg-white rounded-xl border border-slate-200">
+              <span class="font-bold text-slate-900">1. Keripik Singkong Balado 250g</span>
+              <span class="font-mono font-black text-indigo-700">42 PCS</span>
+            </div>
+            <div class="flex items-center justify-between p-1.5 bg-white rounded-xl border border-slate-200">
+              <span class="font-bold text-slate-900">2. Makaroni Pedas Daun Jeruk</span>
+              <span class="font-mono font-black text-indigo-700">35 PCS</span>
+            </div>
+            <div class="flex items-center justify-between p-1.5 bg-white rounded-xl border border-slate-200">
+              <span class="font-bold text-slate-900">3. Basreng Pedas Gurih 200g</span>
+              <span class="font-mono font-black text-indigo-700">28 PCS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-report')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Tutup</button>
+        <button onclick="showMockupToast('🖨️ Mencetak Laporan Rekap Penjualan Shift Kasir...', 'success');" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          🖨️ Cetak Rekap Laporan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 14. MODAL PENGATURAN PRINTER THERMAL ================= -->
+  <div id="sis-modal-printer" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-slate-700 to-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🖨️</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Setting Printer Thermal Kasir</h3>
+            <p class="text-[11px] text-slate-300">Konfigurasi Lebar Kertas & Tes Cetak Struk</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-printer')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Lebar Kertas Thermal *</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button class="p-2.5 border-2 border-slate-900 bg-slate-50 rounded-xl font-black text-slate-900 text-xs">58 mm (Standar)</button>
+            <button class="p-2.5 border border-slate-300 hover:border-slate-400 rounded-xl font-bold text-slate-600 text-xs">80 mm (Lebar)</button>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Tipe Sambungan</label>
+          <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 bg-white">
+            <option>Bluetooth Thermal Printer (Auto-Connect)</option>
+            <option>USB Kabel Komputer Kasir</option>
+          </select>
+        </div>
+        <button onclick="showMockupToast('🖨️ Sample struk tes berhasil dikirim ke printer!', 'success');" class="w-full py-2.5 bg-slate-800 hover:bg-black text-white font-bold rounded-xl shadow-xs transition cursor-pointer">
+          🖨️ Tes Cetak Sample Struk
+        </button>
+      </div>
+
       <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
-        <button onclick="closeMockupMemberModal()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl text-xs cursor-pointer transition">
-          Batal
+        <button onclick="closeSisModal('sis-modal-printer')" class="px-5 py-2 bg-slate-800 text-white font-bold rounded-xl text-xs cursor-pointer">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 15. MODAL PROFIL TOKO & STRUK ================= -->
+  <div id="sis-modal-profile" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-slate-700 to-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🏪</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">Profil Toko & Struk</h3>
+            <p class="text-[11px] text-slate-300">Identitas Toko yang Tercetak pada Struk Belanja</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-profile')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nama Toko Minimarket *</label>
+          <input type="text" value="SNACK TIME EXPRESS" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-900 focus:outline-none focus:border-slate-600" />
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Alamat Toko</label>
+          <input type="text" value="Jl. Raya Utama No. 88, Pusat Ritel" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-slate-600" />
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nomor WhatsApp / Telp Kasir</label>
+          <input type="text" value="0812-3456-7890" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono text-slate-900 focus:outline-none focus:border-slate-600" />
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Pesan Footer Struk Belanja</label>
+          <input type="text" value="Terima kasih atas kunjungan Anda. Barang yang dibeli tidak dapat ditukar kecuali ada perjanjian." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-slate-600" />
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-profile')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+        <button onclick="showMockupToast('🏪 Profil Toko & Struk Berhasil Disimpan!', 'success'); closeSisModal('sis-modal-profile');" class="px-5 py-2 bg-slate-900 hover:bg-black text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          💾 Simpan Profil Toko
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 16. MODAL QRIS & PEMBAYARAN ================= -->
+  <div id="sis-modal-qris" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-slate-700 to-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">💳</span>
+          <div>
+            <h3 class="font-black text-sm uppercase tracking-wider">QRIS & Metode Bayar</h3>
+            <p class="text-[11px] text-slate-300">Pengaturan QRIS Dinamis / Statis untuk Kasir</p>
+          </div>
+        </div>
+        <button onclick="closeSisModal('sis-modal-qris')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-black flex items-center justify-center text-sm cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-4 space-y-3.5 text-xs text-center">
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl inline-block">
+          <div class="w-40 h-40 bg-white border border-slate-300 rounded-xl flex items-center justify-center text-slate-400 font-mono text-xs mx-auto">
+            [ QRIS STANDAR ]
+          </div>
+          <span class="text-[10px] font-bold text-slate-700 mt-2 block">NMID: ID102030405060</span>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1 text-left">Nama Merchant Terdaftar *</label>
+          <input type="text" value="SNACK TIME TOKO PUSAT" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-900" />
+        </div>
+      </div>
+
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
+        <button onclick="closeSisModal('sis-modal-qris')" class="px-4 py-2 bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer">Batal</button>
+        <button onclick="showMockupToast('💳 Pengaturan QRIS Berhasil Disimpan!', 'success'); closeSisModal('sis-modal-qris');" class="px-5 py-2 bg-slate-900 hover:bg-black text-white font-black rounded-xl text-xs cursor-pointer shadow-md">
+          💾 Simpan QRIS
         </button>
       </div>
     </div>
@@ -1457,78 +1928,68 @@
       }
     }
 
-    // Modal Pusat Laporan & Analitik Toko (Omzet, Top Laris, Valuasi Stok, Stok Kritis)
-    function openMockupReportsModal(defaultTab = 'sales') {
-      const modal = document.getElementById('mockup-reports-modal');
-      if (modal) modal.classList.remove('hidden');
-      switchMockupReportsTab(defaultTab);
+    // ================= SIS ACTION SCREEN CONTROLLERS =================
+    function openSisModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('hidden');
+        // Tutup SIS drawer otomatis saat layar kerja dibuka
+        const drawer = document.getElementById('sis-drawer');
+        const backdrop = document.getElementById('sis-drawer-backdrop');
+        if (drawer) drawer.classList.add('translate-x-full');
+        if (backdrop) backdrop.classList.add('hidden');
+      }
     }
 
-    function closeMockupReportsModal() {
-      const modal = document.getElementById('mockup-reports-modal');
+    function closeSisModal(modalId) {
+      const modal = document.getElementById(modalId);
       if (modal) modal.classList.add('hidden');
     }
 
-    function switchMockupReportsTab(tab) {
-      const tabs = ['sales', 'top', 'valuation', 'lowstock'];
-      tabs.forEach(t => {
-        const btn = document.getElementById(`tab-btn-rep-${t}`);
-        const panel = document.getElementById(`panel-rep-${t}`);
-        if (btn) {
-          if (t === tab) {
-            btn.className = "flex-1 py-2 px-2.5 rounded-xl text-xs font-black transition bg-white text-indigo-700 shadow-xs cursor-pointer whitespace-nowrap";
-          } else {
-            btn.className = "flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap";
-          }
+    // Keyboard Shortcuts POS Retail Standard (F-Keys & Escape)
+    document.addEventListener('keydown', function(e) {
+      // Escape: Tutup modal atau drawer terbuka
+      if (e.key === 'Escape') {
+        const modals = document.querySelectorAll('[id^="sis-modal-"]:not(.hidden), #mockup-about-modal:not(.hidden)');
+        if (modals.length > 0) {
+          modals.forEach(m => m.classList.add('hidden'));
+          e.preventDefault();
+          return;
         }
-        if (panel) {
-          if (t === tab) panel.classList.remove('hidden');
-          else panel.classList.add('hidden');
+        const drawer = document.getElementById('sis-drawer');
+        if (drawer && !drawer.classList.contains('translate-x-full')) {
+          toggleSisDrawer();
+          e.preventDefault();
+          return;
         }
-      });
-    }
+      }
 
-    // Modal Personil Toko & Hak Otorisasi (COS, ACOS, Kasir, PIN & Shift)
-    function openMockupStaffModal(defaultTab = 'staff') {
-      const modal = document.getElementById('mockup-staff-modal');
-      if (modal) modal.classList.remove('hidden');
-      switchMockupStaffTab(defaultTab);
-    }
-
-    function closeMockupStaffModal() {
-      const modal = document.getElementById('mockup-staff-modal');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function switchMockupStaffTab(tab) {
-      const tabs = ['staff', 'auth', 'attendance'];
-      tabs.forEach(t => {
-        const btn = document.getElementById(`tab-btn-stf-${t}`);
-        const panel = document.getElementById(`panel-stf-${t}`);
-        if (btn) {
-          if (t === tab) {
-            btn.className = "flex-1 py-2 rounded-xl text-xs font-black transition bg-white text-emerald-700 shadow-xs cursor-pointer";
-          } else {
-            btn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer";
-          }
-        }
-        if (panel) {
-          if (t === tab) panel.classList.remove('hidden');
-          else panel.classList.add('hidden');
-        }
-      });
-    }
-
-    // Modal Member Pelanggan Toko
-    function openMockupMemberModal() {
-      const modal = document.getElementById('mockup-member-modal');
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function closeMockupMemberModal() {
-      const modal = document.getElementById('mockup-member-modal');
-      if (modal) modal.classList.add('hidden');
-    }
+      // F-Keys handler saat tidak sedang fokus di input field biasa (kecuali F-key diizinkan)
+      const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+      
+      if (e.key === 'F2') {
+        e.preventDefault();
+        openSisModal('sis-modal-receipts');
+      } else if (e.key === 'F3') {
+        e.preventDefault();
+        openSisModal('sis-modal-retur');
+      } else if (e.key === 'F4') {
+        e.preventDefault();
+        openSisModal('sis-modal-products');
+      } else if (e.key === 'F6') {
+        e.preventDefault();
+        openSisModal('sis-modal-so');
+      } else if (e.key === 'F7') {
+        e.preventDefault();
+        openSisModal('sis-modal-lpb');
+      } else if (e.key === 'F8') {
+        e.preventDefault();
+        openSisModal('sis-modal-label');
+      } else if (e.key === 'F11') {
+        e.preventDefault();
+        openSisModal('sis-modal-klerk');
+      }
+    });
 
     // Katalog Master Produk Mockup Kasir
     const mockCatalog = [
