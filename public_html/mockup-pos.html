@@ -47,43 +47,49 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col select-none">
 
-  <!-- ================= TOP HEADER (GAYA ALFAGIFT MODERN) ================= -->
+  <!-- ================= TOP HEADER (MINIMALIS & ERGONOMIS DI LAYAR HP) ================= -->
   <header class="bg-gradient-to-r from-retail-red via-red-600 to-retail-red text-white shadow-md sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-3">
+    <div class="max-w-7xl mx-auto px-2.5 sm:px-4 py-2 flex items-center justify-between gap-2">
       
-      <!-- Kiri: Brand & Info Kasir Aktif -->
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-white rounded-xl shadow-xs flex items-center justify-center text-retail-red font-black text-lg border border-red-200">
+      <!-- Kiri: Brand & Info Kasir Aktif (Ringkas, Anti-Patah) -->
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="w-8 h-8 rounded-xl bg-white text-retail-red flex items-center justify-center font-black text-sm shadow-xs border border-red-200 flex-shrink-0">
           🛍️
         </div>
-        <div>
-          <h1 class="font-extrabold text-sm sm:text-base tracking-tight leading-tight">TOKO SNACK BERKAH</h1>
-          <p class="text-[11px] text-red-100 flex items-center gap-1.5 font-medium">
-            <span>👤 Kasir: <strong class="text-white">Budi Santoso</strong></span>
-            <span class="opacity-50">•</span>
+        <div class="min-w-0">
+          <h1 class="font-extrabold text-xs sm:text-sm tracking-tight leading-tight truncate">TOKO SNACK BERKAH</h1>
+          <p class="text-[10px] text-red-100 flex items-center gap-1 font-medium truncate">
+            <span>👤 Budi</span>
+            <span class="opacity-40">•</span>
             <span>Shift 1</span>
           </p>
         </div>
       </div>
 
-      <!-- Kanan: Status Dot & Tombol Menu SIS Utama -->
-      <div class="flex items-center gap-2 sm:gap-3">
-        <!-- Status Indikator Minimalis -->
-        <div class="hidden sm:flex items-center gap-2 bg-black/25 px-2.5 py-1 rounded-xl border border-white/15 text-[11px] font-semibold text-red-100">
-          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Cloud</span>
-          <span class="opacity-40">•</span>
-          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> BT 58mm</span>
-          <span class="opacity-40">•</span>
-          <span id="header-clock" class="font-mono text-white font-bold">14:35:10</span>
+      <!-- Kanan: Dot Status (Hijau/Merah), Jam & Tanggal Minimalis, Tombol SIS Ringkas -->
+      <div class="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
+        
+        <!-- Dot Online (Hijau) / Offline (Merah) -->
+        <div id="status-indicator" class="flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-lg bg-black/25 border border-white/15 text-[10px] font-semibold text-white cursor-pointer" title="Status Jaringan: Online">
+          <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
+          <span id="status-label" class="hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300">ONLINE</span>
         </div>
 
-        <!-- TOMBOL PINTU MASUK KE SIS (SISTEM INFORMASI TOKO) -->
-        <button onclick="toggleSisDrawer()" class="px-3 sm:px-4 py-2 bg-white hover:bg-yellow-100 text-retail-red rounded-xl font-extrabold text-xs sm:text-sm shadow-sm flex items-center gap-2 transition active:scale-95 cursor-pointer">
-          <span class="text-base">🏢</span>
-          <span class="hidden sm:inline">MENU SIS TOKO</span>
-          <span class="sm:hidden">SIS</span>
-          <span class="bg-retail-red text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">4</span>
+        <!-- Jam & Tanggal Minimalis (Tampil Rapi di HP & Komputer) -->
+        <div class="flex flex-col items-end justify-center leading-none text-right px-0.5 sm:px-1">
+          <span id="header-date" class="text-[8px] sm:text-[9px] text-red-200 font-mono tracking-tight">--/--</span>
+          <span id="header-clock" class="text-[10px] sm:text-xs font-mono font-bold text-white mt-0.5 tracking-tight">--:--</span>
+        </div>
+
+        <!-- Tombol SIS Minimalis: Ringkas Tanpa Simbol & Tanpa Angka -->
+        <button 
+          onclick="toggleSisDrawer()" 
+          class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-white/20 hover:bg-white text-white hover:text-retail-red rounded-lg font-black text-[11px] sm:text-xs transition active:scale-95 border border-white/40 cursor-pointer flex items-center justify-center tracking-wider shadow-xs"
+          title="Buka Menu Sistem Informasi Toko (SIS)"
+        >
+          SIS
         </button>
+
       </div>
 
     </div>
@@ -478,14 +484,63 @@
   </div>
 
   <script>
-    // Live digital clock
+    // Live digital clock (Minimalis: DD/MM & HH:MM)
     function updateClock() {
       const now = new Date();
-      const el = document.getElementById('header-clock');
-      if (el) el.textContent = now.toTimeString().split(' ')[0];
+      const clockEl = document.getElementById('header-clock');
+      const dateEl = document.getElementById('header-date');
+      
+      if (clockEl) {
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        clockEl.textContent = `${hh}:${mm}`;
+      }
+      
+      if (dateEl) {
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mo = String(now.getMonth() + 1).padStart(2, '0');
+        dateEl.textContent = `${dd}/${mo}`;
+      }
     }
     setInterval(updateClock, 1000);
     updateClock();
+
+    // Status Jaringan (Dot Hijau Online / Merah Offline)
+    function updateNetworkStatus(forceOffline) {
+      const dot = document.getElementById('status-dot');
+      const label = document.getElementById('status-label');
+      const container = document.getElementById('status-indicator');
+      const isOnline = forceOffline === undefined ? navigator.onLine : !forceOffline;
+
+      if (!dot) return;
+
+      if (isOnline) {
+        dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
+        if (label) {
+          label.textContent = "ONLINE";
+          label.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300";
+        }
+        if (container) container.title = "Status: Online (Siap Transaksi)";
+      } else {
+        dot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.8)]";
+        if (label) {
+          label.textContent = "OFFLINE";
+          label.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-rose-300";
+        }
+        if (container) container.title = "Status: Terputus / Offline (Mode Kasir Standalone)";
+      }
+    }
+
+    window.addEventListener('online', () => updateNetworkStatus());
+    window.addEventListener('offline', () => updateNetworkStatus());
+    updateNetworkStatus();
+
+    // Klik indikator status untuk simulasi online/offline toggle saat demo
+    document.getElementById('status-indicator')?.addEventListener('click', function() {
+      const dot = document.getElementById('status-dot');
+      const isCurrentlyOnline = dot && dot.classList.contains('bg-emerald-400');
+      updateNetworkStatus(isCurrentlyOnline);
+    });
 
     // Toggle SIS Drawer
     function toggleSisDrawer() {
