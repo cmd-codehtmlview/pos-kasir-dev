@@ -66,7 +66,17 @@
         </div>
       </div>
 
-      <!-- Kanan: Dot Status (Hijau/Merah), Jam & Tanggal Minimalis, Tombol SIS Ringkas -->
+      <!-- Tengah: Jam Digital, Hari, Tanggal, Bulan, Tahun & Detik Bahasa Indonesia -->
+      <div class="flex flex-col items-center justify-center text-center px-2 sm:px-3 py-0.5 rounded-xl bg-black/15 border border-white/10 shadow-xs flex-shrink-0">
+        <span id="header-date" class="text-[8px] sm:text-[10px] text-red-100 font-medium tracking-tight">
+          --
+        </span>
+        <span id="header-clock" class="text-xs sm:text-sm font-mono font-black text-white tracking-widest leading-tight">
+          --:--:--
+        </span>
+      </div>
+
+      <!-- Kanan: Dot Status (Hijau/Merah), Ikon Printer Flat, Tombol SIS Ringkas -->
       <div class="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
         
         <!-- Dot Status Online (Hijau 30s) / Offline (Merah) & Tombol Klik Sinkron Manual -->
@@ -78,12 +88,6 @@
         >
           <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
           <span id="status-label" class="hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300">AUTO 30s</span>
-        </div>
-
-        <!-- Jam & Tanggal Minimalis (Tampil Rapi di HP & Komputer) -->
-        <div class="flex flex-col items-end justify-center leading-none text-right px-0.5 sm:px-1">
-          <span id="header-date" class="text-[8px] sm:text-[9px] text-red-200 font-mono tracking-tight">--/--</span>
-          <span id="header-clock" class="text-[10px] sm:text-xs font-mono font-bold text-white mt-0.5 tracking-tight">--:--</span>
         </div>
 
         <!-- Ikon Flat Printer Thermal Minimalis (Klik untuk Buka Setting Printer) -->
@@ -1785,7 +1789,10 @@
   </div>
 
   <script>
-    // Live digital clock (Minimalis: DD/MM & HH:MM)
+    // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
+    const INDO_DAYS = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const INDO_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
     function updateClock() {
       const now = new Date();
       const clockEl = document.getElementById('header-clock');
@@ -1794,13 +1801,16 @@
       if (clockEl) {
         const hh = String(now.getHours()).padStart(2, '0');
         const mm = String(now.getMinutes()).padStart(2, '0');
-        clockEl.textContent = `${hh}:${mm}`;
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        clockEl.textContent = `${hh}:${mm}:${ss}`;
       }
       
       if (dateEl) {
+        const day = INDO_DAYS[now.getDay()];
         const dd = String(now.getDate()).padStart(2, '0');
-        const mo = String(now.getMonth() + 1).padStart(2, '0');
-        dateEl.textContent = `${dd}/${mo}`;
+        const mon = INDO_MONTHS[now.getMonth()];
+        const yyyy = now.getFullYear();
+        dateEl.textContent = `${day}, ${dd} ${mon} ${yyyy}`;
       }
     }
     setInterval(updateClock, 1000);
