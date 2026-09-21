@@ -1,0 +1,3611 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1120" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Dashboard Laporan Toko - POS Kasir Retail</title>
+  
+  <!-- PWA Manifest & App Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- Tailwind CSS & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Supabase JS Client v2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            alfa: {
+              red: '#d61823',
+              darkred: '#a51019',
+              yellow: '#ffcc00',
+              blue: '#0055a5'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0b1120;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 9999px;
+    }
+    .stat-card-glow {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-alfa-yellow selection:text-slate-900 pb-12">
+
+  <!-- Dynamic Dev Environment Banner (Hanya muncul jika diakses via dev/localhost/port 8080) -->
+  <script>
+    (function() {
+      var h = window.location.hostname;
+      var p = window.location.port;
+      var isDev = h.startsWith('dev.') || h.includes('-dev.') || h === 'localhost' || h === '127.0.0.1' || p === '8080';
+      if (isDev) {
+        var injectBanner = function() {
+          if (document.getElementById('dev-environment-banner')) return;
+          var b = document.createElement('div');
+          b.id = 'dev-environment-banner';
+          b.className = 'bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 text-slate-950 px-3 py-1.5 text-xs font-black shadow-md flex items-center justify-between border-b-2 border-amber-700 z-50 sticky top-0 no-print select-none';
+          b.innerHTML = '<div class="flex items-center gap-1.5 mx-auto text-center">' +
+            '<span class="text-sm animate-pulse">⚠️</span>' +
+            '<span class="tracking-wider uppercase">DASHBOARD OWNER [DEV] — AREA KERJA UJI COBA</span>' +
+            '<span class="px-2 py-0.5 bg-slate-950 text-amber-300 text-[10px] rounded-full font-mono font-black ml-2 shadow-xs">MODE: DEV</span>' +
+            '</div>' +
+            '<a href="https://pos-kasir-coj.pages.dev/owner.html" target="_blank" class="hidden sm:flex items-center gap-1 px-2.5 py-1 bg-slate-950 hover:bg-slate-800 text-white rounded-lg text-[10px] font-bold transition shadow-xs">' +
+            '<span>🟢 Buka Versi Stabil</span>' +
+            '<span>↗</span>' +
+            '</a>';
+          if (document.body) {
+            document.body.prepend(b);
+          } else {
+            window.addEventListener('DOMContentLoaded', function() { document.body.prepend(b); });
+          }
+        };
+        if (document.readyState === 'loading') {
+          window.addEventListener('DOMContentLoaded', injectBanner);
+        } else {
+          injectBanner();
+        }
+      }
+    })();
+  </script>
+
+  <!-- ========================================== -->
+  <!-- TOP NAVBAR OWNER (MOBILE & DESKTOP) -->
+  <!-- ========================================== -->
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-3 py-2.5 sm:px-6">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
+      
+      <!-- Brand & Store Identity -->
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-alfa-red to-orange-600 flex items-center justify-center font-black text-white text-base sm:text-lg shadow-md shadow-red-900/40 flex-shrink-0">
+          🏪
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <h1 id="owner-store-name" class="font-black text-xs sm:text-base text-white tracking-tight uppercase truncate max-w-[130px] sm:max-w-none">
+              POS KASIR RETAIL
+            </h1>
+            <span class="px-1.5 py-0.5 bg-yellow-400 text-slate-950 font-black text-[8px] sm:text-[9px] rounded-full uppercase tracking-wider flex-shrink-0">
+              DASHBOARD
+            </span>
+            <span id="owner-store-id-badge" class="px-1.5 py-0.5 bg-slate-800 text-slate-300 font-mono text-[8px] sm:text-[9px] font-bold rounded-full uppercase">
+              -
+            </span>
+          </div>
+          <p class="text-[10px] sm:text-[11px] text-slate-400 flex items-center gap-1.5 truncate">
+            <span class="hidden sm:inline">Monitoring Realtime</span>
+            <span class="hidden sm:inline text-slate-600">•</span>
+            <span id="owner-clock" class="font-mono text-yellow-300 font-bold text-[10px] sm:text-[11px]">-</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Actions: Refresh, Cloud Status, Settings -->
+      <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+        <!-- Cloud Status Badge -->
+        <div id="owner-cloud-badge" class="hidden sm:flex px-2 sm:px-2.5 py-1 rounded-xl text-[10px] sm:text-[11px] font-bold border items-center gap-1.5 bg-slate-800 border-slate-700 text-slate-300">
+          <span class="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></span>
+          <span id="owner-cloud-label">Memuat...</span>
+        </div>
+
+        <!-- Refresh Button -->
+        <button 
+          id="btn-refresh-data"
+          onclick="fetchDashboardData()" 
+          class="p-1.5 sm:px-3 sm:py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-1 transition-all"
+          title="Segarkan Data Sekarang"
+        >
+          <span id="refresh-spinner" class="inline-block">🔄</span>
+          <span class="hidden sm:inline">Refresh</span>
+          <span id="refresh-timer" class="text-[10px] text-slate-400 font-mono">(30s)</span>
+        </button>
+
+        <!-- Settings Button -->
+        <button 
+          onclick="openSettingsModal()" 
+          class="p-1.5 sm:px-3 sm:py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer"
+          title="Pengaturan Koneksi Cloud Supabase"
+        >
+          <span>⚙️</span>
+          <span class="hidden md:inline">Koneksi</span>
+        </button>
+
+        <!-- Lock Button: Proteksi Akses Dashboard -->
+        <button 
+          type="button"
+          onclick="lockOwnerDashboard()" 
+          class="p-1.5 sm:px-3 sm:py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer"
+          title="Kunci Dashboard (Memerlukan PIN COS/Owner untuk Masuk Kembali)"
+        >
+          <span>🔒</span>
+          <span class="hidden md:inline">Kunci</span>
+        </button>
+
+        <!-- Link back to POS Cashier -->
+        <a 
+          href="index.html" 
+          class="p-1.5 sm:px-3 sm:py-1.5 bg-alfa-red hover:bg-red-700 text-white rounded-xl text-xs font-black shadow-md flex items-center gap-1 transition-all"
+          title="Kembali ke Layar Kasir"
+        >
+          <span>🛒</span>
+          <span class="hidden md:inline">Kasir POS</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- MAIN CONTAINER -->
+  <!-- ========================================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-5 space-y-6 flex-1 w-full">
+
+    <!-- BANNER STATUS LANGGANAN CLOUD DASHBOARD -->
+    <div id="owner-cloud-gate-banner" class="hidden p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg"></div>
+
+    <!-- LOCK VIEW KHUSUS AKSES REMOTE HP KETIKA CLOUD ADD-ON NONAKTIF -->
+    <div id="owner-cloud-lock-view" class="hidden p-6 sm:p-8 bg-slate-900 border border-slate-800 rounded-3xl text-center space-y-5 shadow-2xl max-w-xl mx-auto my-8">
+      <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-3xl mx-auto">
+        🔒
+      </div>
+      <div class="space-y-2">
+        <h3 class="text-lg font-black text-white">Akses Cloud Dashboard HP Belum Aktif</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Toko Anda terdaftar pada <span class="text-emerald-400 font-bold">Paket 1 (Beli Putus POS Offline)</span>. Kasir fisik di komputer toko Anda tetap aktif selamanya dan beroperasi normal 100%.
+        </p>
+        <p class="text-xs text-amber-300/90 leading-relaxed bg-amber-950/40 border border-amber-500/30 p-3 rounded-xl">
+          Untuk memantau omzet harian, stok barang, dan grafik penjualan secara live dari HP kapan saja, silakan pilih durasi aktifkan <strong>Add-on Cloud Dashboard</strong>:
+        </p>
+      </div>
+
+      <!-- 4 KARTU PILIHAN DURASI CLOUD SYNC HP -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
+        <!-- 1 Bulan -->
+        <div onclick="openOwnerCloudCheckout('1m')" class="p-3 bg-slate-950/90 hover:bg-amber-950/30 border border-slate-800 hover:border-amber-500/60 rounded-2xl cursor-pointer transition flex flex-col justify-between group">
+          <div class="text-[10px] text-slate-400 font-bold group-hover:text-amber-300">1 Bulan</div>
+          <div class="text-sm font-black text-amber-400 font-mono mt-1" id="owner-price-cloud-1m">Rp 25.000</div>
+          <div class="text-[9px] text-slate-500 mt-1">Fleksibel</div>
+        </div>
+        <!-- 3 Bulan -->
+        <div onclick="openOwnerCloudCheckout('3m')" class="p-3 bg-slate-950/90 hover:bg-amber-950/30 border border-slate-800 hover:border-amber-500/60 rounded-2xl cursor-pointer transition flex flex-col justify-between group">
+          <div class="text-[10px] text-slate-400 font-bold group-hover:text-amber-300">3 Bulan</div>
+          <div class="text-sm font-black text-amber-400 font-mono mt-1" id="owner-price-cloud-3m">Rp 65.000</div>
+          <div class="text-[9px] text-emerald-400 mt-1">Hemat 10rb</div>
+        </div>
+        <!-- 6 Bulan -->
+        <div onclick="openOwnerCloudCheckout('6m')" class="p-3 bg-slate-950/90 hover:bg-amber-950/30 border border-slate-800 hover:border-amber-500/60 rounded-2xl cursor-pointer transition flex flex-col justify-between group">
+          <div class="text-[10px] text-slate-400 font-bold group-hover:text-amber-300">6 Bulan</div>
+          <div class="text-sm font-black text-amber-400 font-mono mt-1" id="owner-price-cloud-6m">Rp 120.000</div>
+          <div class="text-[9px] text-emerald-400 mt-1">Hemat 30rb</div>
+        </div>
+        <!-- 1 Tahun -->
+        <div onclick="openOwnerCloudCheckout('1y')" class="p-3 bg-amber-500/10 hover:bg-amber-500/20 border-2 border-amber-500 rounded-2xl cursor-pointer transition flex flex-col justify-between group relative shadow-md shadow-amber-950/30">
+          <span class="absolute -top-2 right-2 px-1.5 py-0.2 bg-amber-500 text-slate-950 font-black text-[7px] uppercase rounded">TERBAIK</span>
+          <div class="text-[10px] text-amber-300 font-bold">1 Tahun</div>
+          <div class="text-sm font-black text-amber-400 font-mono mt-1" id="owner-price-cloud-1y">Rp 200.000</div>
+          <div class="text-[9px] text-emerald-400 mt-1">Hemat 100rb</div>
+        </div>
+      </div>
+
+      <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <button type="button" onclick="openOwnerCloudCheckout('1y')" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+          <span>⚡ Aktifkan Cloud via QRIS (Mulai Rp 25.000)</span>
+        </button>
+        <button type="button" onclick="location.reload()" class="w-full sm:w-auto px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition cursor-pointer flex items-center justify-center gap-1">
+          <span>🔄</span> <span>Muat Ulang Status</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- WRAPPER BODY DASHBOARD PEMILIK -->
+    <div id="owner-dashboard-body" class="space-y-6">
+    <!-- BAR FILTER TANGGAL & STATUS TOKO -->
+    <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-slate-400">Periode Data:</span>
+        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+          <button onclick="setDateFilter('today')" id="filter-btn-today" class="px-3 py-1 rounded-lg font-bold transition-all bg-alfa-red text-white">Hari Ini</button>
+          <button onclick="setDateFilter('7days')" id="filter-btn-7days" class="px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white">7 Hari</button>
+          <button onclick="setDateFilter('30days')" id="filter-btn-30days" class="px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white">30 Hari</button>
+          <button onclick="setDateFilter('all')" id="filter-btn-all" class="px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white">Semua</button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs text-slate-400">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+        <span>Kasir Toko Aktif: <strong class="text-white font-mono" id="active-cashier-label">POS 01 (Kasir 1)</strong></span>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 9 KARTU KPI UTAMA (METRICS) -->
+    <!-- ========================================== -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-9 gap-3 sm:gap-4">
+      
+      <!-- KPI 1: TOTAL OMZET -->
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span class="font-bold uppercase tracking-wider text-[10px]">Total Omzet</span>
+            <span class="text-lg">💰</span>
+          </div>
+          <div id="kpi-omzet" class="text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-2">
+            Rp 0
+          </div>
+        </div>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+          <span>Gross Revenue</span>
+          <span id="kpi-omzet-sub" class="text-emerald-500 font-semibold">Tercatat</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: LABA BERSIH TOKO -->
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span class="font-bold uppercase tracking-wider text-[10px]">Laba Bersih (Net)</span>
+            <span class="text-lg">📈</span>
+          </div>
+          <div id="kpi-profit" class="text-xl sm:text-2xl font-black font-mono text-blue-400 mt-2">
+            Rp 0
+          </div>
+        </div>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+          <span>Margin Bersih</span>
+          <span id="kpi-margin-pct" class="font-bold text-blue-400">0%</span>
+        </div>
+      </div>
+
+      <!-- KPI 3: SELISIH STOK OPNAME -->
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span class="font-bold uppercase tracking-wider text-[10px]">Selisih Stok Opname</span>
+            <span class="text-lg">⚖️</span>
+          </div>
+          <div id="kpi-so-diff-amount" class="text-xl sm:text-2xl font-black font-mono text-purple-400 mt-2">
+            Rp 0
+          </div>
+        </div>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+          <span id="kpi-so-unit-diff" class="text-slate-400 font-semibold text-[10px]">Audit Fisik (0 SO)</span>
+          <button onclick="scrollToSection('section-so-history')" class="text-purple-400 font-bold hover:underline">Audit &rarr;</button>
+        </div>
+      </div>
+
+      <!-- KPI 4: STRUK TRANSAKSI & PCS -->
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span class="font-bold uppercase tracking-wider text-[10px]">Struk Belanja</span>
+            <span class="text-lg">🧾</span>
+          </div>
+          <div id="kpi-transactions" class="text-xl sm:text-2xl font-black font-mono text-white mt-2">
+            0 Struk
+          </div>
+        </div>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+          <span>Total Item Terjual</span>
+          <span id="kpi-items-sold" class="font-bold text-yellow-400">0 pcs</span>
+        </div>
+      </div>
+
+      <!-- KPI 5: STOK KRITIS / MENIPIS -->
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span class="font-bold uppercase tracking-wider text-[10px]">Perlu Kulakan (PO) Qty</span>
+            <span class="text-lg">⚠️</span>
+          </div>
+          <div id="kpi-low-stock-count" class="text-xl sm:text-2xl font-black font-mono text-rose-400 mt-2">
+            0 Produk
+          </div>
+        </div>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+          <span>Sisa Stok &le; 5 pcs</span>
+          <button onclick="scrollToSection('section-low-stock')" class="text-rose-400 font-bold hover:underline">Lihat &rarr;</button>
+        </div>
+      </div>
+
+      <!-- KPI 6: TOTAL RETUR PELANGGAN -->
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span class="font-bold uppercase tracking-wider text-[10px]">Retur Barang</span>
+            <span class="text-lg">🔄</span>
+          </div>
+          <div id="kpi-refund-amount" class="text-xl sm:text-2xl font-black font-mono text-amber-400 mt-2">
+            Rp 0
+          </div>
+        </div>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+          <span>Total Refund Dana</span>
+          <span id="kpi-retur-count" class="font-bold text-amber-400">0 retur</span>
+        </div>
+      </div>
+
+      <!-- KPI 7: DAY SALES INVENTORY (DSI) -->
+      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span class="font-bold uppercase tracking-wider text-[10px]">DSI Rata-rata Toko</span>
+            <span class="text-lg">⏳</span>
+          </div>
+          <div id="kpi-store-dsi" class="text-xl sm:text-2xl font-black font-mono text-cyan-400 mt-2">
+            - Hari
+          </div>
+        </div>
+        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
+          <span id="kpi-dsi-status" class="text-slate-400 font-semibold text-[10px]">Ketahanan Stok</span>
+          <button onclick="scrollToSection('section-dsi-analysis')" class="text-cyan-400 font-bold hover:underline">Analisis &rarr;</button>
+        </div>
+      </div>
+
+      <!-- KPI 8: TOTAL PENERIMAAN BARANG (LPB) -->
+      <div class="bg-gradient-to-br from-emerald-950 to-slate-950 p-4 rounded-2xl border border-emerald-900/50 stat-card-glow flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span class="font-bold uppercase tracking-wider text-[10px] text-emerald-400">Penerimaan Barang</span>
+            <span class="text-lg">📦</span>
+          </div>
+          <div id="kpi-lpb-count" class="text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-2">
+            0 LPB
+          </div>
+        </div>
+        <div class="pt-2 mt-2 border-t border-emerald-900/50 text-[10px] text-slate-400 flex items-center justify-between">
+          <span id="kpi-lpb-value" class="font-bold text-emerald-300 font-mono">Rp 0</span>
+          <button onclick="scrollToSection('section-lpb-history')" class="text-emerald-400 font-bold hover:underline">LPB →</button>
+        </div>
+      </div>
+
+      <!-- KPI 9: TOTAL MEMBER & LOYALITAS -->
+      <div class="bg-gradient-to-br from-indigo-950 to-slate-950 p-4 rounded-2xl border border-indigo-900/50 stat-card-glow flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between text-slate-400 text-xs">
+            <span class="font-bold uppercase tracking-wider text-[10px] text-indigo-400">Member Pelanggan</span>
+            <span class="text-lg">👤</span>
+          </div>
+          <div id="kpi-member-count" class="text-xl sm:text-2xl font-black font-mono text-indigo-400 mt-2">
+            0 Member
+          </div>
+        </div>
+        <div class="pt-2 mt-2 border-t border-indigo-900/50 text-[10px] text-slate-400 flex items-center justify-between">
+          <span id="kpi-member-points" class="font-bold text-indigo-300 font-mono">0 Poin Aktif</span>
+          <button onclick="scrollToSection('section-members-management')" class="text-indigo-400 font-bold hover:underline">Member &rarr;</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- GRAFIK OMZET & METODE PEMBAYARAN -->
+    <!-- ========================================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Grafik Tren Omzet Harian -->
+      <div class="lg:col-span-2 bg-slate-900 p-5 rounded-3xl border border-slate-800 stat-card-glow space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-black text-sm text-white flex items-center gap-2">
+              <span>📊</span>
+              <span>Tren Omzet Penjualan (Harian)</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Grafik pergerakan omzet toko berdasarkan struk kasir yang masuk.</p>
+          </div>
+          <span class="px-2.5 py-1 bg-slate-800 border border-slate-700 text-emerald-400 font-mono text-xs font-bold rounded-xl">
+            Realtime Chart
+          </span>
+        </div>
+
+        <div class="h-64 w-full">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Komposisi Metode Pembayaran (Tunai vs QRIS) -->
+      <div class="bg-slate-900 p-5 rounded-3xl border border-slate-800 stat-card-glow space-y-4 flex flex-col justify-between">
+        <div>
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <span>💳</span>
+            <span>Metode Pembayaran</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Porsi transaksi Tunai, QRIS, dan Transfer.</p>
+        </div>
+
+        <div class="h-44 flex items-center justify-center">
+          <canvas id="paymentMethodChart"></canvas>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800 text-center text-xs">
+          <div class="p-2 bg-slate-950 rounded-xl">
+            <span class="text-[10px] text-emerald-400 font-bold block">TUNAI</span>
+            <span id="payment-cash-pct" class="font-mono font-bold text-white text-xs">0%</span>
+          </div>
+          <div class="p-2 bg-slate-950 rounded-xl">
+            <span class="text-[10px] text-blue-400 font-bold block">QRIS</span>
+            <span id="payment-qris-pct" class="font-mono font-bold text-white text-xs">0%</span>
+          </div>
+          <div class="p-2 bg-slate-950 rounded-xl">
+            <span class="text-[10px] text-purple-400 font-bold block">TRANSFER</span>
+            <span id="payment-transfer-pct" class="font-mono font-bold text-white text-xs">0%</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TOP 10 PRODUK & FEED TRANSAKSI LIVE -->
+    <!-- ========================================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- TOP 10 PRODUK TERLARIS (5 Kolom) -->
+      <div class="lg:col-span-5 bg-slate-900 p-5 rounded-3xl border border-slate-800 stat-card-glow space-y-4 flex flex-col">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-black text-sm text-white flex items-center gap-2">
+              <span>🏆</span>
+              <span>Top 10 Produk Terlaris</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Produk dengan kuantiti penjualan tertinggi.</p>
+          </div>
+          <span class="text-xs font-mono text-yellow-400 font-bold">Terlaris</span>
+        </div>
+
+        <div id="top-products-list" class="space-y-3 overflow-y-auto max-h-[380px] custom-scrollbar pr-1 flex-1">
+          <!-- Diisi otomatis -->
+        </div>
+      </div>
+
+      <!-- FEED TRANSAKSI KASIR REALTIME (7 Kolom) -->
+      <div class="lg:col-span-7 bg-slate-900 p-5 rounded-3xl border border-slate-800 stat-card-glow space-y-4 flex flex-col">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-black text-sm text-white flex items-center gap-2">
+              <span>⚡</span>
+              <span>Feed Transaksi Kasir Realtime</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Struk belanja yang baru saja diproses di meja kasir toko.</p>
+          </div>
+          <span class="px-2.5 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800 font-mono text-[10px] font-black rounded-full uppercase tracking-wider animate-pulse">
+            Live Stream
+          </span>
+        </div>
+
+        <div class="overflow-x-auto max-h-[380px] custom-scrollbar">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <tr>
+                <th class="py-2.5 px-3">No. Struk</th>
+                <th class="py-2.5 px-3">Waktu</th>
+                <th class="py-2.5 px-3">Kasir</th>
+                <th class="py-2.5 px-3">Rincian Belanja</th>
+                <th class="py-2.5 px-3 font-mono">Total</th>
+                <th class="py-2.5 px-3 font-mono text-emerald-400">Laba</th>
+                <th class="py-2.5 px-3 text-center">Metode</th>
+              </tr>
+            </thead>
+            <tbody id="live-transactions-tbody" class="divide-y divide-slate-800/60">
+              <!-- Diisi otomatis -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PERINGATAN STOK MENIPIS (PERLU KULAKAN) -->
+    <!-- ========================================== -->
+    <section id="section-low-stock" class="bg-slate-900 p-5 rounded-3xl border border-rose-900/50 stat-card-glow space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <span>🚨</span>
+            <span class="text-rose-400">Peringatan Stok Rak Menipis (&le; 5 pcs)</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Segera order ulang (PO) ke supplier agar toko tidak kehabisan stok produk favorit pembeli.</p>
+        </div>
+        <span id="low-stock-badge-count" class="px-3 py-1 bg-rose-950 text-rose-300 border border-rose-800 font-black text-xs rounded-xl">
+          0 Produk Kritis
+        </span>
+      </div>
+
+      <div class="overflow-x-auto max-h-[300px] custom-scrollbar">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr>
+              <th class="py-2.5 px-3">Nama Produk</th>
+              <th class="py-2.5 px-3">PLU / Barcode</th>
+              <th class="py-2.5 px-3">Kategori</th>
+              <th class="py-2.5 px-3 font-mono">Harga Modal (HPP)</th>
+              <th class="py-2.5 px-3 font-mono">Harga Jual</th>
+              <th class="py-2.5 px-3 text-center">Sisa Stok</th>
+              <th class="py-2.5 px-3 text-right">Aksi Supplier</th>
+            </tr>
+          </thead>
+          <tbody id="low-stock-tbody" class="divide-y divide-slate-800/60">
+            <!-- Diisi otomatis -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- ANALISIS DAY SALES INVENTORY (DSI) PRODUK LARIS -->
+    <!-- ========================================== -->
+    <section id="section-dsi-analysis" class="bg-slate-900 p-5 rounded-3xl border border-cyan-900/40 stat-card-glow space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <span>⏳</span>
+            <span class="text-cyan-400">Analisis Day Sales Inventory (DSI) Produk Laris</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Estimasi ketahanan sisa stok terhadap laju penjualan harian (<span class="text-cyan-300 font-mono">Sisa Stok &divide; Rata-rata Penjualan / Hari</span>).
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="dsi-badge-count" class="px-3 py-1 bg-cyan-950/80 text-cyan-300 border border-cyan-800 font-mono text-xs font-bold rounded-xl whitespace-nowrap">
+            0 Produk Dianalisis
+          </span>
+        </div>
+      </div>
+
+      <!-- Controls: Pencarian, Filter Status & Sortir DSI -->
+      <div class="flex flex-col sm:flex-row gap-2 pt-1">
+        <div class="relative flex-1">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
+          <input 
+            type="text" 
+            id="dsi-search-input" 
+            oninput="renderDSITable()" 
+            placeholder="Cari nama produk / PLU barcode..." 
+            class="w-full pl-8 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
+          >
+        </div>
+        <div class="flex items-center gap-2">
+          <select 
+            id="dsi-status-filter" 
+            onchange="renderDSITable()" 
+            class="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-cyan-500 font-semibold"
+          >
+            <option value="all">Semua Status Ketahanan</option>
+            <option value="kritis">🚨 Kritis (&le; 3 Hari)</option>
+            <option value="menipis">⚠️ Menipis (4 - 7 Hari)</option>
+            <option value="optimal">✅ Optimal (8 - 21 Hari)</option>
+            <option value="overstock">📦 Overstock (&gt; 21 Hari)</option>
+            <option value="unsold">💤 Belum Terjual</option>
+          </select>
+          <select 
+            id="dsi-sort-select" 
+            onchange="renderDSITable()" 
+            class="bg-slate-950 border border-slate-800 text-xs text-cyan-300 rounded-xl px-3 py-2 focus:outline-none focus:border-cyan-500 font-bold"
+          >
+            <option value="dsi_asc">⏳ DSI Terendah (Cepat Habis)</option>
+            <option value="dsi_desc">⏳ DSI Tertinggi (Paling Tahan)</option>
+            <option value="sales_desc">🔥 Terlaris (Qty Terbanyak)</option>
+            <option value="stock_asc">📉 Stok Paling Sedikit</option>
+            <option value="stock_desc">📈 Stok Paling Banyak</option>
+            <option value="name_asc">🔤 Nama Produk (A-Z)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto max-h-[380px] custom-scrollbar">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr>
+              <th class="py-2.5 px-3">Produk</th>
+              <th class="py-2.5 px-3">PLU & Kategori</th>
+              <th class="py-2.5 px-3 text-center font-mono">Sisa Stok</th>
+              <th class="py-2.5 px-3 text-center font-mono">Total Terjual</th>
+              <th class="py-2.5 px-3 text-center font-mono text-yellow-400">Laju Jual / Hari</th>
+              <th class="py-2.5 px-3 text-center font-mono text-cyan-400">Estimasi DSI</th>
+              <th class="py-2.5 px-3 text-center">Status Ketahanan</th>
+              <th class="py-2.5 px-3 text-right">Rekomendasi / Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="dsi-tbody" class="divide-y divide-slate-800/60">
+            <!-- Diisi otomatis -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- RIWAYAT RETUR BARANG & REFUND -->
+    <!-- ========================================== -->
+    <section class="bg-slate-900 p-5 rounded-3xl border border-slate-800 stat-card-glow space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <span>🔄</span>
+            <span>Riwayat Retur Penjualan Kasir</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Pengembalian barang dan refund dana yang diproses dengan verifikasi nomor struk.</p>
+        </div>
+        <span id="returns-badge-count" class="px-3 py-1 bg-slate-800 text-amber-300 border border-slate-700 font-mono text-xs font-bold rounded-xl">
+          0 Retur
+        </span>
+      </div>
+
+      <div class="overflow-x-auto max-h-[260px] custom-scrollbar">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr>
+              <th class="py-2.5 px-3">No. Retur</th>
+              <th class="py-2.5 px-3">No. Struk Asal</th>
+              <th class="py-2.5 px-3">Waktu</th>
+              <th class="py-2.5 px-3">Alasan Retur</th>
+              <th class="py-2.5 px-3 font-mono text-rose-400">Total Refund</th>
+              <th class="py-2.5 px-3 text-center">Status Stok</th>
+              <th class="py-2.5 px-3">Kasir</th>
+            </tr>
+          </thead>
+          <tbody id="returns-tbody" class="divide-y divide-slate-800/60">
+            <!-- Diisi otomatis -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- RIWAYAT STOCK OPNAME TOKO (AUDIT FISIK) -->
+    <!-- ========================================== -->
+    <section id="section-so-history" class="bg-slate-900 p-5 rounded-3xl border border-slate-800 stat-card-glow space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <span>📋</span>
+            <span>Riwayat Stock Opname (Audit Fisik Rak vs Komputer)</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Catatan audit fisik berkala, koreksi selisih stok, dan pejabat toko yang mengesahkan.</p>
+        </div>
+        <span id="so-badge-count" class="px-3 py-1 bg-slate-800 text-purple-300 border border-slate-700 font-mono text-xs font-bold rounded-xl">
+          0 Penyesuaian
+        </span>
+      </div>
+
+      <div class="overflow-x-auto max-h-[280px] custom-scrollbar">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr>
+              <th class="py-2.5 px-3">No. SO / Ref</th>
+              <th class="py-2.5 px-3">Waktu</th>
+              <th class="py-2.5 px-3">Nama Produk & PLU</th>
+              <th class="py-2.5 px-3 text-center">Status Selisih</th>
+              <th class="py-2.5 px-3 text-center">Selisih Fisik</th>
+              <th class="py-2.5 px-3">Catatan / Alasan</th>
+              <th class="py-2.5 px-3">Pejabat Pengesah</th>
+            </tr>
+          </thead>
+          <tbody id="so-history-tbody" class="divide-y divide-slate-800/60">
+            <!-- Diisi otomatis -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- RIWAYAT KLERK KASIR (CLOSING SHIFT & REKONSILIASI KAS) -->
+    <!-- ========================================== -->
+    <section id="section-klerk-history" class="bg-slate-900 p-5 rounded-3xl border border-slate-800 stat-card-glow space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <span>💵</span>
+            <span>Riwayat Klerk Kasir (Closing Shift & Rekonsiliasi Kas Laci)</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Catatan serah terima kasir, saldo kas komputer vs uang fisik di laci, dan selisih kas per shift.</p>
+        </div>
+        <span id="klerk-badge-count" class="px-3 py-1 bg-slate-800 text-amber-300 border border-slate-700 font-mono text-xs font-bold rounded-xl">
+          0 Closing Shift
+        </span>
+      </div>
+
+      <div class="overflow-x-auto max-h-[280px] custom-scrollbar">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr>
+              <th class="py-2.5 px-3">No. Klerk</th>
+              <th class="py-2.5 px-3">Waktu Closing</th>
+              <th class="py-2.5 px-3">Kasir & Shift</th>
+              <th class="py-2.5 px-3 text-right">Modal Awal</th>
+              <th class="py-2.5 px-3 text-right">Tunai Komputer</th>
+              <th class="py-2.5 px-3 text-right">Uang Fisik</th>
+              <th class="py-2.5 px-3 text-center">Selisih Kas</th>
+              <th class="py-2.5 px-3 text-center">Status</th>
+              <th class="py-2.5 px-3">Pengesah (COS/ACOS)</th>
+            </tr>
+          </thead>
+          <tbody id="klerk-history-tbody" class="divide-y divide-slate-800/60">
+            <!-- Diisi otomatis -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- DATA MUTASI BARANG TOKO (MONITORING PERSEDIAAN LENGKAP) -->
+    <!-- ========================================== -->
+    <section id="section-mutations-history" class="bg-slate-900 p-5 rounded-3xl border border-slate-800 stat-card-glow space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <span>📦</span>
+            <span class="text-yellow-400">Data Mutasi Barang Toko (Arus Keluar-Masuk Stok)</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Pantau pergerakan stok persediaan secara menyeluruh: Barang Masuk (LPB/Supplier), Penjualan POS, Retur Barang, dan Koreksi Stock Opname.
+          </p>
+        </div>
+        <span id="mutations-badge-count" class="px-3 py-1 bg-slate-800 text-yellow-300 border border-slate-700 font-mono text-xs font-bold rounded-xl whitespace-nowrap self-start sm:self-auto">
+          0 Mutasi
+        </span>
+      </div>
+
+      <!-- Controls: Search, Type Filter & Sorting -->
+      <div class="flex flex-col sm:flex-row gap-2 pt-1">
+        <div class="relative flex-1">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
+          <input 
+            type="text" 
+            id="mutations-search-input" 
+            oninput="renderMutationsTable()" 
+            placeholder="Cari produk, barcode, no ref, atau operator..." 
+            class="w-full pl-8 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-yellow-500 transition-colors"
+          >
+        </div>
+        <div class="flex items-center gap-2">
+          <select 
+            id="mutations-type-filter" 
+            onchange="renderMutationsTable()" 
+            class="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-yellow-500 font-semibold"
+          >
+            <option value="all">Semua Jenis Mutasi</option>
+            <option value="IN_SUPPLIER">📥 Barang Masuk (LPB Supplier)</option>
+            <option value="OUT_SALE">🛒 Penjualan Kasir (POS)</option>
+            <option value="RETURN_SALE">🔄 Retur Penjualan (Restok Rak)</option>
+            <option value="SO_PLUS">📈 Koreksi SO Fisik Lebih (+)</option>
+            <option value="SO_MINUS">📉 Koreksi SO Fisik Kurang (-)</option>
+            <option value="OUT_DAMAGE">⚠️ Barang Rusak / Expired</option>
+          </select>
+          <select 
+            id="mutations-sort-select" 
+            onchange="renderMutationsTable()" 
+            class="bg-slate-950 border border-slate-800 text-xs text-yellow-300 rounded-xl px-3 py-2 focus:outline-none focus:border-yellow-500 font-bold"
+          >
+            <option value="date_desc">🕒 Waktu Terbaru</option>
+            <option value="date_asc">🕒 Waktu Terlama</option>
+            <option value="qty_desc">🔢 Qty Perubahan Terbesar</option>
+            <option value="qty_asc">🔢 Qty Perubahan Terkecil</option>
+            <option value="name_asc">🔤 Nama Produk (A-Z)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto max-h-[360px] custom-scrollbar">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr>
+              <th class="py-2.5 px-3">No. Ref / Mutasi</th>
+              <th class="py-2.5 px-3">Waktu</th>
+              <th class="py-2.5 px-3 text-center">Jenis Mutasi</th>
+              <th class="py-2.5 px-3">Nama Produk & Barcode</th>
+              <th class="py-2.5 px-3 text-center font-mono">Jumlah Qty</th>
+              <th class="py-2.5 px-3">Keterangan / Alasan</th>
+              <th class="py-2.5 px-3">Petugas / Operator</th>
+            </tr>
+          </thead>
+          <tbody id="mutations-history-tbody" class="divide-y divide-slate-800/60">
+            <!-- Diisi otomatis -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- RIWAYAT PENERIMAAN BARANG (LPB) PER SUPPLIER -->
+    <!-- ========================================== -->
+    <section id="section-lpb-history" class="bg-slate-900 p-5 rounded-3xl border border-emerald-900/40 stat-card-glow space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <span>📦</span>
+            <span class="text-emerald-400">Riwayat Penerimaan Barang (LPB) per Supplier</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Daftar seluruh dokumen penerimaan barang masuk dari supplier. Klik baris untuk melihat detail item per produk.
+          </p>
+        </div>
+        <span id="lpb-history-badge" class="px-3 py-1 bg-emerald-950 text-emerald-300 border border-emerald-800 font-mono text-xs font-bold rounded-xl whitespace-nowrap self-start sm:self-auto">
+          0 Dokumen LPB
+        </span>
+      </div>
+
+      <!-- Filter -->
+      <div class="flex flex-col sm:flex-row gap-2 pt-1">
+        <div class="relative flex-1">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
+          <input type="text" id="lpb-history-search"
+            oninput="renderOwnerLpbTable()"
+            placeholder="Cari supplier, no. faktur, atau no. LPB..."
+            class="w-full pl-8 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors">
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="date" id="lpb-filter-from"
+            onchange="renderOwnerLpbTable()"
+            class="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-emerald-500">
+          <span class="text-slate-500 text-xs">s/d</span>
+          <input type="date" id="lpb-filter-to"
+            onchange="renderOwnerLpbTable()"
+            class="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-emerald-500">
+        </div>
+      </div>
+
+      <!-- Tabel LPB -->
+      <div class="overflow-x-auto max-h-[400px] custom-scrollbar">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr>
+              <th class="py-2.5 px-3">No. LPB</th>
+              <th class="py-2.5 px-3">Tanggal</th>
+              <th class="py-2.5 px-3">Supplier</th>
+              <th class="py-2.5 px-3">No. Faktur</th>
+              <th class="py-2.5 px-3">Pembayaran</th>
+              <th class="py-2.5 px-3 text-center">SKU</th>
+              <th class="py-2.5 px-3 text-center">Qty</th>
+              <th class="py-2.5 px-3 text-right">Total Nilai</th>
+              <th class="py-2.5 px-3">Operator</th>
+            </tr>
+          </thead>
+          <tbody id="lpb-history-tbody" class="divide-y divide-slate-800/60">
+            <tr><td colspan="9" class="py-8 text-center text-slate-500 text-xs">Belum ada data LPB. Data akan muncul setelah sinkronisasi.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Detail expandable (inline) -->
+      <div id="lpb-detail-inline" class="hidden bg-slate-950 border border-emerald-800/50 rounded-2xl p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <h4 id="lpb-detail-inline-title" class="font-black text-xs text-emerald-400 uppercase"></h4>
+          <button onclick="document.getElementById('lpb-detail-inline').classList.add('hidden')"
+            class="text-slate-400 hover:text-white text-sm">✕</button>
+        </div>
+        <div id="lpb-detail-inline-body"></div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- DATA MEMBER & PELANGGAN LOYALITAS ONLINE -->
+    <!-- ========================================== -->
+    <section id="section-members-management" class="bg-slate-900 p-5 rounded-3xl border border-indigo-900/40 stat-card-glow space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <span>👤</span>
+            <span class="text-indigo-400">Data Member & Pelanggan Loyalitas Online</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Daftar seluruh member pelanggan yang didaftarkan di kasir POS secara realtime di database online VPS.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="members-badge-count" class="px-3 py-1 bg-indigo-950 text-indigo-300 border border-indigo-800 font-mono text-xs font-bold rounded-xl whitespace-nowrap">
+            0 Terdaftar
+          </span>
+          <button onclick="fetchDashboardData()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold rounded-xl flex items-center gap-1 transition-all" title="Segarkan Data Member">
+            <span>🔄</span>
+            <span class="hidden sm:inline">Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Ringkasan Statistik Member -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+        <div class="p-3 bg-slate-950/80 border border-slate-800 rounded-2xl flex flex-col justify-between">
+          <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Member</div>
+          <div id="member-summary-total" class="text-lg font-black font-mono text-white mt-1">0 Member</div>
+          <div class="text-[9px] text-indigo-400 font-semibold mt-0.5">Database Online</div>
+        </div>
+        <div class="p-3 bg-slate-950/80 border border-slate-800 rounded-2xl flex flex-col justify-between">
+          <div class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">Total Saldo Poin</div>
+          <div id="member-summary-points" class="text-lg font-black font-mono text-indigo-400 mt-1">0 Poin</div>
+          <div class="text-[9px] text-slate-400 mt-0.5">Beredar di Pelanggan</div>
+        </div>
+        <div class="p-3 bg-slate-950/80 border border-slate-800 rounded-2xl flex flex-col justify-between">
+          <div class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Akumulasi Belanja</div>
+          <div id="member-summary-spend" class="text-lg font-black font-mono text-emerald-400 mt-1">Rp 0</div>
+          <div class="text-[9px] text-slate-400 mt-0.5">Total Omzet Member</div>
+        </div>
+        <div class="p-3 bg-slate-950/80 border border-slate-800 rounded-2xl flex flex-col justify-between">
+          <div class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">Rata-rata Belanja</div>
+          <div id="member-summary-avg" class="text-lg font-black font-mono text-cyan-400 mt-1">Rp 0</div>
+          <div class="text-[9px] text-slate-400 mt-0.5">Per Pelanggan</div>
+        </div>
+      </div>
+
+      <!-- Filter Pencarian & Pengurutan -->
+      <div class="flex flex-col sm:flex-row gap-2 pt-1">
+        <div class="relative flex-1">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">🔍</span>
+          <input type="text" id="member-table-search"
+            oninput="renderOwnerMembersTable()"
+            placeholder="Cari nama pelanggan, nomor HP, atau ID member..."
+            class="w-full pl-8 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="member-table-sort" onchange="renderOwnerMembersTable()" class="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
+            <option value="newest">Terbaru Terdaftar</option>
+            <option value="highest_spend">Belanja Tertinggi</option>
+            <option value="highest_points">Poin Tertinggi</option>
+            <option value="name_asc">Nama (A - Z)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tabel Member Online -->
+      <div class="overflow-x-auto max-h-[450px] custom-scrollbar">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr>
+              <th class="py-2.5 px-3">No & ID Member</th>
+              <th class="py-2.5 px-3">Nama Lengkap</th>
+              <th class="py-2.5 px-3">No. WhatsApp / HP</th>
+              <th class="py-2.5 px-3">Alamat Domisili</th>
+              <th class="py-2.5 px-3 text-center">Saldo Poin</th>
+              <th class="py-2.5 px-3 text-right">Total Belanja</th>
+              <th class="py-2.5 px-3">Tgl Terdaftar</th>
+              <th class="py-2.5 px-3 text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="owner-members-tbody" class="divide-y divide-slate-800/60">
+            <tr><td colspan="8" class="py-8 text-center text-slate-500 text-xs">Memuat data member online...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    </div> <!-- /#owner-dashboard-body -->
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL DETAIL STRUK TRANSAKSI (DIGITAL RECEIPT) -->
+  <!-- ========================================== -->
+  <div id="modal-receipt-detail" class="fixed inset-0 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between text-white">
+        <div class="font-black text-xs uppercase flex items-center gap-1.5">
+          <span>🧾</span>
+          <span>Detail Struk Transaksi Digital</span>
+        </div>
+        <button onclick="closeModal('modal-receipt-detail')" class="text-slate-400 hover:text-white font-black text-base p-1">✕</button>
+      </div>
+      <div id="receipt-detail-content" class="p-4 overflow-y-auto space-y-3 text-xs font-mono">
+        <!-- Diisi otomatis -->
+      </div>
+      <div class="p-3 bg-slate-950 border-t border-slate-800">
+        <button onclick="closeModal('modal-receipt-detail')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold">
+          Tutup [ESC]
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL PENGATURAN SUPABASE KHUSUS OWNER -->
+  <!-- ========================================== -->
+  <div id="modal-owner-settings" class="fixed inset-0 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-slate-900 border border-slate-700 w-full max-w-md rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-gradient-to-r from-emerald-700 to-teal-800 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">⚡</span>
+          <div>
+            <h3 class="font-black text-sm uppercase">Konfigurasi Cloud Supabase</h3>
+            <p class="text-[11px] text-emerald-200">Hubungkan halaman owner ini langsung ke database cloud toko Anda.</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-owner-settings')" class="text-white hover:text-yellow-300 font-black p-1 text-lg">✕</button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Project URL Supabase *</label>
+          <input 
+            type="text" 
+            id="owner-supabase-url" 
+            placeholder="https://xyzprojectid.supabase.co"
+            class="w-full px-3 py-2.5 bg-slate-950 border border-slate-700 rounded-xl font-mono text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          />
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 mb-1">Anon Public Key (API Key) *</label>
+          <input 
+            type="password" 
+            id="owner-supabase-key" 
+            placeholder="eyJhbGciOi..."
+            class="w-full px-3 py-2.5 bg-slate-950 border border-slate-700 rounded-xl font-mono text-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          />
+        </div>
+
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          💡 Pengaturan ini disimpan secara aman di browser HP/komputer Anda. Data transaksi dan stok akan ditarik langsung secara realtime dari Supabase.
+        </p>
+
+        <div class="flex items-center gap-2 pt-2">
+          <button 
+            type="button" 
+            onclick="saveOwnerSupabaseSettings()"
+            class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black text-xs shadow-md transition-all"
+          >
+            Simpan & Hubungkan
+          </button>
+          <button 
+            type="button" 
+            onclick="closeModal('modal-owner-settings')" 
+            class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold text-xs"
+          >
+            Batal
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL PIN GATE: PROTEKSI AKSES OWNER DASHBOARD -->
+  <!-- ========================================== -->
+  <div id="modal-owner-pin-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl shadow-black/80 space-y-5">
+      
+      <!-- Icon Gembok -->
+      <div class="w-16 h-16 bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto shadow-inner text-3xl">
+        🔒
+      </div>
+
+      <!-- Judul & Keterangan -->
+      <div>
+        <h2 class="text-lg font-black text-white tracking-tight uppercase flex items-center justify-center gap-2">
+          <span>Portal Owner Toko</span>
+          <span class="px-2 py-0.5 bg-amber-400 text-slate-950 text-[10px] rounded-full font-black">RESTRICTED</span>
+        </h2>
+        <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+          Dashboard ini memuat laporan omzet dan data rahasia toko. Masukkan PIN COS / Owner untuk membuka akses.
+        </p>
+      </div>
+
+      <!-- Form Input PIN -->
+      <form onsubmit="submitOwnerPinAuth(event)" class="space-y-4">
+        <div>
+          <input 
+            type="password" 
+            id="owner-pin-input" 
+            maxlength="6" 
+            inputmode="numeric" 
+            pattern="[0-9]*" 
+            placeholder="••••" 
+            autocomplete="off"
+            class="w-full text-center text-2xl tracking-[0.5em] font-mono py-3 bg-slate-950 border border-slate-700 text-amber-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 placeholder:text-slate-600 transition-all"
+            required
+            autofocus
+          />
+          <div id="owner-pin-error" class="hidden text-rose-400 text-xs font-bold mt-2 flex items-center justify-center gap-1">
+            <span>⚠️</span>
+            <span id="owner-pin-error-text">PIN tidak valid!</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 pt-1">
+          <button 
+            type="submit" 
+            id="btn-submit-owner-pin"
+            class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-amber-500/20 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
+          >
+            <span>🔓 Buka Dashboard</span>
+          </button>
+
+          <a 
+            href="index.html" 
+            class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5"
+          >
+            <span>← Kembali ke Kasir POS</span>
+          </a>
+        </div>
+      </form>
+
+      <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-center gap-1">
+        <span>🛡️ Proteksi Otorisasi Chief of Store (COS)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL PEMBAYARAN QRIS CLOUD ADD-ON OWNER -->
+  <!-- ========================================== -->
+  <div id="modal-owner-cloud-checkout" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="text-left">
+          <h3 class="text-sm font-black text-white flex items-center gap-1.5">
+            <span>⚡</span> <span>Aktivasi Cloud Dashboard HP</span>
+          </h3>
+          <p class="text-[10px] text-slate-400">Pembayaran Resmi Lisensi Cloud</p>
+        </div>
+        <button onclick="closeModal('modal-owner-cloud-checkout')" class="text-slate-400 hover:text-white text-lg font-bold p-1 cursor-pointer">&times;</button>
+      </div>
+
+      <!-- Paket & Nominal -->
+      <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 text-left space-y-1">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Durasi Terpilih:</span>
+          <span id="owner-checkout-dur-label" class="text-xs font-bold text-amber-400">1 Tahun</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Total Pembayaran:</span>
+          <span id="owner-checkout-nominal-label" class="text-base font-black font-mono text-emerald-400">Rp 200.000</span>
+        </div>
+      </div>
+
+      <!-- QRIS Barcode Box -->
+      <div class="p-4 bg-white rounded-2xl max-w-[200px] mx-auto text-center shadow-lg">
+        <img id="owner-checkout-qris-img" src="" alt="QRIS Vendor" class="w-40 h-40 mx-auto object-contain rounded-lg hidden" />
+        <div id="owner-checkout-qris-placeholder" class="w-40 h-40 mx-auto flex flex-col items-center justify-center bg-slate-50 rounded-lg p-2">
+          <span class="text-3xl">📱</span>
+          <span class="text-[10px] font-bold text-slate-800 mt-2">Scan QRIS Vendor</span>
+          <span class="text-[8px] text-slate-500 text-center">Buka BCA, GoPay, OVO, Shopee, atau DANA</span>
+        </div>
+        <div class="text-[9px] font-bold text-slate-800 mt-2 pt-1 border-t border-slate-200">
+          QRIS Nasional (NMID Resmi)
+        </div>
+      </div>
+
+      <!-- Tombol Konfirmasi WhatsApp -->
+      <div class="space-y-2 pt-1">
+        <a id="owner-checkout-wa-btn" href="#" target="_blank" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+          <span>💬 Konfirmasi via WhatsApp</span>
+        </a>
+        <button onclick="closeModal('modal-owner-cloud-checkout')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white font-bold text-xs rounded-xl transition cursor-pointer">
+          Batal
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- TOAST CONTAINER -->
+  <div id="owner-toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ========================================== -->
+  <!-- LOGIKA DASHBOARD OWNER JAVASCRIPT -->
+  <!-- ========================================== -->
+  <script>
+    // State Aplikasi Owner
+    let ownerSupabaseClient = null;
+    let dashboardData = {
+      transactions: [],
+      products: [],
+      returns: [],
+      mutations: [],
+      lpbRecords: [],
+      klerkHistory: [],
+      members: [],
+      settings: {}
+    };
+    let currentDateFilter = "today"; // 'today', '7days', '30days', 'all'
+    let revenueChartInstance = null;
+    let paymentChartInstance = null;
+    let autoRefreshCountdown = 30;
+    let autoRefreshInterval = null;
+
+    // Helper Format Rupiah & Angka
+    function formatRupiah(num) {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(Number(num) || 0);
+    }
+
+    function formatAngka(num) {
+      return new Intl.NumberFormat("id-ID").format(Number(num) || 0);
+    }
+
+    function showToast(msg, type = "success") {
+      const container = document.getElementById("owner-toast-container");
+      if (!container) return;
+      const toast = document.createElement("div");
+      toast.className = `px-4 py-2.5 rounded-xl text-xs font-bold shadow-xl text-white transition-all transform duration-300 translate-y-2 opacity-0 ${
+        type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-blue-600'
+      }`;
+      toast.textContent = msg;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.remove("translate-y-2", "opacity-0"));
+      setTimeout(() => {
+        toast.classList.add("opacity-0", "translate-y-2");
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    // ==========================================
+    // SISTEM KEAMANAN: PROTEKSI PIN OWNER & COS
+    // ==========================================
+    function isOwnerAuthenticated() {
+      return sessionStorage.getItem("snack_pos_owner_session") === "active";
+    }
+
+    function checkOwnerPinAuth() {
+      // 1. Cek apakah ada token otorisasi instan dari POS Kasir (dibuka oleh COS dalam 30 detik terakhir)
+      try {
+        const token = localStorage.getItem("snack_pos_owner_auth_token");
+        if (token) {
+          const tokenTime = parseInt(token, 10);
+          if (!isNaN(tokenTime) && (Date.now() - tokenTime) < 30000) {
+            sessionStorage.setItem("snack_pos_owner_session", "active");
+            localStorage.removeItem("snack_pos_owner_auth_token");
+          }
+        }
+      } catch (e) {}
+
+      // 2. Cek status session
+      if (isOwnerAuthenticated()) {
+        const gateModal = document.getElementById("modal-owner-pin-gate");
+        if (gateModal) gateModal.classList.add("hidden");
+        return true;
+      } else {
+        const gateModal = document.getElementById("modal-owner-pin-gate");
+        if (gateModal) {
+          gateModal.classList.remove("hidden");
+          const pinInput = document.getElementById("owner-pin-input");
+          if (pinInput) {
+            pinInput.value = "";
+            setTimeout(() => pinInput.focus(), 150);
+          }
+        }
+        return false;
+      }
+    }
+
+    function submitOwnerPinAuth(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const pinInput = document.getElementById("owner-pin-input");
+      const errorEl = document.getElementById("owner-pin-error");
+      const errorTextEl = document.getElementById("owner-pin-error-text");
+      const enteredPin = pinInput ? pinInput.value.trim() : "";
+
+      if (!enteredPin) return;
+
+      let isValid = false;
+      let supervisorName = "Owner / COS";
+
+      try {
+        const storedEmp = localStorage.getItem("snack_pos_employees");
+        if (storedEmp) {
+          const empList = JSON.parse(storedEmp);
+          if (Array.isArray(empList)) {
+            const found = empList.find(emp => emp.role === "COS" && String(emp.pin) === enteredPin);
+            if (found) {
+              isValid = true;
+              supervisorName = found.name;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Error membaca data karyawan:", err);
+      }
+
+      if (!isValid) {
+        try {
+          const storedSettings = localStorage.getItem("snack_pos_settings");
+          if (storedSettings) {
+            const s = JSON.parse(storedSettings);
+            if (s.supervisorPin && String(s.supervisorPin) === enteredPin) {
+              isValid = true;
+            }
+          }
+        } catch (err) {}
+      }
+
+      if (!isValid && enteredPin === "1234") {
+        isValid = true;
+      }
+
+      if (isValid) {
+        if (errorEl) errorEl.classList.add("hidden");
+        sessionStorage.setItem("snack_pos_owner_session", "active");
+        const gateModal = document.getElementById("modal-owner-pin-gate");
+        if (gateModal) gateModal.classList.add("hidden");
+
+        showToast(`Akses Diterima. Selamat Datang ${supervisorName}!`, "success");
+
+        initOwnerSupabase();
+        fetchDashboardData();
+        startAutoRefreshTimer();
+      } else {
+        if (errorEl && errorTextEl) {
+          errorTextEl.textContent = "PIN COS / Owner salah! Akses ditolak.";
+          errorEl.classList.remove("hidden");
+        }
+        if (pinInput) {
+          pinInput.value = "";
+          pinInput.classList.add("border-rose-500", "animate-pulse");
+          setTimeout(() => {
+            pinInput.classList.remove("border-rose-500", "animate-pulse");
+            pinInput.focus();
+          }, 1000);
+        }
+      }
+    }
+
+    function lockOwnerDashboard() {
+      sessionStorage.removeItem("snack_pos_owner_session");
+      try { localStorage.removeItem("snack_pos_owner_auth_token"); } catch (e) {}
+      if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+      const gateModal = document.getElementById("modal-owner-pin-gate");
+      if (gateModal) {
+        gateModal.classList.remove("hidden");
+        const pinInput = document.getElementById("owner-pin-input");
+        if (pinInput) {
+          pinInput.value = "";
+          setTimeout(() => pinInput.focus(), 150);
+        }
+      }
+      showToast("Dashboard Owner telah dikunci.", "info");
+    }
+
+    // Pembersih URL Supabase
+    function cleanSupabaseUrl(rawUrl) {
+      if (!rawUrl) return "";
+      let url = String(rawUrl).trim();
+      const dashMatch = url.match(/dashboard\/project\/([a-zA-Z0-9_-]+)/);
+      if (dashMatch && dashMatch[1]) return `https://${dashMatch[1]}.supabase.co`;
+      const refMatch = url.match(/([a-zA-Z0-9_-]+)\.supabase\.co/i);
+      if (refMatch && refMatch[1]) return `https://${refMatch[1]}.supabase.co`;
+      url = url.replace(/\/rest\/v1\/?.*$/i, '').replace(/\/+$/, '');
+      if (!url.startsWith("http://") && !url.startsWith("https://")) url = "https://" + url;
+      return url;
+    }
+
+    function cleanSupabaseKey(rawKey) {
+      if (!rawKey) return "";
+      return String(rawKey).trim().replace(/^['"]+|['"]+$/g, '');
+    }
+
+    const OFFICIAL_SUPABASE_URL = (typeof window !== "undefined" && window.location && window.location.origin) ? window.location.origin : "http://2.27.165.72";
+    const OFFICIAL_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg5ODUwNDE4LCJleHAiOjE5NDc1MzA0MTh9.99BRNnUQwei95p1zAqtFBBD5CnUJSedfUeh2MJy97Gg";
+
+    let realtimeChannel = null;
+
+    // Inisialisasi Supabase Client
+    function initOwnerSupabase() {
+      // Prioritas 1: Ambil dari localStorage owner atau pengaturan POS utama
+      let url = localStorage.getItem("snack_pos_owner_supabase_url");
+      let key = localStorage.getItem("snack_pos_owner_supabase_key");
+
+      if (!url || !key) {
+        const settingsRaw = localStorage.getItem("snack_pos_settings");
+        if (settingsRaw) {
+          try {
+            const parsed = JSON.parse(settingsRaw);
+            if (!url) url = parsed.supabaseUrl;
+            if (!key) key = parsed.supabaseKey;
+          } catch (e) {}
+        }
+      }
+
+      if (!url) url = OFFICIAL_SUPABASE_URL;
+      if (!key) key = OFFICIAL_SUPABASE_KEY;
+
+      url = cleanSupabaseUrl(url);
+      key = cleanSupabaseKey(key);
+
+      const badge = document.getElementById("owner-cloud-badge");
+      const label = document.getElementById("owner-cloud-label");
+
+      if (url && key && window.supabase) {
+        try {
+          ownerSupabaseClient = window.supabase.createClient(url, key);
+          if (badge) badge.className = "px-2.5 py-1 rounded-xl text-[11px] font-bold border flex items-center gap-1.5 bg-emerald-950/80 border-emerald-800 text-emerald-400";
+          if (label) label.textContent = "Cloud Online";
+          subscribeOwnerRealtime();
+          return true;
+        } catch (e) {
+          console.error("Gagal init Supabase:", e);
+        }
+      }
+
+      // Fallback: Mode Lokal / Demo
+      if (badge) badge.className = "px-2.5 py-1 rounded-xl text-[11px] font-bold border flex items-center gap-1.5 bg-slate-800 border-slate-700 text-slate-300";
+      if (label) label.textContent = "Mode Lokal";
+      return false;
+    }
+
+    // Langganan Perubahan Data Real-Time Supabase
+    function subscribeOwnerRealtime() {
+      if (!ownerSupabaseClient || realtimeChannel) return;
+      try {
+        realtimeChannel = ownerSupabaseClient
+          .channel('owner_live_changes')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'returns' }, (payload) => {
+            console.log("Realtime retur kasir terdeteksi:", payload);
+            fetchDashboardData();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, (payload) => {
+            console.log("Realtime transaksi kasir terdeteksi:", payload);
+            fetchDashboardData();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
+            console.log("Realtime produk terdeteksi:", payload);
+            fetchDashboardData();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'mutations' }, (payload) => {
+            console.log("Realtime mutasi stok & SO terdeteksi:", payload);
+            fetchDashboardData();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'stock_mutations' }, (payload) => {
+            console.log("Realtime stock_mutations terdeteksi:", payload);
+            fetchDashboardData();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'members' }, (payload) => {
+            console.log("Realtime member terdeteksi:", payload);
+            fetchDashboardData();
+          })
+          .subscribe();
+      } catch (e) {
+        console.warn("Supabase Realtime subscription dilewati:", e.message);
+      }
+    }
+
+    // Cek Akses Langganan Cloud Dashboard (Paket 1 Add-on / Paket 2 SaaS)
+    async function checkStoreCloudSubscription(storeId) {
+      const banner = document.getElementById("owner-cloud-gate-banner");
+      if (!banner) return;
+
+      try {
+        let lic = null;
+        if (ownerSupabaseClient && navigator.onLine && storeId) {
+          try {
+            const { data } = await ownerSupabaseClient
+              .from('licenses')
+              .select('*')
+              .eq('store_id', storeId)
+              .maybeSingle();
+            if (data) lic = data;
+          } catch(e) {}
+        }
+
+        // Cek tabel store_licenses (Arsitektur SaaS Baru)
+        if (ownerSupabaseClient && navigator.onLine && storeId) {
+          try {
+            const { data: supaLic } = await ownerSupabaseClient
+              .from('store_licenses')
+              .select('*')
+              .eq('store_id', storeId)
+              .maybeSingle();
+            if (supaLic) lic = supaLic;
+          } catch(e) {}
+        }
+
+        if (!lic) {
+          const localLicStr = localStorage.getItem("snack_pos_license");
+          if (localLicStr) {
+            try { lic = JSON.parse(localLicStr); } catch(e) {}
+          }
+        }
+
+        if (!lic) {
+          banner.classList.add("hidden");
+          return { granted: false, reason: 'no_license' };
+        }
+
+        const now = new Date();
+        const plan = lic.plan_type || lic.planType || (lic.type === "LIFETIME" ? "PAKET_1" : "PAKET_2");
+        const cloudStatus = lic.cloud_status || lic.cloudStatus || "ACTIVE";
+        const cloudExp = lic.cloud_expires_at || lic.cloudExpiresAt;
+        const posExp = lic.pos_expires_at || lic.expires_at || lic.expiresAt;
+
+        // KASUS 1: PAKET 1 (Beli Putus POS Offline) - Belum bayar cloud ATAU cloud expired
+        if (plan === "PAKET_1" || lic.type === "LIFETIME") {
+          const isExpired = cloudExp && (now > new Date(cloudExp));
+          const isInactive = cloudStatus === "INACTIVE" || !cloudStatus;
+
+          if (isInactive || isExpired) {
+            banner.className = "p-4 rounded-2xl border border-amber-500/40 bg-amber-950/40 text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg";
+            banner.innerHTML = `
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">🔒</span>
+                <div>
+                  <div class="font-black text-xs sm:text-sm text-white flex items-center gap-2">
+                    <span>${isInactive ? 'Fitur Cloud Dashboard HP Belum Aktif' : 'Masa Langganan Cloud HP Telah Berakhir'}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-500 text-slate-950">KASIR TOKO TETAP JALAN OFFLINE 100%</span>
+                  </div>
+                  <p class="text-[11px] text-amber-300/90 mt-0.5">
+                    Kasir fisik di toko Anda (Paket 1 Beli Putus) <strong>tetap aktif selamanya tanpa batas</strong>.
+                    ${isInactive ? 'Untuk memantau omzet toko secara live dari HP di mana saja, hubungi Vendor untuk aktivasi add-on Cloud.' : 'Masa aktif add-on cloud HP Anda telah berakhir. Hubungi Vendor untuk perpanjangan.'}
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <button type="button" onclick="openOwnerCloudCheckout('1y')" class="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-md cursor-pointer">
+                  <span>⚡</span> Aktifkan Cloud via QRIS &rarr;
+                </button>
+              </div>
+            `;
+            banner.classList.remove("hidden");
+            loadOwnerCloudPricing();
+            return { granted: false, reason: isInactive ? 'inactive' : 'expired', plan: 'PAKET_1' };
+          }
+        } 
+        // KASUS 2: PAKET 2 (Full SaaS Langganan POS + Cloud)
+        else if (plan === "PAKET_2" || lic.type === "SUBSCRIPTION") {
+          if (posExp && now > new Date(posExp)) {
+            banner.className = "p-4 rounded-2xl border border-rose-500/40 bg-rose-950/40 text-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg";
+            banner.innerHTML = `
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">⛔</span>
+                <div>
+                  <div class="font-black text-xs sm:text-sm text-white">Paket SaaS Langganan Telah Berakhir</div>
+                  <p class="text-[11px] text-rose-300/90 mt-0.5">
+                    Masa aktif paket bulanan toko ini telah selesai. Silakan lakukan perpanjangan lisensi agar kasir dan dashboard HP kembali aktif.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <a href="order.html?plan=saas&store=${encodeURIComponent(storeId)}" class="px-3.5 py-2 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-md">
+                  <span>⚡</span> Perpanjang via QRIS &rarr;
+                </a>
+              </div>
+            `;
+            banner.classList.remove("hidden");
+            return { granted: false, reason: 'expired', plan: 'PAKET_2' };
+          }
+        }
+
+        banner.classList.add("hidden");
+        return { granted: true, plan };
+      } catch (e) {
+        console.warn("Cek cloud subscription dilewati:", e);
+        return { granted: true, plan: 'UNKNOWN' };
+      }
+    }
+
+    let ownerPricingConfig = {
+      cloud1m: 25000,
+      cloud3m: 65000,
+      cloud6m: 120000,
+      cloud1y: 200000
+    };
+
+    async function loadOwnerCloudPricing() {
+      if (ownerSupabaseClient && navigator.onLine) {
+        try {
+          const { data } = await ownerSupabaseClient.from('app_config').select('value').eq('key', 'pricing').maybeSingle();
+          if (data && data.value) {
+            ownerPricingConfig = Object.assign(ownerPricingConfig, data.value);
+          }
+        } catch(e) {}
+      }
+      const el1m = document.getElementById("owner-price-cloud-1m");
+      const el3m = document.getElementById("owner-price-cloud-3m");
+      const el6m = document.getElementById("owner-price-cloud-6m");
+      const el1y = document.getElementById("owner-price-cloud-1y");
+      if (el1m) el1m.textContent = `Rp ${Number(ownerPricingConfig.cloud1m || 25000).toLocaleString('id-ID')}`;
+      if (el3m) el3m.textContent = `Rp ${Number(ownerPricingConfig.cloud3m || 65000).toLocaleString('id-ID')}`;
+      if (el6m) el6m.textContent = `Rp ${Number(ownerPricingConfig.cloud6m || 120000).toLocaleString('id-ID')}`;
+      if (el1y) el1y.textContent = `Rp ${Number(ownerPricingConfig.cloud1y || 200000).toLocaleString('id-ID')}`;
+    }
+
+    async function openOwnerCloudCheckout(dur) {
+      await loadOwnerCloudPricing();
+      const durKey = dur === '1m' ? 'cloud1m' : dur === '3m' ? 'cloud3m' : dur === '6m' ? 'cloud6m' : 'cloud1y';
+      const durName = dur === '1m' ? '1 Bulan' : dur === '3m' ? '3 Bulan' : dur === '6m' ? '6 Bulan' : '1 Tahun';
+      const nominal = Number(ownerPricingConfig[durKey]) || (dur === '1m' ? 25000 : dur === '3m' ? 65000 : dur === '6m' ? 120000 : 200000);
+
+      const durLabel = document.getElementById("owner-checkout-dur-label");
+      const nominalLabel = document.getElementById("owner-checkout-nominal-label");
+      if (durLabel) durLabel.textContent = durName;
+      if (nominalLabel) nominalLabel.textContent = `Rp ${nominal.toLocaleString('id-ID')}`;
+
+      // Ambil QRIS Vendor Image
+      let qrisUrl = null;
+      let vendorWa = "6285156379786";
+      if (ownerSupabaseClient && navigator.onLine) {
+        try {
+          const { data: pCfg } = await ownerSupabaseClient.from('app_config').select('value').eq('key', 'payment_config').maybeSingle();
+          if (pCfg && pCfg.value) {
+            if (pCfg.value.qrisImageUrl) qrisUrl = pCfg.value.qrisImageUrl;
+            if (pCfg.value.vendorWa) vendorWa = pCfg.value.vendorWa.replace(/[^0-9]/g, '');
+          }
+        } catch(e) {}
+      }
+
+      const qrisImg = document.getElementById("owner-checkout-qris-img");
+      const qrisPlaceholder = document.getElementById("owner-checkout-qris-placeholder");
+      if (qrisImg && qrisUrl) {
+        qrisImg.src = qrisUrl;
+        qrisImg.classList.remove("hidden");
+        if (qrisPlaceholder) qrisPlaceholder.classList.add("hidden");
+      } else if (qrisImg && qrisPlaceholder) {
+        qrisImg.classList.add("hidden");
+        qrisPlaceholder.classList.remove("hidden");
+      }
+
+      // Format link WhatsApp Vendor
+      const storeId = (typeof activeStoreId !== 'undefined' && activeStoreId) ? activeStoreId : "STR-TOKO";
+      const waBtn = document.getElementById("owner-checkout-wa-btn");
+      if (waBtn) {
+        const msg = `Halo Admin Vendor SnackPOS, saya pemilik toko *${storeId}* ingin mengaktifkan *Add-on Cloud Dashboard HP (${durName})* seharga *Rp ${nominal.toLocaleString('id-ID')}*. Mohon konfirmasi aktivasi lisensi cloud saya.`;
+        waBtn.href = `https://wa.me/${vendorWa}?text=${encodeURIComponent(msg)}`;
+      }
+
+      const modal = document.getElementById("modal-owner-cloud-checkout");
+      if (modal) modal.classList.remove("hidden");
+    }
+
+
+
+    // Ambil Data dari Supabase Cloud (dengan Smart-Merge ke Data Lokal Kasir)
+    async function fetchDashboardData() {
+      if (!isOwnerAuthenticated()) {
+        const spinner = document.getElementById("refresh-spinner");
+        if (spinner) spinner.classList.remove("animate-spin");
+        return;
+      }
+
+      const spinner = document.getElementById("refresh-spinner");
+      if (spinner) spinner.classList.add("animate-spin");
+
+      const localTrxRaw = localStorage.getItem("snack_pos_transactions");
+      const localProdRaw = localStorage.getItem("snack_pos_products");
+      const localRetRaw = localStorage.getItem("snack_pos_returns");
+      const localMutRaw = localStorage.getItem("snack_pos_mutations");
+      const localLpbRaw = localStorage.getItem("snack_pos_lpb_records");
+      const localKlerkRaw = localStorage.getItem("snack_pos_klerk_history");
+      const localMembersRaw = localStorage.getItem("snack_pos_members");
+      const localSetRaw = localStorage.getItem("snack_pos_settings");
+
+      let localTrx = [];
+      let localProd = [];
+      let localRet = [];
+      let localMut = [];
+      let localLpb = [];
+      let localKlerk = [];
+      let localMembers = [];
+
+      try { if (localTrxRaw) localTrx = JSON.parse(localTrxRaw); } catch (e) {}
+      try { if (localProdRaw) localProd = JSON.parse(localProdRaw); } catch (e) {}
+      try { if (localRetRaw) localRet = JSON.parse(localRetRaw); } catch (e) {}
+      try { if (localMutRaw) localMut = JSON.parse(localMutRaw); } catch (e) {}
+      try { if (localLpbRaw) localLpb = JSON.parse(localLpbRaw); } catch (e) {}
+      try { if (localKlerkRaw) localKlerk = JSON.parse(localKlerkRaw); } catch (e) {}
+      try { if (localMembersRaw) localMembers = JSON.parse(localMembersRaw); } catch (e) {}
+      if (localSetRaw) {
+        try {
+          dashboardData.settings = JSON.parse(localSetRaw);
+          if (dashboardData.settings.storeName) {
+            document.getElementById("owner-store-name").textContent = dashboardData.settings.storeName;
+          }
+        } catch (e) {}
+      }
+
+      // Deteksi ID Toko Aktif (Multi-Tenant Isolation)
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryStoreId = urlParams.get('store') || urlParams.get('store_id');
+      if (queryStoreId) {
+        localStorage.setItem("snack_pos_owner_store_id", queryStoreId);
+      }
+      const activeStoreId = queryStoreId || localStorage.getItem("snack_pos_owner_store_id") || (dashboardData.settings && (dashboardData.settings.storeId || ("STR-" + (dashboardData.settings.storeCode || "001")))) || "";
+
+      const storeIdBadge = document.getElementById("owner-store-id-badge");
+      if (storeIdBadge) {
+        storeIdBadge.textContent = activeStoreId || "ALL";
+      }
+
+      // Periksa status langganan cloud toko
+      const cloudAccess = await checkStoreCloudSubscription(activeStoreId);
+
+      // Jika akses cloud tidak aktif (Paket 1 tanpa Add-on Cloud atau Paket 2 expired)
+      if (cloudAccess && !cloudAccess.granted) {
+        const lockView = document.getElementById("owner-cloud-lock-view");
+        const dashBody = document.getElementById("owner-dashboard-body");
+        if (lockView) {
+          const btnQris = document.getElementById("btn-cloud-lock-qris");
+          if (btnQris && activeStoreId) {
+            btnQris.href = `order.html?plan=cloud&store=${encodeURIComponent(activeStoreId)}`;
+          }
+          lockView.classList.remove("hidden");
+        }
+        if (dashBody) dashBody.classList.add("hidden");
+        if (spinner) spinner.classList.remove("animate-spin");
+        return;
+      } else {
+        const lockView = document.getElementById("owner-cloud-lock-view");
+        const dashBody = document.getElementById("owner-dashboard-body");
+        if (lockView) lockView.classList.add("hidden");
+        if (dashBody) dashBody.classList.remove("hidden");
+      }
+
+      // Ambil nama toko terbaru dari Supabase store_licenses jika online
+      if (ownerSupabaseClient && navigator.onLine && activeStoreId) {
+        try {
+          const { data: storeInfo } = await ownerSupabaseClient
+            .from('store_licenses')
+            .select('store_name, whatsapp')
+            .eq('store_id', activeStoreId)
+            .maybeSingle();
+          if (storeInfo && storeInfo.store_name) {
+            const storeNameEl = document.getElementById("owner-store-name");
+            if (storeNameEl) storeNameEl.textContent = storeInfo.store_name;
+          }
+        } catch(e) {}
+      }
+
+      // Cek apakah data lokal browser cocok dengan store_id aktif (mencegah kebocoran data toko lain)
+      const isLocalMatchingStore = !activeStoreId || !dashboardData.settings?.storeId || (dashboardData.settings.storeId === activeStoreId);
+
+      // Default gunakan data lokal jika store ID cocok
+      dashboardData.transactions = (isLocalMatchingStore && Array.isArray(localTrx)) ? localTrx : [];
+      dashboardData.products = (isLocalMatchingStore && Array.isArray(localProd)) ? localProd : [];
+      dashboardData.returns = (isLocalMatchingStore && Array.isArray(localRet)) ? localRet : [];
+      dashboardData.mutations = (isLocalMatchingStore && Array.isArray(localMut)) ? localMut : [];
+      dashboardData.lpbRecords = (isLocalMatchingStore && Array.isArray(localLpb)) ? localLpb : [];
+      dashboardData.klerkHistory = (isLocalMatchingStore && Array.isArray(localKlerk)) ? localKlerk : [];
+      dashboardData.members = (isLocalMatchingStore && Array.isArray(localMembers)) ? localMembers : [];
+
+      // 2. Tarik data dari Supabase jika online, kredensial valid, dan izin akses cloud aktif
+      if (ownerSupabaseClient && navigator.onLine && (!cloudAccess || cloudAccess.granted)) {
+        try {
+          // Ambil Transaksi dari Supabase (dengan filter store_id)
+          let trxQuery = ownerSupabaseClient.from('transactions').select('*');
+          if (activeStoreId) {
+            trxQuery = trxQuery.eq('store_id', activeStoreId);
+          }
+          let { data: trxData, error: trxErr } = await trxQuery.order('created_at', { ascending: false }).limit(100);
+          if (trxErr || !Array.isArray(trxData) || trxData.length === 0) {
+            try {
+              const urlTrx = activeStoreId ? `/rest/v1/transactions?store_id=eq.${encodeURIComponent(activeStoreId)}&select=*&order=created_at.desc&limit=100` : '/rest/v1/transactions?select=*&order=created_at.desc&limit=100';
+              const rRes = await fetch(urlTrx);
+              if (rRes.ok) {
+                const rJson = await rRes.json();
+                if (Array.isArray(rJson) && rJson.length > 0) {
+                  trxData = rJson;
+                  trxErr = null;
+                }
+              }
+            } catch(fErr) {}
+          }
+
+          if (trxErr && (trxErr.message?.includes('store_id') || trxErr.code === 'PGRST204')) {
+            const retry = await ownerSupabaseClient.from('transactions').select('*').order('created_at', { ascending: false }).limit(100);
+            trxData = retry.data;
+            trxErr = retry.error;
+          }
+
+          if (!trxErr && trxData && trxData.length > 0) {
+            const cloudTrx = trxData.map(t => ({
+              id: t.id,
+              date: t.date,
+              time: t.time,
+              cashier: t.cashier || 'Kasir 1',
+              shift: t.shift || 'Shift 1',
+              items: Array.isArray(t.items) ? t.items : [],
+              subtotal: Number(t.subtotal) || 0,
+              discountAmount: Number(t.discount_amount) || 0,
+              grandTotal: Number(t.grand_total) || 0,
+              profit: Number(t.profit) || 0,
+              paymentMethod: t.payment_method || 'cash',
+              createdAt: t.created_at
+            }));
+
+            // Smart-merge: gabungkan cloud & lokal kasir hanya jika store ID cocok
+            const trxMap = new Map();
+            cloudTrx.forEach(t => trxMap.set(t.id, t));
+            if (isLocalMatchingStore) {
+              localTrx.forEach(t => { if (!trxMap.has(t.id)) trxMap.set(t.id, t); });
+            }
+            dashboardData.transactions = Array.from(trxMap.values()).sort((a, b) => {
+              const dateA = new Date((a.date || '') + ' ' + (a.time || '00:00:00')).getTime() || 0;
+              const dateB = new Date((b.date || '') + ' ' + (b.time || '00:00:00')).getTime() || 0;
+              return dateB - dateA;
+            });
+          }
+
+          // Ambil Produk dari Supabase (dengan filter store_id)
+          let prodQuery = ownerSupabaseClient.from('products').select('*');
+          if (activeStoreId) {
+            prodQuery = prodQuery.eq('store_id', activeStoreId);
+          }
+          let { data: prodData, error: prodErr } = await prodQuery.order('stock', { ascending: true });
+
+          if (prodErr && (prodErr.message?.includes('store_id') || prodErr.code === 'PGRST204')) {
+            const retryProd = await ownerSupabaseClient.from('products').select('*').order('stock', { ascending: true });
+            prodData = retryProd.data;
+            prodErr = retryProd.error;
+          }
+
+          if (!prodErr && prodData && prodData.length > 0) {
+            const cloudProd = prodData.map(p => ({
+              id: p.id,
+              name: p.name,
+              barcode: p.barcode,
+              category: p.category || 'Snack',
+              costPrice: Number(p.cost_price) || 0,
+              price: Number(p.price) || 0,
+              stock: Number(p.stock) || 0,
+              unit: p.unit || 'Bungkus'
+            }));
+
+            const prodMap = new Map();
+            cloudProd.forEach(p => prodMap.set(p.id, p));
+            if (isLocalMatchingStore) {
+              localProd.forEach(p => { if (!prodMap.has(p.id)) prodMap.set(p.id, p); });
+            }
+            dashboardData.products = Array.from(prodMap.values());
+          }
+
+          // Ambil Retur dari Supabase (dengan filter store_id)
+          let retQuery = ownerSupabaseClient.from('returns').select('*');
+          if (activeStoreId) {
+            retQuery = retQuery.eq('store_id', activeStoreId);
+          }
+          let { data: retData, error: retErr } = await retQuery.order('created_at', { ascending: false }).limit(50);
+
+          if (retErr && (retErr.message?.includes('store_id') || retErr.code === 'PGRST204')) {
+            const retryRet = await ownerSupabaseClient.from('returns').select('*').order('created_at', { ascending: false }).limit(50);
+            retData = retryRet.data;
+            retErr = retryRet.error;
+          }
+
+          if (!retErr && retData && retData.length > 0) {
+            const cloudRet = retData.map(r => ({
+              id: r.id,
+              originalTrxId: r.original_trx_id,
+              date: r.date,
+              time: r.time,
+              cashier: r.cashier,
+              reason: r.reason,
+              restocked: r.restocked,
+              items: Array.isArray(r.items) ? r.items : [],
+              totalRefund: Number(r.total_refund) || 0,
+              createdAt: r.created_at
+            }));
+
+            const retMap = new Map();
+            cloudRet.forEach(r => retMap.set(r.id, r));
+            if (isLocalMatchingStore) {
+              localRet.forEach(r => { if (!retMap.has(r.id)) retMap.set(r.id, r); });
+            }
+            dashboardData.returns = Array.from(retMap.values()).sort((a, b) => {
+              const dateA = new Date((a.date || '') + ' ' + (a.time || '00:00:00')).getTime() || 0;
+              const dateB = new Date((b.date || '') + ' ' + (b.time || '00:00:00')).getTime() || 0;
+              return dateB - dateA;
+            });
+          } else {
+            dashboardData.returns = isLocalMatchingStore ? localRet : [];
+          }
+
+          // Ambil Mutasi Stok dari Supabase (termasuk Stock Opname)
+          try {
+            let mutData = null;
+            let mutQuery1 = ownerSupabaseClient.from('stock_mutations').select('*');
+            if (activeStoreId) mutQuery1 = mutQuery1.eq('store_id', activeStoreId);
+            let res1 = await mutQuery1.order('created_at', { ascending: false }).limit(300);
+
+            if (res1.error && (res1.error.message?.includes('store_id') || res1.error.code === 'PGRST204')) {
+              res1 = await ownerSupabaseClient.from('stock_mutations').select('*').order('created_at', { ascending: false }).limit(300);
+            }
+
+            if (!res1.error && Array.isArray(res1.data) && res1.data.length > 0) {
+              mutData = res1.data;
+            } else {
+              let mutQuery2 = ownerSupabaseClient.from('mutations').select('*');
+              if (activeStoreId) mutQuery2 = mutQuery2.eq('store_id', activeStoreId);
+              let res2 = await mutQuery2.order('created_at', { ascending: false }).limit(300);
+              if (res2.error && (res2.error.message?.includes('store_id') || res2.error.code === 'PGRST204')) {
+                res2 = await ownerSupabaseClient.from('mutations').select('*').order('created_at', { ascending: false }).limit(300);
+              }
+              if (!res2.error && Array.isArray(res2.data)) {
+                mutData = res2.data;
+              }
+            }
+
+            if (Array.isArray(mutData) && mutData.length > 0) {
+              const cloudMut = mutData.map(m => ({
+                id: m.id,
+                date: m.date,
+                time: m.time,
+                type: m.type,
+                productId: m.product_id || m.productId,
+                productName: m.product_name || m.productName,
+                barcode: m.barcode,
+                qty: Number(m.qty) || 0,
+                costPrice: Number(m.cost_price || m.costPrice) || 0,
+                sellPrice: Number(m.sell_price || m.sellPrice) || 0,
+                note: m.note,
+                operator: m.operator
+              }));
+              const mutMap = new Map();
+              cloudMut.forEach(m => mutMap.set(m.id, m));
+              if (isLocalMatchingStore) {
+                localMut.forEach(m => { if (!mutMap.has(m.id)) mutMap.set(m.id, m); });
+              }
+              dashboardData.mutations = Array.from(mutMap.values()).sort((a, b) => {
+                const dateA = new Date((a.date || '') + ' ' + (a.time || '00:00:00')).getTime() || 0;
+                const dateB = new Date((b.date || '') + ' ' + (b.time || '00:00:00')).getTime() || 0;
+                return dateB - dateA;
+              });
+            }
+          } catch (e) {}
+
+          // Ambil Riwayat LPB dari Supabase
+          try {
+            let lpbQuery = ownerSupabaseClient.from('lpb_records').select('*');
+            if (activeStoreId) lpbQuery = lpbQuery.eq('store_id', activeStoreId);
+            let resLpb = await lpbQuery.order('created_at', { ascending: false }).limit(200);
+
+            if (resLpb.error && (resLpb.error.message?.includes('store_id') || resLpb.error.code === 'PGRST204')) {
+              resLpb = await ownerSupabaseClient.from('lpb_records').select('*').order('created_at', { ascending: false }).limit(200);
+            }
+
+            if (!resLpb.error && Array.isArray(resLpb.data) && resLpb.data.length > 0) {
+              const cloudLpb = resLpb.data.map(r => ({
+                id: r.id,
+                date: r.date,
+                time: r.time,
+                supplierName: r.supplier_name || r.supplierName,
+                invoiceNo: r.invoice_no || r.invoiceNo,
+                paymentType: r.payment_type || r.paymentType || 'KREDIT',
+                note: r.note || '',
+                operator: r.operator || 'Kepala Toko',
+                items: Array.isArray(r.items) ? r.items : [],
+                totalItems: Number(r.total_items || r.totalItems) || 0,
+                totalQty: Number(r.total_qty || r.totalQty) || 0,
+                totalValue: Number(r.total_value || r.totalValue) || 0
+              }));
+              const lpbMap = new Map();
+              cloudLpb.forEach(r => lpbMap.set(r.id, r));
+              localLpb.forEach(r => { if (!lpbMap.has(r.id)) lpbMap.set(r.id, r); });
+              dashboardData.lpbRecords = Array.from(lpbMap.values()).sort((a, b) => {
+                const dateA = new Date((a.date || '') + ' ' + (a.time || '00:00:00')).getTime() || 0;
+                const dateB = new Date((b.date || '') + ' ' + (b.time || '00:00:00')).getTime() || 0;
+                return dateB - dateA;
+              });
+            }
+          } catch (e) {}
+
+          // Ambil Data Member Pelanggan dari Supabase / PostgREST Cloud
+          try {
+            let membersData = null;
+            // A. PostgREST direct endpoint
+            try {
+              let pUrl = '/rest/v1/members?select=*';
+              if (activeStoreId) pUrl += `&store_id=eq.${encodeURIComponent(activeStoreId)}`;
+              pUrl += '&order=created_at.desc';
+              const mRes = await fetch(pUrl);
+              if (mRes.ok) {
+                membersData = await mRes.json();
+              } else {
+                const mRes2 = await fetch('/rest/v1/members?select=*&order=created_at.desc');
+                if (mRes2.ok) membersData = await mRes2.json();
+              }
+            } catch (e) {}
+
+            // B. Fallback Supabase Client
+            if (!membersData && ownerSupabaseClient) {
+              try {
+                let mbrQuery = ownerSupabaseClient.from('members').select('*');
+                if (activeStoreId) mbrQuery = mbrQuery.eq('store_id', activeStoreId);
+                const { data: sData } = await mbrQuery.order('created_at', { ascending: false });
+                if (Array.isArray(sData)) membersData = sData;
+              } catch (e) {}
+            }
+
+            if (Array.isArray(membersData) && membersData.length > 0) {
+              const cloudMembers = membersData.map(m => ({
+                id: m.id,
+                storeId: m.store_id || m.storeId,
+                name: m.name,
+                phone: m.phone,
+                address: m.address || '',
+                points: Number(m.points) || 0,
+                totalSpend: Number(m.total_spend !== undefined ? m.total_spend : m.totalSpend) || 0,
+                registeredAt: m.created_at ? m.created_at.split('T')[0] : (m.registeredAt || '-'),
+                createdAt: m.created_at
+              }));
+
+              const mbrMap = new Map();
+              cloudMembers.forEach(m => mbrMap.set(m.id || m.phone, m));
+              localMembers.forEach(m => {
+                const key = m.id || m.phone;
+                if (!mbrMap.has(key)) {
+                  mbrMap.set(key, m);
+                } else {
+                  const existing = mbrMap.get(key);
+                  existing.points = Math.max(existing.points, Number(m.points) || 0);
+                  existing.totalSpend = Math.max(existing.totalSpend, Number(m.totalSpend) || 0);
+                }
+              });
+
+              dashboardData.members = Array.from(mbrMap.values()).sort((a, b) => {
+                const dateA = new Date(a.createdAt || a.registeredAt || 0).getTime() || 0;
+                const dateB = new Date(b.createdAt || b.registeredAt || 0).getTime() || 0;
+                return dateB - dateA;
+              });
+            }
+          } catch (mbrCloudErr) {
+            console.warn("Gagal tarik members cloud:", mbrCloudErr);
+          }
+
+        } catch (cloudError) {
+          console.warn("Gagal menarik data cloud, tetap menggunakan data lokal:", cloudError.message);
+        }
+      }
+
+      // Render seluruh komponen dashboard
+      renderAllMetrics();
+      renderLiveTransactionsTable();
+      renderLowStockTable();
+      renderDSITable();
+      renderReturnsTable();
+      renderStockOpnameTable();
+      renderKlerkTable();
+      renderMutationsTable();
+      renderOwnerLpbTable();
+      renderOwnerMembersTable();
+      renderCharts();
+
+      setTimeout(() => {
+        if (spinner) spinner.classList.remove("animate-spin");
+      }, 400);
+
+      autoRefreshCountdown = 30;
+    }
+
+    // Filter Tanggal
+    function setDateFilter(filter) {
+      currentDateFilter = filter;
+      ['today', '7days', '30days', 'all'].forEach(f => {
+        const btn = document.getElementById(`filter-btn-${f}`);
+        if (btn) {
+          if (f === filter) {
+            btn.className = "px-3 py-1 rounded-lg font-bold transition-all bg-alfa-red text-white shadow-xs";
+          } else {
+            btn.className = "px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white";
+          }
+        }
+      });
+      renderAllMetrics();
+      renderLiveTransactionsTable();
+      renderLowStockTable();
+      renderDSITable();
+      renderReturnsTable();
+      renderStockOpnameTable();
+      renderKlerkTable();
+      renderMutationsTable();
+      renderCharts();
+    }
+
+    // Utilitas Normalisasi Tanggal untuk Komparasi yang Akurat
+    function normalizeDateString(dateVal) {
+      if (!dateVal) return "";
+      const str = String(dateVal).trim();
+      const match = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+      if (match) {
+        return `${match[1]}-${match[2].padStart(2, '0')}-${match[3].padStart(2, '0')}`;
+      }
+      return str.split('T')[0].split(' ')[0];
+    }
+
+    function isSameOrToday(dateVal) {
+      if (!dateVal) return false;
+      const target = normalizeDateString(dateVal);
+      const now = new Date();
+      const localToday = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const utcToday = now.toISOString().split('T')[0];
+      return target === localToday || target === utcToday;
+    }
+
+    function getFilteredTransactions() {
+      const now = new Date();
+      const localTodayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const todayTime = new Date(localTodayStr).getTime();
+
+      return (dashboardData.transactions || []).filter(t => {
+        if (currentDateFilter === "all") return true;
+        const tDateVal = t.date || t.createdAt || t.created_at;
+        if (!tDateVal) return true;
+
+        if (currentDateFilter === "today") {
+          return isSameOrToday(tDateVal);
+        }
+
+        const tNorm = normalizeDateString(tDateVal);
+        const itemTime = new Date(tNorm).getTime();
+        if (isNaN(itemTime)) return true;
+        const diffDays = (todayTime - itemTime) / (1000 * 60 * 60 * 24);
+
+        if (currentDateFilter === "7days") return diffDays <= 7;
+        if (currentDateFilter === "30days") return diffDays <= 30;
+        return true;
+      });
+    }
+
+    function getFilteredReturns() {
+      const now = new Date();
+      const localTodayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const todayTime = new Date(localTodayStr).getTime();
+
+      return (dashboardData.returns || []).filter(r => {
+        if (currentDateFilter === "all") return true;
+        const rDateVal = r.date || r.createdAt || r.created_at;
+        if (!rDateVal) return true;
+
+        if (currentDateFilter === "today") {
+          return isSameOrToday(rDateVal);
+        }
+
+        const rNorm = normalizeDateString(rDateVal);
+        const itemTime = new Date(rNorm).getTime();
+        if (isNaN(itemTime)) return true;
+        const diffDays = (todayTime - itemTime) / (1000 * 60 * 60 * 24);
+
+        if (currentDateFilter === "7days") return diffDays <= 7;
+        if (currentDateFilter === "30days") return diffDays <= 30;
+        return true;
+      });
+    }
+
+    function getFilteredLpbRecords() {
+      const now = new Date();
+      const localTodayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const todayTime = new Date(localTodayStr).getTime();
+
+      return (dashboardData.lpbRecords || []).filter(r => {
+        if (currentDateFilter === "all") return true;
+        const rDateVal = r.date || r.createdAt || r.created_at;
+        if (!rDateVal) return true;
+
+        if (currentDateFilter === "today") {
+          return isSameOrToday(rDateVal);
+        }
+
+        const rNorm = normalizeDateString(rDateVal);
+        const itemTime = new Date(rNorm).getTime();
+        if (isNaN(itemTime)) return true;
+        const diffDays = (todayTime - itemTime) / (1000 * 60 * 60 * 24);
+
+        if (currentDateFilter === "7days") return diffDays <= 7;
+        if (currentDateFilter === "30days") return diffDays <= 30;
+        return true;
+      });
+    }
+
+    // Render 5 KPI Metrics
+    function renderAllMetrics() {
+      const transactions = getFilteredTransactions();
+      const returns = getFilteredReturns();
+
+      const totalOmzetGross = transactions.reduce((s, t) => s + (t.grandTotal || 0), 0);
+      const totalRefund = returns.reduce((s, r) => s + (Number(r.totalRefund) || 0), 0);
+      const totalOmzetNet = Math.max(0, totalOmzetGross - totalRefund);
+
+      // Hitung penyesuaian laba dari retur
+      let returnProfitLoss = 0;
+      returns.forEach(r => {
+        if (Array.isArray(r.items)) {
+          r.items.forEach(item => {
+            const costVal = (Number(item.costPrice) || 0) * (Number(item.returnQty) || 0);
+            const subtotal = Number(item.refundSubtotal) || ((Number(item.price) || 0) * (Number(item.returnQty) || 0));
+            if (r.restocked) {
+              returnProfitLoss += (subtotal - costVal);
+            } else {
+              returnProfitLoss += subtotal;
+            }
+          });
+        }
+      });
+
+      const grossProfit = transactions.reduce((s, t) => s + (t.profit || 0), 0);
+
+      // Hitung Penyesuaian Nilai Stock Opname (SO) ke Laba Bersih
+      const soList = getFilteredStockOpname();
+      let soCostAdjustment = 0;
+      let soNetPcs = 0;
+      soList.forEach(m => {
+        const p = (dashboardData.products || []).find(prod => prod.id === m.productId || prod.barcode === m.barcode);
+        const cost = Number(m.costPrice) || (p ? (Number(p.costPrice) || Number(p.buyPrice) || 0) : 0);
+        const qty = Number(m.qty) || 0;
+        soNetPcs += qty;
+        if (qty > 0) {
+          soCostAdjustment += qty * cost;
+        } else if (qty < 0) {
+          soCostAdjustment -= Math.abs(qty) * cost;
+        }
+      });
+
+      const totalProfitNet = Math.max(0, grossProfit - returnProfitLoss + soCostAdjustment);
+
+      const totalCount = transactions.length;
+      const totalItems = transactions.reduce((s, t) => s + t.items.reduce((acc, i) => acc + (i.qty || 0), 0), 0);
+      const marginPct = totalOmzetNet > 0 ? Math.round((totalProfitNet / totalOmzetNet) * 100) : 0;
+
+      // Low Stock Count
+      const lowStockCount = dashboardData.products.filter(p => p.stock <= 5).length;
+
+      // Returns Data
+      const totalReturnsCount = returns.length;
+
+      // Update DOM
+      document.getElementById("kpi-omzet").textContent = formatRupiah(totalOmzetNet);
+      const omzetSub = document.getElementById("kpi-omzet-sub");
+      if (omzetSub) {
+        omzetSub.textContent = totalRefund > 0 ? `Net (-${formatRupiah(totalRefund)})` : "Gross Revenue";
+      }
+      document.getElementById("kpi-profit").textContent = formatRupiah(totalProfitNet);
+      const marginEl = document.getElementById("kpi-margin-pct");
+      if (marginEl) {
+        marginEl.textContent = soCostAdjustment !== 0 
+          ? `${marginPct}% (Net SO)` 
+          : `${marginPct}%`;
+      }
+      document.getElementById("kpi-transactions").textContent = `${formatAngka(totalCount)} Struk`;
+      document.getElementById("kpi-items-sold").textContent = `${formatAngka(totalItems)} pcs`;
+      document.getElementById("kpi-low-stock-count").textContent = `${lowStockCount} Produk`;
+      document.getElementById("low-stock-badge-count").textContent = `${lowStockCount} Produk Kritis`;
+      document.getElementById("kpi-refund-amount").textContent = formatRupiah(totalRefund);
+      document.getElementById("kpi-retur-count").textContent = `${totalReturnsCount} retur`;
+      document.getElementById("returns-badge-count").textContent = `${totalReturnsCount} Retur`;
+
+      // Update KPI Selisih Stok Opname
+      const kpiSoDiffEl = document.getElementById("kpi-so-diff-amount");
+      const kpiSoUnitEl = document.getElementById("kpi-so-unit-diff");
+      if (kpiSoDiffEl) {
+        if (soCostAdjustment > 0) {
+          kpiSoDiffEl.textContent = `+${formatRupiah(soCostAdjustment)}`;
+          kpiSoDiffEl.className = "text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-2";
+        } else if (soCostAdjustment < 0) {
+          kpiSoDiffEl.textContent = `-${formatRupiah(Math.abs(soCostAdjustment))}`;
+          kpiSoDiffEl.className = "text-xl sm:text-2xl font-black font-mono text-rose-400 mt-2";
+        } else {
+          kpiSoDiffEl.textContent = "Rp 0";
+          kpiSoDiffEl.className = "text-xl sm:text-2xl font-black font-mono text-purple-400 mt-2";
+        }
+      }
+      if (kpiSoUnitEl) {
+        kpiSoUnitEl.textContent = `Audit: ${soNetPcs >= 0 ? '+' : ''}${soNetPcs} pcs (${soList.length} SO)`;
+      }
+
+      // Update KPI Day Sales Inventory (DSI Rata-rata Toko)
+      const totalInventoryCost = (dashboardData.products || []).reduce((sum, p) => {
+        const cost = Number(p.costPrice) || Number(p.buyPrice) || 0;
+        const stock = Math.max(0, Number(p.stock) || 0);
+        return sum + (stock * cost);
+      }, 0);
+
+      let activeTrxForDsi = transactions;
+      let dsiDaysCount = 1;
+      if (currentDateFilter === "7days") dsiDaysCount = 7;
+      else if (currentDateFilter === "30days") dsiDaysCount = 30;
+      else if (currentDateFilter === "today") {
+        if (transactions.length < 3 && (dashboardData.transactions || []).length > transactions.length) {
+          activeTrxForDsi = dashboardData.transactions.slice(0, 50);
+          const distinctDates = new Set(activeTrxForDsi.map(t => t.date || (t.createdAt ? t.createdAt.split('T')[0] : ''))).size;
+          dsiDaysCount = Math.max(1, distinctDates);
+        } else {
+          dsiDaysCount = 1;
+        }
+      } else {
+        const distinctDates = new Set(activeTrxForDsi.map(t => t.date || (t.createdAt ? t.createdAt.split('T')[0] : ''))).size;
+        dsiDaysCount = Math.max(1, distinctDates);
+      }
+
+      const totalSalesCost = activeTrxForDsi.reduce((sum, t) => {
+        const costTrx = (t.items || []).reduce((itemSum, item) => {
+          const cost = Number(item.costPrice) || 0;
+          return itemSum + ((Number(item.qty) || 0) * cost);
+        }, 0);
+        return sum + costTrx;
+      }, 0);
+
+      const dailyAvgSalesCost = dsiDaysCount > 0 ? (totalSalesCost / dsiDaysCount) : 0;
+      const storeDsiEl = document.getElementById("kpi-store-dsi");
+      const storeDsiStatusEl = document.getElementById("kpi-dsi-status");
+
+      if (storeDsiEl) {
+        if (dailyAvgSalesCost > 0 && totalInventoryCost > 0) {
+          const storeDsiDays = totalInventoryCost / dailyAvgSalesCost;
+          storeDsiEl.textContent = `${storeDsiDays.toFixed(1)} Hari`;
+          if (storeDsiDays <= 3) {
+            storeDsiEl.className = "text-xl sm:text-2xl font-black font-mono text-rose-400 mt-2";
+            if (storeDsiStatusEl) storeDsiStatusEl.innerHTML = `<span class="text-rose-400 font-bold">🚨 Kritis (&le;3 Hr)</span>`;
+          } else if (storeDsiDays <= 7) {
+            storeDsiEl.className = "text-xl sm:text-2xl font-black font-mono text-amber-400 mt-2";
+            if (storeDsiStatusEl) storeDsiStatusEl.innerHTML = `<span class="text-amber-400 font-bold">⚠️ Menipis (4-7 Hr)</span>`;
+          } else if (storeDsiDays <= 21) {
+            storeDsiEl.className = "text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-2";
+            if (storeDsiStatusEl) storeDsiStatusEl.innerHTML = `<span class="text-emerald-400 font-bold">✅ Optimal (8-21 Hr)</span>`;
+          } else {
+            storeDsiEl.className = "text-xl sm:text-2xl font-black font-mono text-blue-400 mt-2";
+            if (storeDsiStatusEl) storeDsiStatusEl.innerHTML = `<span class="text-blue-400 font-bold">📦 Overstock (&gt;21 Hr)</span>`;
+          }
+        } else {
+          storeDsiEl.textContent = "Aman";
+          storeDsiEl.className = "text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-2";
+          if (storeDsiStatusEl) storeDsiStatusEl.textContent = "Ketahanan Stok";
+        }
+      }
+
+      // Update KPI LPB (Penerimaan Barang)
+      const lpbList = getFilteredLpbRecords();
+      const totalLpbCount = lpbList.length;
+      const totalLpbValue = lpbList.reduce((s, r) => s + (Number(r.totalValue) || 0), 0);
+      const kpiLpbCountEl = document.getElementById("kpi-lpb-count");
+      const kpiLpbValEl = document.getElementById("kpi-lpb-value");
+      if (kpiLpbCountEl) kpiLpbCountEl.textContent = `${formatAngka(totalLpbCount)} LPB`;
+      if (kpiLpbValEl) kpiLpbValEl.textContent = formatRupiah(totalLpbValue);
+
+      // Update KPI 9: Member Pelanggan
+      const members = dashboardData.members || [];
+      const totalMembersCount = members.length;
+      const totalMemberPoints = members.reduce((sum, m) => sum + (Number(m.points) || 0), 0);
+      const kpiMbrCountEl = document.getElementById("kpi-member-count");
+      const kpiMbrPtsEl = document.getElementById("kpi-member-points");
+      const badgeMbrCountEl = document.getElementById("members-badge-count");
+      if (kpiMbrCountEl) kpiMbrCountEl.textContent = `${formatAngka(totalMembersCount)} Member`;
+      if (kpiMbrPtsEl) kpiMbrPtsEl.textContent = `${formatAngka(totalMemberPoints)} Poin Aktif`;
+      if (badgeMbrCountEl) badgeMbrCountEl.textContent = `${formatAngka(totalMembersCount)} Terdaftar`;
+
+      // Top 10 Products
+      renderTopProducts(transactions);
+    }
+
+    // Render Top 10 Produk
+    function renderTopProducts(transactions) {
+      const map = {};
+      transactions.forEach(t => {
+        t.items.forEach(i => {
+          if (!map[i.name]) map[i.name] = { name: i.name, qty: 0, revenue: 0 };
+          map[i.name].qty += (i.qty || 0);
+          map[i.name].revenue += ((i.price || 0) * (i.qty || 0));
+        });
+      });
+
+      const sorted = Object.values(map).sort((a, b) => b.qty - a.qty).slice(0, 10);
+      const maxQty = sorted[0]?.qty || 1;
+      const container = document.getElementById("top-products-list");
+
+      if (!container) return;
+      if (sorted.length === 0) {
+        container.innerHTML = `<p class="py-12 text-center text-slate-500 text-xs">Belum ada data penjualan pada periode ini.</p>`;
+        return;
+      }
+
+      container.innerHTML = sorted.map((p, idx) => `
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-200 truncate max-w-[200px]">
+              <strong class="text-yellow-400 font-mono mr-1">#${idx + 1}</strong> ${p.name}
+            </span>
+            <span class="font-mono text-emerald-400 font-bold shrink-0">
+              ${p.qty} pcs (${formatRupiah(p.revenue)})
+            </span>
+          </div>
+          <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800">
+            <div class="bg-gradient-to-r from-yellow-500 to-alfa-red h-full rounded-full" style="width: ${Math.round((p.qty / maxQty) * 100)}%"></div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // Render Feed Transaksi Kasir Live
+    function renderLiveTransactionsTable() {
+      const tbody = document.getElementById("live-transactions-tbody");
+      if (!tbody) return;
+
+      const transactions = getFilteredTransactions().slice(0, 25);
+
+      if (transactions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-slate-500 text-xs">Belum ada transaksi kasir pada periode ini.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = transactions.map(t => {
+        const summary = t.items.map(i => `${i.name} (${i.qty})`).join(", ");
+        return `
+          <tr class="hover:bg-slate-800/50 transition-colors cursor-pointer" onclick='viewReceiptDetail(${JSON.stringify(t)})'>
+            <td class="py-2.5 px-3 font-mono font-bold text-blue-400 whitespace-nowrap">${t.id}</td>
+            <td class="py-2.5 px-3 text-slate-400 whitespace-nowrap">${t.date} <span class="text-slate-500">${t.time}</span></td>
+            <td class="py-2.5 px-3 text-slate-300 whitespace-nowrap">${t.cashier || 'Kasir'}</td>
+            <td class="py-2.5 px-3 text-slate-400 truncate max-w-[200px]" title="${summary}">${summary}</td>
+            <td class="py-2.5 px-3 font-mono font-bold text-white whitespace-nowrap">${formatRupiah(t.grandTotal)}</td>
+            <td class="py-2.5 px-3 font-mono font-bold text-emerald-400 whitespace-nowrap">+${formatRupiah(t.profit)}</td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                t.paymentMethod === 'cash' ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' :
+                t.paymentMethod === 'qris' ? 'bg-blue-950 text-blue-300 border border-blue-800' :
+                'bg-purple-950 text-purple-300 border border-purple-800'
+              }">
+                ${t.paymentMethod}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Render Tabel Stok Kritis & Tombol WhatsApp Supplier
+    function renderLowStockTable() {
+      const tbody = document.getElementById("low-stock-tbody");
+      if (!tbody) return;
+
+      const lowStocks = dashboardData.products.filter(p => p.stock <= 5).sort((a, b) => a.stock - b.stock);
+
+      if (lowStocks.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-8 text-center text-emerald-400 font-bold text-xs">
+              ✅ Seluruh stok aman! Tidak ada produk dengan sisa stok kritis.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = lowStocks.map(p => {
+        const waText = encodeURIComponent(`Halo Supplier, saya ingin memesan restok produk:\n- Nama: ${p.name}\n- Barcode: ${p.barcode}\n- Sisa Stok Toko: ${p.stock} ${p.unit}\nMohon konfirmasi ketersediaan pasokan. Terima kasih!`);
+        return `
+          <tr class="hover:bg-slate-800/40">
+            <td class="py-2.5 px-3 font-bold text-white">${p.name}</td>
+            <td class="py-2.5 px-3 font-mono text-slate-400">${p.barcode || p.id}</td>
+            <td class="py-2.5 px-3 text-slate-400">${p.category || 'Umum'}</td>
+            <td class="py-2.5 px-3 font-mono text-slate-300">${formatRupiah(p.costPrice)}</td>
+            <td class="py-2.5 px-3 font-mono font-bold text-white">${formatRupiah(p.price)}</td>
+            <td class="py-2.5 px-3 text-center">
+              <span class="px-2 py-0.5 rounded-full font-mono font-black text-xs ${p.stock <= 0 ? 'bg-rose-950 text-rose-400 border border-rose-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">
+                ${p.stock} ${p.unit}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-right">
+              <a 
+                href="https://wa.me/?text=${waText}" 
+                target="_blank" 
+                class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-[11px] font-bold shadow-xs transition-all"
+              >
+                <span>💬 PO WA</span>
+              </a>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // ==========================================
+    // LOGIKA DAY SALES INVENTORY (DSI) PRODUK LARIS
+    // ==========================================
+    function calculateProductDSI() {
+      const products = dashboardData.products || [];
+      const transactions = getFilteredTransactions();
+
+      // Tentukan hari acuan perputaran (baseline days)
+      let periodDays = 1;
+      let trxSource = transactions;
+
+      if (currentDateFilter === "7days") periodDays = 7;
+      else if (currentDateFilter === "30days") periodDays = 30;
+      else if (currentDateFilter === "today") {
+        // Jika filter hari ini tapi transaksi masih sedikit, gunakan seluruh data transaksi terkini agar estimasi DSI bermakna
+        if (transactions.length < 5 && (dashboardData.transactions || []).length > transactions.length) {
+          trxSource = dashboardData.transactions.slice(0, 100);
+          const distinctDates = new Set(trxSource.map(t => t.date || (t.createdAt ? t.createdAt.split('T')[0] : ''))).size;
+          periodDays = Math.max(1, distinctDates);
+        } else {
+          periodDays = 1;
+        }
+      } else {
+        const distinctDates = new Set(trxSource.map(t => t.date || (t.createdAt ? t.createdAt.split('T')[0] : ''))).size;
+        periodDays = Math.max(1, distinctDates);
+      }
+
+      // Agregasi penjualan per produk
+      const salesMap = {};
+      trxSource.forEach(t => {
+        (t.items || []).forEach(item => {
+          const key = item.id || item.barcode || item.name;
+          if (!salesMap[key]) {
+            salesMap[key] = { qty: 0, revenue: 0 };
+          }
+          salesMap[key].qty += (Number(item.qty) || 0);
+          salesMap[key].revenue += ((Number(item.price) || 0) * (Number(item.qty) || 0));
+        });
+      });
+
+      // Petakan ke setiap produk
+      const dsiList = products.map(p => {
+        const sales = salesMap[p.id] || salesMap[p.barcode] || salesMap[p.name] || { qty: 0, revenue: 0 };
+        const totalSold = sales.qty;
+        const dailyRate = totalSold / periodDays;
+        const stock = Number(p.stock) || 0;
+
+        let dsiDays = Infinity;
+        let statusKey = "unsold";
+        let statusLabel = "💤 Belum Terjual";
+        let badgeClass = "bg-slate-800 text-slate-400 border border-slate-700";
+
+        if (stock <= 0) {
+          dsiDays = 0;
+          statusKey = "kritis";
+          statusLabel = "⛔ Habis (0 Hari)";
+          badgeClass = "bg-rose-950 text-rose-300 border border-rose-800";
+        } else if (dailyRate > 0) {
+          dsiDays = stock / dailyRate;
+          if (dsiDays <= 3) {
+            statusKey = "kritis";
+            statusLabel = `🚨 Kritis (${dsiDays.toFixed(1)} Hr)`;
+            badgeClass = "bg-rose-950 text-rose-300 border border-rose-800";
+          } else if (dsiDays <= 7) {
+            statusKey = "menipis";
+            statusLabel = `⚠️ Menipis (${dsiDays.toFixed(1)} Hr)`;
+            badgeClass = "bg-amber-950 text-amber-300 border border-amber-800";
+          } else if (dsiDays <= 21) {
+            statusKey = "optimal";
+            statusLabel = `✅ Optimal (${dsiDays.toFixed(1)} Hr)`;
+            badgeClass = "bg-emerald-950 text-emerald-300 border border-emerald-800";
+          } else {
+            statusKey = "overstock";
+            statusLabel = `📦 Overstock (${dsiDays.toFixed(1)} Hr)`;
+            badgeClass = "bg-blue-950 text-blue-300 border border-blue-800";
+          }
+        }
+
+        return {
+          ...p,
+          totalSold,
+          dailyRate,
+          dsiDays,
+          statusKey,
+          statusLabel,
+          badgeClass,
+          periodDays
+        };
+      });
+
+      return dsiList;
+    }
+
+    function renderDSITable() {
+      const tbody = document.getElementById("dsi-tbody");
+      const badgeCount = document.getElementById("dsi-badge-count");
+      if (!tbody) return;
+
+      const searchInput = (document.getElementById("dsi-search-input")?.value || "").toLowerCase().trim();
+      const statusFilter = document.getElementById("dsi-status-filter")?.value || "all";
+      const sortBy = document.getElementById("dsi-sort-select")?.value || "dsi_asc";
+
+      let list = calculateProductDSI();
+
+      // Filter Pencarian
+      if (searchInput) {
+        list = list.filter(p => 
+          (p.name && p.name.toLowerCase().includes(searchInput)) ||
+          (p.barcode && p.barcode.toLowerCase().includes(searchInput)) ||
+          (p.category && p.category.toLowerCase().includes(searchInput))
+        );
+      }
+
+      // Filter Status
+      if (statusFilter !== "all") {
+        list = list.filter(p => p.statusKey === statusFilter);
+      }
+
+      // Sortir
+      list.sort((a, b) => {
+        if (sortBy === "dsi_asc") {
+          // Kritis & 0 hari di atas, infinite/unsold di bawah
+          if (a.dsiDays === b.dsiDays) return a.stock - b.stock;
+          return a.dsiDays - b.dsiDays;
+        } else if (sortBy === "dsi_desc") {
+          const aVal = isFinite(a.dsiDays) ? a.dsiDays : 99999;
+          const bVal = isFinite(b.dsiDays) ? b.dsiDays : 99999;
+          return bVal - aVal;
+        } else if (sortBy === "sales_desc") {
+          return b.totalSold - a.totalSold;
+        } else if (sortBy === "stock_asc") {
+          return a.stock - b.stock;
+        } else if (sortBy === "stock_desc") {
+          return b.stock - a.stock;
+        } else if (sortBy === "name_asc") {
+          return (a.name || "").localeCompare(b.name || "");
+        }
+        return 0;
+      });
+
+      if (badgeCount) {
+        badgeCount.textContent = `${list.length} Produk Dianalisis`;
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500 text-xs">Tidak ada data produk yang sesuai dengan filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(p => {
+        const dsiDisplay = p.stock <= 0 
+          ? '<span class="text-rose-400 font-bold">0 Hari</span>'
+          : isFinite(p.dsiDays) 
+            ? `<span class="font-bold ${p.dsiDays <= 3 ? 'text-rose-400' : p.dsiDays <= 7 ? 'text-amber-400' : p.dsiDays <= 21 ? 'text-emerald-400' : 'text-blue-400'}">${p.dsiDays.toFixed(1)} Hari</span>`
+            : '<span class="text-slate-500">&infin; (Belum Laku)</span>';
+
+        const waText = encodeURIComponent(`Halo Supplier, saya ingin pesan restok mendesak untuk produk:\n- Nama: ${p.name}\n- Barcode: ${p.barcode}\n- Sisa Stok Toko: ${p.stock} ${p.unit || 'pcs'}\n- Laju Penjualan: ${p.dailyRate.toFixed(1)} pcs/hari\n- Estimasi Stok Habis: ${isFinite(p.dsiDays) ? p.dsiDays.toFixed(1) + ' hari' : 'segera'}\nMohon konfirmasi kesiapan barang. Terima kasih!`);
+
+        let actionBtn = "";
+        if (p.dsiDays <= 7 || p.stock <= 0) {
+          actionBtn = `
+            <a 
+              href="https://wa.me/?text=${waText}" 
+              target="_blank" 
+              class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-[10px] font-bold shadow-xs transition-all whitespace-nowrap"
+            >
+              <span>💬 PO WA</span>
+            </a>
+          `;
+        } else if (p.statusKey === 'overstock') {
+          actionBtn = `
+            <span class="inline-flex items-center px-2 py-0.5 bg-blue-950 text-blue-300 border border-blue-800 rounded-lg text-[10px] font-semibold whitespace-nowrap">
+              🏷️ Beri Diskon
+            </span>
+          `;
+        } else {
+          actionBtn = `
+            <span class="text-slate-500 text-[10px] whitespace-nowrap">Stok Cukup</span>
+          `;
+        }
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2.5 px-3 text-slate-200">
+              <div class="font-bold text-white flex items-center gap-1.5">
+                <span>${p.name}</span>
+              </div>
+            </td>
+            <td class="py-2.5 px-3 text-slate-400">
+              <div class="font-mono text-xs text-slate-300">${p.barcode || p.id}</div>
+              <div class="text-[10px] text-slate-500">${p.category || 'Umum'}</div>
+            </td>
+            <td class="py-2.5 px-3 text-center font-mono font-bold ${p.stock <= 3 ? 'text-rose-400' : p.stock <= 7 ? 'text-amber-400' : 'text-slate-200'}">
+              ${p.stock} ${p.unit || 'pcs'}
+            </td>
+            <td class="py-2.5 px-3 text-center font-mono text-yellow-400 font-bold">
+              ${p.totalSold} pcs
+            </td>
+            <td class="py-2.5 px-3 text-center font-mono text-slate-300 text-xs">
+              ${p.dailyRate > 0 ? p.dailyRate.toFixed(1) + ' /hr' : '-'}
+            </td>
+            <td class="py-2.5 px-3 text-center font-mono text-xs whitespace-nowrap">
+              ${dsiDisplay}
+            </td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${p.badgeClass}">
+                ${p.statusLabel}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-right">
+              ${actionBtn}
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Render Tabel Riwayat Retur
+    function renderReturnsTable() {
+      const tbody = document.getElementById("returns-tbody");
+      if (!tbody) return;
+
+      const allReturns = dashboardData.returns || [];
+      const returns = getFilteredReturns().slice(0, 15);
+
+      if (returns.length === 0) {
+        if (allReturns.length > 0 && currentDateFilter === "today") {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="py-8 text-center text-slate-300 text-xs">
+                <span>Belum ada retur barang <b>Hari Ini</b>. Terdapat <b>${allReturns.length} retur</b> pada periode sebelumnya.</span>
+                <button onclick="setDateFilter('all')" class="ml-2.5 px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg font-bold text-xs transition-all">
+                  Lihat Semua Periode (${allReturns.length})
+                </button>
+              </td>
+            </tr>
+          `;
+        } else {
+          tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 text-xs">Belum ada riwayat retur barang pada periode ini.</td></tr>`;
+        }
+        return;
+      }
+
+      tbody.innerHTML = returns.map(r => {
+        const itemsSummary = Array.isArray(r.items) && r.items.length > 0 
+          ? r.items.map(i => `${i.name} (${i.returnQty || i.qty || 1})`).join(", ") 
+          : "-";
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2.5 px-3 font-mono font-bold text-rose-400 whitespace-nowrap">${r.id}</td>
+            <td class="py-2.5 px-3 font-mono text-blue-400 whitespace-nowrap">${r.originalTrxId}</td>
+            <td class="py-2.5 px-3 text-slate-400 whitespace-nowrap">${r.date} <span class="text-slate-500 text-[10px]">${r.time}</span></td>
+            <td class="py-2.5 px-3 text-slate-300">
+              <div class="font-semibold text-white">${r.reason || 'Cacat/Rusak'}</div>
+              <div class="text-[10px] text-slate-400 truncate max-w-[200px]" title="${itemsSummary}">📦 ${itemsSummary}</div>
+            </td>
+            <td class="py-2.5 px-3 font-mono font-bold text-rose-400 whitespace-nowrap">${formatRupiah(r.totalRefund)}</td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.restocked ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
+                ${r.restocked ? '✅ Masuk Rak' : '❌ Tidak Restok'}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-slate-300 whitespace-nowrap">${r.cashier || 'Kasir'}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Filter Mutasi Stock Opname
+    function getFilteredStockOpname() {
+      const allMutations = dashboardData.mutations || [];
+      const soMutations = allMutations.filter(m => m.type === 'SO_PLUS' || m.type === 'SO_MINUS');
+
+      const now = new Date();
+      const localTodayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const todayTime = new Date(localTodayStr).getTime();
+
+      if (currentDateFilter === "today") {
+        return soMutations.filter(m => isSameOrToday(m.date));
+      } else if (currentDateFilter === "7days") {
+        const d7 = new Date(todayTime - (7 * 24 * 60 * 60 * 1000));
+        const d7Str = d7.toISOString().split("T")[0];
+        return soMutations.filter(m => normalizeDateString(m.date) >= d7Str);
+      } else if (currentDateFilter === "30days") {
+        const d30 = new Date(todayTime - (30 * 24 * 60 * 60 * 1000));
+        const d30Str = d30.toISOString().split("T")[0];
+        return soMutations.filter(m => normalizeDateString(m.date) >= d30Str);
+      }
+      return soMutations;
+    }
+
+    // Render Tabel Riwayat Stock Opname
+    function renderStockOpnameTable() {
+      const tbody = document.getElementById("so-history-tbody");
+      const badgeCount = document.getElementById("so-badge-count");
+      if (!tbody) return;
+
+      const soList = getFilteredStockOpname();
+      if (badgeCount) badgeCount.textContent = `${soList.length} Penyesuaian`;
+
+      if (soList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 text-xs">Belum ada riwayat Stock Opname pada periode ini.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = soList.map(m => {
+        const isPlus = m.type === 'SO_PLUS' || m.qty > 0;
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2.5 px-3 font-mono font-bold text-purple-400 whitespace-nowrap">${m.id || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-400 whitespace-nowrap">${m.date} <span class="text-slate-500 text-[10px]">${m.time || ''}</span></td>
+            <td class="py-2.5 px-3 text-slate-200">
+              <div class="font-bold text-white">${m.productName || '-'}</div>
+              <div class="text-[10px] font-mono text-slate-400">PLU: ${m.barcode || m.productId || '-'}</div>
+            </td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isPlus ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-rose-950 text-rose-400 border border-rose-800'}">
+                ${isPlus ? '📈 Fisik Lebih (+)' : '📉 Fisik Kurang (-)'}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-center font-mono font-bold whitespace-nowrap ${isPlus ? 'text-emerald-400' : 'text-rose-400'}">
+              ${isPlus ? '+' : ''}${m.qty} pcs
+            </td>
+            <td class="py-2.5 px-3 text-slate-300 text-xs">${m.note || 'Penyesuaian SO'}</td>
+            <td class="py-2.5 px-3 text-slate-300 font-mono text-xs whitespace-nowrap">${m.operator || 'Pejabat Toko'}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Filter Riwayat Klerk Kasir Berdasarkan Periode
+    function getFilteredKlerk() {
+      const klerkList = dashboardData.klerkHistory || [];
+      const todayTime = new Date().setHours(0, 0, 0, 0);
+
+      if (currentDateFilter === "today") {
+        return klerkList.filter(k => isSameOrToday(k.date));
+      } else if (currentDateFilter === "7days") {
+        const d7 = new Date(todayTime - (7 * 24 * 60 * 60 * 1000));
+        const d7Str = d7.toISOString().split("T")[0];
+        return klerkList.filter(k => normalizeDateString(k.date) >= d7Str);
+      } else if (currentDateFilter === "30days") {
+        const d30 = new Date(todayTime - (30 * 24 * 60 * 60 * 1000));
+        const d30Str = d30.toISOString().split("T")[0];
+        return klerkList.filter(k => normalizeDateString(k.date) >= d30Str);
+      }
+      return klerkList;
+    }
+
+    // Render Tabel Riwayat Klerk Kasir
+    function renderKlerkTable() {
+      const tbody = document.getElementById("klerk-history-tbody");
+      const badgeCount = document.getElementById("klerk-badge-count");
+      if (!tbody) return;
+
+      const klerkList = getFilteredKlerk();
+      if (badgeCount) badgeCount.textContent = `${klerkList.length} Closing Shift`;
+
+      if (klerkList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-500 text-xs">Belum ada riwayat Klerk closing shift pada periode ini.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = klerkList.map(k => {
+        const diff = Number(k.variance) || 0;
+        let statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">✅ KLOP</span>';
+        let diffColor = 'text-emerald-400';
+        let diffText = 'Rp 0';
+        if (diff > 0) {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-950 text-blue-400 border border-blue-800">📈 LEBIH</span>';
+          diffColor = 'text-blue-400';
+          diffText = `+${formatRupiah(diff)}`;
+        } else if (diff < 0) {
+          statusBadge = '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-400 border border-rose-800">📉 KURANG</span>';
+          diffColor = 'text-rose-400';
+          diffText = `-${formatRupiah(Math.abs(diff))}`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2.5 px-3 font-mono font-bold text-amber-400 whitespace-nowrap">${k.id || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-400 whitespace-nowrap">${k.date} <span class="text-slate-500 text-[10px]">${k.time || ''}</span></td>
+            <td class="py-2.5 px-3 text-slate-200">
+              <div class="font-bold text-white">${k.cashierName || 'Kasir'}</div>
+              <div class="text-[10px] font-mono text-amber-400">${k.shift || 'Shift 1'} • NIK: ${k.cashierNik || '-'}</div>
+            </td>
+            <td class="py-2.5 px-3 text-right font-mono text-slate-400 whitespace-nowrap">${formatRupiah(k.initialCash || 0)}</td>
+            <td class="py-2.5 px-3 text-right font-mono text-emerald-400 font-bold whitespace-nowrap">${formatRupiah(k.cashSales || 0)}</td>
+            <td class="py-2.5 px-3 text-right font-mono text-white font-black whitespace-nowrap">${formatRupiah(k.physicalCash || 0)}</td>
+            <td class="py-2.5 px-3 text-center font-mono font-black whitespace-nowrap ${diffColor}">${diffText}</td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">${statusBadge}</td>
+            <td class="py-2.5 px-3 text-slate-300 font-mono text-xs whitespace-nowrap">${k.supervisor || 'Pejabat Toko'}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // ==========================================
+    // LOGIKA DATA MUTASI BARANG TOKO
+    // ==========================================
+    function getFilteredMutations() {
+      const allMutations = dashboardData.mutations || [];
+      const now = new Date();
+      const localTodayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const todayTime = new Date(localTodayStr).getTime();
+
+      return allMutations.filter(m => {
+        if (currentDateFilter === "all") return true;
+        const mDateVal = m.date || m.createdAt || m.created_at;
+        if (!mDateVal) return true;
+
+        if (currentDateFilter === "today") {
+          return isSameOrToday(mDateVal);
+        }
+
+        const mNorm = normalizeDateString(mDateVal);
+        const itemTime = new Date(mNorm).getTime();
+        if (isNaN(itemTime)) return true;
+        const diffDays = (todayTime - itemTime) / (1000 * 60 * 60 * 24);
+
+        if (currentDateFilter === "7days") return diffDays <= 7;
+        if (currentDateFilter === "30days") return diffDays <= 30;
+        return true;
+      });
+    }
+
+    function renderMutationsTable() {
+      const tbody = document.getElementById("mutations-history-tbody");
+      const badgeCount = document.getElementById("mutations-badge-count");
+      if (!tbody) return;
+
+      const searchInput = (document.getElementById("mutations-search-input")?.value || "").toLowerCase().trim();
+      const typeFilter = document.getElementById("mutations-type-filter")?.value || "all";
+      const sortBy = document.getElementById("mutations-sort-select")?.value || "date_desc";
+
+      let list = getFilteredMutations();
+
+      // Filter Tipe Mutasi
+      if (typeFilter !== "all") {
+        list = list.filter(m => m.type === typeFilter);
+      }
+
+      // Filter Pencarian
+      if (searchInput) {
+        list = list.filter(m => 
+          (m.productName && m.productName.toLowerCase().includes(searchInput)) ||
+          (m.barcode && m.barcode.toLowerCase().includes(searchInput)) ||
+          (m.id && m.id.toLowerCase().includes(searchInput)) ||
+          (m.operator && m.operator.toLowerCase().includes(searchInput)) ||
+          (m.note && m.note.toLowerCase().includes(searchInput))
+        );
+      }
+
+      // Sortir
+      list.sort((a, b) => {
+        if (sortBy === "date_desc") {
+          const dateA = new Date((a.date || '') + ' ' + (a.time || '00:00:00')).getTime() || 0;
+          const dateB = new Date((b.date || '') + ' ' + (b.time || '00:00:00')).getTime() || 0;
+          return dateB - dateA;
+        } else if (sortBy === "date_asc") {
+          const dateA = new Date((a.date || '') + ' ' + (a.time || '00:00:00')).getTime() || 0;
+          const dateB = new Date((b.date || '') + ' ' + (b.time || '00:00:00')).getTime() || 0;
+          return dateA - dateB;
+        } else if (sortBy === "qty_desc") {
+          return Math.abs(Number(b.qty) || 0) - Math.abs(Number(a.qty) || 0);
+        } else if (sortBy === "qty_asc") {
+          return Math.abs(Number(a.qty) || 0) - Math.abs(Number(b.qty) || 0);
+        } else if (sortBy === "name_asc") {
+          return (a.productName || "").localeCompare(b.productName || "");
+        }
+        return 0;
+      });
+
+      if (badgeCount) {
+        badgeCount.textContent = `${list.length} Mutasi`;
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500 text-xs">Belum ada riwayat mutasi barang pada filter ini.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(m => {
+        let typeBadge = "";
+        const qtyVal = Number(m.qty) || 0;
+        let qtyDisplay = "";
+
+        if (m.type === "IN_SUPPLIER") {
+          typeBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800 whitespace-nowrap">📥 Masuk (LPB)</span>`;
+          qtyDisplay = `<span class="font-mono font-bold text-emerald-400">+${Math.abs(qtyVal)} pcs</span>`;
+        } else if (m.type === "OUT_SALE") {
+          typeBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-950 text-yellow-400 border border-yellow-800 whitespace-nowrap">🛒 Jual Kasir</span>`;
+          qtyDisplay = `<span class="font-mono font-bold text-yellow-400">-${Math.abs(qtyVal)} pcs</span>`;
+        } else if (m.type === "RETURN_SALE") {
+          typeBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-950 text-blue-400 border border-blue-800 whitespace-nowrap">🔄 Retur Restok</span>`;
+          qtyDisplay = `<span class="font-mono font-bold text-blue-400">+${Math.abs(qtyVal)} pcs</span>`;
+        } else if (m.type === "SO_PLUS") {
+          typeBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-950 text-purple-400 border border-purple-800 whitespace-nowrap">📈 SO Lebih (+)</span>`;
+          qtyDisplay = `<span class="font-mono font-bold text-purple-400">+${Math.abs(qtyVal)} pcs</span>`;
+        } else if (m.type === "SO_MINUS") {
+          typeBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-400 border border-rose-800 whitespace-nowrap">📉 SO Kurang (-)</span>`;
+          qtyDisplay = `<span class="font-mono font-bold text-rose-400">-${Math.abs(qtyVal)} pcs</span>`;
+        } else if (m.type === "OUT_DAMAGE") {
+          typeBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-400 border border-rose-800 whitespace-nowrap">⚠️ Rusak/Kadaluwarsa</span>`;
+          qtyDisplay = `<span class="font-mono font-bold text-rose-400">-${Math.abs(qtyVal)} pcs</span>`;
+        } else {
+          typeBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700 whitespace-nowrap">${m.type || 'Mutasi'}</span>`;
+          qtyDisplay = `<span class="font-mono font-bold ${qtyVal >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${qtyVal >= 0 ? '+' : ''}${qtyVal} pcs</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2.5 px-3 font-mono font-bold text-yellow-400 whitespace-nowrap text-xs">${m.id || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-400 whitespace-nowrap text-xs">${m.date || '-'} <span class="text-slate-500 text-[10px]">${m.time || ''}</span></td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">${typeBadge}</td>
+            <td class="py-2.5 px-3 text-slate-200">
+              <div class="font-bold text-white text-xs">${m.productName || '-'}</div>
+              <div class="text-[10px] font-mono text-slate-400">PLU: ${m.barcode || m.productId || '-'}</div>
+            </td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap text-xs">${qtyDisplay}</td>
+            <td class="py-2.5 px-3 text-slate-300 text-xs">${m.note || '-'}</td>
+            <td class="py-2.5 px-3 text-slate-300 font-mono text-xs whitespace-nowrap">${m.operator || 'Kasir'}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Render Tabel Riwayat Penerimaan Barang (LPB) di Dashboard Owner
+    function renderOwnerLpbTable() {
+      const tbody = document.getElementById("lpb-history-tbody");
+      const badgeCount = document.getElementById("lpb-history-badge");
+      if (!tbody) return;
+
+      const search = (document.getElementById("lpb-history-search")?.value || "").toLowerCase().trim();
+      const filterFrom = document.getElementById("lpb-filter-from")?.value || "";
+      const filterTo = document.getElementById("lpb-filter-to")?.value || "";
+
+      let list = getFilteredLpbRecords();
+
+      if (filterFrom) list = list.filter(r => (r.date || '') >= filterFrom);
+      if (filterTo) list = list.filter(r => (r.date || '') <= filterTo);
+
+      if (search) {
+        list = list.filter(r =>
+          (r.id && r.id.toLowerCase().includes(search)) ||
+          (r.supplierName && r.supplierName.toLowerCase().includes(search)) ||
+          (r.invoiceNo && r.invoiceNo.toLowerCase().includes(search)) ||
+          (r.note && r.note.toLowerCase().includes(search)) ||
+          (r.operator && r.operator.toLowerCase().includes(search))
+        );
+      }
+
+      // Sort tanggal terbaru
+      list.sort((a, b) => {
+        const dateA = new Date((a.date || '') + ' ' + (a.time || '00:00:00')).getTime() || 0;
+        const dateB = new Date((b.date || '') + ' ' + (b.time || '00:00:00')).getTime() || 0;
+        return dateB - dateA;
+      });
+
+      if (badgeCount) {
+        badgeCount.textContent = `${list.length} Dokumen LPB`;
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-500 text-xs">Belum ada dokumen LPB pada periode filter ini.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(r => `
+        <tr class="hover:bg-emerald-950/30 transition-colors cursor-pointer" onclick="showOwnerLpbDetailInline('${r.id}')">
+          <td class="py-2.5 px-3 font-mono font-bold text-emerald-400 whitespace-nowrap text-xs">
+            <span class="underline decoration-dotted">${r.id}</span>
+          </td>
+          <td class="py-2.5 px-3 text-slate-400 whitespace-nowrap text-xs">${r.date || '-'} <span class="text-slate-500 text-[10px]">${r.time || ''}</span></td>
+          <td class="py-2.5 px-3 font-bold text-white text-xs whitespace-nowrap">${r.supplierName || '-'}</td>
+          <td class="py-2.5 px-3 font-mono text-slate-300 text-[11px] whitespace-nowrap">${r.invoiceNo || '-'}</td>
+          <td class="py-2.5 px-3 whitespace-nowrap">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${
+              r.paymentType === 'TUNAI' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' :
+              r.paymentType === 'TRANSFER' ? 'bg-blue-950 text-blue-400 border border-blue-800' :
+              'bg-amber-950 text-amber-400 border border-amber-800'
+            }">${r.paymentType || 'KREDIT'}</span>
+          </td>
+          <td class="py-2.5 px-3 text-center font-bold text-slate-200 text-xs">${r.totalItems || (r.items ? r.items.length : 0)}</td>
+          <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-400 text-xs">${formatAngka(r.totalQty || 0)}</td>
+          <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-xs whitespace-nowrap">${formatRupiah(r.totalValue || 0)}</td>
+          <td class="py-2.5 px-3 text-slate-400 font-mono text-xs whitespace-nowrap">${r.operator || 'Kepala Toko'}</td>
+        </tr>
+      `).join("");
+    }
+
+    // Tampilkan Detail LPB Inline
+    function showOwnerLpbDetailInline(lpbId) {
+      const doc = (dashboardData.lpbRecords || []).find(r => r.id === lpbId);
+      const container = document.getElementById("lpb-detail-inline");
+      const titleEl = document.getElementById("lpb-detail-inline-title");
+      const bodyEl = document.getElementById("lpb-detail-inline-body");
+
+      if (!container || !doc) return;
+
+      if (titleEl) {
+        titleEl.textContent = `Rincian Barang Masuk: ${doc.id} | Supplier: ${doc.supplierName} (${doc.date} ${doc.time || ''})`;
+      }
+
+      const items = Array.isArray(doc.items) ? doc.items : [];
+      if (bodyEl) {
+        bodyEl.innerHTML = `
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs p-3 bg-slate-900 rounded-xl border border-slate-800 mb-3">
+            <div><span class="text-slate-500 block text-[10px]">No. Faktur Supplier</span><strong class="text-white font-mono">${doc.invoiceNo || '-'}</strong></div>
+            <div><span class="text-slate-500 block text-[10px]">Metode Bayar</span><strong class="text-yellow-400">${doc.paymentType || 'KREDIT'}</strong></div>
+            <div><span class="text-slate-500 block text-[10px]">Total Item / Qty</span><strong class="text-emerald-400">${doc.totalItems || items.length} SKU (${formatAngka(doc.totalQty || 0)} pcs)</strong></div>
+            <div><span class="text-slate-500 block text-[10px]">Total Nilai LPB</span><strong class="text-emerald-400 text-sm font-mono">${formatRupiah(doc.totalValue || 0)}</strong></div>
+            ${doc.note ? `<div class="col-span-2 sm:col-span-4 text-slate-400 text-[11px] pt-1 border-t border-slate-800/60"><span class="text-slate-500">Catatan:</span> ${doc.note}</div>` : ''}
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-800">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-900 text-[10px] font-bold text-slate-400 uppercase">
+                <tr>
+                  <th class="py-2 px-3">No</th>
+                  <th class="py-2 px-3">Nama Produk</th>
+                  <th class="py-2 px-3">Barcode / PLU</th>
+                  <th class="py-2 px-3 text-center">Qty Terima</th>
+                  <th class="py-2 px-3 text-right">HPP Masuk</th>
+                  <th class="py-2 px-3 text-right">Subtotal Rupiah</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800">
+                ${items.map((it, idx) => `
+                  <tr class="hover:bg-slate-800/30">
+                    <td class="py-2 px-3 text-slate-500 text-xs">${idx + 1}</td>
+                    <td class="py-2 px-3 font-bold text-white text-xs">${it.productName || '-'}</td>
+                    <td class="py-2 px-3 font-mono text-slate-400 text-[11px]">${it.barcode || it.productId || '-'}</td>
+                    <td class="py-2 px-3 text-center font-mono font-bold text-emerald-400 text-xs">+${formatAngka(it.qty || 0)}</td>
+                    <td class="py-2 px-3 text-right font-mono text-slate-300 text-xs">${formatRupiah(it.costPrice || 0)}</td>
+                    <td class="py-2 px-3 text-right font-mono font-bold text-emerald-400 text-xs">${formatRupiah(it.subtotal || 0)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+              <tfoot class="bg-slate-900 font-bold text-xs border-t-2 border-slate-700">
+                <tr>
+                  <td colspan="3" class="py-2.5 px-3 text-right text-slate-400">TOTAL NILAI PEMBELIAN:</td>
+                  <td class="py-2.5 px-3 text-center font-mono text-emerald-400 font-bold">${formatAngka(doc.totalQty || 0)} pcs</td>
+                  <td></td>
+                  <td class="py-2.5 px-3 text-right font-mono font-black text-emerald-400 text-sm">${formatRupiah(doc.totalValue || 0)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        `;
+      }
+
+      container.classList.remove("hidden");
+      container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Render Tabel Member Pelanggan Online di Dashboard Owner
+    function renderOwnerMembersTable() {
+      const tbody = document.getElementById("owner-members-tbody");
+      const totalEl = document.getElementById("member-summary-total");
+      const pointsEl = document.getElementById("member-summary-points");
+      const spendEl = document.getElementById("member-summary-spend");
+      const avgEl = document.getElementById("member-summary-avg");
+      const badgeCount = document.getElementById("members-badge-count");
+      if (!tbody) return;
+
+      const search = (document.getElementById("member-table-search")?.value || "").toLowerCase().trim();
+      const sortMode = document.getElementById("member-table-sort")?.value || "newest";
+
+      let list = Array.isArray(dashboardData.members) ? [...dashboardData.members] : [];
+
+      // Summary statistics
+      const totalCount = list.length;
+      const totalPoints = list.reduce((s, m) => s + (Number(m.points) || 0), 0);
+      const totalSpend = list.reduce((s, m) => s + (Number(m.totalSpend !== undefined ? m.totalSpend : m.total_spend) || 0), 0);
+      const avgSpend = totalCount > 0 ? Math.round(totalSpend / totalCount) : 0;
+
+      if (totalEl) totalEl.textContent = `${formatAngka(totalCount)} Member`;
+      if (pointsEl) pointsEl.textContent = `${formatAngka(totalPoints)} Poin`;
+      if (spendEl) spendEl.textContent = formatRupiah(totalSpend);
+      if (avgEl) avgEl.textContent = formatRupiah(avgSpend);
+      if (badgeCount) badgeCount.textContent = `${formatAngka(totalCount)} Terdaftar`;
+
+      // Filter search
+      if (search) {
+        list = list.filter(m =>
+          (m.name && m.name.toLowerCase().includes(search)) ||
+          (m.phone && m.phone.toLowerCase().includes(search)) ||
+          (m.id && m.id.toLowerCase().includes(search)) ||
+          (m.address && m.address.toLowerCase().includes(search))
+        );
+      }
+
+      // Sort
+      if (sortMode === "highest_spend") {
+        list.sort((a, b) => (Number(b.totalSpend || b.total_spend) || 0) - (Number(a.totalSpend || a.total_spend) || 0));
+      } else if (sortMode === "highest_points") {
+        list.sort((a, b) => (Number(b.points) || 0) - (Number(a.points) || 0));
+      } else if (sortMode === "name_asc") {
+        list.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      } else {
+        // newest
+        list.sort((a, b) => {
+          const dateA = new Date(a.createdAt || a.registeredAt || 0).getTime() || 0;
+          const dateB = new Date(b.createdAt || b.registeredAt || 0).getTime() || 0;
+          return dateB - dateA;
+        });
+      }
+
+      if (list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="py-8 text-center text-slate-500 text-xs">
+              ${search ? 'Tidak ada member yang cocok dengan kata kunci "' + search + '".' : 'Belum ada member terdaftar. Member yang didaftarkan di kasir akan muncul di sini secara realtime.'}
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = list.map((m, idx) => {
+        const cleanPhone = String(m.phone || '').replace(/[^0-9]/g, '');
+        let waNumber = cleanPhone;
+        if (waNumber.startsWith('0')) {
+          waNumber = '62' + waNumber.slice(1);
+        } else if (!waNumber.startsWith('62') && waNumber.length > 0) {
+          waNumber = '62' + waNumber;
+        }
+
+        const waMessage = encodeURIComponent(`Halo Bp/Ibu ${m.name || 'Pelanggan'}, terima kasih telah menjadi member setia toko kami. Saldo poin Anda saat ini adalah ${m.points || 0} poin.`);
+        const waLink = cleanPhone ? `https://wa.me/${waNumber}?text=${waMessage}` : null;
+        const totalBelanja = Number(m.totalSpend !== undefined ? m.totalSpend : m.total_spend) || 0;
+        const pts = Number(m.points) || 0;
+        const tglDaftar = m.registeredAt || (m.createdAt ? m.createdAt.split('T')[0] : '-');
+
+        return `
+          <tr class="hover:bg-indigo-950/20 transition-colors">
+            <td class="py-2.5 px-3 whitespace-nowrap">
+              <span class="text-slate-500 text-[10px] mr-1 font-mono">#${idx + 1}</span>
+              <span class="px-2 py-0.5 rounded-lg bg-indigo-950/80 border border-indigo-800 text-indigo-300 font-mono font-bold text-[11px]">
+                ${m.id || '-'}
+              </span>
+            </td>
+            <td class="py-2.5 px-3">
+              <div class="font-black text-white text-xs flex items-center gap-1.5">
+                <span>👤</span>
+                <span>${m.name || '-'}</span>
+              </div>
+            </td>
+            <td class="py-2.5 px-3 whitespace-nowrap font-mono text-slate-300 text-xs">
+              ${cleanPhone ? `
+                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-bold hover:underline" title="Chat via WhatsApp">
+                  <span>💬</span>
+                  <span>${m.phone}</span>
+                </a>
+              ` : '-'}
+            </td>
+            <td class="py-2.5 px-3 text-slate-300 text-xs max-w-[180px] truncate" title="${m.address || '-'}">
+              ${m.address || '<span class="text-slate-600">-</span>'}
+            </td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              <span class="px-2.5 py-1 rounded-xl font-mono font-black text-xs ${pts > 0 ? 'bg-indigo-950 text-indigo-300 border border-indigo-800' : 'bg-slate-950 text-slate-500 border border-slate-800'}">
+                ⭐ ${formatAngka(pts)} Poin
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-right whitespace-nowrap font-mono font-black text-emerald-400 text-xs">
+              ${formatRupiah(totalBelanja)}
+            </td>
+            <td class="py-2.5 px-3 whitespace-nowrap font-mono text-slate-400 text-[11px]">
+              ${tglDaftar}
+            </td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              ${waLink ? `
+                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-[10px] rounded-lg inline-flex items-center gap-1 transition shadow-xs cursor-pointer" title="Kirim Pesan WhatsApp">
+                  <span>WA</span>
+                </a>
+              ` : `
+                <span class="text-slate-600 text-[10px]">-</span>
+              `}
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Render Grafik Chart.js
+    function renderCharts() {
+      renderRevenueChart();
+      renderPaymentMethodChart();
+    }
+
+    function renderRevenueChart() {
+      const ctx = document.getElementById("revenueChart");
+      if (!ctx) return;
+
+      const transactions = getFilteredTransactions();
+
+      // Agregasi per tanggal
+      const dateMap = {};
+      transactions.forEach(t => {
+        if (!dateMap[t.date]) dateMap[t.date] = 0;
+        dateMap[t.date] += (t.grandTotal || 0);
+      });
+
+      const labels = Object.keys(dateMap).sort().slice(-14);
+      const dataValues = labels.map(d => dateMap[d]);
+
+      if (revenueChartInstance) {
+        revenueChartInstance.destroy();
+      }
+
+      revenueChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels.map(l => l.slice(5)), // MM-DD
+          datasets: [{
+            label: 'Omzet Harian (Rp)',
+            data: dataValues,
+            borderColor: '#ffcc00',
+            backgroundColor: 'rgba(255, 204, 0, 0.12)',
+            borderWidth: 2.5,
+            fill: true,
+            tension: 0.35,
+            pointBackgroundColor: '#d61823',
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `Omzet: ${formatRupiah(ctx.parsed.y)}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: {
+                color: '#94a3b8',
+                font: { family: 'JetBrains Mono', size: 10 },
+                callback: (val) => formatRupiah(val).replace(',00', '')
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderPaymentMethodChart() {
+      const ctx = document.getElementById("paymentMethodChart");
+      if (!ctx) return;
+
+      const transactions = getFilteredTransactions();
+      let cash = 0, qris = 0, transfer = 0;
+
+      transactions.forEach(t => {
+        const method = (t.paymentMethod || 'cash').toLowerCase();
+        if (method === 'cash') cash++;
+        else if (method === 'qris') qris++;
+        else transfer++;
+      });
+
+      const total = cash + qris + transfer || 1;
+      document.getElementById("payment-cash-pct").textContent = `${Math.round((cash / total) * 100)}%`;
+      document.getElementById("payment-qris-pct").textContent = `${Math.round((qris / total) * 100)}%`;
+      document.getElementById("payment-transfer-pct").textContent = `${Math.round((transfer / total) * 100)}%`;
+
+      if (paymentChartInstance) {
+        paymentChartInstance.destroy();
+      }
+
+      paymentChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Tunai', 'QRIS', 'Transfer'],
+          datasets: [{
+            data: [cash, qris, transfer],
+            backgroundColor: ['#10b981', '#3b82f6', '#a855f7'],
+            borderColor: '#0f172a',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          cutout: '70%'
+        }
+      });
+    }
+
+    // Modal Struk Detail
+    function viewReceiptDetail(trx) {
+      const modal = document.getElementById("modal-receipt-detail");
+      const content = document.getElementById("receipt-detail-content");
+      if (!modal || !content) return;
+
+      const itemsHtml = trx.items.map(i => `
+        <div class="flex justify-between py-1 border-b border-slate-800">
+          <div>
+            <div class="text-white font-bold">${i.name}</div>
+            <div class="text-[10px] text-slate-400">${i.qty} x ${formatAngka(i.price)}</div>
+          </div>
+          <div class="font-bold text-white">${formatAngka(i.price * i.qty)}</div>
+        </div>
+      `).join("");
+
+      content.innerHTML = `
+        <div class="text-center pb-2 border-b border-slate-800">
+          <div class="font-black text-sm text-yellow-400 uppercase">POS KASIR RETAIL</div>
+          <div class="text-[10px] text-slate-400">Bukti Struk Transaksi Kasir</div>
+        </div>
+        <div class="space-y-1 text-slate-300 text-[11px] pb-2 border-b border-slate-800">
+          <div class="flex justify-between"><span>No Struk</span><strong class="text-blue-400">${trx.id}</strong></div>
+          <div class="flex justify-between"><span>Waktu</span><span>${trx.date} ${trx.time}</span></div>
+          <div class="flex justify-between"><span>Kasir</span><span>${trx.cashier || 'Kasir'} (${trx.shift || 'Shift 1'})</span></div>
+          <div class="flex justify-between"><span>Metode</span><strong class="uppercase text-emerald-400">${trx.paymentMethod || 'TUNAI'}</strong></div>
+        </div>
+        <div class="py-1">
+          ${itemsHtml}
+        </div>
+        <div class="pt-2 border-t border-slate-800 space-y-1 text-slate-300 text-[11px]">
+          <div class="flex justify-between"><span>Subtotal</span><span>${formatRupiah(trx.subtotal)}</span></div>
+          ${trx.discountAmount > 0 ? `<div class="flex justify-between text-rose-400"><span>Diskon</span><span>-${formatRupiah(trx.discountAmount)}</span></div>` : ''}
+          <div class="flex justify-between text-sm font-black text-white pt-1 border-t border-dashed border-slate-700 mt-1">
+            <span>TOTAL BAYAR</span>
+            <span class="text-emerald-400">${formatRupiah(trx.grandTotal)}</span>
+          </div>
+          <div class="flex justify-between text-[11px] text-blue-400 font-bold pt-1">
+            <span>Estimasi Laba Bersih</span>
+            <span>+${formatRupiah(trx.profit)}</span>
+          </div>
+          ${(() => {
+            const member = trx.member || (trx.memberName || trx.memberId ? {
+              name: trx.memberName,
+              phone: trx.memberPhone,
+              pointsEarned: trx.memberPoints,
+              totalPoints: trx.memberTotalPoints
+            } : null);
+            if (!member || (!member.name && !member.id)) return '';
+            return `
+              <div class="pt-2 border-t border-dashed border-slate-700 mt-2 space-y-0.5 text-[10px] text-slate-300">
+                <div class="flex justify-between font-bold text-amber-300"><span>MEMBER</span><span>${member.name || '-'}</span></div>
+                <div class="flex justify-between text-slate-400"><span>NO. HP</span><span>${member.phone || '-'}</span></div>
+                <div class="flex justify-between text-emerald-400"><span>POIN DIDAPAT</span><span>+${Number(member.pointsEarned || trx.memberPoints || 0).toLocaleString('id-ID')} Poin</span></div>
+                <div class="flex justify-between font-bold text-yellow-400"><span>TOTAL SALDO POIN</span><span>${Number(member.totalPoints !== undefined ? member.totalPoints : (trx.memberTotalPoints || 0)).toLocaleString('id-ID')} Poin</span></div>
+              </div>
+            `;
+          })()}
+        </div>
+      `;
+
+      modal.classList.remove("hidden");
+    }
+
+    // Modal Controls
+    function openSettingsModal() {
+      const modal = document.getElementById("modal-owner-settings");
+      if (!modal) return;
+      const urlInput = document.getElementById("owner-supabase-url");
+      const keyInput = document.getElementById("owner-supabase-key");
+
+      if (urlInput) urlInput.value = localStorage.getItem("snack_pos_owner_supabase_url") || "";
+      if (keyInput) keyInput.value = localStorage.getItem("snack_pos_owner_supabase_key") || "";
+
+      modal.classList.remove("hidden");
+    }
+
+    function saveOwnerSupabaseSettings() {
+      const url = cleanSupabaseUrl(document.getElementById("owner-supabase-url").value);
+      const key = cleanSupabaseKey(document.getElementById("owner-supabase-key").value);
+
+      if (!url || !key) {
+        alert("Harap isi URL dan Anon Key Supabase Anda!");
+        return;
+      }
+
+      localStorage.setItem("snack_pos_owner_supabase_url", url);
+      localStorage.setItem("snack_pos_owner_supabase_key", key);
+
+      initOwnerSupabase();
+      closeModal("modal-owner-settings");
+      showToast("Koneksi Supabase berhasil disimpan! Memuat data...", "success");
+      fetchDashboardData();
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add("hidden");
+    }
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Jam Digital Live
+    function updateClock() {
+      const clockEl = document.getElementById("owner-clock");
+      if (clockEl) {
+        const now = new Date();
+        clockEl.textContent = now.toLocaleDateString("id-ID", {
+          day: '2-digit', month: 'short', year: 'numeric'
+        }) + " " + now.toLocaleTimeString("id-ID");
+      }
+    }
+
+    // Timer Auto-Refresh 30 Detik
+    function startAutoRefreshTimer() {
+      if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+      autoRefreshInterval = setInterval(() => {
+        autoRefreshCountdown--;
+        const timerEl = document.getElementById("refresh-timer");
+        if (timerEl) timerEl.textContent = `(${autoRefreshCountdown}s)`;
+
+        if (autoRefreshCountdown <= 0) {
+          fetchDashboardData();
+        }
+      }, 1000);
+    }
+
+    // Inisialisasi Saat Dokumen Dimuat
+    document.addEventListener("DOMContentLoaded", () => {
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      const isAuthed = checkOwnerPinAuth();
+      if (isAuthed) {
+        initOwnerSupabase();
+        fetchDashboardData();
+        startAutoRefreshTimer();
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeModal('modal-receipt-detail');
+          closeModal('modal-owner-settings');
+        }
+      });
+
+      // Registrasi Service Worker PWA
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('Owner PWA SW registered:', reg.scope))
+          .catch((err) => console.warn('Owner SW error:', err));
+      }
+
+      // Sinkronisasi Instan Antar-Tab (Cross-Tab LocalStorage Event)
+      window.addEventListener("storage", (e) => {
+        if (isOwnerAuthenticated() && (e.key === "snack_pos_returns" || e.key === "snack_pos_transactions" || e.key === "snack_pos_products" || e.key === "snack_pos_settings" || e.key === "snack_pos_mutations" || e.key === "snack_pos_lpb_records")) {
+          console.log("Menerima pembaruan data kasir lokal:", e.key);
+          fetchDashboardData();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+

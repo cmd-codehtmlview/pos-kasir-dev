@@ -1,0 +1,995 @@
+/* =========================================================
+   SnackPOS - Edisi Kasir Retail Minimarket Modern
+   ========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --pos-red: #d61823;
+  --pos-red-dark: #b91c1c;
+  --pos-yellow: #ffcc00;
+  --pos-blue: #0055a5;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+html, body {
+  font-family: var(--font-sans);
+  background-color: #f1f5f9;
+  color: #0f172a;
+  overscroll-behavior-y: contain !important;
+  overscroll-behavior-x: none !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #e2e8f0;
+}
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Header Khas Kasir Retail */
+.pos-header, .alfa-header {
+  background: linear-gradient(135deg, #d61823 0%, #b91c1c 100%);
+  color: #ffffff;
+  border-bottom: 3px solid #ffcc00;
+}
+
+/* Kotak Layar LED Total Digital Kasir */
+.pos-led-display {
+  background: #090d16;
+  border: 2px solid #1e293b;
+  border-radius: 1rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0,0,0,0.15);
+  font-family: var(--font-mono);
+}
+
+.pos-led-label {
+  color: #fbbf24;
+  letter-spacing: 0.1em;
+}
+
+.pos-led-total {
+  color: #4ade80;
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+}
+
+.pos-led-change {
+  color: #38bdf8;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+}
+
+/* Tabel Scan Kasir Kontras Tinggi */
+.pos-table-header {
+  background-color: #0055a5;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pos-table-row {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.15s ease;
+}
+
+.pos-table-row:hover {
+  background-color: #f8fafc;
+}
+
+/* Sorot Baris Barang yang Baru Saja Discan */
+.active-scan-row {
+  background-color: #fef3c7 !important;
+  border-left: 4px solid #d61823 !important;
+  animation: scanHighlight 1s ease-out;
+}
+
+@keyframes scanHighlight {
+  0% { background-color: #fde047; }
+  100% { background-color: #fef3c7; }
+}
+
+/* Tombol Fungsi Keyboard Kasir (F1 - F10) */
+.f-key-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 0.7rem;
+  color: #ffffff;
+  transition: all 0.15s ease;
+  user-select: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  min-width: 65px;
+}
+
+.f-key-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.f-key-btn:active {
+  transform: translateY(1px);
+}
+
+.f-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 900;
+  background: rgba(0,0,0,0.3);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+  margin-bottom: 0.15rem;
+  line-height: 1;
+}
+
+/* Warna Khas Tombol Kasir */
+.btn-f-red { background-color: #d61823; }
+.btn-f-blue { background-color: #0055a5; }
+.btn-f-amber { background-color: #d97706; }
+.btn-f-green { background-color: #16a34a; }
+.btn-f-purple { background-color: #7c3aed; }
+.btn-f-slate { background-color: #475569; }
+
+/* Status Indikator Cloud Supabase */
+.cloud-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.cloud-online {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.cloud-offline {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.cloud-syncing {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde047;
+}
+
+/* Struk Thermal Kertas Kasir */
+.thermal-receipt {
+  font-family: var(--font-mono);
+  background: #ffffff;
+  color: #000000;
+  padding: 1.25rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  border-radius: 0.5rem;
+  margin: 0 auto;
+}
+
+.thermal-receipt.width-58 {
+  max-width: 320px;
+  width: 100%;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.thermal-receipt.width-80 {
+  max-width: 420px;
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.receipt-dashed-line {
+  border-top: 1px dashed #475569;
+  margin: 0.5rem 0;
+}
+
+.receipt-double-line {
+  border-top: 2px dashed #0f172a;
+  margin: 0.5rem 0;
+}
+
+/* =========================================================
+   PENGATURAN CETAK STRUK THERMAL & EXPORT PDF (58mm / 80mm)
+   Memastikan hasil cetak fisik & simpan PDF presisi sama dengan pratinjau layar
+   ========================================================= */
+@media print {
+  @page {
+    /* Hilangkan header & footer bawaan browser (URL, tanggal, nomor halaman) */
+    margin: 0;
+    size: auto;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    display: block !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* Sembunyikan seluruh UI selain printable-receipt-container agar tidak ada halaman kosong */
+  body > *:not(#printable-receipt-container) {
+    display: none !important;
+  }
+
+  /* Container Struk Kasir Khusus Print & PDF */
+  #printable-receipt-container,
+  #printable-receipt-container.hidden {
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+    margin: 0 auto !important;
+    padding: 3mm 2mm !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printable-receipt-container * {
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Format Kertas 58mm (Standar Thermal POS Kasir) */
+  .thermal-receipt,
+  .thermal-receipt.width-58,
+  #printable-receipt-container.width-58,
+  #printable-receipt-container.thermal-receipt {
+    width: 58mm !important;
+    max-width: 58mm !important;
+    margin: 0 auto !important;
+    padding: 2.5mm 3mm !important;
+    font-family: 'Courier New', Courier, monospace, var(--font-mono) !important;
+    font-size: 10.5px !important;
+    line-height: 1.35 !important;
+    color: #000000 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    box-sizing: border-box !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* Format Kertas 80mm (Printer Thermal Lebar) */
+  .thermal-receipt.width-80,
+  #printable-receipt-container.width-80 {
+    width: 80mm !important;
+    max-width: 80mm !important;
+    margin: 0 auto !important;
+    padding: 3.5mm 4mm !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Garis putus-putus pembatas struk hitam pekat & tajam */
+  #printable-receipt-container .receipt-dashed-line {
+    border-top: 1px dashed #000000 !important;
+    margin: 0.35rem 0 !important;
+  }
+
+  #printable-receipt-container .receipt-double-line {
+    border-top: 2px dashed #000000 !important;
+    margin: 0.35rem 0 !important;
+  }
+
+  /* Teks abu-abu dibuat kontras tinggi agar tidak pudar di thermal paper atau PDF */
+  #printable-receipt-container .text-slate-400,
+  #printable-receipt-container .text-slate-500,
+  #printable-receipt-container .text-slate-600,
+  #printable-receipt-container .text-slate-700 {
+    color: #000000 !important;
+  }
+
+  /* Pertahankan warna latar badge (Klerk, Retur) */
+  #printable-receipt-container .bg-slate-900,
+  #printable-receipt-container .bg-slate-800,
+  #printable-receipt-container .bg-black {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printable-receipt-container .bg-slate-100,
+  #printable-receipt-container .bg-slate-200 {
+    background-color: #f1f5f9 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* =========================================================
+     PENGATURAN CETAK LABEL RAK & STIKER KEMASAN
+     ========================================================= */
+  #printable-receipt-container.print-label-mode {
+    padding: 0 !important;
+    margin: 0 auto !important;
+    width: auto !important;
+    max-width: 100% !important;
+    background: #ffffff !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
+  .print-label-item {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  /* FORMAT 1: THERMAL ROLL 58MM */
+  #printable-receipt-container.print-label-mode.print-format-thermal-58 {
+    width: 58mm !important;
+    max-width: 58mm !important;
+  }
+  .print-format-thermal-58 .print-label-item {
+    margin: 1.2mm auto !important;
+    width: 58mm !important;
+  }
+  .print-format-thermal-58 .thermal-shelf-tag {
+    width: 54mm !important;
+    height: 36mm !important;
+    padding: 0.8mm 1.2mm !important;
+  }
+  .print-format-thermal-58 .shelf-tag-price-huge {
+    font-size: 22pt !important;
+  }
+  .print-format-thermal-58 .shelf-barcode-svg {
+    width: 100% !important;
+    height: 11mm !important;
+  }
+  .print-format-thermal-58 .thermal-snack-sticker {
+    width: 52mm !important;
+    height: 28mm !important;
+    padding: 1mm 1.5mm !important;
+  }
+
+  /* FORMAT 2: THERMAL ROLL 80MM */
+  #printable-receipt-container.print-label-mode.print-format-thermal-80 {
+    width: 80mm !important;
+    max-width: 80mm !important;
+  }
+  .print-format-thermal-80 .print-label-item {
+    margin: 2mm auto !important;
+    width: 80mm !important;
+  }
+  .print-format-thermal-80 .thermal-shelf-tag {
+    width: 74mm !important;
+    height: 42mm !important;
+    padding: 1.5mm 2mm !important;
+  }
+  .print-format-thermal-80 .shelf-tag-title {
+    font-size: 11pt !important;
+  }
+  .print-format-thermal-80 .shelf-tag-price-huge {
+    font-size: 30pt !important;
+  }
+  .print-format-thermal-80 .shelf-barcode-svg {
+    height: 15mm !important;
+  }
+  .print-format-thermal-80 .thermal-snack-sticker {
+    width: 72mm !important;
+    height: 38mm !important;
+    padding: 1.5mm 2mm !important;
+  }
+  .print-format-thermal-80 .snack-sticker-name {
+    font-size: 9.5pt !important;
+  }
+  .print-format-thermal-80 .snack-sticker-barcode-svg {
+    width: 50mm !important;
+    height: 12mm !important;
+  }
+
+  /* FORMAT 3: STIKER ROLL DIE-CUT 50X30MM */
+  #printable-receipt-container.print-label-mode.print-format-sticker-50x30 {
+    width: 50mm !important;
+    max-width: 50mm !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+  }
+  .print-format-sticker-50x30 .print-label-item {
+    page-break-after: always !important;
+    break-after: page !important;
+    width: 50mm !important;
+    height: 30mm !important;
+    max-height: 30mm !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .print-format-sticker-50x30 .thermal-shelf-tag {
+    width: 48mm !important;
+    height: 28mm !important;
+    padding: 0.6mm 1mm !important;
+    border-width: 1.5px !important;
+  }
+  .print-format-sticker-50x30 .shelf-tag-header {
+    font-size: 5.5pt !important;
+    margin-bottom: 0.3mm !important;
+    padding-bottom: 0.2mm !important;
+  }
+  .print-format-sticker-50x30 .shelf-tag-title {
+    font-size: 7.5pt !important;
+    margin-bottom: 0.3mm !important;
+  }
+  .print-format-sticker-50x30 .shelf-barcode-svg {
+    height: 9mm !important;
+  }
+  .print-format-sticker-50x30 .shelf-barcode-text {
+    font-size: 5.5pt !important;
+  }
+  .print-format-sticker-50x30 .shelf-tag-price-huge {
+    font-size: 19pt !important;
+  }
+  .print-format-sticker-50x30 .thermal-snack-sticker {
+    width: 48mm !important;
+    height: 28mm !important;
+    padding: 0.8mm 1.2mm !important;
+    border-width: 1.2px !important;
+  }
+  .print-format-sticker-50x30 .snack-sticker-name {
+    font-size: 7.5pt !important;
+  }
+  .print-format-sticker-50x30 .snack-sticker-barcode-svg {
+    width: 34mm !important;
+    height: 8mm !important;
+  }
+
+  /* FORMAT 4: KERTAS A4 / HVS GRID (3 KOLOM X 8 BARIS) */
+  #printable-receipt-container.print-label-mode.print-format-a4-grid {
+    width: 210mm !important;
+    max-width: 210mm !important;
+    padding: 6mm 5mm !important;
+    box-sizing: border-box !important;
+  }
+  .print-format-a4-grid .labels-grid-container {
+    display: grid !important;
+    grid-template-columns: repeat(3, 63mm) !important;
+    justify-content: space-between !important;
+    gap: 3mm 2mm !important;
+    width: 100% !important;
+  }
+  .print-format-a4-grid .print-label-item {
+    width: 63mm !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .print-format-a4-grid .thermal-shelf-tag {
+    width: 63mm !important;
+    max-width: 63mm !important;
+    height: 35mm !important;
+    padding: 0.8mm 1.2mm !important;
+  }
+  .print-format-a4-grid .thermal-snack-sticker {
+    width: 63mm !important;
+    max-width: 63mm !important;
+    height: 32mm !important;
+    padding: 1mm 1.5mm !important;
+  }
+}
+
+/* =========================================================
+   STIKER BARCODE & PRICE TAG RAK MINIMARKET
+   ========================================================= */
+
+/* Mode 1: Label Rak Kompak Standar Minimarket Termaksimalkan (Lebar 6,8 cm x Tinggi 3,8 cm) */
+.thermal-shelf-tag {
+  background: #ffffff;
+  color: #000000;
+  width: 68mm;
+  height: 38mm;
+  box-sizing: border-box;
+  border: 2.5px solid #000000;
+  border-radius: 3px;
+  padding: 1.2mm 2mm;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0 auto;
+}
+
+.shelf-tag-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #000000;
+  padding-bottom: 0.4mm;
+  margin-bottom: 0.6mm;
+  font-size: 6.5pt;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.shelf-tag-title {
+  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+  font-size: 9.5pt;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.1;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.6mm;
+}
+
+.shelf-tag-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  gap: 1.5mm;
+  margin: 0.4mm 0;
+}
+
+.shelf-barcode-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 48%;
+}
+
+.shelf-barcode-svg {
+  width: 100%;
+  height: 13.5mm;
+  display: block;
+}
+
+.shelf-barcode-text {
+  font-family: monospace;
+  font-size: 6.5pt;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-align: center;
+  margin-top: 0.4mm;
+  line-height: 1;
+}
+
+.shelf-price-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  width: 52%;
+}
+
+.shelf-tag-price-huge {
+  font-family: 'Bebas Neue', 'Anton', 'Arial Black', Impact, sans-serif;
+  font-size: 26pt;
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.5px;
+  text-align: right;
+  display: block;
+}
+
+.shelf-tag-price-prefix {
+  font-size: 7.5pt;
+  font-weight: 800;
+  color: #000000;
+}
+
+.shelf-wholesale-banner {
+  background: #000000;
+  color: #ffffff;
+  border-radius: 2px;
+  padding: 0.7mm 1.5mm;
+  font-size: 6pt;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5mm;
+  line-height: 1;
+}
+
+/* Mode 2: Stiker Barcode Kemasan Snack (Lebar 5,0 cm x Tinggi 2,8 cm) */
+.thermal-snack-sticker {
+  background: #ffffff;
+  color: #000000;
+  width: 50mm;
+  height: 28mm;
+  box-sizing: border-box;
+  border: 1.5px dashed #000000;
+  border-radius: 4px;
+  padding: 1.5mm 2mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0 auto;
+}
+
+.snack-sticker-name {
+  font-size: 7.5pt;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.1;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.snack-sticker-netto {
+  font-size: 6pt;
+  font-weight: 700;
+  color: #222222;
+  margin-top: 0.5mm;
+  line-height: 1;
+}
+
+.snack-sticker-barcode-svg {
+  width: 36mm;
+  height: 8.5mm;
+  display: block;
+}
+
+.snack-sticker-barcode-text {
+  font-family: monospace;
+  font-size: 6.5pt;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-align: center;
+  margin-top: 0.5mm;
+  line-height: 1;
+}
+
+/* Garis Sobek / Potong untuk Continuous Roll */
+.label-tear-line {
+  width: 100%;
+  border-bottom: 1.5px dashed #94a3b8;
+  margin: 2.5mm 0;
+  text-align: center;
+  font-size: 6.5pt;
+  color: #64748b;
+  position: relative;
+}
+.label-tear-line span {
+  background: #ffffff;
+  padding: 0 4px;
+  position: relative;
+  top: 5px;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+/* =========================================================
+   PONDASI BAKU MODAL / POP-UP KASIR (KEBAL CDN & RESILIENT)
+   Memastikan seluruh jendela pop-up selalu tampil penuh,
+   berada di tengah layar, dan tidak pernah menciut 0x0.
+   ========================================================= */
+.modal-backdrop {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(15, 23, 42, 0.75) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  z-index: 80 !important;
+  box-sizing: border-box !important;
+}
+
+.modal-backdrop.hidden {
+  display: none !important;
+}
+
+/* Kotak Dialog Pop-up di Dalam Modal */
+.modal-backdrop > div {
+  max-height: 92vh !important;
+  border-radius: 1.5rem !important;
+  overflow: hidden !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4) !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Penyesuaian Responsif HP agar tidak terpotong & tidak tertutup footer */
+@media (max-width: 640px) {
+  .modal-backdrop {
+    padding: 0.5rem !important;
+  }
+  .modal-backdrop > div {
+    max-height: 95vh !important;
+    border-radius: 1.25rem !important;
+  }
+  /* Saat modal terbuka di HP, sembunyikan navigasi bawah agar tombol aksi modal tidak tertutup */
+  body.modal-open nav.md\:hidden {
+    display: none !important;
+  }
+}
+
+/* Modal Prioritas Khusus (Otorisasi & Login) */
+.modal-backdrop.modal-high-priority {
+  z-index: 9999 !important;
+}
+
+/* =========================================================
+   PENGATURAN RUANG SCROLL KONTEN TAB AGAR TIDAK TERTUTUP BAR FUNGSI
+   ========================================================= */
+#tab-pos,
+#tab-inventory,
+#tab-reports,
+#tab-settings {
+  padding-bottom: 9rem !important;
+}
+
+/* =========================================================
+   PENGATURAN TAMPILAN RESPONSIVE MOBILE / SMARTPHONE (HP)
+   ========================================================= */
+@media (max-width: 768px) {
+  /* Hilangkan horizontal overflow berlebih */
+  html, body {
+    overflow-x: hidden;
+    touch-action: manipulation;
+  }
+
+  /* Padding bawah untuk memberi ruang navigasi mobile & tombol */
+  main {
+    padding-bottom: 7.5rem !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  #tab-pos,
+  #tab-inventory,
+  #tab-reports,
+  #tab-settings {
+    padding-bottom: 7.5rem !important;
+  }
+
+  /* Display LED lebih proporsional di layar kecil */
+  .pos-led-display {
+    padding: 0.75rem !important;
+    border-radius: 0.875rem !important;
+  }
+
+  .pos-led-total {
+    font-size: 1.65rem !important;
+  }
+
+  /* Optimasi tabel keranjang di layar HP */
+  .pos-table-row td {
+    padding: 0.5rem 0.35rem !important;
+  }
+
+  /* Tombol stepper Qty yang nyaman ditekan jempol */
+  .qty-btn-touch {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  /* Modal fullscreen atau bottom sheet yang nyaman di HP */
+  .modal-backdrop > div {
+    max-height: 94vh !important;
+    border-radius: 1.25rem !important;
+    margin: 0.5rem !important;
+  }
+
+  /* Navigasi bawah HP */
+  .mobile-nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.25rem;
+    border-radius: 0.5rem;
+    transition: all 0.15s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-nav-btn:active {
+    transform: scale(0.95);
+  }
+}
+
+.snack-sticker-footer {
+  font-size: 5.5pt;
+  font-weight: 700;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border-top: 1px dotted #cbd5e1;
+  padding-top: 0.4mm;
+  margin-top: 0.3mm;
+  line-height: 1;
+}
+
+/* =========================================================
+   BLUETOOTH HARDWARE STATUS BADGE (NAVBAR HEADER)
+   ========================================================= */
+.bt-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 9999px;
+  font-family: var(--font-mono, monospace);
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+.bt-status-badge .bt-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+
+.bt-status-badge.bt-disconnected {
+  background: rgba(15, 23, 42, 0.65);
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.bt-status-badge.bt-disconnected:hover {
+  background: rgba(30, 41, 59, 0.85);
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.bt-status-badge.bt-disconnected .bt-dot {
+  background: #64748b;
+}
+
+.bt-status-badge.bt-standby {
+  background: rgba(234, 179, 8, 0.2);
+  color: #fef08a;
+  border-color: rgba(250, 204, 21, 0.45);
+}
+.bt-status-badge.bt-standby:hover {
+  background: rgba(234, 179, 8, 0.35);
+  border-color: rgba(250, 204, 21, 0.8);
+}
+.bt-status-badge.bt-standby .bt-dot {
+  background: #eab308;
+  box-shadow: 0 0 7px rgba(234, 179, 8, 0.85);
+  animation: bt-pulse-yellow 1.2s infinite alternate;
+}
+
+.bt-status-badge.bt-connecting {
+  background: rgba(202, 138, 4, 0.3);
+  color: #fef08a;
+  border-color: rgba(250, 204, 21, 0.45);
+}
+.bt-status-badge.bt-connecting .bt-dot {
+  background: #facc15;
+  box-shadow: 0 0 6px rgba(250, 204, 21, 0.8);
+  animation: bt-pulse-yellow 0.8s infinite alternate;
+}
+
+.bt-status-badge.bt-ready {
+  background: rgba(16, 185, 129, 0.25);
+  color: #a7f3d0;
+  border-color: rgba(52, 211, 153, 0.45);
+}
+.bt-status-badge.bt-ready:hover {
+  background: rgba(16, 185, 129, 0.35);
+}
+.bt-status-badge.bt-ready .bt-dot {
+  background: #10b981;
+  box-shadow: 0 0 7px rgba(16, 185, 129, 0.85);
+}
+
+.bt-status-badge.bt-busy {
+  background: rgba(37, 99, 235, 0.35);
+  color: #bfdbfe;
+  border-color: rgba(96, 165, 250, 0.55);
+}
+.bt-status-badge.bt-busy .bt-dot {
+  background: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.9);
+  animation: bt-pulse-blue 0.65s infinite alternate;
+}
+
+@keyframes bt-pulse-yellow {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(1.25); opacity: 1; }
+}
+
+@keyframes bt-pulse-blue {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+/* =========================================================
+   FLOATING PRINT SPOOLER PROGRESS WIDGET
+   ========================================================= */
+#print-spooler-widget {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 9999 !important;
+}
+
+#print-spooler-widget.active {
+  transform: translate(-50%, 0) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+#print-spooler-widget.closing {
+  transform: translate(-50%, -15px) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+@media (min-width: 640px) {
+  #print-spooler-widget.closing {
+    transform: translate(-50%, 15px) !important;
+  }
+}

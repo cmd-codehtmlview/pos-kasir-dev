@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="theme-color" content="#090e17" />
+  <title>Aktivasi & Pembayaran Lisensi - SnackPOS Retail</title>
+  
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Supabase JS Client for Instant Sync -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // Pastikan halaman checkout selalu fresh dan service worker tidak membajak dengan cache usang
+    (function() {
+      const ORDER_BUILD_KEY = 'snackpos_order_v60';
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          for (let r of regs) {
+            r.unregister();
+          }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => {
+            caches.open(name).then(c => {
+              c.delete('/order');
+              c.delete('/order.html');
+              c.delete('./order.html');
+              c.delete(window.location.pathname);
+            });
+          });
+        });
+      }
+      // Jika versi cache lokal belum diperbarui, redirect sekali dengan query param waktu
+      if (localStorage.getItem(ORDER_BUILD_KEY) !== 'yes') {
+        localStorage.setItem(ORDER_BUILD_KEY, 'yes');
+        if (!window.location.search.includes('v=')) {
+          window.location.replace(window.location.pathname + '?v=' + Date.now());
+        }
+      }
+    })();
+
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { background-color: #090e17; color: #f1f5f9; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- ================= TOP HEADER ================= -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-lg sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-red-600 flex items-center justify-center text-base sm:text-lg shadow-md shadow-rose-900/30">
+          ⚡
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-xs sm:text-base font-black tracking-tight text-white">SnackPOS Checkout</h1>
+            <span class="px-2 py-0.5 text-[8px] sm:text-[9px] font-black uppercase rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Aktivasi Instan</span>
+          </div>
+          <p class="text-[10px] sm:text-[11px] text-slate-400">Pembayaran Resmi Lisensi Kasir Toko</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="forceRefreshOrderPage()" title="Segarkan halaman jika data belum update"
+          class="px-2 sm:px-2.5 py-1.5 text-[10px] sm:text-xs font-bold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 rounded-lg border border-amber-500/30 transition flex items-center gap-1 cursor-pointer">
+          <span>🔄</span> <span class="hidden xs:inline">Segarkan</span>
+        </button>
+        <a href="index.html" class="px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700/60 transition flex items-center gap-1">
+          <span>🏪</span> <span class="hidden xs:inline">Buka</span> Kasir
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-5 sm:space-y-6">
+
+    <!-- STEPPER INDICATOR (OPTIMAL UNTUK HP & TABLET) -->
+    <div class="flex items-center justify-center gap-1.5 sm:gap-4 max-w-md mx-auto text-[11px] sm:text-xs font-bold px-2">
+      <div id="step-indicator-1" class="flex items-center gap-1 text-emerald-400 shrink-0">
+        <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center text-[10px] sm:text-[11px] font-black">1</span>
+        <span>Pilih Paket</span>
+      </div>
+      <span class="text-slate-700 text-[10px]">───</span>
+      <div id="step-indicator-2" class="flex items-center gap-1 text-slate-500 shrink-0">
+        <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] sm:text-[11px] font-black">2</span>
+        <span>Data Toko</span>
+      </div>
+      <span class="text-slate-700 text-[10px]">───</span>
+      <div id="step-indicator-3" class="flex items-center gap-1 text-slate-500 shrink-0">
+        <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] sm:text-[11px] font-black">3</span>
+        <span>Bayar</span>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 1: PILIH PAKET & DATA TOKO ================= -->
+    <section id="view-order-form" class="space-y-6">
+      
+      <!-- HERO BANNER -->
+      <div class="text-center space-y-1.5 max-w-xl mx-auto">
+        <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Tingkatkan Operasional Toko Anda</h2>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Pilih paket lisensi kasir retail terbaik untuk bisnis Anda. Setelah pembayaran diverifikasi, akun email toko Anda langsung aktif otomatis.
+        </p>
+      </div>
+
+      <!-- KARTU PILIHAN PAKET -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- PAKET 1: LIFETIME POS OFFLINE -->
+        <div id="card-plan-paket1" onclick="selectPlan('PAKET_1')" 
+          class="relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-emerald-500 shadow-lg shadow-emerald-950/30 flex flex-col justify-between">
+          <div class="absolute -top-3 right-4 px-3 py-0.5 bg-emerald-500 text-slate-950 font-black text-[10px] uppercase tracking-wider rounded-full shadow-md">
+            💎 SEKALI BAYAR
+          </div>
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">💎</span>
+              <div>
+                <h3 class="font-black text-white text-base">Paket 1: Beli Putus POS Offline</h3>
+                <span class="text-[11px] text-emerald-400 font-semibold">Bayar 1 Kali, Kasir Aktif Selamanya</span>
+              </div>
+            </div>
+
+            <div class="py-2 border-y border-slate-800">
+              <div class="flex items-baseline gap-1.5">
+                <span class="text-2xl sm:text-3xl font-black text-white font-mono" id="display-price-p1">Rp 99.000</span>
+                <span class="text-xs text-slate-400 font-semibold">/ selamanya</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Cocok untuk toko yang ingin kasir mandiri offline tanpa beban biaya bulanan.</p>
+            </div>
+
+            <ul class="space-y-1.5 text-xs text-slate-300">
+              <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <strong>Unlimited SKU</strong> Produk & Transaksi Harian</li>
+              <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <strong>100% Offline-First</strong> (Jualan tanpa internet)</li>
+              <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Cetak Struk Bluetooth & Scanner Barcode</li>
+              <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Laporan Grafik Profit & Ekspor Excel di Kasir</li>
+            </ul>
+
+            <!-- Add-on Cloud Option for Paket 1 -->
+            <div class="pt-3 border-t border-slate-800 space-y-2" onclick="event.stopPropagation()">
+              <label class="flex items-center justify-between text-xs font-bold text-amber-400 cursor-pointer">
+                <span class="flex items-center gap-1.5">
+                  <input type="checkbox" id="check-addon-cloud" onchange="toggleAddonCloud()" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 bg-slate-950 border-slate-700" />
+                  <span>+ Tambah Akses Cloud Dashboard HP</span>
+                </span>
+                <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">Opsional</span>
+              </label>
+
+              <!-- Kartu Pilihan Durasi Addon Cloud (Langsung Terlihat) -->
+              <div id="div-addon-duration" class="hidden space-y-1.5 pt-1">
+                <div class="text-[10px] uppercase font-bold text-slate-400">Pilih Durasi Cloud HP:</div>
+                <div class="grid grid-cols-2 gap-2">
+                  <button type="button" id="btn-addon-1m" onclick="chooseAddonDuration('1m')" class="p-2 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-amber-500/50 text-left transition-all">
+                    <div class="text-[10px] text-slate-400 font-semibold">1 Bulan</div>
+                    <div class="text-xs font-black text-amber-300 font-mono" id="label-addon-1m">+Rp 25.000</div>
+                  </button>
+                  <button type="button" id="btn-addon-3m" onclick="chooseAddonDuration('3m')" class="p-2 rounded-xl border border-amber-500 bg-amber-500/10 text-left transition-all">
+                    <div class="flex items-center justify-between">
+                      <span class="text-[10px] text-amber-300 font-semibold">3 Bulan</span>
+                      <span class="text-[8px] bg-amber-500 text-slate-950 font-black px-1 rounded">FAVORIT</span>
+                    </div>
+                    <div class="text-xs font-black text-amber-300 font-mono" id="label-addon-3m">+Rp 65.000</div>
+                  </button>
+                  <button type="button" id="btn-addon-6m" onclick="chooseAddonDuration('6m')" class="p-2 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-amber-500/50 text-left transition-all">
+                    <div class="text-[10px] text-slate-400 font-semibold">6 Bulan</div>
+                    <div class="text-xs font-black text-amber-300 font-mono" id="label-addon-6m">+Rp 120.000</div>
+                  </button>
+                  <button type="button" id="btn-addon-1y" onclick="chooseAddonDuration('1y')" class="p-2 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-amber-500/50 text-left transition-all">
+                    <div class="text-[10px] text-slate-400 font-semibold">1 Tahun</div>
+                    <div class="text-xs font-black text-amber-300 font-mono" id="label-addon-1y">+Rp 200.000</div>
+                  </button>
+                </div>
+                <select id="select-addon-cloud-duration" class="hidden">
+                  <option value="1m">1m</option>
+                  <option value="3m" selected>3m</option>
+                  <option value="6m">6m</option>
+                  <option value="1y">1y</option>
+                </select>
+                <p class="text-[10px] text-slate-500">Pantau omzet toko secara live kapan saja dari smartphone pemilik.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="pt-4">
+            <div id="radio-p1-indicator" class="w-full py-2 rounded-xl text-xs font-black text-center bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+              ✓ PAKET INI TERPILIH
+            </div>
+          </div>
+        </div>
+
+        <!-- PAKET 2: FULL SAAS ALL-IN -->
+        <div id="card-plan-paket2" onclick="selectPlan('PAKET_2')" 
+          class="relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-slate-800 hover:border-slate-700 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🔄</span>
+              <div>
+                <h3 class="font-black text-white text-base">Paket 2: Full SaaS Langganan</h3>
+                <span class="text-[11px] text-blue-400 font-semibold">POS Kasir Lengkap + Cloud Dashboard HP</span>
+              </div>
+            </div>
+
+            <!-- Kartu Pilihan Durasi Langganan SaaS Terbuka (Langsung Tampil Semua) -->
+            <div class="py-2 border-y border-slate-800 space-y-2" onclick="event.stopPropagation()">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-slate-400">Pilih Durasi Paket:</span>
+                <span class="text-[10px] text-blue-400 font-mono font-bold" id="display-duration-summary">Aktif: 1 Bulan</span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <!-- Durasi 1 Bulan -->
+                <div id="card-saas-1m" onclick="chooseSaasDuration('1m')" class="p-3 rounded-2xl border-2 border-blue-500 bg-blue-500/10 cursor-pointer transition-all hover:border-blue-400">
+                  <div class="text-[10px] font-bold text-slate-300">1 Bulan</div>
+                  <div class="text-sm font-black text-white font-mono mt-0.5" id="label-saas-1m">Rp 30.000</div>
+                  <div class="text-[9px] text-slate-400 mt-0.5">Fleksibel bulanan</div>
+                </div>
+
+                <!-- Durasi 3 Bulan -->
+                <div id="card-saas-3m" onclick="chooseSaasDuration('3m')" class="p-3 rounded-2xl border border-slate-800 bg-slate-950/80 cursor-pointer transition-all hover:border-blue-500/50">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-slate-300">3 Bulan</span>
+                    <span class="text-[8px] bg-blue-500 text-white font-black px-1.5 py-0.5 rounded">HEMAT</span>
+                  </div>
+                  <div class="text-sm font-black text-white font-mono mt-0.5" id="label-saas-3m">Rp 85.000</div>
+                  <div class="text-[9px] text-slate-400 mt-0.5">Rekomendasi toko</div>
+                </div>
+
+                <!-- Durasi 6 Bulan -->
+                <div id="card-saas-6m" onclick="chooseSaasDuration('6m')" class="p-3 rounded-2xl border border-slate-800 bg-slate-950/80 cursor-pointer transition-all hover:border-blue-500/50">
+                  <div class="text-[10px] font-bold text-slate-300">6 Bulan</div>
+                  <div class="text-sm font-black text-white font-mono mt-0.5" id="label-saas-6m">Rp 160.000</div>
+                  <div class="text-[9px] text-slate-400 mt-0.5">Paket semester</div>
+                </div>
+
+                <!-- Durasi 1 Tahun -->
+                <div id="card-saas-1y" onclick="chooseSaasDuration('1y')" class="p-3 rounded-2xl border border-slate-800 bg-slate-950/80 cursor-pointer transition-all hover:border-blue-500/50">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-slate-300">1 Tahun</span>
+                    <span class="text-[8px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.5 rounded">TERBAIK</span>
+                  </div>
+                  <div class="text-sm font-black text-white font-mono mt-0.5" id="label-saas-1y">Rp 300.000</div>
+                  <div class="text-[9px] text-emerald-400 mt-0.5">Paling populer</div>
+                </div>
+              </div>
+
+              <!-- Select Hidden untuk Kompatibilitas Form -->
+              <select id="select-saas-duration" class="hidden">
+                <option value="1m" selected>1m</option>
+                <option value="3m">3m</option>
+                <option value="6m">6m</option>
+                <option value="1y">1y</option>
+              </select>
+              <span class="hidden" id="display-price-p2"></span>
+              <span class="hidden" id="display-duration-p2"></span>
+            </div>
+
+            <ul class="space-y-1.5 text-xs text-slate-300">
+              <li class="flex items-center gap-2"><span class="text-blue-400">✓</span> <strong>Semua Fitur Kasir Offline Lengkap</strong></li>
+              <li class="flex items-center gap-2"><span class="text-blue-400">✓</span> <strong>Dashboard Pemilik HP Aktif Otomatis</strong></li>
+              <li class="flex items-center gap-2"><span class="text-blue-400">✓</span> Pantau Grafik Omzet & Profit Real-time</li>
+              <li class="flex items-center gap-2"><span class="text-blue-400">✓</span> Backup Otomatis Database Toko ke Cloud</li>
+            </ul>
+          </div>
+
+          <div class="pt-4">
+            <div id="radio-p2-indicator" class="w-full py-2 rounded-xl text-xs font-black text-center bg-slate-800 text-slate-400 border border-slate-700">
+              Pilih Paket Ini
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FORM DATA TOKO PEMBELI -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-7 space-y-4 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <h3 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+            <span>📋</span> Formulir Data Merchant & Akun Kasir
+          </h3>
+          <!-- Checkbox Opsi Perpanjang Toko Lama -->
+          <label class="inline-flex items-center gap-2 cursor-pointer bg-slate-950 px-3 py-1.5 rounded-xl border border-indigo-500/30 hover:border-indigo-500/60 transition">
+            <input type="checkbox" id="order-is-renewal" onchange="toggleOrderRenewalMode()" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-700 focus:ring-0 cursor-pointer">
+            <span class="text-[11px] font-bold text-indigo-300">Saya ingin perpanjang toko yang sudah ada</span>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+              1. Nama Toko Anda *
+            </label>
+            <input type="text" id="order-store-name" required placeholder="Contoh: Toko Snack Berkah"
+              oninput="autoFillStoreId()"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl font-bold text-xs text-white focus:outline-none" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+              <span id="label-order-store-id">2. ID Toko (Store ID Tenant) *</span>
+              <button type="button" id="btn-regen-store-id" onclick="reGenOrderStoreId()" class="text-indigo-400 hover:text-indigo-300 font-normal text-[10px] cursor-pointer">🔄 Acak ID Baru</button>
+            </label>
+            <input type="text" id="order-store-id" required placeholder="STR-XXXX" readonly
+              class="w-full px-4 py-2.5 bg-slate-950 border border-indigo-500/40 rounded-xl font-mono font-bold text-xs text-indigo-300 uppercase focus:outline-none select-all" />
+            <p class="text-[10px] text-slate-500 mt-1" id="hint-order-store-id">Kode tenant unik toko kasir Anda (terbuat otomatis).</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+              3. Nomor WhatsApp Pemilik Toko *
+            </label>
+            <input type="tel" id="order-wa" required placeholder="Contoh: 081234567890"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl font-bold text-xs text-white focus:outline-none" />
+            <p class="text-[10px] text-slate-500 mt-1">Digunakan untuk kwitansi digital & pemulihan jika lupa PIN.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
+              4. Buat PIN Kasir (6 Digit Angka) *
+            </label>
+            <input type="password" id="order-pin" maxlength="6" required placeholder="• • • • • •"
+              class="w-full px-4 py-2.5 bg-slate-950 border border-amber-500/40 focus:border-amber-500 rounded-xl font-mono font-bold text-sm tracking-widest text-white focus:outline-none text-center" />
+            <p class="text-[10px] text-slate-500 mt-1">PIN 6 digit ini digunakan untuk masuk ke kasir toko Anda.</p>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+              5. Alamat Email Pemilik Toko (Opsional / Arsip Kwitansi)
+            </label>
+            <input type="email" id="order-email" placeholder="Contoh: tokoberkah@gmail.com (opsional)"
+              class="w-full px-4 py-2 bg-slate-950 border border-slate-800 focus:border-slate-700 rounded-xl font-semibold text-xs text-white focus:outline-none" />
+          </div>
+        </div>
+
+        <!-- RINGKASAN & TOMBOL LANJUT -->
+        <div class="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <span class="text-[11px] text-slate-400 uppercase font-bold block">Total Tagihan Pembayaran:</span>
+            <div class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono" id="order-summary-total">Rp 1.000.000</div>
+            <span class="text-[10px] text-slate-500" id="order-summary-desc">Paket 1: Beli Putus POS Offline</span>
+          </div>
+
+          <button onclick="handleProceedToPayment()" id="btn-proceed-pay"
+            class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.99] text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition cursor-pointer">
+            <span>⚡ LANJUT KE PEMBAYARAN &rarr;</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= VIEW 2: QRIS PAYMENT SCREEN ================= -->
+    <section id="view-payment-screen" class="hidden space-y-6 max-w-lg mx-auto animate-in fade-in zoom-in duration-300">
+      <div class="bg-slate-900/95 border-2 border-emerald-500/50 rounded-3xl p-6 text-center space-y-5 shadow-2xl relative overflow-hidden">
+        
+        <!-- HEADER PEMBAYARAN -->
+        <div class="space-y-1">
+          <span id="pay-badge-method" class="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-[10px] font-black uppercase tracking-wider">
+            📸 QRIS RESMI VENDOR
+          </span>
+          <h3 class="text-lg font-black text-white" id="pay-store-name-display">Toko Snack Berkah</h3>
+          <p class="text-xs text-slate-400" id="pay-subtitle-desc">Lakukan pembayaran dan kirim bukti transfer ke WhatsApp Vendor untuk aktivasi instan</p>
+        </div>
+
+        <!-- TOTAL HARGA -->
+        <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800">
+          <span class="text-[11px] font-bold text-slate-400 block uppercase">Total Nominal Pembayaran:</span>
+          <div class="flex items-center justify-center gap-2 mt-0.5">
+            <span class="text-3xl font-black text-emerald-400 font-mono" id="pay-amount-display">Rp 1.000.000</span>
+            <button type="button" onclick="copyPayAmount()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] font-bold cursor-pointer" title="Salin Nominal">📋 Salin</button>
+          </div>
+          <span class="text-[10px] text-slate-500 block mt-1" id="pay-order-ref">REF: SPOS-ORD-172635</span>
+        </div>
+
+        <!-- ================= CONTAINER 1: QRIS STATIS / DINAMIS ================= -->
+        <div id="container-pay-qris" class="space-y-3">
+          <div class="p-4 bg-white rounded-2xl max-w-[260px] mx-auto shadow-inner flex flex-col items-center justify-center">
+            <div id="qris-image-container" class="w-full flex items-center justify-center">
+              <img id="qris-img" src="" alt="QRIS Code" class="w-48 h-48 rounded-lg shadow-sm object-contain" />
+            </div>
+            <div class="mt-2 text-slate-900 font-bold text-[10px] tracking-wider text-center">
+              <span>BCA • Mandiri • BRI • BNI • GoPay • OVO • Dana • ShopeePay</span>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400">
+            Scan barcode QRIS di atas dengan aplikasi m-Banking atau e-Wallet apa saja, lalu kirimkan bukti bayar ke Vendor.
+          </p>
+        </div>
+
+        <!-- ================= CONTAINER 2: TRANSFER REKENING BANK ================= -->
+        <div id="container-pay-bank" class="hidden p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3 text-left">
+          <div class="text-center pb-2 border-b border-slate-800">
+            <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">Tujuan Transfer Bank</span>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Bank Tujuan:</span>
+              <span class="font-bold text-white uppercase font-mono" id="bank-name-display">BCA</span>
+            </div>
+            <div class="flex justify-between items-center bg-slate-900 p-2.5 rounded-xl border border-slate-800">
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase">Nomor Rekening:</span>
+                <span class="font-mono font-black text-sm text-emerald-400 tracking-wider" id="bank-acc-display">-</span>
+              </div>
+              <button type="button" onclick="copyBankAccount()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer">
+                Salin
+              </button>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Atas Nama:</span>
+              <span class="font-bold text-slate-200" id="bank-holder-display">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TOMBOL UTAMA: KIRIM BUKTI PEMBAYARAN KE WHATSAPP ================= -->
+        <div class="pt-2 space-y-2">
+          <button id="btn-send-wa-proof" onclick="sendProofToVendorWhatsApp()" 
+            class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition cursor-pointer hover:scale-[1.01]">
+            <span class="text-base">📲</span>
+            <span>KIRIM BUKTI PEMBAYARAN KE WHATSAPP VENDOR</span>
+          </button>
+          <p class="text-[10px] text-slate-400">
+            Klik tombol di atas untuk membuka WhatsApp Vendor dan mengirimkan foto bukti transfer agar akun toko segera diaktifkan.
+          </p>
+        </div>
+
+        <!-- TIMER COUNTDOWN & STATUS POLLING -->
+        <div class="space-y-2 pt-2 border-t border-slate-800/80">
+          <div class="flex items-center justify-center gap-2 text-xs font-bold text-amber-400">
+            <span>⏳ Waktu Menunggu:</span>
+            <span class="font-mono text-sm font-black px-2 py-0.5 bg-amber-500/20 rounded-md border border-amber-500/30" id="countdown-timer">14:59</span>
+          </div>
+          <div class="flex items-center justify-center gap-2 text-[11px] text-slate-400 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>Mengecek aktivasi lisensi otomatis...</span>
+          </div>
+        </div>
+
+        <!-- TOMBOL AKSI KEMBALI / BUKA SNAP -->
+        <div class="pt-2 space-y-2 text-center">
+          <button id="btn-open-snap-again" onclick="reopenMidtransSnap()" 
+            class="hidden w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <span>💳 BUKA KEMBALI POPUP MIDTRANS SNAP</span>
+          </button>
+          <button onclick="cancelPaymentAndBack()" class="text-xs text-slate-500 hover:text-slate-300 underline cursor-pointer">
+            &larr; Batalkan & Ganti Paket
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= VIEW 3: SUKSES AKTIVASI & KWITANSI ================= -->
+    <section id="view-success-screen" class="hidden space-y-6 max-w-lg mx-auto animate-in zoom-in duration-300">
+      <div class="bg-slate-900/95 border-2 border-emerald-500 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-2xl">
+        
+        <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/20">
+          🎉
+        </div>
+
+        <div class="space-y-1">
+          <h2 class="text-xl font-black text-white">Pembayaran Sukses!</h2>
+          <p class="text-xs text-emerald-400 font-semibold">Akun Kasir Toko Anda Telah Otomatis Aktif</p>
+        </div>
+
+        <!-- RINCIAN KWITANSI LUNAS -->
+        <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 text-left space-y-2.5 text-xs">
+          <div class="flex justify-between border-b border-slate-800/80 pb-2">
+            <span class="text-slate-400">Nama Toko:</span>
+            <span class="font-bold text-white" id="receipt-store-name">-</span>
+          </div>
+          <div class="flex justify-between border-b border-slate-800/80 pb-2">
+            <span class="text-slate-400">ID Toko (Store ID):</span>
+            <span class="font-mono font-black text-indigo-400" id="receipt-store-id">-</span>
+          </div>
+          <div class="flex justify-between border-b border-slate-800/80 pb-2">
+            <span class="text-slate-400">No. WhatsApp Pemilik:</span>
+            <span class="font-mono font-bold text-white" id="receipt-wa">-</span>
+          </div>
+          <div class="flex justify-between items-center border-b border-slate-800/80 pb-2 bg-emerald-500/10 -mx-4 px-4 py-2 rounded-xl">
+            <div>
+              <span class="text-emerald-400 font-bold block">PIN Kasir Anda:</span>
+              <span class="text-[10px] text-slate-400">Gunakan PIN ini untuk masuk ke kasir</span>
+            </div>
+            <span class="font-mono font-black text-emerald-300 text-lg tracking-widest" id="receipt-pin">------</span>
+          </div>
+          <div class="flex justify-between border-b border-slate-800/80 pb-2">
+            <span class="text-slate-400">Paket Lisensi:</span>
+            <span class="font-bold text-emerald-400" id="receipt-plan">-</span>
+          </div>
+          <div class="flex justify-between pt-1">
+            <span class="text-slate-400">Status Pembayaran:</span>
+            <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 font-black rounded text-[10px]">LUNAS</span>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="space-y-2.5 pt-2">
+          <a href="index.html" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition">
+            <span>🏪 BUKA POS KASIR & MASUK SEKARANG &rarr;</span>
+          </a>
+
+          <a id="btn-open-cloud-receipt" href="owner.html" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2">
+            <span>📊 BUKA DASHBOARD CLOUD DI HP</span>
+          </a>
+
+          <button onclick="shareReceiptWhatsApp()" class="w-full py-2.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center justify-center gap-1.5 cursor-pointer">
+            <span>💬 Salin / Kirim Bukti Pembayaran ke WhatsApp</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= LOGIC & SCRIPT ================= -->
+  <script>
+    // State
+    let currentSelectedPlan = "PAKET_1";
+    let customPricing = {
+      p1Lifetime: 99000,
+      cloud1m: 25000, cloud3m: 65000, cloud6m: 120000, cloud1y: 200000,
+      multiKasirPrice: 40000,
+      p2_1m: 30000, p2_3m: 85000, p2_6m: 160000, p2_1y: 300000
+    };
+    let currentOrderData = null;
+    let countdownInterval = null;
+    let pollingInterval = null;
+    let lastSnapToken = null;
+
+    // Helper untuk ambil harga live dari Supabase Cloud (Pusat Komando Resmi)
+    async function fetchCloudPricingFromSupabase() {
+      if (!window.supabase || !navigator.onLine) return null;
+      try {
+        const sbUrl = "https://zsjbiuwtjsnjxyvhwggz.supabase.co";
+        const sbKey = "sb_publishable_cO81g3R2IpzniHuackKd_A_7YYe2T39";
+        const client = window.supabase.createClient(sbUrl, sbKey);
+
+        // 1. Coba app_config (Primary)
+        try {
+          const { data } = await client.from('app_config').select('value').eq('key', 'pricing').maybeSingle();
+          if (data && data.value) return data.value;
+        } catch(e) {}
+
+        // 2. Fallback store_licenses (SYS_CONFIG_PRICING)
+        try {
+          const { data: sysRow } = await client.from('store_licenses').select('store_name').eq('store_id', 'SYS_CONFIG_PRICING').maybeSingle();
+          if (sysRow && sysRow.store_name) return JSON.parse(sysRow.store_name);
+        } catch(e) {}
+      } catch(e) {}
+      return null;
+    }
+
+    // Payment Configuration State (Tersinkronisasi dari Supabase Cloud app_config)
+    let paymentConfig = {
+      vendorWa: "6281234567890",
+      paymentMode: "QRIS_STATIC", // QRIS_STATIC | BANK_TRANSFER | MIDTRANS
+      qrisImageUrl: "",
+      bankName: "BCA",
+      bankAccount: "",
+      bankHolder: "",
+      midtransMode: "SANDBOX",
+      midtransClientKey: "",
+      midtransServerKey: ""
+    };
+
+    async function loadPaymentConfig() {
+      if (window.supabase && navigator.onLine) {
+        try {
+          const sbUrl = "https://zsjbiuwtjsnjxyvhwggz.supabase.co";
+          const sbKey = "sb_publishable_cO81g3R2IpzniHuackKd_A_7YYe2T39";
+          const client = window.supabase.createClient(sbUrl, sbKey);
+          const { data } = await client.from('app_config').select('value').eq('key', 'payment_config').maybeSingle();
+          if (data && data.value) {
+            Object.assign(paymentConfig, data.value);
+            localStorage.setItem("snackpos_gateway_config", JSON.stringify(paymentConfig));
+            return paymentConfig;
+          }
+        } catch (e) {
+          console.warn("[Order] Gagal memuat payment_config dari Supabase:", e.message);
+        }
+      }
+
+      // Fallback localStorage
+      try {
+        const stored = localStorage.getItem("snackpos_gateway_config");
+        if (stored) {
+          Object.assign(paymentConfig, JSON.parse(stored));
+        }
+      } catch (e) {}
+
+      return paymentConfig;
+    }
+
+    // Load custom pricing from localStorage & Supabase
+    async function loadPricing() {
+      const stored = localStorage.getItem("snackpos_custom_pricing");
+      if (stored) {
+        try { Object.assign(customPricing, JSON.parse(stored)); } catch(e) {}
+      }
+
+      // Ambil harga cloud termutakhir dari Supabase jika terhubung
+      const cloudData = await fetchCloudPricingFromSupabase();
+      if (cloudData) {
+        Object.assign(customPricing, cloudData);
+        localStorage.setItem("snackpos_custom_pricing", JSON.stringify(cloudData));
+      }
+
+      // Perbarui label harga pada Kartu Paket 1 Lifetime
+      const lP1 = document.getElementById("display-price-p1");
+      if (lP1) lP1.textContent = `Rp ${Number(customPricing.p1Lifetime).toLocaleString('id-ID')}`;
+
+      // Perbarui label harga pada Kartu Pilihan Durasi SaaS Terbuka
+      const lSaas1m = document.getElementById("label-saas-1m");
+      const lSaas3m = document.getElementById("label-saas-3m");
+      const lSaas6m = document.getElementById("label-saas-6m");
+      const lSaas1y = document.getElementById("label-saas-1y");
+      if (lSaas1m) lSaas1m.textContent = `Rp ${Number(customPricing.p2_1m).toLocaleString('id-ID')}`;
+      if (lSaas3m) lSaas3m.textContent = `Rp ${Number(customPricing.p2_3m).toLocaleString('id-ID')}`;
+      if (lSaas6m) lSaas6m.textContent = `Rp ${Number(customPricing.p2_6m).toLocaleString('id-ID')}`;
+      if (lSaas1y) lSaas1y.textContent = `Rp ${Number(customPricing.p2_1y).toLocaleString('id-ID')}`;
+
+      // Perbarui label harga pada Kartu Pilihan Durasi Addon Cloud Terbuka
+      const lAddon1m = document.getElementById("label-addon-1m");
+      const lAddon3m = document.getElementById("label-addon-3m");
+      const lAddon6m = document.getElementById("label-addon-6m");
+      const lAddon1y = document.getElementById("label-addon-1y");
+      if (lAddon1m) lAddon1m.textContent = `+Rp ${Number(customPricing.cloud1m).toLocaleString('id-ID')}`;
+      if (lAddon3m) lAddon3m.textContent = `+Rp ${Number(customPricing.cloud3m).toLocaleString('id-ID')}`;
+      if (lAddon6m) lAddon6m.textContent = `+Rp ${Number(customPricing.cloud6m).toLocaleString('id-ID')}`;
+      if (lAddon1y) lAddon1y.textContent = `+Rp ${Number(customPricing.cloud1y).toLocaleString('id-ID')}`;
+
+      updateSaasDuration();
+      calculateTotal();
+    }
+
+    function chooseSaasDuration(dur) {
+      const select = document.getElementById("select-saas-duration");
+      if (select) select.value = dur;
+
+      // Update highlight kartu durasi SaaS
+      const allDurs = ['1m', '3m', '6m', '1y'];
+      allDurs.forEach(d => {
+        const card = document.getElementById(`card-saas-${d}`);
+        if (!card) return;
+        if (d === dur) {
+          card.className = "p-3 rounded-2xl border-2 border-blue-500 bg-blue-500/10 cursor-pointer transition-all hover:border-blue-400 shadow-md shadow-blue-950/40";
+        } else {
+          card.className = "p-3 rounded-2xl border border-slate-800 bg-slate-950/80 cursor-pointer transition-all hover:border-blue-500/50";
+        }
+      });
+
+      const summaryMap = {
+        '1m': 'Aktif: 1 Bulan',
+        '3m': 'Aktif: 3 Bulan (Hemat)',
+        '6m': 'Aktif: 6 Bulan',
+        '1y': 'Aktif: 1 Tahun (Terbaik)'
+      };
+      const summaryEl = document.getElementById("display-duration-summary");
+      if (summaryEl) summaryEl.textContent = summaryMap[dur] || `Aktif: ${dur}`;
+
+      // Otomatis aktifkan pilihan Paket 2
+      selectPlan('PAKET_2');
+    }
+
+    function chooseAddonDuration(dur) {
+      const select = document.getElementById("select-addon-cloud-duration");
+      if (select) select.value = dur;
+
+      // Update highlight tombol durasi Addon Cloud
+      const allDurs = ['1m', '3m', '6m', '1y'];
+      allDurs.forEach(d => {
+        const btn = document.getElementById(`btn-addon-${d}`);
+        if (!btn) return;
+        if (d === dur) {
+          btn.className = "p-2 rounded-xl border border-amber-500 bg-amber-500/10 text-left transition-all shadow-xs";
+        } else {
+          btn.className = "p-2 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-amber-500/50 text-left transition-all";
+        }
+      });
+
+      calculateTotal();
+    }
+
+    function selectPlan(plan) {
+      currentSelectedPlan = plan;
+      const cardP1 = document.getElementById("card-plan-paket1");
+      const cardP2 = document.getElementById("card-plan-paket2");
+      const indP1 = document.getElementById("radio-p1-indicator");
+      const indP2 = document.getElementById("radio-p2-indicator");
+
+      if (plan === "PAKET_1") {
+        cardP1.className = "relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-emerald-500 shadow-lg shadow-emerald-950/30 flex flex-col justify-between";
+        cardP2.className = "relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-slate-800 hover:border-slate-700 flex flex-col justify-between";
+        indP1.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
+        indP1.textContent = "✓ PAKET INI TERPILIH";
+        indP2.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-slate-800 text-slate-400 border border-slate-700";
+        indP2.textContent = "Pilih Paket Ini";
+      } else {
+        cardP2.className = "relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-blue-500 shadow-lg shadow-blue-950/30 flex flex-col justify-between";
+        cardP1.className = "relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-slate-800 hover:border-slate-700 flex flex-col justify-between";
+        indP2.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-blue-500/20 text-blue-400 border border-blue-500/40";
+        indP2.textContent = "✓ PAKET INI TERPILIH";
+        indP1.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-slate-800 text-slate-400 border border-slate-700";
+        indP1.textContent = "Pilih Paket Ini";
+      }
+      calculateTotal();
+    }
+
+    function toggleAddonCloud() {
+      const isChecked = document.getElementById("check-addon-cloud").checked;
+      const div = document.getElementById("div-addon-duration");
+      if (isChecked) {
+        div.classList.remove("hidden");
+      } else {
+        div.classList.add("hidden");
+      }
+      calculateTotal();
+    }
+
+    function updateSaasDuration() {
+      const select = document.getElementById("select-saas-duration");
+      const dur = select ? select.value : "1m";
+      const displayPrice = document.getElementById("display-price-p2");
+      const displayDur = document.getElementById("display-duration-p2");
+
+      let total = customPricing.p2_1m;
+      let durText = "/ bulan";
+
+      if (dur === "3m") {
+        total = customPricing.p2_3m;
+        durText = "/ 3 bulan";
+      } else if (dur === "6m") {
+        total = customPricing.p2_6m;
+        durText = "/ 6 bulan";
+      } else if (dur === "1y") {
+        total = customPricing.p2_1y;
+        durText = "/ 1 tahun";
+      }
+
+      if (displayPrice) displayPrice.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+      if (displayDur) displayDur.textContent = durText;
+      calculateTotal();
+    }
+
+    function calculateTotal() {
+      let total = 0;
+      let desc = "";
+      const isCloudRenewalOnly = new URLSearchParams(window.location.search).get("plan") === "cloud";
+
+      if (currentSelectedPlan === "PAKET_1") {
+        const addonChecked = document.getElementById("check-addon-cloud")?.checked;
+        if (isCloudRenewalOnly && addonChecked) {
+          total = 0;
+          desc = "Perpanjangan Add-on Cloud Dashboard HP";
+        } else {
+          total = customPricing.p1Lifetime;
+          desc = "Paket 1: Beli Putus POS Offline (Lifetime)";
+        }
+
+        if (addonChecked) {
+          const addonDur = document.getElementById("select-addon-cloud-duration").value;
+          let addonPrice = customPricing.cloud3m;
+          let addonText = "3 Bulan";
+          if (addonDur === "1m") { addonPrice = customPricing.cloud1m; addonText = "1 Bulan"; }
+          else if (addonDur === "6m") { addonPrice = customPricing.cloud6m; addonText = "6 Bulan"; }
+          else if (addonDur === "1y") { addonPrice = customPricing.cloud1y; addonText = "1 Tahun"; }
+
+          total += addonPrice;
+          desc = (isCloudRenewalOnly) ? `Perpanjangan Add-on Cloud HP (${addonText})` : `${desc} + Add-on Cloud HP (${addonText})`;
+        }
+      } else {
+        const dur = document.getElementById("select-saas-duration").value;
+        if (dur === "1m") { total = customPricing.p2_1m; desc = "Paket 2: Full SaaS (1 Bulan)"; }
+        else if (dur === "3m") { total = customPricing.p2_3m; desc = "Paket 2: Full SaaS (3 Bulan)"; }
+        else if (dur === "6m") { total = customPricing.p2_6m; desc = "Paket 2: Full SaaS (6 Bulan)"; }
+        else { total = customPricing.p2_1y; desc = "Paket 2: Full SaaS (1 Tahun)"; }
+      }
+
+      document.getElementById("order-summary-total").textContent = `Rp ${total.toLocaleString('id-ID')}`;
+      document.getElementById("order-summary-desc").textContent = desc;
+      return total;
+    }
+
+    function reGenOrderStoreId() {
+      const storeName = document.getElementById("order-store-name").value.trim();
+      const clean = storeName ? storeName.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase() : "TOKO";
+      const rand = Math.floor(1000 + Math.random() * 9000);
+      document.getElementById("order-store-id").value = `STR-${clean}-${rand}`;
+    }
+
+    function autoFillStoreId() {
+      const storeName = document.getElementById("order-store-name").value.trim();
+      const storeIdInput = document.getElementById("order-store-id");
+      if (storeName) {
+        const clean = storeName.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase();
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        storeIdInput.value = `STR-${clean || "TOKO"}-${rand}`;
+      } else if (!storeIdInput.value) {
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        storeIdInput.value = `STR-${rand}`;
+      }
+    }
+
+    // Load Midtrans Snap script dynamically if configured
+    function initMidtransSnapIfConfigured() {
+      const cfg = paymentConfig;
+      if (cfg && cfg.paymentMode === "MIDTRANS" && cfg.midtransClientKey) {
+        const snapUrl = cfg.midtransMode === "PRODUCTION"
+          ? "https://app.midtrans.com/snap/snap.js"
+          : "https://app.sandbox.midtrans.com/snap/snap.js";
+
+        if (!document.querySelector(`script[src*="snap/snap.js"]`)) {
+          const script = document.createElement("script");
+          script.src = snapUrl;
+          script.setAttribute("data-client-key", cfg.midtransClientKey);
+          document.head.appendChild(script);
+        }
+      }
+    }
+
+    function openQrScreen() {
+      document.getElementById("view-order-form").classList.add("hidden");
+      document.getElementById("view-payment-screen").classList.remove("hidden");
+
+      document.getElementById("pay-store-name-display").textContent = currentOrderData.storeName;
+      document.getElementById("pay-amount-display").textContent = `Rp ${currentOrderData.total.toLocaleString('id-ID')}`;
+      document.getElementById("pay-order-ref").textContent = `REF: ${currentOrderData.orderRef} • ${currentOrderData.email}`;
+
+      // Update Stepper
+      document.getElementById("step-indicator-2").className = "flex items-center gap-1.5 text-emerald-400";
+      document.getElementById("step-indicator-3").className = "flex items-center gap-1.5 text-emerald-400";
+
+      // Sesuaikan Tampilan berdasarkan metode pembayaran resmi Vendor
+      const mode = paymentConfig.paymentMode || "QRIS_STATIC";
+      const badgeEl = document.getElementById("pay-badge-method");
+      const descEl = document.getElementById("pay-subtitle-desc");
+      const boxQris = document.getElementById("container-pay-qris");
+      const boxBank = document.getElementById("container-pay-bank");
+
+      if (mode === "BANK_TRANSFER") {
+        if (boxQris) boxQris.classList.add("hidden");
+        if (boxBank) boxBank.classList.remove("hidden");
+        if (badgeEl) badgeEl.textContent = "🏦 TRANSFER REKENING BANK";
+        if (descEl) descEl.textContent = "Transfer ke rekening resmi Vendor di bawah ini, lalu klik tombol hijau untuk kirim bukti transfer ke WhatsApp.";
+
+        const nameEl = document.getElementById("bank-name-display");
+        const accEl = document.getElementById("bank-acc-display");
+        const holderEl = document.getElementById("bank-holder-display");
+        if (nameEl) nameEl.textContent = (paymentConfig.bankName || "BCA").toUpperCase();
+        if (accEl) accEl.textContent = paymentConfig.bankAccount || "-";
+        if (holderEl) holderEl.textContent = paymentConfig.bankHolder || "-";
+      } else {
+        // QRIS_STATIC atau fallback MIDTRANS
+        if (boxBank) boxBank.classList.add("hidden");
+        if (boxQris) boxQris.classList.remove("hidden");
+        if (badgeEl) badgeEl.textContent = mode === "MIDTRANS" ? "🚀 MIDTRANS SNAP QRIS" : "📸 QRIS RESMI VENDOR";
+        if (descEl) descEl.textContent = "Scan barcode QRIS di bawah ini dengan m-Banking atau e-Wallet, lalu klik tombol hijau untuk kirim bukti ke WhatsApp.";
+
+        const qrisImg = document.getElementById("qris-img");
+        if (qrisImg) {
+          if (paymentConfig.qrisImageUrl && (paymentConfig.qrisImageUrl.startsWith("http://") || paymentConfig.qrisImageUrl.startsWith("https://") || paymentConfig.qrisImageUrl.startsWith("data:image/"))) {
+            qrisImg.src = paymentConfig.qrisImageUrl;
+          } else {
+            // Default barcode QRIS
+            qrisImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=00020101021226590014ID.LINKAJA.WWW01189360091400000000000215SNACKPOSPAYMENT520454995802ID5914SNACKPOS+KASIR6007JAKARTA62070703A0163046D5E`;
+          }
+        }
+      }
+
+      if (lastSnapToken) {
+        document.getElementById("btn-open-snap-again").classList.remove("hidden");
+      } else {
+        document.getElementById("btn-open-snap-again").classList.add("hidden");
+      }
+
+      startCountdown(15 * 60);
+      startPollingPaymentStatus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function reopenMidtransSnap() {
+      if (!lastSnapToken || !window.snap) {
+        alert("Sesi Snap tidak ditemukan. Silakan bayar melalui QRIS atau transfer manual di bawah ini.");
+        return;
+      }
+      window.snap.pay(lastSnapToken, {
+        onSuccess: async function(result) {
+          await activateMerchantRecord(currentOrderData);
+          showPaymentSuccessScreen();
+        },
+        onPending: function(result) {
+          openQrScreen();
+        },
+        onError: function(result) {
+          alert("Pembayaran belum berhasil: " + (result.status_message || "Silakan coba lagi."));
+        },
+        onClose: function() {
+          openQrScreen();
+        }
+      });
+    }
+
+    function copyPayAmount() {
+      if (!currentOrderData) return;
+      navigator.clipboard.writeText(currentOrderData.total.toString()).then(() => {
+        alert(`Nominal Rp ${currentOrderData.total.toLocaleString('id-ID')} berhasil disalin!`);
+      });
+    }
+
+    function copyBankAccount() {
+      const acc = document.getElementById("bank-acc-display")?.textContent || "";
+      if (acc && acc !== "-") {
+        navigator.clipboard.writeText(acc).then(() => {
+          alert(`Nomor rekening ${acc} berhasil disalin ke clipboard!`);
+        });
+      }
+    }
+
+    function sendProofToVendorWhatsApp() {
+      if (!currentOrderData) return;
+      let vendorWa = (paymentConfig.vendorWa || "6281234567890").replace(/[^0-9]/g, '');
+      if (vendorWa.startsWith("0")) vendorWa = "62" + vendorWa.slice(1);
+
+      const planName = currentOrderData.plan === "PAKET_1" 
+        ? "Paket 1: Beli Putus POS Offline (Lifetime)" 
+        : "Paket 2: Full SaaS Langganan (POS + Cloud HP)";
+
+      const durationInfo = currentOrderData.hasCloud ? ` (Durasi Cloud: ${currentOrderData.cloudDuration})` : "";
+
+      const msg = 
+`*KONFIRMASI PEMBAYARAN LISENSI SNACKPOS* 🧾✨
+━━━━━━━━━━━━━━━━━━━━━
+🏪 *Nama Toko:* ${currentOrderData.storeName}
+🆔 *Store ID:* ${currentOrderData.storeId}
+📧 *Email Kasir:* ${currentOrderData.email}
+📱 *WhatsApp Pemilik:* ${currentOrderData.wa}
+📦 *Paket Pesanan:* ${planName}${durationInfo}
+💵 *Total Nominal:* Rp ${currentOrderData.total.toLocaleString('id-ID')}
+🔖 *No Referensi:* ${currentOrderData.orderRef}
+━━━━━━━━━━━━━━━━━━━━━
+Halo Admin Vendor SnackPOS, saya telah melakukan pembayaran/transfer untuk aktivasi lisensi toko saya. 
+
+Berikut saya lampirkan foto bukti transfer pembayarannya. Mohon bantuannya untuk verifikasi dan aktivasi lisensinya ya. Terima kasih banyak! 🙏`;
+
+      const waUrl = `https://wa.me/${vendorWa}?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, "_blank");
+    }
+
+    function toggleOrderRenewalMode() {
+      const isRenewal = document.getElementById("order-is-renewal").checked;
+      const storeIdInput = document.getElementById("order-store-id");
+      const labelEl = document.getElementById("label-order-store-id");
+      const btnRegen = document.getElementById("btn-regen-store-id");
+      const hintEl = document.getElementById("hint-order-store-id");
+
+      if (isRenewal) {
+        storeIdInput.readOnly = false;
+        storeIdInput.placeholder = "Contoh: STR-1234";
+        storeIdInput.value = "";
+        storeIdInput.focus();
+        if (btnRegen) btnRegen.classList.add("hidden");
+        if (labelEl) labelEl.textContent = "2. ID Toko Lama Yang Mau Diperpanjang *";
+        if (hintEl) hintEl.textContent = "Masukkan ID Toko lama Anda agar masa aktifnya diperpanjang otomatis.";
+      } else {
+        storeIdInput.readOnly = true;
+        storeIdInput.placeholder = "STR-XXXX";
+        if (btnRegen) btnRegen.classList.remove("hidden");
+        if (labelEl) labelEl.textContent = "2. ID Toko (Store ID Tenant) *";
+        if (hintEl) hintEl.textContent = "Kode tenant unik toko kasir Anda (terbuat otomatis).";
+        autoFillStoreId();
+      }
+    }
+
+    // Step 2: Proceed to Payment
+    async function handleProceedToPayment() {
+      const storeName = document.getElementById("order-store-name").value.trim();
+      const storeId = document.getElementById("order-store-id").value.trim().toUpperCase() || ("STR-" + Math.floor(100 + Math.random() * 900));
+      const wa = document.getElementById("order-wa").value.trim();
+      const pin = (document.getElementById("order-pin")?.value || "").trim();
+      let email = (document.getElementById("order-email")?.value || "").trim().toLowerCase();
+
+      if (!storeName) {
+        alert("Silakan masukkan Nama Toko Anda!");
+        document.getElementById("order-store-name").focus();
+        return;
+      }
+
+      if (!wa) {
+        alert("Silakan masukkan Nomor WhatsApp Anda!");
+        document.getElementById("order-wa").focus();
+        return;
+      }
+
+      if (!pin || pin.length < 6 || !/^\d{6}$/.test(pin)) {
+        alert("Silakan buat PIN Kasir 6-Digit Angka (contoh: 123456)!");
+        document.getElementById("order-pin")?.focus();
+        return;
+      }
+
+      // Jika email kosong, buat email sistem yang ramah
+      if (!email) {
+        const cleanWa = wa.replace(/[^0-9]/g, '');
+        email = `${cleanWa || storeId.toLowerCase()}@snackpos.com`;
+      }
+
+      // Proteksi Lapis 1: Periksa apakah tarif resmi di Supabase berubah
+      if (window.supabase && navigator.onLine) {
+        try {
+          const freshData = await fetchCloudPricingFromSupabase();
+          if (freshData) {
+            const freshPrice = currentSelectedPlan === "PAKET_1" ? freshData.p1Lifetime : freshData.p2_1m;
+            const currentPrice = currentSelectedPlan === "PAKET_1" ? customPricing.p1Lifetime : customPricing.p2_1m;
+            if (freshPrice && freshPrice !== currentPrice) {
+              Object.assign(customPricing, freshData);
+              localStorage.setItem("snackpos_custom_pricing", JSON.stringify(freshData));
+              await loadPricing();
+              alert(`⚠️ Pemberitahuan: Terdapat penyesuaian tarif paket resmi dari Vendor.\nNominal pesanan telah diperbarui otomatis. Silakan klik Lanjut Bayar kembali.`);
+              return;
+            }
+          }
+        } catch(e) {}
+      }
+
+      // Refresh payment configuration dari Cloud
+      await loadPaymentConfig();
+
+      const total = calculateTotal();
+      const orderRef = `SPOS-ORD-${Date.now().toString().slice(-6)}`;
+      const planDesc = document.getElementById("order-summary-desc")?.textContent || currentSelectedPlan;
+
+      currentOrderData = {
+        storeName,
+        storeId,
+        email,
+        wa,
+        pin,
+        isRenewal: !!document.getElementById("order-is-renewal")?.checked,
+        plan: currentSelectedPlan,
+        total,
+        orderRef,
+        hasCloud: currentSelectedPlan === "PAKET_2" || document.getElementById("check-addon-cloud").checked,
+        cloudDuration: currentSelectedPlan === "PAKET_2" 
+          ? document.getElementById("select-saas-duration").value 
+          : (document.getElementById("check-addon-cloud").checked ? document.getElementById("select-addon-cloud-duration").value : "INACTIVE")
+      };
+
+      const btn = document.getElementById("btn-proceed-pay");
+      const originalBtnText = btn.innerHTML;
+
+      // Jika Vendor memilih mode MIDTRANS dan kunci API sudah tersedia
+      if (paymentConfig.paymentMode === "MIDTRANS" && (paymentConfig.midtransServerKey || paymentConfig.midtransClientKey)) {
+        btn.disabled = true;
+        btn.innerHTML = `<span>⏳ Menyiapkan Midtrans Snap...</span>`;
+
+        try {
+          const res = await fetch("/api/midtrans-token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              order_id: orderRef,
+              gross_amount: total,
+              customer_details: {
+                first_name: storeName,
+                email: email,
+                phone: wa
+              },
+              item_details: [
+                {
+                  id: currentSelectedPlan,
+                  price: total,
+                  quantity: 1,
+                  name: planDesc
+                }
+              ],
+              custom_field1: storeId,
+              custom_field2: currentSelectedPlan,
+              custom_field3: email,
+              custom_field4: pin,
+              server_key: paymentConfig.midtransServerKey || undefined,
+              is_production: paymentConfig.midtransMode === "PRODUCTION"
+            })
+          });
+
+          const data = await res.json();
+          btn.disabled = false;
+          btn.innerHTML = originalBtnText;
+
+          if (data.success && data.token) {
+            lastSnapToken = data.token;
+            if (window.snap) {
+              window.snap.pay(data.token, {
+                onSuccess: async function(result) {
+                  await activateMerchantRecord(currentOrderData);
+                  showPaymentSuccessScreen();
+                },
+                onPending: function(result) {
+                  openQrScreen();
+                },
+                onError: function(result) {
+                  alert("Pembayaran belum berhasil: " + (result.status_message || "Silakan coba kembali."));
+                },
+                onClose: function() {
+                  openQrScreen();
+                }
+              });
+              return;
+            } else {
+              openQrScreen();
+              return;
+            }
+          } else {
+            console.warn("Midtrans token generation notice:", data.message);
+            openQrScreen();
+            return;
+          }
+        } catch (fetchErr) {
+          console.warn("Fetch /api/midtrans-token error:", fetchErr.message);
+          btn.disabled = false;
+          btn.innerHTML = originalBtnText;
+          openQrScreen();
+          return;
+        }
+      }
+
+      // Default: Langsung buka QRIS Statis atau Rekening Bank Vendor
+      openQrScreen();
+    }
+
+    function cancelPaymentAndBack() {
+      clearInterval(countdownInterval);
+      clearInterval(pollingInterval);
+      document.getElementById("view-payment-screen").classList.add("hidden");
+      document.getElementById("view-order-form").classList.remove("hidden");
+      document.getElementById("step-indicator-3").className = "flex items-center gap-1.5 text-slate-500";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Countdown Timer 15 Menit
+    function startCountdown(seconds) {
+      clearInterval(countdownInterval);
+      let remaining = seconds;
+      const el = document.getElementById("countdown-timer");
+      countdownInterval = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(countdownInterval);
+          el.textContent = "00:00 (Kedaluwarsa)";
+          alert("Waktu menunggu telah habis. Silakan konfirmasi via WhatsApp Vendor jika sudah transfer.");
+          cancelPaymentAndBack();
+          return;
+        }
+        const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+        const s = (remaining % 60).toString().padStart(2, '0');
+        el.textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    // Polling Status Aktivasi Lisensi dari Supabase Cloud
+    function startPollingPaymentStatus() {
+      clearInterval(pollingInterval);
+      pollingInterval = setInterval(async () => {
+        const isPaid = await checkLicenseStatusInSupabase(currentOrderData.email);
+        if (isPaid) {
+          showPaymentSuccessScreen();
+        }
+      }, 3500);
+    }
+
+    async function checkLicenseStatusInSupabase(email) {
+      if (window.supabase && navigator.onLine) {
+        try {
+          const officialUrl = "https://zsjbiuwtjsnjxyvhwggz.supabase.co";
+          const officialKey = "sb_publishable_cO81g3R2IpzniHuackKd_A_7YYe2T39";
+          const client = window.supabase.createClient(officialUrl, officialKey);
+          const { data } = await client.from('store_licenses')
+            .select('pos_status, updated_at')
+            .eq('owner_email', email)
+            .maybeSingle();
+          if (data && data.pos_status === "ACTIVE") {
+            return true;
+          }
+        } catch (e) {}
+      }
+      return false;
+    }
+
+    async function activateMerchantRecord(order) {
+      let posDuration = order.plan === "PAKET_1" ? "LIFETIME" : "30";
+      let posExpiresAt = null;
+      let baseTime = Date.now();
+
+      // 1. Sinkronkan ke Supabase Cloud Server Lisensi Resmi lebih dulu
+      const officialUrl = "https://zsjbiuwtjsnjxyvhwggz.supabase.co";
+      const officialKey = "sb_publishable_cO81g3R2IpzniHuackKd_A_7YYe2T39";
+      if (window.supabase) {
+        try {
+          const client = window.supabase.createClient(officialUrl, officialKey);
+
+          // Jika perpanjang, cek masa aktif toko sebelumnya jika masih aktif
+          if (order.isRenewal) {
+            const { data: existRow } = await client.from('store_licenses')
+              .select('pos_expires_at, cloud_expires_at')
+              .eq('store_id', order.storeId)
+              .maybeSingle();
+
+            if (existRow && existRow.pos_expires_at && new Date(existRow.pos_expires_at) > new Date()) {
+              baseTime = new Date(existRow.pos_expires_at).getTime();
+            }
+          }
+
+          if (order.plan === "PAKET_2") {
+            let days = 30;
+            if (order.cloudDuration === "3m") days = 90;
+            else if (order.cloudDuration === "6m") days = 180;
+            else if (order.cloudDuration === "1y") days = 365;
+            posDuration = days.toString();
+            posExpiresAt = new Date(baseTime + days * 24 * 3600 * 1000).toISOString();
+          }
+
+          let cloudStatus = order.hasCloud ? "ACTIVE" : "INACTIVE";
+          let cloudExpiresAt = null;
+          if (order.hasCloud) {
+            let cDays = 30;
+            if (order.cloudDuration === "3m") cDays = 90;
+            else if (order.cloudDuration === "6m") cDays = 180;
+            else if (order.cloudDuration === "1y") cDays = 365;
+            cloudExpiresAt = new Date(baseTime + cDays * 24 * 3600 * 1000).toISOString();
+          }
+
+          // A. Upsert ke store_licenses
+          const slPayload = {
+            store_id: order.storeId,
+            store_name: order.storeName,
+            owner_email: order.email,
+            plan_type: order.plan,
+            pos_status: "ACTIVE",
+            pos_expires_at: posExpiresAt,
+            cloud_status: cloudStatus,
+            cloud_expires_at: cloudExpiresAt,
+            whatsapp: order.wa,
+            last_payment_method: "QRIS",
+            last_amount_paid: order.total,
+            updated_at: new Date().toISOString()
+          };
+
+          // Simpan ke store_licenses (Cek existing store_id)
+          try {
+            const { data: existRow } = await client.from('store_licenses').select('id').eq('store_id', order.storeId).maybeSingle();
+            if (existRow && existRow.id) {
+              await client.from('store_licenses').update(slPayload).eq('id', existRow.id);
+            } else {
+              await client.from('store_licenses').insert(slPayload);
+            }
+          } catch(eSl) {
+            console.warn("[Order] store_licenses error:", eSl);
+          }
+
+          // B. Dual-layer: simpan PIN ke app_config (store_pins)
+          if (order.pin) {
+            try {
+              const { data: cfgRow } = await client.from('app_config').select('value').eq('key', 'store_pins').maybeSingle();
+              let pinsMap = (cfgRow && cfgRow.value) ? cfgRow.value : {};
+              if (typeof pinsMap === 'string') {
+                try { pinsMap = JSON.parse(pinsMap); } catch(e) { pinsMap = {}; }
+              }
+              pinsMap[order.storeId] = order.pin;
+              if (order.wa) {
+                const normWa = order.wa.replace(/[^0-9]/g, '').replace(/^62/, '0');
+                pinsMap[normWa] = order.pin;
+              }
+              await client.from('app_config').upsert({
+                key: 'store_pins',
+                value: pinsMap,
+                updated_at: new Date().toISOString()
+              }, { onConflict: 'key' });
+            } catch(ePin) {
+              console.warn("Dual layer PIN save notice:", ePin.message);
+            }
+          }
+        } catch (e) {
+          console.warn("Supabase upsert notice:", e.message);
+        }
+      }
+
+      // 2. Simpan ke daftar merchant lokal vendor
+      const storedMerchants = localStorage.getItem("snackpos_registered_merchants");
+      let merchants = storedMerchants ? JSON.parse(storedMerchants) : [];
+      const newEntry = {
+        id: Date.now(),
+        store_name: order.storeName,
+        store_id: order.storeId,
+        owner_email: order.email,
+        whatsapp: order.wa,
+        pin: order.pin,
+        plan_type: order.plan,
+        pos_status: "ACTIVE",
+        pos_duration: posDuration,
+        pos_expires_at: posExpiresAt,
+        cloud_status: order.hasCloud ? "ACTIVE" : "INACTIVE",
+        cloud_duration: order.cloudDuration,
+        cloud_expires_at: posExpiresAt,
+        payment_method: "QRIS",
+        amount_paid: order.total,
+        active_device_id: null,
+        created_at: new Date().toISOString().split("T")[0]
+      };
+      merchants.unshift(newEntry);
+      localStorage.setItem("snackpos_registered_merchants", JSON.stringify(merchants));
+    }
+
+    function showPaymentSuccessScreen() {
+      clearInterval(countdownInterval);
+      clearInterval(pollingInterval);
+
+      document.getElementById("view-payment-screen").classList.add("hidden");
+      document.getElementById("view-success-screen").classList.remove("hidden");
+
+      document.getElementById("receipt-store-name").textContent = currentOrderData.storeName;
+      document.getElementById("receipt-store-id").textContent = currentOrderData.storeId;
+      if (document.getElementById("receipt-wa")) {
+        document.getElementById("receipt-wa").textContent = currentOrderData.wa || "-";
+      }
+      if (document.getElementById("receipt-pin")) {
+        document.getElementById("receipt-pin").textContent = currentOrderData.pin || "******";
+      }
+      document.getElementById("receipt-plan").textContent = currentOrderData.plan === "PAKET_1" 
+        ? "Paket 1 - Beli Putus POS Offline (Lifetime)" 
+        : "Paket 2 - Full SaaS Langganan (POS + Cloud)";
+
+      document.getElementById("btn-open-cloud-receipt").href = `owner.html?store=${encodeURIComponent(currentOrderData.storeId)}`;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function shareReceiptWhatsApp() {
+      if (!currentOrderData) return;
+      const text = `*BUKTI PEMBAYARAN RESMI SNACKPOS* 🧾✨\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `🏪 Nama Toko: ${currentOrderData.storeName}\n` +
+        `🆔 ID Toko: ${currentOrderData.storeId}\n` +
+        `📱 No. WhatsApp: ${currentOrderData.wa}\n` +
+        `🔐 PIN Kasir: ${currentOrderData.pin || '-'}\n` +
+        `💵 Total: Rp ${currentOrderData.total.toLocaleString('id-ID')} (LUNAS via QRIS)\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `Aplikasi kasir siap digunakan jualan! Masuk via ID Toko & PIN di:\n` +
+        `👉 ${window.location.origin}/index.html`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Kwitansi disalin ke clipboard! Silakan kirim ke WhatsApp pembeli.");
+      });
+    }
+
+    async function forceRefreshOrderPage() {
+      try {
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (let r of regs) await r.unregister();
+        }
+        if ('caches' in window) {
+          const names = await caches.keys();
+          await Promise.all(names.map(name => caches.delete(name)));
+        }
+      } catch (e) {
+        console.warn('Cache purge error:', e);
+      }
+      window.location.replace(window.location.pathname + '?v=' + Date.now());
+    }
+
+    // Auto-detect URL Params e.g. ?plan=cloud&store=STR-001
+    window.addEventListener("DOMContentLoaded", async () => {
+      await loadPaymentConfig();
+      loadPricing();
+      initMidtransSnapIfConfigured();
+      const params = new URLSearchParams(window.location.search);
+      const storeParam = params.get("store");
+      const planParam = params.get("plan");
+
+      if (storeParam) {
+        document.getElementById("order-store-id").value = storeParam;
+      } else {
+        autoFillStoreId();
+      }
+
+      if (planParam === "saas" || planParam === "paket2") {
+        selectPlan("PAKET_2");
+      } else if (planParam === "cloud") {
+        selectPlan("PAKET_1");
+        document.getElementById("check-addon-cloud").checked = true;
+        toggleAddonCloud();
+      }
+    });
+  </script>
+</body>
+</html>
+

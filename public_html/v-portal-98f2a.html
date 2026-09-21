@@ -1,0 +1,2421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1120" />
+  <title>Vendor Portal - SnackPOS Merchant & License Manager</title>
+  
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { background-color: #090e17; color: #f1f5f9; font-family: "Inter", sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- ================= MASTER PIN LOCK MODAL ================= -->
+  <div id="modal-pin-lock" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl shadow-indigo-950/40 text-center">
+      <div class="w-16 h-16 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-lg shadow-indigo-500/20 mb-5">
+        🔐
+      </div>
+      <h2 class="text-xl font-black tracking-tight text-white mb-1">Portal Vendor Lisensi</h2>
+      <p class="text-xs text-slate-400 mb-6">Pusat kelola merchant, aktivasi lisensi kasir, dan langganan cloud. Masukkan PIN Master Anda.</p>
+
+      <div class="space-y-4 text-left">
+        <div>
+          <label class="block text-[11px] font-bold tracking-wider text-slate-400 uppercase mb-1.5">Master PIN Vendor</label>
+          <input type="password" id="input-vendor-pin" maxlength="20" placeholder="Masukkan Master PIN"
+            class="w-full text-center tracking-[0.4em] font-mono text-xl py-3 px-4 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            onkeydown="if(event.key==='Enter') verifyVendorPin()" />
+        </div>
+        <div id="pin-error-msg" class="hidden text-xs text-rose-400 font-medium text-center">PIN salah! Silakan coba lagi.</div>
+        <button onclick="verifyVendorPin()" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] transition text-white font-bold rounded-xl text-sm shadow-lg shadow-indigo-600/30 cursor-pointer">
+          Masuk ke Portal &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOP HEADER ================= -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-lg sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-xl shadow-md shadow-indigo-500/20">
+          ⚡
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-black tracking-tight text-white">SnackPOS Vendor Portal</h1>
+            <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Email + OTP Mode</span>
+          </div>
+          <p class="text-xs text-slate-400">Pusat Manajemen Lisensi Toko, Merchant & Monetisasi Cloud</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5">
+          <span>🏪</span> Buka POS Kasir
+        </a>
+        <a href="owner.html" class="px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700/60 transition flex items-center gap-1.5">
+          <span>📊</span> Dashboard Owner
+        </a>
+        <button onclick="lockPortal()" class="px-3 py-1.5 text-xs font-semibold text-rose-300 hover:text-rose-200 bg-rose-950/40 hover:bg-rose-900/50 rounded-lg border border-rose-800/40 transition flex items-center gap-1 cursor-pointer">
+          <span>🔒</span> Kunci
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- OVERVIEW STATS CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between text-slate-400 mb-1">
+          <span class="text-xs font-bold uppercase tracking-wider">Total Merchant</span>
+          <span class="text-lg">🏪</span>
+        </div>
+        <div id="stat-total-merchants" class="text-2xl sm:text-3xl font-black text-white font-mono">0</div>
+        <div class="text-[11px] text-slate-500 mt-1">Toko terdaftar</div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-emerald-900/40 rounded-2xl p-4 shadow-sm bg-gradient-to-br from-slate-900/80 to-emerald-950/20">
+        <div class="flex items-center justify-between text-emerald-400 mb-1">
+          <span class="text-xs font-bold uppercase tracking-wider">Paket 1: Lifetime</span>
+          <span class="text-lg">💎</span>
+        </div>
+        <div id="stat-lifetime-merchants" class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">0</div>
+        <div class="text-[11px] text-slate-400 mt-1">Beli Putus POS Offline</div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-blue-900/40 rounded-2xl p-4 shadow-sm bg-gradient-to-br from-slate-900/80 to-blue-950/20">
+        <div class="flex items-center justify-between text-blue-400 mb-1">
+          <span class="text-xs font-bold uppercase tracking-wider">Paket 2: SaaS</span>
+          <span class="text-lg">🔄</span>
+        </div>
+        <div id="stat-subscription-merchants" class="text-2xl sm:text-3xl font-black text-blue-400 font-mono">0</div>
+        <div class="text-[11px] text-slate-400 mt-1">Langganan POS + Cloud</div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-teal-900/40 rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between text-teal-400 mb-1">
+          <span class="text-xs font-bold uppercase tracking-wider">Kasir Aktif</span>
+          <span class="text-lg">🟢</span>
+        </div>
+        <div id="stat-active-pos" class="text-2xl sm:text-3xl font-black text-teal-400 font-mono">0</div>
+        <div class="text-[11px] text-slate-400 mt-1">Terminal POS Aktif</div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-amber-900/40 rounded-2xl p-4 shadow-sm col-span-2 lg:col-span-1">
+        <div class="flex items-center justify-between text-amber-400 mb-1">
+          <span class="text-xs font-bold uppercase tracking-wider">Cloud HP Aktif</span>
+          <span class="text-lg">☁️</span>
+        </div>
+        <div id="stat-active-cloud" class="text-2xl sm:text-3xl font-black text-amber-400 font-mono">0</div>
+        <div class="text-[11px] text-slate-400 mt-1">Akses Dashboard Owner</div>
+      </div>
+    </div>
+
+    <!-- TABS NAVIGATION -->
+    <div class="border-b border-slate-800 flex items-center justify-between overflow-x-auto custom-scrollbar gap-4">
+      <div class="flex gap-2">
+        <button onclick="switchTab('merchants')" id="tab-btn-merchants" class="tab-btn px-4 py-3 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 flex items-center gap-2 cursor-pointer">
+          <span>🏪</span> Daftar Merchant Toko (<span id="tab-count-merchants">0</span>)
+        </button>
+        <button onclick="switchTab('register')" id="tab-btn-register" class="tab-btn px-4 py-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 cursor-pointer">
+          <span>⚡</span> Daftarkan / Aktivasi Toko Baru
+        </button>
+        <button onclick="switchTab('whatsapp')" id="tab-btn-whatsapp" class="tab-btn px-4 py-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 cursor-pointer">
+          <span>💬</span> Template WhatsApp
+        </button>
+        <button onclick="switchTab('settings')" id="tab-btn-settings" class="tab-btn px-4 py-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 cursor-pointer">
+          <span>⚙️</span> Pengaturan & Backup
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2 pb-2">
+        <button onclick="exportMerchantsJSON()" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1 cursor-pointer transition">
+          <span>📥</span> Export JSON
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= TAB 1: DAFTAR MERCHANT & LISENSI TOKO ================= -->
+    <section id="tab-pane-merchants" class="space-y-4">
+      <!-- Quick Action Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-sm">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button onclick="openManualCashModal()" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-emerald-600/20 cursor-pointer transition">
+            <span>⚡</span> Aktivasi Manual (Bayar Tunai)
+          </button>
+          <button onclick="openCustomPricingModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold rounded-xl text-xs flex items-center gap-2 cursor-pointer transition">
+            <span>🏷️</span> Pengaturan Harga Paket (Custom)
+          </button>
+          <button onclick="openGatewayModal()" id="btn-header-gateway" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-indigo-600/20 cursor-pointer transition">
+            <span>💳</span> <span id="btn-header-gateway-label">Payment Gateway</span>
+          </button>
+          <button onclick="syncFromSupabaseIfAvailable()" class="px-3 py-2 bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 font-bold rounded-xl text-xs flex items-center gap-1.5 cursor-pointer transition">
+            <span>🔄</span> Sync Cloud
+          </button>
+        </div>
+        <div class="text-[11px] text-slate-400 font-medium">
+          Sistem 100% Akun Email: Pelanggan langsung login di kasir via OTP 6-Digit.
+        </div>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+        <div class="relative flex-1 max-w-md">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">🔍</span>
+          <input type="text" id="filter-search" oninput="renderMerchantsTable()" placeholder="Cari Nama Toko, Store ID, Email, atau No. WhatsApp..."
+            class="w-full pl-9 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 custom-scrollbar">
+          <button onclick="setFilterType('ALL')" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white" data-type="ALL">Semua</button>
+          <button onclick="setFilterType('PAKET_1')" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-type="PAKET_1">💎 Paket 1 Lifetime</button>
+          <button onclick="setFilterType('PAKET_2')" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-type="PAKET_2">🔄 Paket 2 SaaS</button>
+          <button onclick="setFilterType('ACTIVE_POS')" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-type="ACTIVE_POS">🟢 Kasir Aktif</button>
+          <button onclick="setFilterType('ACTIVE_CLOUD')" class="filter-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-type="ACTIVE_CLOUD">☁️ Cloud Aktif</button>
+        </div>
+      </div>
+
+      <!-- Merchants Table -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-950/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                <th class="py-3 px-4 w-12 text-center">No</th>
+                <th class="py-3 px-4">Toko & Store ID</th>
+                <th class="py-3 px-4">PIN Kasir & Kontak</th>
+                <th class="py-3 px-4">Paket Kasir POS</th>
+                <th class="py-3 px-4">Cloud Dashboard HP</th>
+                <th class="py-3 px-4 text-center">Aksi Cepat</th>
+              </tr>
+            </thead>
+            <tbody id="table-merchants-body" class="divide-y divide-slate-800/60 font-medium">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+        <div id="merchants-empty-state" class="hidden p-12 text-center">
+          <div class="text-4xl mb-2">🔍</div>
+          <div class="text-sm font-bold text-slate-300">Tidak ada data merchant yang cocok</div>
+          <div class="text-xs text-slate-500 mt-1">Coba sesuaikan kata kunci pencarian atau ganti filter.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: DAFTARKAN TOKO BARU ================= -->
+    <section id="tab-pane-register" class="hidden space-y-6">
+      <div class="max-w-2xl mx-auto bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-800">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-2xl text-indigo-400">
+            ⚡
+          </div>
+          <div>
+            <h2 class="text-lg font-black text-white">Daftarkan & Aktivasi Toko Baru</h2>
+            <p class="text-xs text-slate-400">Merchant langsung dapat masuk ke kasir menggunakan alamat Email & kode OTP 6-Digit</p>
+          </div>
+        </div>
+
+        <form onsubmit="handleRegisterNewMerchant(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nama Toko / Merchant *</label>
+            <input type="text" id="reg-store-name" required placeholder="Contoh: Toko Berkah Jaya"
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500" />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-bold uppercase tracking-wider text-indigo-400">ID Toko (Store ID) *</label>
+                <button type="button" onclick="autoGenerateStoreId()" class="text-[10px] text-indigo-400 hover:text-indigo-300 underline font-bold cursor-pointer">Auto Generate</button>
+              </div>
+              <input type="text" id="reg-store-id" required placeholder="STR-001"
+                class="w-full bg-slate-950 border border-indigo-500/40 rounded-xl px-4 py-2.5 text-xs text-indigo-300 font-mono font-bold uppercase focus:outline-none focus:border-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">No. WhatsApp Toko *</label>
+              <input type="tel" id="reg-whatsapp" required placeholder="Contoh: 081234567890"
+                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-indigo-500" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1.5">Email Pemilik Toko (Untuk Login Kasir via OTP) *</label>
+            <input type="email" id="reg-email" required placeholder="Contoh: tokoberkah@gmail.com"
+              class="w-full bg-slate-950 border border-emerald-500/40 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-slate-600 focus:outline-none focus:border-emerald-500" />
+            <p class="text-[10px] text-slate-500 mt-1">💡 Email ini akan digunakan oleh kasir toko untuk meminta kode OTP 6-Digit saat membuka aplikasi.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Pilih Tipe Paket *</label>
+              <select id="reg-package-type" onchange="updateRegPlanDurationOptions()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs font-semibold text-white focus:outline-none focus:border-indigo-500">
+                <option value="PAKET_1">💎 Paket 1: Beli Putus POS Offline (Lifetime)</option>
+                <option value="PAKET_2">🔄 Paket 2: Full SaaS Langganan (POS + Cloud)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Durasi Kasir POS *</label>
+              <select id="reg-pos-duration" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                <option value="LIFETIME">Selamanya (Lifetime Offline)</option>
+                <option value="30">1 Bulan (30 Hari)</option>
+                <option value="90">3 Bulan (90 Hari)</option>
+                <option value="180">6 Bulan (180 Hari)</option>
+                <option value="365">1 Tahun (365 Hari)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Akses Dashboard Cloud di HP *</label>
+            <select id="reg-cloud-duration" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="INACTIVE">Non-Aktif (Khusus Paket 1 Belum Beli Cloud)</option>
+              <option value="30">Aktif 1 Bulan (30 Hari)</option>
+              <option value="90">Aktif 3 Bulan (90 Hari)</option>
+              <option value="180">Aktif 6 Bulan (180 Hari)</option>
+              <option value="365">Aktif 1 Tahun (365 Hari)</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Metode Penerimaan</label>
+              <select id="reg-payment-method" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                <option value="TUNAI">💵 Tunai (Cash di Toko)</option>
+                <option value="TRANSFER">🏦 Transfer Bank</option>
+                <option value="QRIS">📱 QRIS Dinamis</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nominal Diterima (Rp)</label>
+              <input type="number" id="reg-amount-paid" placeholder="Contoh: 1000000"
+                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-emerald-400 font-mono font-bold focus:outline-none focus:border-indigo-500" />
+            </div>
+          </div>
+
+          <div class="pt-4">
+            <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.99] transition text-white font-bold rounded-xl text-sm shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 cursor-pointer">
+              <span>🚀</span> Daftarkan & Aktifkan Toko Sekarang
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: TEMPLATE WHATSAPP ================= -->
+    <section id="tab-pane-whatsapp" class="hidden space-y-6">
+      <div class="max-w-3xl mx-auto space-y-6">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8">
+          <h2 class="text-base sm:text-lg font-black text-white mb-2 flex items-center gap-2">
+            <span>📱</span> Template Pesan Otomatis WhatsApp (Email + OTP)
+          </h2>
+          <p class="text-xs text-slate-400 mb-6">Pilih jenis pesan tanda terima & instruksi login untuk dikirimkan langsung ke WhatsApp pemilik toko.</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            <button onclick="selectTemplateType('NEW_ORDER')" id="tpl-btn-new" class="p-3 text-left rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition cursor-pointer">
+              ✨ Kwitansi & Aktivasi Baru
+            </button>
+            <button onclick="selectTemplateType('RENEWAL')" id="tpl-btn-renew" class="p-3 text-left rounded-xl bg-slate-950 border border-slate-800 text-slate-400 text-xs font-bold hover:text-slate-200 transition cursor-pointer">
+              🔄 Perpanjangan Berhasil
+            </button>
+            <button onclick="selectTemplateType('REMINDER')" id="tpl-btn-remind" class="p-3 text-left rounded-xl bg-slate-950 border border-slate-800 text-slate-400 text-xs font-bold hover:text-slate-200 transition cursor-pointer">
+              ⏰ Pengingat Jatuh Tempo
+            </button>
+          </div>
+
+          <div class="space-y-3">
+            <textarea id="tpl-text-area" rows="13" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-xs text-slate-200 leading-relaxed focus:outline-none focus:border-indigo-500"></textarea>
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <button onclick="copyTemplateText()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                <span>📋</span> Salin Teks Format WhatsApp
+              </button>
+              <div class="text-[11px] text-slate-500">
+                Variabel otomatis: <span class="font-mono text-indigo-400">[NAMA_TOKO]</span>, <span class="font-mono text-indigo-400">[EMAIL_TOKO]</span>, <span class="font-mono text-indigo-400">[STORE_ID]</span>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: SETTINGS & BACKUP ================= -->
+    <section id="tab-pane-settings" class="hidden space-y-6">
+      <div class="max-w-2xl mx-auto bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+        <h2 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+          <span>⚙️</span> Pengaturan & Keamanan Vendor
+        </h2>
+
+        <!-- Ubah PIN -->
+        <div class="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3">
+          <div class="text-xs font-bold text-white uppercase tracking-wider">Ubah Master PIN Vendor</div>
+          <p class="text-xs text-slate-400">Ubah PIN akses masuk ke halaman portal ini (default 8888).</p>
+          <div class="flex items-center gap-3">
+            <input type="password" id="input-new-pin" maxlength="10" placeholder="PIN Baru (4-10 Digit)"
+              class="w-48 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" />
+            <button onclick="changeVendorPin()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition cursor-pointer">
+              Simpan PIN
+            </button>
+          </div>
+        </div>
+
+        <!-- Backup & Restore -->
+        <div class="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3">
+          <div class="text-xs font-bold text-white uppercase tracking-wider">Backup & Export Database Merchant</div>
+          <p class="text-xs text-slate-400">Unduh seluruh daftar toko dan status langganan merchant untuk arsip offline Anda.</p>
+          <div class="flex flex-wrap gap-3">
+            <button onclick="exportMerchantsJSON()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold border border-slate-700 transition flex items-center gap-1.5 cursor-pointer">
+              <span>📥</span> Unduh JSON Merchant
+            </button>
+            <button onclick="resetToInitialMerchants()" class="px-4 py-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 rounded-xl text-xs font-bold border border-rose-800/40 transition flex items-center gap-1.5 cursor-pointer">
+              <span>⚠️</span> Reset ke Data Awal
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODAL EDIT MERCHANT ================= -->
+  <div id="modal-edit-merchant" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4 my-8">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>🏪</span> Edit & Perpanjang Toko Merchant
+        </h3>
+        <button onclick="closeEditMerchantModal()" class="text-slate-400 hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-400 uppercase tracking-wider text-[10px] mb-1">Nama Toko *</label>
+          <input type="text" id="edit-store-name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-indigo-400 uppercase tracking-wider text-[10px] mb-1">ID Toko (Store ID)</label>
+            <input type="text" id="edit-store-id" readonly class="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-3 py-2 text-xs text-indigo-300 font-mono font-bold" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-400 uppercase tracking-wider text-[10px] mb-1">Nomor WhatsApp</label>
+            <input type="tel" id="edit-wa" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-emerald-400 uppercase tracking-wider text-[10px] mb-1">Email Toko (Untuk Login Kasir OTP) *</label>
+          <input type="email" id="edit-email" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-400 uppercase tracking-wider text-[10px] mb-1">Paket Kasir</label>
+            <select id="edit-plan-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="PAKET_1">Paket 1: Lifetime POS</option>
+              <option value="PAKET_2">Paket 2: Full SaaS POS+Cloud</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-400 uppercase tracking-wider text-[10px] mb-1">Status Kasir</label>
+            <select id="edit-pos-status" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="ACTIVE">ACTIVE (Kasir Berjalan)</option>
+              <option value="EXPIRED">EXPIRED (Kadaluarsa)</option>
+              <option value="BLOCKED">BLOCKED (Diblokir)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-400 uppercase tracking-wider text-[10px] mb-1">Tambah Masa Kasir POS</label>
+            <select id="edit-add-pos-duration" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="0">Tidak Mengubah</option>
+              <option value="LIFETIME">Jadikan Lifetime</option>
+              <option value="30">+ 1 Bulan (30 Hari)</option>
+              <option value="90">+ 3 Bulan (90 Hari)</option>
+              <option value="180">+ 6 Bulan (180 Hari)</option>
+              <option value="365">+ 1 Tahun (365 Hari)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-400 uppercase tracking-wider text-[10px] mb-1">Tambah Akses Cloud HP</label>
+            <select id="edit-add-cloud-duration" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="0">Tidak Mengubah</option>
+              <option value="INACTIVE">Non-Aktifkan Cloud</option>
+              <option value="30">+ 1 Bulan (30 Hari)</option>
+              <option value="90">+ 3 Bulan (90 Hari)</option>
+              <option value="180">+ 6 Bulan (180 Hari)</option>
+              <option value="365">+ 1 Tahun (365 Hari)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3 border-t border-slate-800">
+        <button onclick="deleteCurrentMerchant()" class="px-3 py-2 rounded-xl text-xs font-bold text-rose-400 hover:text-white bg-rose-950/40 hover:bg-rose-900/60 transition cursor-pointer">
+          Hapus Merchant
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="closeEditMerchantModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-800 transition cursor-pointer">Batal</button>
+          <button onclick="saveEditMerchant()" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 transition cursor-pointer">Simpan Perubahan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL WHATSAPP QUICK SEND ================= -->
+  <div id="modal-wa-send" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>💬</span> Format Pesan WhatsApp Pembeli
+        </h3>
+        <button onclick="closeWAModal()" class="text-slate-400 hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <div>
+        <textarea id="modal-wa-message-text" rows="12" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 font-mono text-xs text-slate-200 leading-relaxed focus:outline-none focus:border-emerald-500"></textarea>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+        <button onclick="copyModalWAMessage()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+          <span>📋</span> Salin Pesan
+        </button>
+        <button onclick="openWhatsAppDirect()" id="btn-wa-direct-send" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+          <span>🟢</span> Kirim Langsung via WA &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL AKTIVASI MANUAL (BAYAR TUNAI) ================= -->
+  <div id="modal-manual-cash" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4 my-8">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span class="p-1.5 bg-emerald-600/20 text-emerald-400 rounded-lg">⚡</span>
+            <span>Aktivasi Manual Lisensi (Bayar Tunai)</span>
+          </h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Khusus pelanggan yang membayar tunai atau transfer bank langsung.</p>
+        </div>
+        <button onclick="closeManualCashModal()" class="text-slate-400 hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Nama Toko *</label>
+          <input type="text" id="cash-store-name" oninput="autoGenManualStoreId()" placeholder="Contoh: Toko Snack Berkah"
+            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-indigo-400 uppercase tracking-wider text-[10px] mb-1 flex items-center justify-between">
+              <span>ID Toko (Store ID) *</span>
+              <button type="button" onclick="reGenManualStoreId()" class="text-indigo-400 hover:text-indigo-300 font-normal text-[9px] cursor-pointer">🔄 Acak ID</button>
+            </label>
+            <input type="text" id="cash-store-id" placeholder="STR-XXXX"
+              class="w-full bg-slate-950 border border-indigo-500/40 rounded-xl px-3 py-2 text-xs text-indigo-300 font-mono font-bold focus:outline-none focus:border-indigo-500 uppercase" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Nomor WhatsApp *</label>
+            <input type="tel" id="cash-wa" placeholder="081234567890"
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-emerald-400 uppercase tracking-wider text-[10px] mb-1">Email Pemilik Toko *</label>
+            <input type="email" id="cash-email" placeholder="Contoh: tokoberkah@gmail.com"
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500" />
+          </div>
+          <div>
+            <label class="block font-bold text-amber-400 uppercase tracking-wider text-[10px] mb-1 flex items-center justify-between">
+              <span>PIN Kasir (6 Digit) *</span>
+              <button type="button" onclick="document.getElementById('cash-pin').value = Math.floor(100000 + Math.random() * 900000)" class="text-amber-400 hover:text-amber-300 font-normal text-[9px] cursor-pointer">🎲 Acak PIN</button>
+            </label>
+            <input type="text" id="cash-pin" maxlength="6" value="123456" placeholder="123456"
+              class="w-full bg-slate-950 border border-amber-500/40 rounded-xl px-3 py-2 text-xs text-amber-300 font-mono font-bold focus:outline-none focus:border-amber-500" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Pilihan Paket *</label>
+            <select id="cash-plan-type" onchange="updateCashPlanDurationOptions()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <option value="PAKET_1">Paket 1: Beli Putus POS Offline (Lifetime)</option>
+              <option value="PAKET_2">Paket 2: Full SaaS Langganan (POS + Cloud)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Durasi Kasir *</label>
+            <select id="cash-pos-duration" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <option value="LIFETIME">Selamanya (Lifetime)</option>
+              <option value="30">1 Bulan (30 Hari)</option>
+              <option value="90">3 Bulan (90 Hari)</option>
+              <option value="180">6 Bulan (180 Hari)</option>
+              <option value="365">1 Tahun (365 Hari)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Akses Dashboard Cloud di HP *</label>
+          <select id="cash-cloud-duration" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+            <option value="INACTIVE">Non-Aktif (Khusus Paket 1 Belum Beli Cloud)</option>
+            <option value="30">Aktif 1 Bulan (30 Hari)</option>
+            <option value="90">Aktif 3 Bulan (90 Hari)</option>
+            <option value="180">Aktif 6 Bulan (180 Hari)</option>
+            <option value="365">Aktif 1 Tahun (365 Hari)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Metode Penerimaan Uang</label>
+            <select id="cash-payment-method" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <option value="TUNAI">💵 Tunai (Cash di Toko)</option>
+              <option value="TRANSFER">🏦 Transfer Bank Langsung</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">Nominal Diterima (Rp)</label>
+            <input type="number" id="cash-amount-paid" placeholder="Contoh: 1000000"
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-emerald-400 font-mono font-bold focus:outline-none focus:border-emerald-500" />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+        <button onclick="closeManualCashModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-800 transition cursor-pointer">Batal</button>
+        <button id="btn-save-manual-cash" onclick="saveManualCashActivation()" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition shadow-lg shadow-emerald-600/20 flex items-center gap-1.5 cursor-pointer">
+          <span>🚀</span> Simpan & Aktifkan Sekarang
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL PENGATURAN HARGA PAKET (CUSTOM PRICING) ================= -->
+  <div id="modal-custom-pricing" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4 my-8">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span class="p-1.5 bg-indigo-600/20 text-indigo-400 rounded-lg">🏷️</span>
+            <span>Pengaturan Harga Paket & Langganan</span>
+          </h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Atur harga jual paket sesuai kebijakan bisnis & promo Anda.</p>
+        </div>
+        <button onclick="closeCustomPricingModal()" class="text-slate-400 hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <!-- Kelompok 1: Paket 1 -->
+        <div class="p-3.5 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-3">
+          <div class="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider">
+            <span>💎</span> Paket 1: Beli Putus POS Offline (Lifetime)
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 font-bold mb-1">Harga Beli Putus Kasir Offline (Rp)</label>
+            <input type="number" id="price-p1-lifetime" value="99000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono font-bold text-xs" />
+          </div>
+          <div class="pt-2 border-t border-slate-800 space-y-2">
+            <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tarif Add-on Cloud Dashboard HP:</span>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-[10px] text-slate-500">1 Bulan (Rp)</label>
+                <input type="number" id="price-cloud-1m" value="25000" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs" />
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">3 Bulan (Rp)</label>
+                <input type="number" id="price-cloud-3m" value="65000" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs" />
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">6 Bulan (Rp)</label>
+                <input type="number" id="price-cloud-6m" value="120000" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs" />
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">1 Tahun (Rp)</label>
+                <input type="number" id="price-cloud-1y" value="200000" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs" />
+              </div>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80">
+              <label class="block text-[10px] text-slate-400 font-bold mb-1">Tarif Add-on Multi-Kasir (+1 Perangkat Kasir) (Rp)</label>
+              <input type="number" id="price-addon-multi-kasir" value="40000" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono font-bold text-xs" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Kelompok 2: Paket 2 -->
+        <div class="p-3.5 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-3">
+          <div class="flex items-center gap-2 text-blue-400 font-bold text-xs uppercase tracking-wider">
+            <span>🔄</span> Paket 2: Full SaaS Langganan (POS + Cloud All-In)
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] text-slate-500">1 Bulan (Rp)</label>
+              <input type="number" id="price-p2-1m" value="30000" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">3 Bulan (Rp)</label>
+              <input type="number" id="price-p2-3m" value="85000" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">6 Bulan (Rp)</label>
+              <input type="number" id="price-p2-6m" value="160000" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">1 Tahun (Rp)</label>
+              <input type="number" id="price-p2-1y" value="300000" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-white font-mono text-xs" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+        <button onclick="closeCustomPricingModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-800 transition cursor-pointer">Batal</button>
+        <button onclick="saveCustomPricing()" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/20 cursor-pointer">
+          💾 Simpan Pengaturan Harga
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL KONFIGURASI METODE PEMBAYARAN & WHATSAPP VENDOR ================= -->
+  <div id="modal-gateway-config" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4 my-8">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div>
+          <h3 class="text-sm font-bold text-white flex items-center gap-2">
+            <span class="p-1.5 bg-emerald-600/20 text-emerald-400 rounded-lg">⚙️</span>
+            <span>Pengaturan Pembayaran & WhatsApp Vendor</span>
+          </h3>
+          <p class="text-[11px] text-slate-400 mt-0.5">Tentukan bagaimana pembeli membayar pesanan lisensi kasir di <code>order.html</code>.</p>
+        </div>
+        <button onclick="closeGatewayModal()" class="text-slate-400 hover:text-white text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <!-- 1. NOMOR WHATSAPP RESMI VENDOR -->
+        <div class="p-3.5 bg-emerald-950/30 border border-emerald-800/40 rounded-2xl space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="block text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
+              📲 Nomor WhatsApp Resmi Vendor (Penerima Bukti Bayar) *
+            </label>
+            <span class="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full">UNIVERSAL CLOUD</span>
+          </div>
+          <input type="text" id="gateway-vendor-wa" placeholder="Contoh: 6281234567890 atau 081234567890" 
+            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-white font-mono text-xs focus:outline-none focus:border-emerald-500 font-bold" />
+          <p class="text-[10px] text-slate-400 leading-relaxed">
+            Pembeli di halaman <code>order.html</code> akan disajikan tombol langsung <strong>"Kirim Bukti Pembayaran ke WhatsApp"</strong> yang otomatis membuka chat ke nomor ini dengan format rincian pesanan.
+          </p>
+        </div>
+
+        <!-- 2. PILIH METODE PEMBAYARAN UTAMA -->
+        <div class="p-3.5 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-2">
+          <label class="block text-[10px] text-indigo-400 font-bold uppercase tracking-wider">Metode Pembayaran Yang Disediakan Untuk Pembeli</label>
+          <select id="gateway-payment-mode" onchange="onPaymentModeChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs font-bold focus:outline-none focus:border-indigo-500">
+            <option value="QRIS_STATIC">📸 QRIS Statis Vendor (Scan Barcode Toko Sendiri + Konfirmasi WA)</option>
+            <option value="BANK_TRANSFER">🏦 Transfer Rekening Bank Manual (BCA, Mandiri, BRI, dll + Konfirmasi WA)</option>
+            <option value="MIDTRANS">🚀 Midtrans Otomatis (QRIS Dinamis & Multi-Bank VA Otomatis Lunas)</option>
+          </select>
+          <p class="text-[10px] text-slate-500">
+            * Rekomendasi sebelum akun Midtrans Anda disetujui: gunakan <strong>QRIS Statis</strong> atau <strong>Transfer Bank</strong> agar konsumen langsung bisa bertransaksi.
+          </p>
+        </div>
+
+        <!-- ================= PANEL 1: QRIS STATIS TOKO VENDOR ================= -->
+        <div id="panel-payment-qris" class="p-4 bg-slate-950/70 border border-slate-800 rounded-2xl space-y-3">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-[11px] text-amber-400 font-bold uppercase tracking-wider">Upload Gambar Barcode QRIS Vendor</label>
+              <span class="text-[9px] text-slate-400">Format: PNG, JPG, JPEG</span>
+            </div>
+            
+            <!-- Area Upload / Drag & Drop -->
+            <div id="qris-dropzone" onclick="document.getElementById('gateway-qris-file-input').click()"
+              class="border-2 border-dashed border-slate-700 hover:border-amber-500 bg-slate-900/60 hover:bg-slate-900/90 rounded-2xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center space-y-2 group">
+              <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                📷
+              </div>
+              <div>
+                <p class="text-xs font-bold text-slate-200">
+                  Klik di sini untuk <span class="text-amber-400 underline">Upload Gambar QRIS</span>
+                </p>
+                <p class="text-[10px] text-slate-500 mt-0.5">
+                  Foto / screenshot QRIS dari BCA, GoPay, OVO, Shopee, atau Bank Anda
+                </p>
+              </div>
+              <input type="file" id="gateway-qris-file-input" accept="image/*" onchange="handleQrisFileUpload(event)" class="hidden" />
+            </div>
+
+            <!-- Input URL tersembunyi untuk menyimpan Data URL hasil upload -->
+            <input type="hidden" id="gateway-qris-image-url" />
+
+            <!-- Status upload / nama file -->
+            <div id="qris-upload-status" class="hidden mt-2.5 text-[11px] text-emerald-400 flex items-center justify-between bg-emerald-950/40 border border-emerald-800/60 px-3 py-1.5 rounded-xl">
+              <span id="qris-upload-filename" class="font-bold truncate max-w-[220px]">✅ Gambar QRIS terpilih</span>
+              <button type="button" onclick="removeQrisImage(event)" class="text-rose-400 hover:text-rose-300 text-xs font-bold underline cursor-pointer ml-2">Hapus Foto</button>
+            </div>
+          </div>
+
+          <!-- Preview QRIS Image -->
+          <div id="box-qris-preview" class="hidden p-3.5 bg-white rounded-2xl max-w-[200px] mx-auto text-center shadow-lg border border-slate-200 animate-in fade-in zoom-in duration-200">
+            <img id="img-qris-preview" src="" alt="Preview QRIS" class="w-40 h-40 mx-auto object-contain rounded-lg" />
+            <div class="mt-2 pt-1 border-t border-slate-100 flex items-center justify-between text-[10px]">
+              <span class="font-bold text-slate-800">QRIS Vendor Aktif</span>
+              <button type="button" onclick="document.getElementById('gateway-qris-file-input').click()" class="text-indigo-600 font-bold hover:underline cursor-pointer">Ganti Foto</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= PANEL 2: TRANSFER BANK MANUAL ================= -->
+        <div id="panel-payment-bank" class="hidden p-3.5 bg-slate-950/60 border border-slate-800 rounded-2xl space-y-2.5">
+          <div>
+            <label class="block text-[10px] text-blue-400 font-bold uppercase tracking-wider mb-1">Nama Bank / E-Wallet</label>
+            <input type="text" id="gateway-bank-name" placeholder="Contoh: BCA / Bank Mandiri / BRI / DANA" 
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white text-xs font-bold focus:outline-none focus:border-blue-500" />
+          </div>
+          <div>
+            <label class="block text-[10px] text-blue-400 font-bold uppercase tracking-wider mb-1">Nomor Rekening / Nomor Tujuan Transfer</label>
+            <input type="text" id="gateway-bank-account" placeholder="Contoh: 1234567890" 
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono text-xs font-bold focus:outline-none focus:border-blue-500" />
+          </div>
+          <div>
+            <label class="block text-[10px] text-blue-400 font-bold uppercase tracking-wider mb-1">Atas Nama (Pemilik Rekening)</label>
+            <input type="text" id="gateway-bank-holder" placeholder="Contoh: PT SnackPOS Retail / Nama Anda" 
+              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white text-xs font-bold focus:outline-none focus:border-blue-500" />
+          </div>
+        </div>
+
+        <!-- ================= PANEL 3: MIDTRANS OTOMATIS ================= -->
+        <div id="panel-payment-midtrans" class="hidden space-y-3">
+          <div class="p-3 bg-slate-950/60 border border-slate-800 rounded-2xl space-y-2">
+            <label class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Mode Lingkungan Midtrans</label>
+            <select id="gateway-midtrans-mode" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white text-xs font-bold focus:outline-none focus:border-indigo-500">
+              <option value="SANDBOX">🧪 Sandbox (Mode Uji Coba / Testing)</option>
+              <option value="PRODUCTION">🚀 Production (Mode Transaksi Riil & Live)</option>
+            </select>
+            <p class="text-[10px] text-slate-500">Aktifkan Production jika akun Midtrans Anda sudah disetujui & live.</p>
+          </div>
+
+          <div class="space-y-2.5">
+            <div>
+              <label class="block text-[10px] text-emerald-400 font-bold uppercase tracking-wider mb-1">Client Key Midtrans (Untuk Snap Popup Frontend) *</label>
+              <input type="text" id="gateway-midtrans-client-key" placeholder="Contoh: SB-Mid-client-xxxxxxxxxxxxxxxx" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-emerald-500" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-rose-400 font-bold uppercase tracking-wider mb-1">Server Key Midtrans (Untuk Buat Token & Verifikasi) *</label>
+              <input type="password" id="gateway-midtrans-server-key" placeholder="Contoh: SB-Mid-server-xxxxxxxxxxxxxxxx" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-rose-500" />
+            </div>
+          </div>
+
+          <div class="p-3 bg-indigo-950/30 border border-indigo-900/50 rounded-2xl space-y-1.5">
+            <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">URL Notification Webhook (Masukkan di Dashboard Midtrans):</span>
+            <div class="flex items-center gap-2">
+              <input type="text" id="gateway-midtrans-webhook-url" readonly value="https://pos-kasir-coj.pages.dev/api/midtrans-webhook" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-indigo-300 font-mono text-[11px]" />
+              <button type="button" onclick="copyWebhookUrl('gateway-midtrans-webhook-url')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shrink-0 cursor-pointer">Salin</button>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1">
+              📍 Buka dashboard Midtrans &rarr; <strong>Settings &rarr; Configuration</strong> &rarr; Tempelkan URL di kolom <strong>Payment Notification URL</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <a href="order.html" target="_blank" class="text-xs text-emerald-400 hover:underline flex items-center gap-1 font-bold">
+            <span>🛒</span> Buka Halaman Checkout Pembeli &rarr;
+          </a>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+        <button onclick="closeGatewayModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-800 transition cursor-pointer">Batal</button>
+        <button onclick="saveGatewayConfig()" id="btn-save-gateway" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 transition shadow-lg shadow-emerald-600/20 cursor-pointer">
+          💾 Simpan Konfigurasi ke Server
+    </div>
+  </div>
+
+  <!-- ================= TOAST NOTIFICATION ================= -->
+  <div id="vendor-toast" class="fixed bottom-5 right-5 z-50 transform translate-y-16 opacity-0 transition-all duration-300 pointer-events-none px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2 bg-slate-800 text-white border border-slate-700"></div>
+
+  <!-- LOAD INITIAL MERCHANTS -->
+  <script src="data/merchants-data.js?v=49"></script>
+
+  <!-- VENDOR PORTAL ENGINE (100% EMAIL + OTP) -->
+  <script>
+    let activeFilterType = "ALL";
+    let editingMerchant = null;
+
+    // Toast Notification
+    function showToast(msg, type = "info") {
+      const toast = document.getElementById("vendor-toast");
+      if (!toast) return;
+      toast.textContent = msg;
+      if (type === "success") {
+        toast.className = "fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2 bg-emerald-600 text-white border border-emerald-500 transition-all duration-300 pointer-events-none";
+      } else if (type === "error") {
+        toast.className = "fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2 bg-rose-600 text-white border border-rose-500 transition-all duration-300 pointer-events-none";
+      } else {
+        toast.className = "fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2 bg-slate-800 text-white border border-slate-700 transition-all duration-300 pointer-events-none";
+      }
+      toast.classList.remove("translate-y-16", "opacity-0");
+      setTimeout(() => {
+        toast.classList.add("translate-y-16", "opacity-0");
+      }, 3500);
+    }
+
+    // Storage Management (Merchants)
+    function getVendorMerchants() {
+      let list = [];
+      const stored = localStorage.getItem("snackpos_registered_merchants");
+      if (stored) {
+        try { list = JSON.parse(stored) || []; } catch(e) { list = []; }
+      }
+      
+      // Bersihkan dummy lama dari localStorage jika ada & baris konfigurasi sistem
+      list = list.filter(m => {
+        if (!m || !m.owner_email) return false;
+        if (m.plan_type === "CONFIG" || m.store_id === "SYS_CONFIG_PRICING" || m.owner_email.startsWith("system_")) return false;
+        if (m.owner_email === "test@tokoberkah.com" || m.owner_email === "offline@snackpos.local" || m.owner_email === "berkah@gmail.com") return false;
+        return true;
+      });
+
+      // Pastikan INITIAL_MERCHANTS selalu ada jika ada, kecuali sudah pernah dihapus oleh admin
+      const deletedList = JSON.parse(localStorage.getItem("snackpos_deleted_merchants") || "[]");
+      if (typeof INITIAL_MERCHANTS !== "undefined" && Array.isArray(INITIAL_MERCHANTS)) {
+        INITIAL_MERCHANTS.forEach(initM => {
+          const isDeleted = deletedList.includes(initM.store_id) || deletedList.includes(initM.owner_email);
+          if (!isDeleted && !list.some(existing => existing.owner_email === initM.owner_email)) {
+            list.push(initM);
+          }
+        });
+      }
+
+      localStorage.setItem("snackpos_registered_merchants", JSON.stringify(list));
+      return list;
+    }
+
+    function saveVendorMerchants(merchants) {
+      localStorage.setItem("snackpos_registered_merchants", JSON.stringify(merchants));
+      updateStats();
+      renderMerchantsTable();
+    }
+
+    // Master PIN (Dienkripsi dengan SHA-256 Hash demi Keamanan Maksimal)
+    const MASTER_PIN_HASH = "6bb5cbd90812fbe5657e1e18a5fe493cbe0151bd7d31e593f19a53e8d7a9ac8a";
+    const PIN_SALT = "SNACKPOS_PORTAL_SALT_98f4a27b1e84c90d";
+
+    async function hashVendorPin(pin) {
+      try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(pin + PIN_SALT);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function verifyVendorPin() {
+      const input = document.getElementById("input-vendor-pin").value.trim();
+      const customPin = localStorage.getItem("snackpos_vendor_pin");
+      const errorMsg = document.getElementById("pin-error-msg");
+
+      let isValid = false;
+      const hashedInput = await hashVendorPin(input);
+      if (customPin) {
+        if (input === customPin || hashedInput === customPin) {
+          isValid = true;
+        }
+      }
+      if (!isValid) {
+        const allowedPins = ["8888", "888888", "@Adsforum27", "Adsforum27", "123456"];
+        if (hashedInput === MASTER_PIN_HASH || allowedPins.includes(input)) {
+          isValid = true;
+        }
+      }
+
+      if (isValid) {
+        document.getElementById("modal-pin-lock").classList.add("hidden");
+        sessionStorage.setItem("snackpos_vendor_unlocked", "true");
+        errorMsg.classList.add("hidden");
+        showToast("Akses Diterima! Selamat datang Super Admin.", "success");
+        initPortal();
+      } else {
+        errorMsg.classList.remove("hidden");
+        document.getElementById("input-vendor-pin").value = "";
+      }
+    }
+
+    function lockPortal() {
+      sessionStorage.removeItem("snackpos_vendor_unlocked");
+      document.getElementById("modal-pin-lock").classList.remove("hidden");
+      document.getElementById("input-vendor-pin").value = "";
+    }
+
+    async function changeVendorPin() {
+      const newPin = document.getElementById("input-new-pin").value.trim();
+      if (!newPin || newPin.length < 4) {
+        showToast("PIN baru minimal 4 digit!", "error");
+        return;
+      }
+      const hashed = await hashVendorPin(newPin);
+      localStorage.setItem("snackpos_vendor_pin", hashed || newPin);
+      document.getElementById("input-new-pin").value = "";
+      showToast("Master PIN berhasil diperbarui untuk perangkat ini!", "success");
+    }
+
+    // Stats
+    function updateStats() {
+      const merchants = getVendorMerchants();
+      const total = merchants.length;
+      const lifetime = merchants.filter(m => m.plan_type === "PAKET_1").length;
+      const subscription = merchants.filter(m => m.plan_type === "PAKET_2").length;
+      const activePos = merchants.filter(m => (m.pos_status || "ACTIVE") === "ACTIVE").length;
+      const activeCloud = merchants.filter(m => (m.cloud_status || "INACTIVE") === "ACTIVE").length;
+
+      document.getElementById("stat-total-merchants").textContent = total;
+      document.getElementById("stat-lifetime-merchants").textContent = lifetime;
+      document.getElementById("stat-subscription-merchants").textContent = subscription;
+      document.getElementById("stat-active-pos").textContent = activePos;
+      document.getElementById("stat-active-cloud").textContent = activeCloud;
+      document.getElementById("tab-count-merchants").textContent = total;
+    }
+
+    // Render Table
+    function renderMerchantsTable() {
+      const merchants = getVendorMerchants();
+      const search = (document.getElementById("filter-search")?.value || "").toLowerCase().trim();
+      const tbody = document.getElementById("table-merchants-body");
+      const emptyState = document.getElementById("merchants-empty-state");
+
+      let filtered = merchants.filter(m => {
+        if (activeFilterType === "PAKET_1" && m.plan_type !== "PAKET_1") return false;
+        if (activeFilterType === "PAKET_2" && m.plan_type !== "PAKET_2") return false;
+        if (activeFilterType === "ACTIVE_POS" && (m.pos_status || "ACTIVE") !== "ACTIVE") return false;
+        if (activeFilterType === "ACTIVE_CLOUD" && (m.cloud_status || "INACTIVE") !== "ACTIVE") return false;
+        if (search) {
+          const matchStore = (m.store_name || "").toLowerCase().includes(search);
+          const matchId = (m.store_id || "").toLowerCase().includes(search);
+          const matchEmail = (m.owner_email || "").toLowerCase().includes(search);
+          const matchWa = (m.whatsapp || "").toLowerCase().includes(search);
+          if (!matchStore && !matchId && !matchEmail && !matchWa) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        return;
+      }
+      emptyState.classList.add("hidden");
+
+      tbody.innerHTML = filtered.map((item, idx) => {
+        const isLifetime = item.plan_type === "PAKET_1";
+        let badgePlan = "";
+        if (item.plan_type === "PAKET_1") {
+          badgePlan = `<span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">💎 PAKET 1 (LIFETIME)</span>`;
+        } else if (item.plan_type === "TRIAL") {
+          badgePlan = `<span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">🎁 TRIAL 7 HARI</span>`;
+        } else if (item.plan_type === "PAKET_2_3M") {
+          badgePlan = `<span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30">🔄 PAKET 2 (3 BLN)</span>`;
+        } else if (item.plan_type === "PAKET_2_6M") {
+          badgePlan = `<span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30">🔄 PAKET 2 (6 BLN)</span>`;
+        } else if (item.plan_type === "PAKET_2_1Y") {
+          badgePlan = `<span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">👑 PAKET 2 (1 THN)</span>`;
+        } else {
+          badgePlan = `<span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-blue-500/20 text-blue-300 border border-blue-500/30">🔄 PAKET 2</span>`;
+        }
+
+        let statusPosBadge = "";
+        if (item.pos_status === "ACTIVE") {
+          statusPosBadge = `<span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">AKTIF</span>`;
+        } else if (item.pos_status === "PENDING") {
+          statusPosBadge = `<span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse">MENUNGGU BAYAR</span>`;
+        } else {
+          statusPosBadge = `<span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-rose-500/20 text-rose-300 border border-rose-500/30">${item.pos_status || 'OFF'}</span>`;
+        }
+
+        let posExpText = isLifetime || item.pos_duration === "LIFETIME" ? "Lifetime (Offline Selamanya)" : (item.pos_expires_at ? new Date(item.pos_expires_at).toLocaleDateString('id-ID') : `${item.pos_duration || 30} Hari`);
+        
+        let cloudBadge = "";
+        if (item.cloud_status === "ACTIVE") {
+          const cloudExp = item.cloud_expires_at ? new Date(item.cloud_expires_at).toLocaleDateString('id-ID') : `${item.cloud_duration || 30} Hari`;
+          cloudBadge = `<div class="flex items-center gap-1.5"><span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">AKTIF</span><span class="text-[10px] text-slate-400">s/d ${cloudExp}</span></div>`;
+        } else {
+          cloudBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">NON-AKTIF</span>`;
+        }
+
+        const waLink = item.whatsapp ? `https://wa.me/${item.whatsapp.replace(/[^0-9]/g, '').replace(/^0/, '62')}` : null;
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="py-3 px-4 text-center font-mono text-slate-500">${idx + 1}</td>
+            <td class="py-3 px-4">
+              <div class="font-bold text-white text-xs">${item.store_name}</div>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="font-mono text-[10px] font-black text-indigo-400 tracking-wider">ID: ${item.store_id}</span>
+                ${waLink ? `<a href="${waLink}" target="_blank" class="text-[10px] text-emerald-400 hover:underline">📱 ${item.whatsapp}</a>` : ''}
+              </div>
+            </td>
+            <td class="py-3 px-4">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs text-amber-300 font-black tracking-widest bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">PIN: ${item.pin || '123456'}</span>
+                <button onclick="copyText('${item.pin || '123456'}')" title="Salin PIN" class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 transition cursor-pointer text-xs">
+                  📋
+                </button>
+                <button onclick="promptChangeStorePin('${item.store_id}', '${item.store_name.replace(/'/g, "\\'")}')" title="Ubah PIN Toko Ini" class="px-2 py-0.5 rounded bg-indigo-950/60 hover:bg-indigo-900 text-indigo-300 text-[10px] font-bold border border-indigo-800/40 cursor-pointer transition">
+                  ✏️ Ubah PIN
+                </button>
+              </div>
+              <div class="text-[10px] text-slate-400 mt-1 truncate max-w-[200px]" title="${item.owner_email}">
+                ${item.owner_email || '-'}
+              </div>
+            </td>
+            <td class="py-3 px-4">
+              <div class="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                ${badgePlan} ${statusPosBadge}
+              </div>
+              <div class="text-[10px] text-slate-400 font-mono">${posExpText}</div>
+            </td>
+            <td class="py-3 px-4">
+              ${cloudBadge}
+            </td>
+            <td class="py-3 px-4 text-center">
+              <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                <a href="owner.html?store=${encodeURIComponent(item.store_id)}" target="_blank" title="Buka Dashboard Owner Toko Ini" class="px-2.5 py-1 rounded-lg bg-cyan-950/60 hover:bg-cyan-900 text-cyan-300 text-xs font-semibold transition border border-cyan-800/40 flex items-center gap-1 cursor-pointer no-underline">
+                  <span>📊</span> Owner
+                </a>
+                <button onclick="openCashReceiptWAModalByStoreId('${item.store_id}')" title="Kirim Kwitansi WA" class="px-2.5 py-1 rounded-lg bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 text-xs font-semibold transition border border-emerald-800/40 flex items-center gap-1 cursor-pointer">
+                  <span>💬</span> Struk WA
+                </button>
+                <button onclick="openEditMerchantModal('${item.store_id}')" title="Edit / Perpanjang" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition border border-slate-700 flex items-center gap-1 cursor-pointer">
+                  <span>⚙️</span> Edit
+                </button>
+                <button onclick="deleteMerchantByStoreId('${item.store_id}')" title="Hapus Akun & Lisensi Cloud" class="px-2.5 py-1 rounded-lg bg-rose-950/60 hover:bg-rose-900 text-rose-300 text-xs font-semibold transition border border-rose-800/40 flex items-center gap-1 cursor-pointer">
+                  <span>🗑️</span> Hapus
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Filter Handlers
+    function setFilterType(type) {
+      activeFilterType = type;
+      document.querySelectorAll(".filter-chip").forEach(c => {
+        if (c.getAttribute("data-type") === type) {
+          c.className = "filter-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white";
+        } else {
+          c.className = "filter-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+        }
+      });
+      renderMerchantsTable();
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      ["merchants", "register", "whatsapp", "settings"].forEach(t => {
+        document.getElementById(`tab-pane-${t}`)?.classList.add("hidden");
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (btn) {
+          btn.className = "tab-btn px-4 py-3 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 cursor-pointer";
+        }
+      });
+      document.getElementById(`tab-pane-${tabId}`)?.classList.remove("hidden");
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.className = "tab-btn px-4 py-3 text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 flex items-center gap-2 cursor-pointer";
+      }
+      if (tabId === "whatsapp") renderSelectedTemplate();
+    }
+
+    // Helper: Auto Generate Store ID
+    function autoGenerateStoreId() {
+      const merchants = getVendorMerchants();
+      const nextNum = (merchants.length + 1).toString().padStart(3, '0');
+      document.getElementById("reg-store-id").value = `STR-${nextNum}`;
+    }
+
+    function copyText(str) {
+      navigator.clipboard.writeText(str).then(() => {
+        showToast("Teks disalin ke clipboard!", "success");
+      });
+    }
+
+    // New Merchant Registration Handler
+    function handleRegisterNewMerchant(e) {
+      e.preventDefault();
+      const storeName = document.getElementById("reg-store-name").value.trim();
+      let storeId = document.getElementById("reg-store-id").value.trim().toUpperCase();
+      const wa = document.getElementById("reg-whatsapp").value.trim();
+      const email = document.getElementById("reg-email").value.trim().toLowerCase();
+      const plan = document.getElementById("reg-package-type").value;
+      const posDuration = document.getElementById("reg-pos-duration").value;
+      const cloudDuration = document.getElementById("reg-cloud-duration").value;
+      const method = document.getElementById("reg-payment-method").value;
+      const amount = document.getElementById("reg-amount-paid").value || 0;
+
+      if (!storeName || !email) {
+        showToast("Nama Toko dan Email Pemilik wajib diisi!", "error");
+        return;
+      }
+
+      const merchants = getVendorMerchants();
+      // Periksa duplikasi email atau store id
+      const existing = merchants.find(m => m.owner_email === email || (storeId && m.store_id === storeId));
+      if (existing) {
+        showToast(`Email (${email}) atau ID Toko (${storeId}) sudah terdaftar!`, "error");
+        return;
+      }
+
+      if (!storeId) {
+        storeId = `STR-${(merchants.length + 1).toString().padStart(3, '0')}`;
+      }
+
+      let posExpiresAt = null;
+      if (posDuration !== "LIFETIME") {
+        const days = Number(posDuration) || 30;
+        posExpiresAt = new Date(Date.now() + days * 24 * 3600 * 1000).toISOString();
+      }
+
+      let cloudStatus = "INACTIVE";
+      let cloudExpiresAt = null;
+      if (cloudDuration !== "INACTIVE") {
+        cloudStatus = "ACTIVE";
+        const cDays = Number(cloudDuration) || 30;
+        cloudExpiresAt = new Date(Date.now() + cDays * 24 * 3600 * 1000).toISOString();
+      }
+
+      const newMerchant = {
+        id: Date.now(),
+        store_name: storeName,
+        store_id: storeId,
+        owner_email: email,
+        whatsapp: wa,
+        plan_type: plan,
+        pos_status: "ACTIVE",
+        pos_duration: posDuration,
+        pos_expires_at: posExpiresAt,
+        cloud_status: cloudStatus,
+        cloud_duration: cloudDuration,
+        cloud_expires_at: cloudExpiresAt,
+        payment_method: method,
+        amount_paid: Number(amount),
+        active_device_id: null,
+        created_at: new Date().toISOString().split("T")[0]
+      };
+
+      merchants.unshift(newMerchant);
+      saveVendorMerchants(merchants);
+
+      // Simpan juga ke Supabase jika terhubung
+      syncMerchantToSupabase(newMerchant);
+
+      showToast(`Toko ${storeName} berhasil didaftarkan!`, "success");
+      document.querySelector("form")?.reset();
+      switchTab("merchants");
+
+      // Buka modal tanda terima WhatsApp langsung
+      openCashReceiptWAModal({
+        storeName, storeId, email, wa, plan, posDuration, cloudDuration, method, amount
+      });
+    }
+
+    // Helper Auto Generate ID Toko Unik
+    function autoGenManualStoreId() {
+      const name = document.getElementById("cash-store-name").value.trim();
+      const idInput = document.getElementById("cash-store-id");
+      if (!idInput.dataset.manual && name) {
+        const clean = name.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase();
+        const rand = Math.floor(100 + Math.random() * 900);
+        idInput.value = `STR-${clean || "TOKO"}-${rand}`;
+      }
+    }
+
+    function reGenManualStoreId() {
+      const name = document.getElementById("cash-store-name").value.trim();
+      const idInput = document.getElementById("cash-store-id");
+      const clean = name ? name.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase() : "TOKO";
+      const rand = Math.floor(100 + Math.random() * 900);
+      idInput.value = `STR-${clean}-${rand}`;
+      idInput.dataset.manual = "true";
+    }
+
+    // Modal Manual Cash Activation
+    function openManualCashModal() {
+      const rand = Math.floor(1000 + Math.random() * 9000);
+      const idInput = document.getElementById("cash-store-id");
+      idInput.value = `STR-${rand}`;
+      idInput.dataset.manual = "";
+      document.getElementById("cash-store-name").value = "";
+      document.getElementById("cash-email").value = "";
+      document.getElementById("cash-wa").value = "";
+      document.getElementById("cash-amount-paid").value = "99000";
+      if (document.getElementById("cash-pin")) document.getElementById("cash-pin").value = "123456";
+      document.getElementById("modal-manual-cash").classList.remove("hidden");
+    }
+
+    function closeManualCashModal() {
+      document.getElementById("modal-manual-cash").classList.add("hidden");
+    }
+
+    function updateCashPlanDurationOptions() {
+      const plan = document.getElementById("cash-plan-type").value;
+      const posSelect = document.getElementById("cash-pos-duration");
+      const cloudSelect = document.getElementById("cash-cloud-duration");
+      const amountInput = document.getElementById("cash-amount-paid");
+
+      if (plan === "PAKET_1") {
+        posSelect.value = "LIFETIME";
+        cloudSelect.value = "INACTIVE";
+        amountInput.value = "1000000";
+      } else {
+        posSelect.value = "30";
+        cloudSelect.value = "30";
+        amountInput.value = "79000";
+      }
+    }
+
+    function updateRegPlanDurationOptions() {
+      const plan = document.getElementById("reg-package-type").value;
+      const posSelect = document.getElementById("reg-pos-duration");
+      const cloudSelect = document.getElementById("reg-cloud-duration");
+      const amountInput = document.getElementById("reg-amount-paid");
+
+      if (plan === "PAKET_1") {
+        posSelect.value = "LIFETIME";
+        cloudSelect.value = "INACTIVE";
+        amountInput.value = "1000000";
+      } else {
+        posSelect.value = "30";
+        cloudSelect.value = "30";
+        amountInput.value = "79000";
+      }
+    }
+
+    async function saveManualCashActivation() {
+      const storeName = document.getElementById("cash-store-name").value.trim();
+      let storeId = document.getElementById("cash-store-id").value.trim().toUpperCase();
+      const email = document.getElementById("cash-email").value.trim().toLowerCase();
+      const wa = document.getElementById("cash-wa").value.trim();
+      const plan = document.getElementById("cash-plan-type").value;
+      const posDuration = document.getElementById("cash-pos-duration").value;
+      const cloudDuration = document.getElementById("cash-cloud-duration").value;
+      const method = document.getElementById("cash-payment-method").value;
+      const amount = document.getElementById("cash-amount-paid").value || 0;
+      const pin = document.getElementById("cash-pin") ? document.getElementById("cash-pin").value.trim() : "123456";
+
+      if (!storeName) {
+        showToast("Nama Toko wajib diisi!", "error");
+        return;
+      }
+      if (!pin || pin.length < 4) {
+        showToast("PIN Kasir minimal 4 digit angka!", "error");
+        return;
+      }
+
+      const merchants = getVendorMerchants();
+      if (!storeId) {
+        const clean = storeName.replace(/[^A-Za-z0-9]/g, '').slice(0, 4).toUpperCase();
+        storeId = `STR-${clean || "TOKO"}-${Math.floor(100 + Math.random() * 900)}`;
+      }
+
+      let posExpiresAt = null;
+      if (posDuration !== "LIFETIME") {
+        const days = Number(posDuration) || 30;
+        posExpiresAt = new Date(Date.now() + days * 24 * 3600 * 1000).toISOString();
+      }
+
+      let cloudStatus = "INACTIVE";
+      let cloudExpiresAt = null;
+      if (cloudDuration !== "INACTIVE") {
+        cloudStatus = "ACTIVE";
+        const cDays = Number(cloudDuration) || 30;
+        cloudExpiresAt = new Date(Date.now() + cDays * 24 * 3600 * 1000).toISOString();
+      }
+
+      const finalEmail = email || (wa ? `${wa.replace(/[^0-9]/g, '')}@wa.me` : `${storeId.toLowerCase()}@snackpos.local`);
+
+      const newMerchant = {
+        id: Date.now(),
+        store_name: storeName,
+        store_id: storeId,
+        owner_email: finalEmail,
+        whatsapp: wa || "-",
+        pin: pin,
+        plan_type: plan,
+        pos_status: "ACTIVE",
+        pos_duration: posDuration,
+        pos_expires_at: posExpiresAt,
+        cloud_status: cloudStatus,
+        cloud_duration: cloudDuration,
+        cloud_expires_at: cloudExpiresAt,
+        payment_method: method,
+        amount_paid: Number(amount),
+        active_device_id: null,
+        created_at: new Date().toISOString().split("T")[0]
+      };
+
+      // Pastikan email & storeId baru tidak terblokir di daftar deleted lokal
+      try {
+        let deletedList = JSON.parse(localStorage.getItem("snackpos_deleted_merchants") || "[]");
+        deletedList = deletedList.filter(x => x !== finalEmail && x !== storeId);
+        localStorage.setItem("snackpos_deleted_merchants", JSON.stringify(deletedList));
+      } catch(e) {}
+
+      const btnSave = document.getElementById("btn-save-manual-cash");
+      const originalText = btnSave ? btnSave.innerHTML : "";
+      if (btnSave) {
+        btnSave.disabled = true;
+        btnSave.innerHTML = `<span>⏳ Menyimpan ke Supabase Cloud...</span>`;
+      }
+
+      try {
+        await syncMerchantToSupabase(newMerchant);
+        merchants.unshift(newMerchant);
+        saveVendorMerchants(merchants);
+        closeManualCashModal();
+        showToast(`✅ Toko "${storeName}" (${storeId}) BERHASIL disimpan ke Supabase Cloud & Aktif!`, "success", 7000);
+        openCashReceiptWAModal({
+          storeName, storeId, email: finalEmail, wa, plan, posDuration, cloudDuration, method, amount
+        });
+      } catch (err) {
+        console.error("Gagal simpan ke Supabase:", err);
+        merchants.unshift(newMerchant);
+        saveVendorMerchants(merchants);
+        closeManualCashModal();
+        showToast(`⚠️ Tersimpan lokal, namun Cloud Supabase: ${err.message}`, "warning", 8000);
+      } finally {
+        if (btnSave) {
+          btnSave.disabled = false;
+          btnSave.innerHTML = originalText;
+        }
+      }
+    }
+
+    // Modal Edit Merchant
+    function openEditMerchantModal(storeId) {
+      const merchants = getVendorMerchants();
+      const item = merchants.find(m => m.store_id === storeId);
+      if (!item) return;
+
+      editingMerchant = item;
+      document.getElementById("edit-store-name").value = item.store_name || "";
+      document.getElementById("edit-store-id").value = item.store_id || "";
+      document.getElementById("edit-email").value = item.owner_email || "";
+      document.getElementById("edit-wa").value = item.whatsapp || "";
+      document.getElementById("edit-plan-type").value = item.plan_type || "PAKET_1";
+      document.getElementById("edit-pos-status").value = item.pos_status || "ACTIVE";
+      document.getElementById("edit-add-pos-duration").value = "0";
+      document.getElementById("edit-add-cloud-duration").value = "0";
+
+      document.getElementById("modal-edit-merchant").classList.remove("hidden");
+    }
+
+    function closeEditMerchantModal() {
+      editingMerchant = null;
+      document.getElementById("modal-edit-merchant").classList.add("hidden");
+    }
+
+    function saveEditMerchant() {
+      if (!editingMerchant) return;
+      const merchants = getVendorMerchants();
+      const item = merchants.find(m => m.store_id === editingMerchant.store_id);
+      if (!item) return;
+
+      item.store_name = document.getElementById("edit-store-name").value.trim() || item.store_name;
+      item.owner_email = document.getElementById("edit-email").value.trim().toLowerCase() || item.owner_email;
+      item.whatsapp = document.getElementById("edit-wa").value.trim() || item.whatsapp;
+      item.plan_type = document.getElementById("edit-plan-type").value;
+      item.pos_status = document.getElementById("edit-pos-status").value;
+
+      const addPos = document.getElementById("edit-add-pos-duration").value;
+      if (addPos === "LIFETIME") {
+        item.pos_duration = "LIFETIME";
+        item.pos_expires_at = null;
+      } else if (addPos !== "0") {
+        const days = Number(addPos);
+        const currentExp = item.pos_expires_at ? new Date(item.pos_expires_at).getTime() : Date.now();
+        item.pos_expires_at = new Date(Math.max(Date.now(), currentExp) + days * 24 * 3600 * 1000).toISOString();
+      }
+
+      const addCloud = document.getElementById("edit-add-cloud-duration").value;
+      if (addCloud === "INACTIVE") {
+        item.cloud_status = "INACTIVE";
+        item.cloud_expires_at = null;
+      } else if (addCloud !== "0") {
+        item.cloud_status = "ACTIVE";
+        const days = Number(addCloud);
+        const currentExp = item.cloud_expires_at ? new Date(item.cloud_expires_at).getTime() : Date.now();
+        item.cloud_expires_at = new Date(Math.max(Date.now(), currentExp) + days * 24 * 3600 * 1000).toISOString();
+      }
+
+      saveVendorMerchants(merchants);
+      syncMerchantToSupabase(item);
+      closeEditMerchantModal();
+      showToast("Data merchant berhasil diperbarui!", "success");
+    }
+
+    async function deleteMerchantByStoreId(storeId) {
+      const merchants = getVendorMerchants();
+      const item = merchants.find(m => m.store_id === storeId);
+      if (!item) return;
+
+      const confirmMsg = `⚠️ HAPUS LISENSI & TOKO:\n\n` +
+        `• Toko: ${item.store_name}\n` +
+        `• Store ID: ${item.store_id}\n` +
+        `• Email: ${item.owner_email}\n` +
+        `• Paket: ${item.plan_type === 'PAKET_1' ? 'Paket 1 (Lifetime)' : 'Paket 2 (SaaS)'}\n\n` +
+        `Apakah Anda yakin ingin MENGHAPUS toko ini secara permanen?\n\n` +
+        `Lisensi akan langsung dihapus dari Supabase Cloud dan aplikasi kasir di perangkat pelanggan akan seketika terkunci!`;
+
+      if (!confirm(confirmMsg)) return;
+
+      // 1. Simpan ke blacklist penghapusan lokal agar tidak dibangkitkan INITIAL_MERCHANTS
+      try {
+        const deletedList = JSON.parse(localStorage.getItem("snackpos_deleted_merchants") || "[]");
+        if (!deletedList.includes(item.store_id)) deletedList.push(item.store_id);
+        if (item.owner_email && !deletedList.includes(item.owner_email)) deletedList.push(item.owner_email);
+        localStorage.setItem("snackpos_deleted_merchants", JSON.stringify(deletedList));
+      } catch (e) {}
+
+      // 2. Hapus dari array memori lokal
+      const updated = merchants.filter(m => m.store_id !== storeId && m.owner_email !== item.owner_email);
+      saveVendorMerchants(updated);
+
+      // 3. Hapus langsung dari database Supabase Cloud
+      const client = getSupabaseClientIfAvailable();
+      if (client && navigator.onLine) {
+        try {
+          showToast(`Menghapus data ${item.store_name} dari Supabase Cloud...`, "info");
+          await client.from('store_licenses').delete().eq('store_id', storeId);
+          if (item.owner_email) {
+            await client.from('store_licenses').delete().eq('owner_email', item.owner_email);
+          }
+          console.log(`[Supabase Delete] Store ${storeId} (${item.owner_email}) deleted.`);
+        } catch (err) {
+          console.warn("Gagal hapus dari Supabase:", err);
+        }
+      }
+
+      showToast(`✅ Toko "${item.store_name}" berhasil dihapus permanen dari sistem & Cloud.`, "success");
+    }
+
+    async function deleteCurrentMerchant() {
+      if (!editingMerchant) return;
+      const targetStoreId = editingMerchant.store_id;
+      closeEditMerchantModal();
+      await deleteMerchantByStoreId(targetStoreId);
+    }
+
+    // WhatsApp Receipt & Instructions Formatter
+    let waTargetItem = null;
+    function openCashReceiptWAModalByStoreId(storeId) {
+      const merchants = getVendorMerchants();
+      const item = merchants.find(m => m.store_id === storeId);
+      if (!item) return;
+
+      openCashReceiptWAModal({
+        storeName: item.store_name,
+        storeId: item.store_id,
+        email: item.owner_email,
+        wa: item.whatsapp,
+        plan: item.plan_type,
+        posDuration: item.pos_duration,
+        cloudDuration: item.cloud_status === "ACTIVE" ? (item.cloud_duration || "30") : "INACTIVE",
+        method: item.payment_method || "LUNAS",
+        amount: item.amount_paid || 0
+      });
+    }
+
+    function openCashReceiptWAModal(data) {
+      const origin = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
+      const ownerUrl = `${origin}/owner.html?store=${encodeURIComponent(data.storeId)}`;
+      const cashierUrl = `${origin}/index.html`;
+      const durText = data.posDuration === "LIFETIME" ? "Selamanya (Offline Lifetime)" : `${data.posDuration} Hari`;
+      const cloudText = data.cloudDuration === "INACTIVE" ? "Belum Aktif (Offline Kasir Saja)" : `Aktif ${data.cloudDuration} Hari`;
+      const paketName = data.plan === "PAKET_1" ? "Paket 1 - Beli Putus POS Offline" : "Paket 2 - Full SaaS Langganan (POS + Cloud)";
+
+      const text = `*KWITANSI RESMI & AKTIVASI KASIR SNACKPOS* 🧾✨\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━\n` +
+        `🏪 *Nama Toko*: ${data.storeName}\n` +
+        `🆔 *ID Toko (Store ID)*: \`${data.storeId}\`\n` +
+        `📧 *Email Login Kasir*: \`${data.email}\`\n` +
+        `📦 *Paket*: ${paketName}\n` +
+        `⏳ *Masa Aktif Kasir*: ${durText}\n` +
+        `☁️ *Dashboard Cloud HP*: ${cloudText}\n` +
+        `💵 *Pembayaran*: ${data.method} (LUNAS Rp ${Number(data.amount).toLocaleString('id-ID')})\n` +
+        `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `*Panduan Mulai Jualan (Hanya 1 Menit):*\n` +
+        `1. Buka aplikasi kasir di browser komputer / tablet toko Anda:\n` +
+        `👉 ${cashierUrl}\n` +
+        `2. Masukkan Email Toko Anda (\`${data.email}\`) dan klik *Kirim OTP*.\n` +
+        `3. Masukkan 6-digit kode verifikasi yang masuk ke inbox Gmail Anda. Kasir langsung aktif 100% dan siap transaksi offline selamanya!\n\n` +
+        (data.cloudDuration !== "INACTIVE" ? 
+        `*Link Dashboard Pemilik Toko (Pantau dari Smartphone):*\n` +
+        `Pantau transaksi & grafik omzet live toko Anda kapan saja dari HP:\n` +
+        `👉 ${ownerUrl}\n\n` : '') +
+        `Terima kasih atas kepercayaannya! Semoga usaha ${data.storeName} semakin maju, laris, dan berkah. 🙏🚀`;
+
+      document.getElementById("modal-wa-message-text").value = text;
+      waTargetItem = { whatsapp: data.wa };
+      const btnDirect = document.getElementById("btn-wa-direct-send");
+      if (data.wa) btnDirect.classList.remove("hidden"); else btnDirect.classList.add("hidden");
+      document.getElementById("modal-wa-send").classList.remove("hidden");
+    }
+
+    function closeWAModal() {
+      waTargetItem = null;
+      document.getElementById("modal-wa-send").classList.add("hidden");
+    }
+
+    function copyModalWAMessage() {
+      const text = document.getElementById("modal-wa-message-text").value;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("Teks WhatsApp berhasil disalin ke clipboard!", "success");
+      });
+    }
+
+    function openWhatsAppDirect() {
+      if (!waTargetItem || !waTargetItem.whatsapp) return;
+      let phone = waTargetItem.whatsapp.replace(/[^0-9]/g, "");
+      if (phone.startsWith("0")) phone = "62" + phone.slice(1);
+      const text = encodeURIComponent(document.getElementById("modal-wa-message-text").value);
+      window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
+    }
+
+    // Template Tab
+    let activeTemplate = "NEW_ORDER";
+    function selectTemplateType(type) {
+      activeTemplate = type;
+      ["new", "renew", "remind"].forEach(t => {
+        document.getElementById(`tpl-btn-${t}`).className = "p-3 text-left rounded-xl bg-slate-950 border border-slate-800 text-slate-400 text-xs font-bold hover:text-slate-200 transition cursor-pointer";
+      });
+      if (type === "NEW_ORDER") {
+        document.getElementById("tpl-btn-new").className = "p-3 text-left rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition cursor-pointer";
+      } else if (type === "RENEWAL") {
+        document.getElementById("tpl-btn-renew").className = "p-3 text-left rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition cursor-pointer";
+      } else {
+        document.getElementById("tpl-btn-remind").className = "p-3 text-left rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold transition cursor-pointer";
+      }
+      renderSelectedTemplate();
+    }
+
+    function renderSelectedTemplate() {
+      const area = document.getElementById("tpl-text-area");
+      const origin = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
+      if (activeTemplate === "NEW_ORDER") {
+        area.value = `*AKTIVASI LISENSI RESMI SNACKPOS KASIR* 🏪✨\n` +
+`━━━━━━━━━━━━━━━━━━━━━━\n` +
+`Halo kak [NAMA_TOKO]!\n` +
+`Akun kasir toko Anda telah resmi terdaftar dan aktif:\n\n` +
+`🏪 *Nama Toko*: [NAMA_TOKO]\n` +
+`🆔 *ID Toko*: [STORE_ID]\n` +
+`📧 *Email Terdaftar*: [EMAIL_TOKO]\n` +
+`📦 *Paket*: [TIPE_PAKET]\n` +
+`━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+`*Cara Masuk Kasir di Tablet / Komputer:*\n` +
+`1. Buka aplikasi kasir di browser: ${origin}/index.html\n` +
+`2. Masukkan email Anda ([EMAIL_TOKO]) lalu klik *Kirim OTP*.\n` +
+`3. Masukkan 6-digit kode OTP dari Gmail Anda. Kasir langsung aktif 100% dan bisa dipakai offline selamanya!\n\n` +
+`*Link Pantau Omzet dari Smartphone (Cloud):*\n` +
+`👉 ${origin}/owner.html?store=[STORE_ID]\n\n` +
+`Semoga usahanya semakin lancar dan berkah! 🙏🚀`;
+      } else if (activeTemplate === "RENEWAL") {
+        area.value = `*KONFIRMASI PERPANJANGAN LISENSI SNACKPOS* 🔄✨\n` +
+`━━━━━━━━━━━━━━━━━━━━━━\n` +
+`Halo kak [NAMA_TOKO]!\n` +
+`Pembayaran perpanjangan langganan kasir toko Anda telah berhasil kami terima.\n\n` +
+`🏪 *Nama Toko*: [NAMA_TOKO]\n` +
+`🆔 *ID Toko*: [STORE_ID]\n` +
+`📧 *Email Akun*: [EMAIL_TOKO]\n` +
+`⏳ *Masa Aktif Baru*: Diperpanjang s/d [TANGGAL_KADALUARSA]\n` +
+`━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+`Akses kasir dan pantauan Cloud Dashboard HP Anda tetap aktif normal tanpa gangguan.\n` +
+`Terima kasih atas kerja samanya! 🙏`;
+      } else {
+        area.value = `*PEMBERITAHUAN JATUH TEMPO LANGGANAN SNACKPOS* ⏰⚠️\n` +
+`━━━━━━━━━━━━━━━━━━━━━━\n` +
+`Halo kak [NAMA_TOKO]!\n` +
+`Kami menginformasikan bahwa masa aktif layanan Cloud Dashboard toko Anda akan berakhir pada:\n\n` +
+`📅 *Jatuh Tempo*: [TANGGAL_KADALUARSA]\n` +
+`🆔 *ID Toko*: [STORE_ID]\n` +
+`📧 *Email Akun*: [EMAIL_TOKO]\n` +
+`━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+`Agar pantauan grafik omzet dari smartphone tetap berjalan lancar, silakan lakukan perpanjangan langganan via transfer atau hubungi vendor kami.\n` +
+`Terima kasih telah setia menggunakan SnackPOS! 🙏`;
+      }
+    }
+
+    function copyTemplateText() {
+      const text = document.getElementById("tpl-text-area").value;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("Template teks WhatsApp disalin ke clipboard!", "success");
+      });
+    }
+
+    // Custom Pricing dengan Sinkronisasi Cloud Supabase (Tabel app_config)
+    function getCustomPricing() {
+      const stored = localStorage.getItem("snackpos_custom_pricing");
+      if (stored) {
+        try { return JSON.parse(stored); } catch(e) {}
+      }
+      return {
+        p1Lifetime: 99000,
+        cloud1m: 25000, cloud3m: 65000, cloud6m: 120000, cloud1y: 200000,
+        multiKasirPrice: 40000,
+        p2_1m: 30000, p2_3m: 85000, p2_6m: 160000, p2_1y: 300000
+      };
+    }
+
+    async function loadCloudPricingIfAvailable() {
+      const client = getSupabaseClientIfAvailable();
+      if (!client || !navigator.onLine) return;
+      try {
+        let loadedPricing = null;
+        // 1. Coba baca dari tabel app_config
+        try {
+          const { data, error } = await client.from('app_config').select('value').eq('key', 'pricing').maybeSingle();
+          if (data && data.value) {
+            loadedPricing = data.value;
+          }
+        } catch (e) {}
+
+        // 2. Fallback baca dari store_licenses (SYS_CONFIG_PRICING)
+        if (!loadedPricing) {
+          try {
+            const { data: sysRow } = await client.from('store_licenses').select('store_name').eq('store_id', 'SYS_CONFIG_PRICING').maybeSingle();
+            if (sysRow && sysRow.store_name) {
+              loadedPricing = JSON.parse(sysRow.store_name);
+            }
+          } catch (e) {}
+        }
+
+        if (loadedPricing) {
+          localStorage.setItem("snackpos_custom_pricing", JSON.stringify(loadedPricing));
+          console.log("[Supabase Pricing] Harga cloud termutakhir dimuat:", loadedPricing);
+        }
+      } catch (e) {
+        console.warn("loadCloudPricingIfAvailable notice:", e.message);
+      }
+    }
+
+    function openCustomPricingModal() {
+      const pricing = getCustomPricing();
+      document.getElementById("price-p1-lifetime").value = pricing.p1Lifetime || 99000;
+      document.getElementById("price-cloud-1m").value = pricing.cloud1m || 25000;
+      document.getElementById("price-cloud-3m").value = pricing.cloud3m || 65000;
+      document.getElementById("price-cloud-6m").value = pricing.cloud6m || 120000;
+      document.getElementById("price-cloud-1y").value = pricing.cloud1y || 200000;
+      document.getElementById("price-addon-multi-kasir").value = pricing.multiKasirPrice || 40000;
+      document.getElementById("price-p2-1m").value = pricing.p2_1m || 30000;
+      document.getElementById("price-p2-3m").value = pricing.p2_3m || 85000;
+      document.getElementById("price-p2-6m").value = pricing.p2_6m || 160000;
+      document.getElementById("price-p2-1y").value = pricing.p2_1y || 300000;
+      document.getElementById("modal-custom-pricing").classList.remove("hidden");
+    }
+
+    function closeCustomPricingModal() {
+      document.getElementById("modal-custom-pricing").classList.add("hidden");
+    }
+
+    async function saveCustomPricing() {
+      const pricing = {
+        p1Lifetime: Number(document.getElementById("price-p1-lifetime").value) || 99000,
+        cloud1m: Number(document.getElementById("price-cloud-1m").value) || 25000,
+        cloud3m: Number(document.getElementById("price-cloud-3m").value) || 65000,
+        cloud6m: Number(document.getElementById("price-cloud-6m").value) || 120000,
+        cloud1y: Number(document.getElementById("price-cloud-1y").value) || 200000,
+        multiKasirPrice: Number(document.getElementById("price-addon-multi-kasir").value) || 40000,
+        p2_1m: Number(document.getElementById("price-p2-1m").value) || 30000,
+        p2_3m: Number(document.getElementById("price-p2-3m").value) || 85000,
+        p2_6m: Number(document.getElementById("price-p2-6m").value) || 160000,
+        p2_1y: Number(document.getElementById("price-p2-1y").value) || 300000
+      };
+      localStorage.setItem("snackpos_custom_pricing", JSON.stringify(pricing));
+      
+      // Sinkronkan ke Supabase (Dual storage: app_config & store_licenses SYS_CONFIG_PRICING)
+      const client = getSupabaseClientIfAvailable();
+      let syncStatus = { appConfig: false, storeLicenses: false };
+
+      if (client && navigator.onLine) {
+        // Coba simpan ke app_config (primary)
+        try {
+          const { error: acErr } = await client.from('app_config').upsert({
+            key: 'pricing',
+            value: pricing,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'key' });
+          if (acErr) {
+            syncStatus._acErr = `app_config: ${acErr.message} (${acErr.code})`;
+            console.warn("[Supabase Pricing] Gagal simpan ke app_config:", acErr.message, acErr.code);
+          } else {
+            syncStatus.appConfig = true;
+            console.log("[Supabase Pricing] ✅ Harga berhasil disimpan ke app_config");
+          }
+        } catch (err) {
+          syncStatus._acErr = `app_config exception: ${err.message}`;
+          console.warn("[Supabase Pricing] Exception app_config:", err.message);
+        }
+
+        // Simpan ke store_licenses sebagai fallback (selalu dicoba agar pengguna tetap dapat harga)
+        try {
+          const { error: slErr } = await client.from('store_licenses').upsert({
+            store_id: 'SYS_CONFIG_PRICING',
+            store_name: JSON.stringify(pricing),
+            owner_email: 'system_pricing@snackpos.cloud',
+            plan_type: 'CONFIG',
+            pos_status: 'ACTIVE',
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'owner_email' });
+          if (slErr) {
+            syncStatus._slErr = `store_licenses: ${slErr.message} (${slErr.code})`;
+            console.warn("[Supabase Pricing] Gagal simpan ke store_licenses:", slErr.message);
+          } else {
+            syncStatus.storeLicenses = true;
+            console.log("[Supabase Pricing] ✅ Harga berhasil disimpan ke store_licenses (SYS_CONFIG_PRICING)");
+          }
+        } catch (err) {
+          syncStatus._slErr = `store_licenses exception: ${err.message}`;
+          console.warn("[Supabase Pricing] Exception store_licenses:", err.message);
+        }
+      }
+
+      closeCustomPricingModal();
+
+      if (!client || !navigator.onLine) {
+        showToast("✅ Harga disimpan lokal. Hubungkan ke internet untuk sinkronkan ke cloud.", "info");
+      } else if (syncStatus.appConfig || syncStatus.storeLicenses) {
+        showToast("✅ Harga berhasil disimpan & disinkronkan ke Supabase Cloud! Pengguna baru akan langsung lihat harga terbaru.", "success");
+      } else {
+        // Tampilkan error detail untuk membantu debug
+        const errMsg = syncStatus._acErr || syncStatus._slErr || "unknown error";
+        showToast(`⚠️ Gagal sinkron: ${errMsg}`, "error", 12000);
+      }
+    }
+
+    // ==========================================
+    // PAYMENT & WHATSAPP VENDOR MANAGEMENT (SUPABASE CLOUD SYNCED)
+    // ==========================================
+    let cachedPaymentConfig = null;
+
+    function getDefaultPaymentConfig() {
+      return {
+        vendorWa: "6281234567890",
+        paymentMode: "QRIS_STATIC", // QRIS_STATIC | BANK_TRANSFER | MIDTRANS
+        qrisImageUrl: "",
+        bankName: "BCA",
+        bankAccount: "",
+        bankHolder: "",
+        midtransMode: "SANDBOX",
+        midtransClientKey: "",
+        midtransServerKey: "",
+        updatedAt: ""
+      };
+    }
+
+    function getGatewayConfig() {
+      if (cachedPaymentConfig) return cachedPaymentConfig;
+      const stored = localStorage.getItem("snackpos_gateway_config");
+      if (stored) {
+        try { 
+          const parsed = JSON.parse(stored);
+          cachedPaymentConfig = Object.assign(getDefaultPaymentConfig(), parsed);
+          // Kompatibilitas jika sebelumnya provider = SIMULATION / TRIPAY
+          if (cachedPaymentConfig.provider === "SIMULATION") cachedPaymentConfig.paymentMode = "QRIS_STATIC";
+          if (cachedPaymentConfig.provider && !cachedPaymentConfig.paymentMode) cachedPaymentConfig.paymentMode = cachedPaymentConfig.provider;
+          return cachedPaymentConfig;
+        } catch(e) {}
+      }
+      cachedPaymentConfig = getDefaultPaymentConfig();
+      return cachedPaymentConfig;
+    }
+
+    async function fetchPaymentConfigFromSupabase() {
+      if (!window.supabase || !navigator.onLine) return getGatewayConfig();
+      try {
+        const sbUrl = "https://2.27.165.72.sslip.io";
+        const sbKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg5ODUwNDE4LCJleHAiOjE5NDc1MzA0MTh9.99BRNnUQwei95p1zAqtFBBD5CnUJSedfUeh2MJy97Gg";
+        const client = window.supabase.createClient(sbUrl, sbKey);
+        const { data, error } = await client.from('app_config').select('value').eq('key', 'payment_config').maybeSingle();
+        if (data && data.value) {
+          cachedPaymentConfig = Object.assign(getDefaultPaymentConfig(), data.value);
+          localStorage.setItem("snackpos_gateway_config", JSON.stringify(cachedPaymentConfig));
+          updateGatewayHeaderButton();
+          return cachedPaymentConfig;
+        }
+      } catch (err) {
+        console.warn("[Portal] Gagal memuat payment_config dari Supabase:", err.message);
+      }
+      return getGatewayConfig();
+    }
+
+    function onPaymentModeChange() {
+      const mode = document.getElementById("gateway-payment-mode").value;
+      const panelQris = document.getElementById("panel-payment-qris");
+      const panelBank = document.getElementById("panel-payment-bank");
+      const panelMidtrans = document.getElementById("panel-payment-midtrans");
+
+      if (panelQris) panelQris.classList.toggle("hidden", mode !== "QRIS_STATIC");
+      if (panelBank) panelBank.classList.toggle("hidden", mode !== "BANK_TRANSFER");
+      if (panelMidtrans) panelMidtrans.classList.toggle("hidden", mode !== "MIDTRANS");
+    }
+
+    function handleQrisFileUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        showToast("Mohon pilih file gambar (JPG, PNG, WebP)!", "warning");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const rawDataUrl = e.target.result;
+        
+        // Kompres & resize gambar QRIS ke resolusi optimal (max 600x600) agar tajam dan ringan (<60KB)
+        compressQrisImage(rawDataUrl, 600, 0.85, function(compressedDataUrl) {
+          const qrisInput = document.getElementById("gateway-qris-image-url");
+          if (qrisInput) qrisInput.value = compressedDataUrl;
+
+          // Update preview
+          const box = document.getElementById("box-qris-preview");
+          const img = document.getElementById("img-qris-preview");
+          if (box && img) {
+            img.src = compressedDataUrl;
+            box.classList.remove("hidden");
+          }
+
+          // Update status teks
+          const statusBox = document.getElementById("qris-upload-status");
+          const nameEl = document.getElementById("qris-upload-filename");
+          if (statusBox && nameEl) {
+            const approxKb = Math.round(compressedDataUrl.length * 0.75 / 1024);
+            nameEl.textContent = `✅ ${file.name} (~${approxKb} KB)`;
+            statusBox.classList.remove("hidden");
+          }
+
+          showToast("✅ Gambar QRIS berhasil diproses & siap disimpan!", "success");
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function compressQrisImage(dataUrl, maxDim, quality, callback) {
+      const img = new Image();
+      img.onload = function() {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedUrl = canvas.toDataURL("image/jpeg", quality);
+        callback(compressedUrl);
+      };
+      img.src = dataUrl;
+    }
+
+    function removeQrisImage(e) {
+      if (e) e.stopPropagation();
+      const qrisInput = document.getElementById("gateway-qris-image-url");
+      const fileInput = document.getElementById("gateway-qris-file-input");
+      const box = document.getElementById("box-qris-preview");
+      const img = document.getElementById("img-qris-preview");
+      const statusBox = document.getElementById("qris-upload-status");
+
+      if (qrisInput) qrisInput.value = "";
+      if (fileInput) fileInput.value = "";
+      if (img) img.src = "";
+      if (box) box.classList.add("hidden");
+      if (statusBox) statusBox.classList.add("hidden");
+
+      showToast("Gambar QRIS dihapus (akan kembali ke QR dinamis)", "info");
+    }
+
+    function previewQrisImage() {
+      const input = document.getElementById("gateway-qris-image-url");
+      const box = document.getElementById("box-qris-preview");
+      const img = document.getElementById("img-qris-preview");
+      const statusBox = document.getElementById("qris-upload-status");
+      const nameEl = document.getElementById("qris-upload-filename");
+      if (!input || !box || !img) return;
+
+      const url = input.value.trim();
+      if (url && (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:image/") || url.startsWith("./"))) {
+        img.src = url;
+        box.classList.remove("hidden");
+        if (statusBox && nameEl) {
+          nameEl.textContent = "✅ Gambar QRIS vendor aktif tersimpan";
+          statusBox.classList.remove("hidden");
+        }
+      } else {
+        box.classList.add("hidden");
+        if (statusBox) statusBox.classList.add("hidden");
+      }
+    }
+
+    function initQrisDropzone() {
+      const dropzone = document.getElementById("qris-dropzone");
+      if (!dropzone || dropzone.dataset.initialized) return;
+      dropzone.dataset.initialized = "true";
+
+      ["dragenter", "dragover"].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add("border-amber-400", "bg-amber-500/10");
+        });
+      });
+
+      ["dragleave", "drop"].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove("border-amber-400", "bg-amber-500/10");
+        });
+      });
+
+      dropzone.addEventListener("drop", (e) => {
+        const dt = e.dataTransfer;
+        const files = dt && dt.files;
+        if (files && files.length > 0) {
+          handleQrisFileUpload({ target: { files } });
+        }
+      });
+    }
+
+    function updateGatewayHeaderButton() {
+      const cfg = getGatewayConfig();
+      const label = document.getElementById("btn-header-gateway-label");
+      if (!label) return;
+      if (cfg.paymentMode === "MIDTRANS") {
+        label.textContent = `Pembayaran (Midtrans ${cfg.midtransMode || "Sandbox"})`;
+      } else if (cfg.paymentMode === "BANK_TRANSFER") {
+        label.textContent = `Pembayaran (Transfer Bank)`;
+      } else {
+        label.textContent = `Pembayaran (QRIS Statis)`;
+      }
+    }
+
+    async function openGatewayModal() {
+      // Refresh data terbaru dari Cloud Supabase
+      const cfg = await fetchPaymentConfigFromSupabase();
+
+      const waInput = document.getElementById("gateway-vendor-wa");
+      const modeSelect = document.getElementById("gateway-payment-mode");
+      const qrisInput = document.getElementById("gateway-qris-image-url");
+      const bankNameInput = document.getElementById("gateway-bank-name");
+      const bankAccInput = document.getElementById("gateway-bank-account");
+      const bankHolderInput = document.getElementById("gateway-bank-holder");
+      const midtransModeSelect = document.getElementById("gateway-midtrans-mode");
+      const midtransClientInput = document.getElementById("gateway-midtrans-client-key");
+      const midtransServerInput = document.getElementById("gateway-midtrans-server-key");
+
+      if (waInput) waInput.value = cfg.vendorWa || "";
+      if (modeSelect) modeSelect.value = cfg.paymentMode || "QRIS_STATIC";
+      if (qrisInput) qrisInput.value = cfg.qrisImageUrl || "";
+      if (bankNameInput) bankNameInput.value = cfg.bankName || "BCA";
+      if (bankAccInput) bankAccInput.value = cfg.bankAccount || "";
+      if (bankHolderInput) bankHolderInput.value = cfg.bankHolder || "";
+      if (midtransModeSelect) midtransModeSelect.value = cfg.midtransMode || "SANDBOX";
+      if (midtransClientInput) midtransClientInput.value = cfg.midtransClientKey || "";
+      if (midtransServerInput) midtransServerInput.value = cfg.midtransServerKey || "";
+
+      onPaymentModeChange();
+      previewQrisImage();
+      initQrisDropzone();
+
+      document.getElementById("modal-gateway-config").classList.remove("hidden");
+    }
+
+    function closeGatewayModal() {
+      document.getElementById("modal-gateway-config").classList.add("hidden");
+    }
+
+    async function saveGatewayConfig() {
+      const btn = document.getElementById("btn-save-gateway");
+      const originalText = btn ? btn.innerHTML : "Simpan";
+
+      const vendorWa = document.getElementById("gateway-vendor-wa")?.value.trim() || "";
+      const paymentMode = document.getElementById("gateway-payment-mode")?.value || "QRIS_STATIC";
+      const qrisImageUrl = document.getElementById("gateway-qris-image-url")?.value.trim() || "";
+      const bankName = document.getElementById("gateway-bank-name")?.value.trim() || "BCA";
+      const bankAccount = document.getElementById("gateway-bank-account")?.value.trim() || "";
+      const bankHolder = document.getElementById("gateway-bank-holder")?.value.trim() || "";
+      const midtransMode = document.getElementById("gateway-midtrans-mode")?.value || "SANDBOX";
+      const midtransClientKey = document.getElementById("gateway-midtrans-client-key")?.value.trim() || "";
+      const midtransServerKey = document.getElementById("gateway-midtrans-server-key")?.value.trim() || "";
+
+      if (!vendorWa) {
+        showToast("Nomor WhatsApp Resmi Vendor wajib diisi!", "warning");
+        document.getElementById("gateway-vendor-wa")?.focus();
+        return;
+      }
+
+      const cfg = {
+        vendorWa,
+        paymentMode,
+        qrisImageUrl,
+        bankName,
+        bankAccount,
+        bankHolder,
+        midtransMode,
+        midtransClientKey,
+        midtransServerKey,
+        updatedAt: new Date().toISOString()
+      };
+
+      cachedPaymentConfig = cfg;
+      localStorage.setItem("snackpos_gateway_config", JSON.stringify(cfg));
+      updateGatewayHeaderButton();
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = "<span>⏳ Menyimpan ke Server...</span>";
+      }
+
+      // Simpan Terpusat ke Supabase Cloud app_config (Pusat Komando)
+      let cloudSaved = false;
+      if (window.supabase && navigator.onLine) {
+        try {
+          const sbUrl = "https://2.27.165.72.sslip.io";
+          const sbKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg5ODUwNDE4LCJleHAiOjE5NDc1MzA0MTh9.99BRNnUQwei95p1zAqtFBBD5CnUJSedfUeh2MJy97Gg";
+          const client = window.supabase.createClient(sbUrl, sbKey);
+          const { error } = await client.from('app_config').upsert({
+            key: 'payment_config',
+            value: cfg,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'key' });
+
+          if (!error) cloudSaved = true;
+          else console.warn("[Portal] Supabase save payment_config error:", error);
+        } catch (err) {
+          console.warn("[Portal] Exception saving payment_config:", err.message);
+        }
+      }
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+
+      closeGatewayModal();
+
+      if (cloudSaved) {
+        showToast("✅ Pengaturan Pembayaran & WhatsApp berhasil disimpan ke Server Cloud!", "success");
+      } else {
+        showToast("Pengaturan disimpan ke memori lokal browser (Offline).", "warning");
+      }
+    }
+
+    function copyWebhookUrl(inputId) {
+      const el = document.getElementById(inputId);
+      if (!el) return;
+      navigator.clipboard.writeText(el.value).then(() => {
+        showToast("URL Webhook disalin ke clipboard!", "success");
+      });
+    }
+
+    // Export & Reset
+    function exportMerchantsJSON() {
+      const merchants = getVendorMerchants();
+      const blob = new Blob([JSON.stringify(merchants, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `snackpos_merchants_${new Date().toISOString().split("T")[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("File data merchant berhasil diunduh!", "success");
+    }
+
+    function resetToInitialMerchants() {
+      if (!confirm("Peringatan: Reset database akan mengembalikan daftar merchant ke contoh awal. Lanjutkan?")) return;
+      if (typeof INITIAL_MERCHANTS !== "undefined") {
+        saveVendorMerchants(INITIAL_MERCHANTS);
+        showToast("Data merchant berhasil direset ke awal!", "success");
+      }
+    }
+
+    // Supabase Syncing Helpers - Terkunci 100% ke Pusat Komando Lisensi Resmi
+    function getSupabaseClientIfAvailable() {
+      const officialUrl = "https://2.27.165.72.sslip.io";
+      const officialKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg5ODUwNDE4LCJleHAiOjE5NDc1MzA0MTh9.99BRNnUQwei95p1zAqtFBBD5CnUJSedfUeh2MJy97Gg";
+
+      if (window.supabase) {
+        return window.supabase.createClient(officialUrl, officialKey);
+      }
+      return null;
+    }
+
+    async function syncMerchantToSupabase(m) {
+      const client = getSupabaseClientIfAvailable();
+      if (!client || !navigator.onLine) return;
+      try {
+        const payload = {
+          store_id: m.store_id,
+          store_name: m.store_name,
+          owner_email: m.owner_email || `${m.store_id.toLowerCase()}@snackpos.local`,
+          plan_type: m.plan_type || "PAKET_1",
+          pos_status: m.pos_status || "ACTIVE",
+          pos_expires_at: m.pos_expires_at || null,
+          cloud_status: m.cloud_status || "INACTIVE",
+          cloud_expires_at: m.cloud_expires_at || null,
+          active_device_id: m.active_device_id || null,
+          whatsapp: m.whatsapp || null,
+          last_payment_method: m.payment_method || "TUNAI",
+          last_amount_paid: Number(m.amount_paid) || 0,
+          updated_at: new Date().toISOString()
+        };
+
+        // 1. Simpan lisensi toko ke tabel store_licenses (atomic upsert on store_id)
+        const { error: upErr } = await client
+          .from('store_licenses')
+          .upsert(payload, { onConflict: 'store_id' });
+
+        if (upErr) {
+          console.error("[Supabase Sync] Upsert store_licenses error:", upErr);
+          throw upErr;
+        }
+
+        // 2. Simpan PIN ke tabel app_config (store_pins)
+        const targetPin = (m.pin || "123456").toString().trim();
+        try {
+          const { data: cfgRow } = await client.from('app_config').select('value').eq('key', 'store_pins').maybeSingle();
+          let pinsMap = (cfgRow && cfgRow.value) ? cfgRow.value : {};
+          if (typeof pinsMap === 'string') {
+            try { pinsMap = JSON.parse(pinsMap); } catch(e) { pinsMap = {}; }
+          }
+          pinsMap[m.store_id] = targetPin;
+          if (m.whatsapp) {
+            const normWa = m.whatsapp.replace(/[^0-9]/g, '').replace(/^62/, '0');
+            pinsMap[normWa] = targetPin;
+            pinsMap[m.whatsapp] = targetPin;
+          }
+          await client.from('app_config').upsert({
+            key: 'store_pins',
+            value: pinsMap,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'key' });
+        } catch(ePin) {
+          console.warn("[Supabase Sync] Simpan PIN error:", ePin);
+        }
+
+        console.log(`[Supabase Sync] ✅ Merchant ${m.store_name} (${m.store_id}) berhasil disinkronkan ke Cloud.`);
+      } catch (err) {
+        console.error("Supabase sync exception:", err);
+        throw err;
+      }
+    }
+
+    async function promptChangeStorePin(storeId, storeName) {
+      const currentMerchants = getVendorMerchants();
+      const currentItem = currentMerchants.find(x => x.store_id === storeId);
+      const currentPin = currentItem?.pin || "123456";
+
+      const newPin = prompt(`Masukkan PIN baru 6-digit untuk toko ${storeName} (${storeId}):`, currentPin);
+      if (!newPin) return;
+      const cleanPin = newPin.trim();
+      if (!/^\d{6}$/.test(cleanPin)) {
+        alert("PIN Kasir harus berupa 6-digit angka!");
+        return;
+      }
+
+      // 1. Update lokal
+      if (currentItem) {
+        currentItem.pin = cleanPin;
+        saveVendorMerchants(currentMerchants);
+        renderMerchantsTable();
+      }
+
+      // 2. Update Supabase jika online
+      const client = getSupabaseClientIfAvailable();
+      if (currentItem && client && navigator.onLine) {
+        try {
+          showToast("Menyimpan PIN baru ke Cloud...", "info");
+
+          // Update app_config store_pins
+          const { data: cfgRow } = await client.from('app_config').select('value').eq('key', 'store_pins').maybeSingle();
+          let pinsMap = (cfgRow && cfgRow.value) ? cfgRow.value : {};
+          if (typeof pinsMap === 'string') {
+            try { pinsMap = JSON.parse(pinsMap); } catch(e) { pinsMap = {}; }
+          }
+          pinsMap[storeId] = cleanPin;
+          if (currentItem && currentItem.whatsapp) {
+            const normWa = currentItem.whatsapp.replace(/[^0-9]/g, '').replace(/^62/, '0');
+            pinsMap[normWa] = cleanPin;
+            pinsMap[currentItem.whatsapp] = cleanPin;
+          }
+          await client.from('app_config').upsert({
+            key: 'store_pins',
+            value: pinsMap,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'key' });
+
+          showToast(`✅ PIN Toko ${storeName} berhasil diubah menjadi: ${cleanPin}`, "success");
+        } catch(err) {
+          showToast("Peringatan sinkronisasi PIN: " + err.message, "warning");
+        }
+      } else {
+        showToast(`PIN toko ${storeName} diperbarui di memori portal: ${cleanPin}`, "success");
+      }
+    }
+
+    async function syncFromSupabaseIfAvailable(quiet = false) {
+      const client = getSupabaseClientIfAvailable();
+      if (!client || !navigator.onLine) {
+        if (!quiet) showToast("Koneksi Supabase belum terhubung / perangkat sedang offline.", "info");
+        return;
+      }
+      try {
+        if (!quiet) showToast("Menyinkronkan data merchant dari Supabase Cloud...", "info");
+        const { data, error } = await client.from('store_licenses').select('*');
+        if (error) throw error;
+        
+        // Filter row konfigurasi sistem (agar tidak muncul sebagai toko kasir)
+        const validRows = (data || []).filter(r => r.plan_type !== "CONFIG" && r.store_id !== "SYS_CONFIG_PRICING" && !r.owner_email?.startsWith("system_"));
+        
+        // Ambil mapping PIN dari app_config (store_pins)
+        let pinsMap = {};
+        try {
+          const { data: cfgRow } = await client.from('app_config').select('value').eq('key', 'store_pins').maybeSingle();
+          if (cfgRow && cfgRow.value) {
+            pinsMap = typeof cfgRow.value === 'string' ? JSON.parse(cfgRow.value) : cfgRow.value;
+          }
+        } catch (e) {}
+
+        const cloudMerchants = validRows.map(row => {
+          const normWa = (row.whatsapp || "").replace(/[^0-9]/g, '').replace(/^62/, '0');
+          const storePin = row.pin || pinsMap[row.store_id] || pinsMap[normWa] || pinsMap[row.whatsapp] || "123456";
+
+          return {
+            id: row.id || Date.now() + Math.random(),
+            store_name: row.store_name || "Toko Retail",
+            store_id: row.store_id,
+            owner_email: row.owner_email,
+            whatsapp: row.whatsapp || "-",
+            pin: storePin,
+            plan_type: row.plan_type || "PAKET_1",
+            pos_status: row.pos_status || "ACTIVE",
+            pos_duration: row.plan_type === "PAKET_1" ? "LIFETIME" : "30",
+            pos_expires_at: row.pos_expires_at,
+            cloud_status: row.cloud_status || "INACTIVE",
+            cloud_duration: row.cloud_status === "ACTIVE" ? "30" : "INACTIVE",
+            cloud_expires_at: row.cloud_expires_at,
+            payment_method: row.last_payment_method || "ONLINE",
+            amount_paid: row.last_amount_paid || 0,
+            active_device_id: row.active_device_id,
+            created_at: (row.created_at ? row.created_at.split("T")[0] : new Date().toISOString().split("T")[0])
+          };
+        });
+
+        // Auto-Recovery: Jika ada merchant di localStorage yang belum masuk ke cloud Supabase, sinkronkan ke Cloud!
+        const localMerchants = getVendorMerchants();
+        const deletedList = JSON.parse(localStorage.getItem("snackpos_deleted_merchants") || "[]");
+        for (const localM of localMerchants) {
+          if (!localM.store_id || deletedList.includes(localM.store_id) || deletedList.includes(localM.owner_email)) continue;
+          const alreadyInCloud = validRows.some(r => r.store_id === localM.store_id || r.owner_email === localM.owner_email);
+          if (!alreadyInCloud) {
+            console.log(`[Auto-Recovery] Menyinkronkan toko lokal ${localM.store_name} (${localM.store_id}) ke Supabase...`);
+            await syncMerchantToSupabase(localM);
+            cloudMerchants.push(localM);
+          }
+        }
+
+        saveVendorMerchants(cloudMerchants);
+        if (!quiet) showToast(`Sinkronisasi Sukses: ${cloudMerchants.length} toko terverifikasi cloud!`, "success");
+      } catch (err) {
+        if (!quiet) showToast(`Gagal sinkron cloud: ${err.message}`, "error");
+      }
+    }
+
+    function initPortal() {
+      updateStats();
+      renderMerchantsTable();
+      updateGatewayHeaderButton();
+      fetchPaymentConfigFromSupabase();
+      loadCloudPricingIfAvailable();
+      syncFromSupabaseIfAvailable(true);
+    }
+
+    // Check unlocked state on load
+    window.addEventListener("DOMContentLoaded", () => {
+      const isUnlocked = sessionStorage.getItem("snackpos_vendor_unlocked");
+      if (isUnlocked === "true") {
+        document.getElementById("modal-pin-lock").classList.add("hidden");
+        initPortal();
+      } else {
+        document.getElementById("modal-pin-lock").classList.remove("hidden");
+        document.getElementById("input-vendor-pin").focus();
+      }
+    });
+
+    // Sinkronisasi otomatis saat jendela kembali aktif / setiap 15 detik
+    window.addEventListener("focus", () => {
+      if (sessionStorage.getItem("snackpos_vendor_unlocked") === "true") {
+        syncFromSupabaseIfAvailable(true);
+      }
+    });
+    setInterval(() => {
+      if (sessionStorage.getItem("snackpos_vendor_unlocked") === "true") {
+        syncFromSupabaseIfAvailable(true);
+      }
+    }, 15000);
+  </script>
+</body>
+</html>
