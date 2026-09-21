@@ -53,7 +53,14 @@ function renderStockOpnameTable() {
       <tr class="border-b border-slate-200 hover:bg-slate-50 text-xs">
         <td class="py-2.5 px-3 font-mono text-slate-400 text-center">${idx + 1}</td>
         <td class="py-2.5 px-3 font-mono font-bold text-blue-700">${p.barcode}</td>
-        <td class="py-2.5 px-3 font-bold text-slate-800">${p.name}</td>
+        <td class="py-2.5 px-3 font-bold text-slate-800">
+          <div class="flex items-center gap-2">
+            <span>${p.name}</span>
+            <button type="button" onclick="onSoCountChange('${p.id}', ${fisik + 1})" class="px-1.5 py-0.5 rounded bg-purple-100 hover:bg-purple-200 text-purple-800 text-[10px] font-bold transition flex items-center gap-0.5 cursor-pointer" title="Tambah 1 Hitungan Fisik Rak">
+              <span>+</span><span>1</span>
+            </button>
+          </div>
+        </td>
         <td class="py-2.5 px-3 text-center font-bold text-slate-700 bg-slate-50">${p.stock}</td>
         <td class="py-2.5 px-3 text-center">
           <input 
@@ -268,8 +275,20 @@ function renderLpbProductSuggestions(matches, exactMatch = null) {
   box.innerHTML = matches.map((p, idx) => `
     <div onclick="selectLpbProduct('${p.id}')"
       class="p-2.5 hover:bg-blue-50 cursor-pointer flex items-center justify-between transition-colors ${exactMatch && exactMatch.id === p.id ? 'bg-blue-100/70' : ''}">
-      <div class="min-w-0 pr-2">
-        <div class="text-xs font-bold text-slate-800 truncate">${p.name}</div>
+      <div class="min-w-0 pr-2 flex-1">
+        <!-- Nama Produk & Tombol + Tambah Berdampingan -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-bold text-slate-800 truncate">${p.name}</span>
+          <button 
+            type="button" 
+            onclick="event.stopPropagation(); selectLpbProduct('${p.id}');" 
+            class="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-md text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
+            title="Pilih dan Tambah ke LPB"
+          >
+            <span>+</span>
+            <span>Tambah</span>
+          </button>
+        </div>
         <div class="text-[10px] text-slate-500 font-mono flex items-center gap-2 mt-0.5">
           <span>PLU: ${p.barcode || p.id}</span>
           <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-sans">Stok: ${p.stock || 0} ${p.unit || 'pcs'}</span>
@@ -283,6 +302,13 @@ function renderLpbProductSuggestions(matches, exactMatch = null) {
   `).join("");
 
   box.classList.remove("hidden");
+}
+
+function handleLpbShowAllProducts() {
+  const allMatches = (pos.products || []).slice(0, 30);
+  renderLpbProductSuggestions(allMatches);
+  const searchInput = document.getElementById("lpb-product-search");
+  if (searchInput) searchInput.focus();
 }
 
 function selectLpbProduct(productId) {

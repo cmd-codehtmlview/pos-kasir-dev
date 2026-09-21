@@ -265,29 +265,42 @@
             <input 
               type="text" 
               id="pos-barcode-search" 
-              placeholder="Scan Barcode / Ketik Nama Produk..."
-              class="w-full pl-3 sm:pl-4 pr-44 sm:pr-56 py-2.5 sm:py-3 bg-yellow-50/60 border-2 border-yellow-400 rounded-xl text-sm sm:text-base font-extrabold text-slate-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-yellow-300/60 font-mono tracking-wide placeholder:font-sans placeholder:font-normal placeholder:text-slate-400"
+              placeholder="Scan Barcode / Ketik Live Nama Produk..."
+              autocomplete="off"
+              oninput="handlePosLiveSearch(this.value)"
+              class="w-full pl-3 sm:pl-4 pr-20 sm:pr-24 py-2.5 sm:py-3 bg-yellow-50/60 border-2 border-yellow-400 rounded-xl text-sm sm:text-base font-extrabold text-slate-900 focus:bg-white focus:outline-none focus:ring-4 focus:ring-yellow-300/60 font-mono tracking-wide placeholder:font-sans placeholder:font-normal placeholder:text-slate-400"
               autofocus
             />
+            
+            <!-- Simbol Minimalis di Dalam Kolom Input: Lihat All Produk & Scan Barcode Kamera -->
             <div class="absolute right-1.5 sm:right-2 flex items-center gap-1 sm:gap-1.5">
+              <!-- Simbol Minimalis: Lihat All Produk -->
+              <button 
+                type="button"
+                onclick="togglePosAllProductsDropdown()" 
+                class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-yellow-100 text-slate-800 active:scale-95 flex items-center justify-center text-sm font-black border border-slate-300 shadow-2xs transition-all cursor-pointer" 
+                title="Lihat Semua Produk Toko [F1]"
+              >
+                📋
+              </button>
+
+              <!-- Simbol Minimalis: Scan Barcode Kamera -->
               <button 
                 type="button"
                 onclick="openPosCameraScanner()" 
-                class="px-2.5 sm:px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-lg text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer" 
-                title="Buka Scanner Barcode Kamera HP / Laptop [Alt+C]"
+                class="w-8 h-8 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white flex items-center justify-center text-sm font-black shadow-2xs transition-all cursor-pointer" 
+                title="Scan Barcode Kamera HP / Laptop [Alt+C]"
               >
-                <span class="text-sm">📷</span>
-                <span class="hidden sm:inline">Scan Kamera</span>
-                <span class="sm:hidden">Kamera</span>
+                📷
               </button>
-              <button 
-                type="button"
-                onclick="openFindProductModal()" 
-                class="px-2 py-1.5 bg-slate-200 hover:bg-slate-300 active:scale-95 text-slate-700 rounded-lg text-xs font-bold font-mono cursor-pointer" 
-                title="Pencarian Cepat Produk [F1]"
-              >
-                Cari [F1]
-              </button>
+            </div>
+
+            <!-- Dropdown Live Search Kasir (Dengan Tombol + Tambah di Samping Nama Produk) -->
+            <div 
+              id="pos-live-search-dropdown" 
+              class="hidden absolute z-50 left-0 right-0 top-full mt-1.5 bg-white border-2 border-yellow-400 rounded-2xl shadow-2xl max-h-80 overflow-y-auto divide-y divide-slate-100 custom-scrollbar"
+            >
+              <!-- Diisi otomatis oleh handlePosLiveSearch() -->
             </div>
           </div>
 
@@ -386,22 +399,32 @@
         </div>
 
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-          <div class="relative w-full sm:w-64">
+          <div class="relative w-full sm:w-64 flex items-center">
             <input 
               type="text" 
               id="inventory-search-input"
               oninput="renderInventoryTable()"
               placeholder="Cari produk / barcode..." 
-              class="w-full pl-3 pr-10 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-alfa-red"
+              class="w-full pl-3 pr-16 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-alfa-red"
             />
-            <button 
-              type="button" 
-              onclick="openBarcodeCameraScanner('inventory-search-input')" 
-              title="Scan Barcode Kemasan dengan Kamera HP / Laptop"
-              class="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 text-slate-500 hover:text-alfa-red hover:bg-slate-100 rounded-lg transition-colors cursor-pointer flex items-center justify-center text-sm"
-            >
-              📷
-            </button>
+            <div class="absolute right-1 flex items-center gap-1">
+              <button 
+                type="button" 
+                onclick="document.getElementById('inventory-search-input').value=''; renderInventoryTable(); document.getElementById('inventory-search-input').focus();" 
+                title="Lihat Seluruh Produk Toko"
+                class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold transition cursor-pointer"
+              >
+                📋
+              </button>
+              <button 
+                type="button" 
+                onclick="openBarcodeCameraScanner('inventory-search-input')" 
+                title="Scan Barcode Kemasan dengan Kamera HP / Laptop"
+                class="w-6 h-6 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center text-xs font-bold transition cursor-pointer shadow-2xs"
+              >
+                📷
+              </button>
+            </div>
           </div>
 
           <!-- Selector Sortir Katalog Produk -->
@@ -1967,13 +1990,33 @@
 
       <!-- SO Search & Filter -->
       <div class="p-3 bg-purple-50 border-b border-purple-100 flex flex-wrap items-center justify-between gap-3">
-        <input 
-          type="text" 
-          id="so-search-input" 
-          oninput="renderStockOpnameTable()" 
-          placeholder="Cari nama produk atau barcode untuk SO..." 
-          class="px-3 py-1.5 bg-white border border-purple-200 rounded-xl text-xs font-semibold w-72 focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
+        <div class="relative flex items-center w-72">
+          <input 
+            type="text" 
+            id="so-search-input" 
+            oninput="renderStockOpnameTable()" 
+            placeholder="Cari nama produk / barcode SO..." 
+            class="w-full pl-3 pr-16 py-1.5 bg-white border border-purple-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+          <div class="absolute right-1 flex items-center gap-1">
+            <button 
+              type="button" 
+              onclick="document.getElementById('so-search-input').value=''; renderStockOpnameTable(); document.getElementById('so-search-input').focus();" 
+              class="w-6 h-6 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-800 flex items-center justify-center text-xs font-bold transition cursor-pointer" 
+              title="Lihat Seluruh Produk Toko"
+            >
+              📋
+            </button>
+            <button 
+              type="button" 
+              onclick="openBarcodeCameraScanner('so-search-input')" 
+              class="w-6 h-6 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center text-xs font-bold transition shadow-2xs cursor-pointer" 
+              title="Scan Barcode Kamera SO"
+            >
+              📷
+            </button>
+          </div>
+        </div>
 
         <div class="flex items-center gap-4 text-xs font-bold">
           <div>Selisih Plus: <span id="so-summary-plus" class="text-blue-700 font-black">+0 pcs</span></div>
@@ -2095,18 +2138,26 @@
               </label>
               <div class="relative flex items-center">
                 <input type="text" id="lpb-product-search"
-                  placeholder="Ketik nama produk / scan barcode..."
+                  placeholder="Ketik live nama produk / scan barcode..."
                   autocomplete="off"
                   oninput="handleLpbProductSearchInput(this.value)"
                   onkeydown="handleLpbProductSearchKeyDown(event)"
-                  class="w-full pl-3 pr-10 py-2 text-xs border border-blue-300 rounded-xl bg-white focus:outline-none focus:border-blue-500 font-medium transition-colors">
-                <!-- Tombol Scan Kamera di dalam kolom bagian kanan -->
-                <button type="button" 
-                  onclick="openBarcodeCameraScanner('lpb-product-search')"
-                  class="absolute right-1 px-2 py-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg text-sm shrink-0 cursor-pointer transition-colors"
-                  title="Scan Barcode Produk dengan Kamera HP / Laptop">
-                  📷
-                </button>
+                  class="w-full pl-3 pr-16 py-2 text-xs border border-blue-300 rounded-xl bg-white focus:outline-none focus:border-blue-500 font-medium transition-colors">
+                <!-- Tombol Simbol Minimalis: Lihat All Produk & Scan Kamera -->
+                <div class="absolute right-1 flex items-center gap-1">
+                  <button type="button" 
+                    onclick="handleLpbShowAllProducts()"
+                    class="w-6 h-6 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-800 flex items-center justify-center text-xs font-bold cursor-pointer transition-colors"
+                    title="Lihat Seluruh Katalog Produk Toko">
+                    📋
+                  </button>
+                  <button type="button" 
+                    onclick="openBarcodeCameraScanner('lpb-product-search')"
+                    class="w-6 h-6 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center text-xs font-bold cursor-pointer transition-colors shadow-2xs"
+                    title="Scan Barcode Produk dengan Kamera HP / Laptop">
+                    📷
+                  </button>
+                </div>
               </div>
 
               <!-- Hidden input menyimpan ID produk terpilih -->
@@ -6354,6 +6405,113 @@
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=120"></script>
   <script>
+    // Live Search untuk Barcode Scanner Kasir Utama (Ketik Live & Dropdown Cepat)
+    function handlePosLiveSearch(rawVal) {
+      const dropdown = document.getElementById("pos-live-search-dropdown");
+      const q = (rawVal || "").trim().toLowerCase();
+      if (!dropdown) return;
+
+      if (!q) {
+        dropdown.classList.add("hidden");
+        dropdown.innerHTML = "";
+        return;
+      }
+
+      const matches = (pos.products || []).filter(p => 
+        (p.name && p.name.toLowerCase().includes(q)) || 
+        (p.barcode && p.barcode.includes(q)) ||
+        (p.id && p.id.toLowerCase().includes(q))
+      ).slice(0, 20);
+
+      renderPosLiveSearchDropdown(matches, q);
+    }
+
+    // Toggle Dropdown Seluruh Produk Toko (Tombol 📋)
+    function togglePosAllProductsDropdown() {
+      const dropdown = document.getElementById("pos-live-search-dropdown");
+      const input = document.getElementById("pos-barcode-search");
+      if (!dropdown) return;
+
+      if (!dropdown.classList.contains("hidden") && (!input.value || input.value.trim() === "")) {
+        dropdown.classList.add("hidden");
+      } else {
+        const allItems = (pos.products || []).slice(0, 40);
+        renderPosLiveSearchDropdown(allItems, "Semua Produk Toko");
+        if (input) input.focus();
+      }
+    }
+
+    function hidePosLiveSearch() {
+      const dropdown = document.getElementById("pos-live-search-dropdown");
+      if (dropdown) dropdown.classList.add("hidden");
+    }
+
+    function renderPosLiveSearchDropdown(items, queryLabel) {
+      const dropdown = document.getElementById("pos-live-search-dropdown");
+      if (!dropdown) return;
+
+      if (items.length === 0) {
+        dropdown.innerHTML = `
+          <div class="p-4 text-center text-xs text-slate-400">
+            Produk tidak ditemukan untuk "<strong>${queryLabel}</strong>"
+          </div>
+        `;
+        dropdown.classList.remove("hidden");
+        return;
+      }
+
+      dropdown.innerHTML = `
+        <div class="p-2.5 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between border-b border-slate-100">
+          <span>Katalog Produk Kasir (${items.length} Item)</span>
+          <button onclick="hidePosLiveSearch()" class="text-slate-400 hover:text-slate-600 font-black cursor-pointer">✕ Tutup</button>
+        </div>
+        <div class="divide-y divide-slate-100">
+          ${items.map(p => `
+            <div onclick="addToCart('${p.id}'); hidePosLiveSearch();" class="p-2.5 hover:bg-yellow-50/80 transition-colors flex items-center justify-between gap-2.5 cursor-pointer group">
+              <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                <img src="${getProductImageSrc(p)}" alt="${p.name}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-slate-200" loading="lazy" onerror="this.onerror=null; this.src=getProductThumbnailSvg('${(p.category || '').replace(/'/g, "\\'")}', '${(p.name || '').replace(/'/g, "\\'")}');">
+                <div class="min-w-0 flex-1">
+                  <!-- Baris Nama Produk & Tombol + Tambah Berdampingan -->
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">${p.name}</span>
+                    <!-- Tombol Tambah di Samping Nama Produk Sesuai Permintaan -->
+                    <button 
+                      type="button" 
+                      onclick="event.stopPropagation(); addToCart('${p.id}'); hidePosLiveSearch();" 
+                      class="px-2 py-0.5 bg-alfa-red hover:bg-red-700 active:scale-95 text-white rounded-md text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
+                      title="Tambah ke Keranjang Kasir"
+                    >
+                      <span>+</span>
+                      <span>Tambah</span>
+                    </button>
+                  </div>
+                  <div class="text-[10px] text-slate-400 font-mono flex items-center gap-2 mt-0.5">
+                    <span>PLU: ${p.barcode || p.id}</span>
+                    <span>•</span>
+                    <span>Stok: <strong class="${p.stock <= p.minStock ? 'text-rose-600 font-bold' : 'text-slate-700'}">${p.stock} ${p.unit || 'pcs'}</strong></span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0 font-mono font-black text-xs sm:text-sm text-alfa-red">
+                ${formatRupiah(p.price)}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+      dropdown.classList.remove("hidden");
+    }
+
+    // Tutup live search saat klik di luar
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById("pos-live-search-dropdown");
+      const searchBox = document.getElementById("pos-barcode-search")?.closest('.relative');
+      if (dropdown && searchBox && !searchBox.contains(e.target)) {
+        dropdown.classList.add("hidden");
+      }
+    });
+
+    // Pencarian Modal F1 (Dengan Tombol + Tambah di Samping Nama Produk)
     function renderQuickFindProducts() {
       const q = document.getElementById("find-product-query").value.toLowerCase().trim();
       const container = document.getElementById("find-product-list");
@@ -6361,17 +6519,28 @@
       
       container.innerHTML = filtered.slice(0, 30).map(p => `
         <div onclick="addToCart('${p.id}'); closeModal('modal-find-product');" class="p-2.5 bg-white hover:bg-yellow-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3 cursor-pointer transition-colors">
-          <div class="flex items-center gap-2.5">
+          <div class="flex items-center gap-2.5 min-w-0 flex-1">
             <img src="${getProductImageSrc(p)}" alt="${p.name}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-slate-200" loading="lazy" onerror="this.onerror=null; this.src=getProductThumbnailSvg('${(p.category || '').replace(/'/g, "\\'")}', '${(p.name || '').replace(/'/g, "\\'")}');">
-          <div>
-            <div class="font-bold text-slate-800 text-xs">${p.name}</div>
-            <div class="text-[10px] text-slate-400 font-mono">PLU: ${p.barcode} • Stok: ${p.stock}</div>
+            <div class="min-w-0 flex-1">
+              <!-- Baris Nama Produk & Tombol + Tambah Berdampingan -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-bold text-slate-800 text-xs truncate">${p.name}</span>
+                <button 
+                  type="button" 
+                  onclick="event.stopPropagation(); addToCart('${p.id}'); closeModal('modal-find-product');" 
+                  class="px-2 py-0.5 bg-alfa-red hover:bg-red-700 active:scale-95 text-white rounded-md text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
+                >
+                  <span>+</span>
+                  <span>Tambah</span>
+                </button>
+              </div>
+              <div class="text-[10px] text-slate-400 font-mono">PLU: ${p.barcode} • Stok: ${p.stock}</div>
+            </div>
           </div>
+          <span class="font-mono font-black text-alfa-red text-xs">${formatRupiah(p.price)}</span>
         </div>
-        <span class="font-mono font-black text-alfa-red text-xs">${formatRupiah(p.price)}</span>
-      </div>
-    `).join("");
-  }
+      `).join("");
+    }
 
   window.onbeforeprint = function() {
     if (typeof preparePrintableReceipt === "function") {

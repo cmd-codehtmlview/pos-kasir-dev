@@ -106,20 +106,52 @@
     <!-- KOLOM KIRI (7/12): SCANNER INPUT, TAMBAH MEMBER & TABEL BELANJA KASIR -->
     <div class="lg:col-span-8 flex flex-col gap-3 w-full">
       
-      <!-- Smart Search & Scan Barcode (Multifungsi: Barcode / Nama Produk) -->
-      <div class="bg-white p-2.5 sm:p-3 rounded-2xl border-2 border-slate-300 shadow-xs flex items-center gap-2">
-        <span class="text-xl pl-1">🔍</span>
-        <input 
-          type="text" 
-          id="mock-barcode-input" 
-          placeholder="Scan Barcode atau Ketik Nama Produk (Enter untuk tambah)..." 
-          class="w-full text-xs sm:text-sm font-bold text-slate-800 placeholder-slate-400 focus:outline-none"
-          autofocus
-          onkeydown="if(event.key==='Enter') addSampleItem()"
-        />
-        <button onclick="addSampleItem()" class="px-3 py-1.5 bg-retail-red hover:bg-red-700 text-white rounded-xl text-xs font-black transition flex-shrink-0 cursor-pointer shadow-xs">
-          + Tambah
-        </button>
+      <!-- Smart Search & Scan Barcode (Ketik Live, Lihat All Produk, Scan Barcode Kamera) -->
+      <div class="relative w-full">
+        <div class="bg-white p-2.5 sm:p-3 rounded-2xl border-2 border-slate-300 focus-within:border-retail-red shadow-xs flex items-center gap-2 transition-all">
+          <span class="text-slate-400 pl-1 text-sm flex-shrink-0">🔍</span>
+          <input 
+            type="text" 
+            id="mock-barcode-input" 
+            placeholder="Scan barcode / ketik live nama produk..." 
+            class="w-full text-xs sm:text-sm font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent"
+            autofocus
+            autocomplete="off"
+            oninput="handleMockupLiveSearch(this.value)"
+            onkeydown="if(event.key==='Enter') handleMockupEnterSearch()"
+          />
+          
+          <!-- Simbol Minimalis: Lihat All Produk & Scan Barcode Kamera (Tombol Tambah di Kolom Dihilangkan) -->
+          <div class="flex items-center gap-1 flex-shrink-0">
+            <!-- Simbol Minimalis: Lihat All Produk -->
+            <button 
+              type="button" 
+              onclick="toggleMockupAllProducts()" 
+              class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center text-xs sm:text-sm font-bold transition border border-slate-200 cursor-pointer" 
+              title="Lihat Semua Produk Toko"
+            >
+              📋
+            </button>
+            
+            <!-- Simbol Minimalis: Scan Barcode Kamera -->
+            <button 
+              type="button" 
+              onclick="triggerMockupCameraScan()" 
+              class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white active:scale-95 flex items-center justify-center text-xs sm:text-sm font-bold transition shadow-2xs cursor-pointer" 
+              title="Scan Barcode Kamera HP / Webcam"
+            >
+              📷
+            </button>
+          </div>
+        </div>
+
+        <!-- Dropdown Live Search (Dengan Tombol + Tambah di Samping Nama Produk) -->
+        <div 
+          id="mock-live-search-dropdown" 
+          class="hidden absolute z-40 left-0 right-0 top-full mt-1.5 bg-white border-2 border-retail-red/70 rounded-2xl shadow-2xl max-h-72 overflow-y-auto divide-y divide-slate-100"
+        >
+          <!-- Diisi otomatis oleh handleMockupLiveSearch() -->
+        </div>
       </div>
 
       <!-- BARIS INPUT TAMBAH MEMBER (Standar Retail Minimarket: Tambah No. HP / Scan Kartu) -->
@@ -649,35 +681,192 @@
       }
     }
 
-    // Add dummy item sample
-    function addSampleItem() {
+    // Katalog Master Produk Mockup Kasir
+    const mockCatalog = [
+      { id: "P1", barcode: "8992761111001", name: "Keripik Tempe Renyah 150g", price: 12000, stock: 45, unit: "Bks" },
+      { id: "P2", barcode: "8992761111002", name: "Basreng Pedas Daun Jeruk 200g", price: 15000, stock: 32, unit: "Bks" },
+      { id: "P3", barcode: "8992761111003", name: "Makaroni Bantet Super Pedas", price: 8500, stock: 60, unit: "Bks" },
+      { id: "P4", barcode: "8992761111004", name: "Keripik Kaca Original 100g", price: 10000, stock: 24, unit: "Bks" },
+      { id: "P5", barcode: "8992761111005", name: "Usus Crispy Renyah Gurih 120g", price: 14000, stock: 18, unit: "Bks" },
+      { id: "P6", barcode: "8992761111006", name: "Cimol Kering Pedas Balado", price: 9000, stock: 40, unit: "Bks" },
+      { id: "P7", barcode: "8992761111007", name: "Seblak Kering Komplit Level 5", price: 11000, stock: 15, unit: "Bks" },
+      { id: "P8", barcode: "8992761111008", name: "Kacang Bali Gurih Asin 250g", price: 18000, stock: 28, unit: "Bks" },
+      { id: "P9", barcode: "8992761111009", name: "Pilus Rumput Laut Crispy", price: 7500, stock: 55, unit: "Bks" },
+      { id: "P10", barcode: "8992761111010", name: "Mie Lidi Si Umang Pedas 130g", price: 13500, stock: 22, unit: "Bks" }
+    ];
+
+    // Live Search Otomatis (Ketik Langsung Muncul Hasil)
+    function handleMockupLiveSearch(query) {
+      const dropdown = document.getElementById('mock-live-search-dropdown');
+      const q = (query || "").trim().toLowerCase();
+
+      if (!dropdown) return;
+
+      if (!q) {
+        dropdown.classList.add('hidden');
+        dropdown.innerHTML = "";
+        return;
+      }
+
+      const matches = mockCatalog.filter(p => 
+        p.name.toLowerCase().includes(q) || 
+        p.barcode.includes(q)
+      );
+
+      renderMockupLiveDropdown(matches, q);
+    }
+
+    // Toggle Tampilkan Seluruh Produk (Tombol Minimalis 📋)
+    function toggleMockupAllProducts() {
+      const dropdown = document.getElementById('mock-live-search-dropdown');
       const input = document.getElementById('mock-barcode-input');
+      if (!dropdown) return;
+
+      if (!dropdown.classList.contains('hidden') && (!input.value || input.value.trim() === "")) {
+        dropdown.classList.add('hidden');
+      } else {
+        renderMockupLiveDropdown(mockCatalog, "Semua Produk Toko");
+        if (input) input.focus();
+      }
+    }
+
+    // Render Dropdown Hasil Pencarian (Tombol + Tambah Ditaruh di Samping Nama Produk)
+    function renderMockupLiveDropdown(items, queryLabel) {
+      const dropdown = document.getElementById('mock-live-search-dropdown');
+      if (!dropdown) return;
+
+      if (items.length === 0) {
+        dropdown.innerHTML = `
+          <div class="p-4 text-center text-xs text-slate-400">
+            Produk tidak ditemukan untuk "<strong>${queryLabel}</strong>"
+          </div>
+        `;
+        dropdown.classList.remove('hidden');
+        return;
+      }
+
+      dropdown.innerHTML = `
+        <div class="p-2 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between border-b border-slate-100">
+          <span>Hasil Pencarian: ${items.length} Produk</span>
+          <button onclick="document.getElementById('mock-live-search-dropdown').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black">✕ Tutup</button>
+        </div>
+        <div class="divide-y divide-slate-100">
+          ${items.map(p => `
+            <div class="p-2.5 hover:bg-amber-50/70 transition-colors flex items-center justify-between gap-2.5 cursor-pointer group" onclick="addMockItemFromCatalog('${p.id}')">
+              <div class="min-w-0 flex-1">
+                <!-- Baris Nama Produk & Tombol + Tambah Berdampingan -->
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">${p.name}</span>
+                  <!-- Tombol Tambah Produk di Samping Nama Produk Sesuai Permintaan -->
+                  <button 
+                    type="button" 
+                    onclick="event.stopPropagation(); addMockItemFromCatalog('${p.id}');" 
+                    class="px-2 py-0.5 bg-retail-red hover:bg-red-700 active:scale-95 text-white rounded-lg text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
+                    title="Tambah Produk ke Keranjang"
+                  >
+                    <span>+</span>
+                    <span>Tambah</span>
+                  </button>
+                </div>
+                <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                  <span>${p.barcode}</span>
+                  <span>•</span>
+                  <span>Stok: <strong class="text-slate-700">${p.stock} ${p.unit}</strong></span>
+                </div>
+              </div>
+              <div class="text-right flex-shrink-0 font-mono font-black text-xs sm:text-sm text-retail-red">
+                Rp ${p.price.toLocaleString('id-ID')}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+
+      dropdown.classList.remove('hidden');
+    }
+
+    // Tambah Produk dari Katalog ke Tabel Kasir
+    function addMockItemFromCatalog(productId) {
+      const p = mockCatalog.find(item => item.id === productId);
+      if (!p) return;
+
       const table = document.getElementById('mock-cart-table');
-      const val = input.value.trim() || 'Keripik Tempe Renyah 150g';
-      
+      const input = document.getElementById('mock-barcode-input');
+      const dropdown = document.getElementById('mock-live-search-dropdown');
+
       const count = table.children.length + 1;
       const row = document.createElement('div');
-      row.className = "p-3 grid grid-cols-12 gap-2 items-center hover:bg-slate-50 text-xs transition bg-amber-50/40 animate-pulse";
+      row.className = "p-3 grid grid-cols-12 gap-2 items-center hover:bg-slate-50 text-xs transition bg-amber-50/30";
       row.innerHTML = `
         <span class="col-span-1 text-center font-bold text-slate-400">${count}</span>
         <div class="col-span-5 min-w-0">
-          <h4 class="font-extrabold text-slate-900 text-sm truncate">${val}</h4>
-          <p class="text-[10px] text-slate-400 font-mono">899${Math.floor(1000000000 + Math.random() * 9000000000)} • Baru</p>
+          <h4 class="font-extrabold text-slate-900 text-sm truncate">${p.name}</h4>
+          <p class="text-[10px] text-slate-400 font-mono">${p.barcode} • Sisa ${p.stock}</p>
         </div>
         <div class="col-span-2 flex items-center justify-center gap-1.5">
           <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">-</button>
           <span class="font-black text-sm w-5 text-center">1</span>
           <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">+</button>
         </div>
-        <span class="col-span-2 text-right font-mono font-semibold text-slate-600">12.000</span>
+        <span class="col-span-2 text-right font-mono font-semibold text-slate-600">${p.price.toLocaleString('id-ID')}</span>
         <div class="col-span-2 text-right font-mono font-extrabold text-slate-900 text-sm flex items-center justify-end gap-1">
-          <span>12.000</span>
+          <span>${p.price.toLocaleString('id-ID')}</span>
           <button onclick="this.closest('.grid').remove()" class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-1">✕</button>
         </div>
       `;
       table.appendChild(row);
-      input.value = "";
-      input.focus();
+
+      showMockupToast(`+1 ${p.name} masuk keranjang`, "success");
+
+      if (input) {
+        input.value = "";
+        input.focus();
+      }
+      if (dropdown) {
+        dropdown.classList.add('hidden');
+      }
+    }
+
+    // Enter Key Search
+    function handleMockupEnterSearch() {
+      const input = document.getElementById('mock-barcode-input');
+      const val = input ? input.value.trim().toLowerCase() : '';
+      if (!val) return;
+
+      const matched = mockCatalog.find(p => p.barcode === val || p.name.toLowerCase().includes(val));
+      if (matched) {
+        addMockItemFromCatalog(matched.id);
+      } else {
+        addSampleItem();
+      }
+    }
+
+    // Scan Barcode Kamera Minimalis (📷)
+    function triggerMockupCameraScan() {
+      showMockupToast("📷 Mengaktifkan Kamera Barcode Scanner...", "success");
+      setTimeout(() => {
+        // Simulasi scan otomatis produk acak dari katalog
+        const randomItem = mockCatalog[Math.floor(Math.random() * mockCatalog.length)];
+        addMockItemFromCatalog(randomItem.id);
+        showMockupToast(`📷 Kamera Membaca: [${randomItem.barcode}] ${randomItem.name}`, "success");
+      }, 700);
+    }
+
+    // Klik di luar dropdown untuk menutup
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('mock-live-search-dropdown');
+      const searchBox = document.getElementById('mock-barcode-input')?.closest('.relative');
+      if (dropdown && searchBox && !searchBox.contains(e.target)) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    // Add dummy item sample fallback
+    function addSampleItem() {
+      const input = document.getElementById('mock-barcode-input');
+      const val = input ? input.value.trim() : '';
+      const dummyId = mockCatalog[0].id;
+      addMockItemFromCatalog(dummyId);
     }
 
     // Tambah & Lepas Member Kasir
