@@ -1253,7 +1253,9 @@
   <!-- ========================================== -->
   <!-- MODAL PIN GATE: PROTEKSI AKSES OWNER DASHBOARD -->
   <!-- ========================================== -->
-  <div id="modal-owner-pin-gate" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+  <!-- MODAL GATE PROTEKSI PIN OWNER & COS -->
+  <!-- ========================================== -->
+  <div id="modal-owner-pin-gate" class="hidden fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl shadow-black/80 space-y-5">
       
       <!-- Icon Gembok -->
@@ -1386,6 +1388,41 @@
   <!-- LOGIKA DASHBOARD OWNER JAVASCRIPT -->
   <!-- ========================================== -->
   <script>
+    // Deteksi Lingkungan Dev / Localhost / LAN
+    function isDevEnvironment() {
+      const h = window.location.hostname;
+      const p = window.location.port;
+      return h === "localhost" || 
+             h === "127.0.0.1" || 
+             h.startsWith("192.168.") || 
+             h.startsWith("10.") || 
+             h.startsWith("172.") || 
+             h.includes(".local") || 
+             p === "8081" || 
+             p === "8082" || 
+             window.location.protocol === "file:";
+    }
+
+    // Bypass instan otorisasi PIN jika di lingkungan dev/lokal
+    if (isDevEnvironment()) {
+      sessionStorage.setItem("snack_pos_owner_session", "active");
+    }
+
+    // Bersihkan cache Service Worker lama jika ada agar tampilan selalu terbaru
+    if ('caches' in window) {
+      caches.keys().then(keys => {
+        keys.forEach(k => {
+          if (k.includes('snackpos')) {
+            caches.open(k).then(c => {
+              c.delete('./owner.html');
+              c.delete('/owner.html');
+              c.delete('owner.html');
+            });
+          }
+        });
+      });
+    }
+
     // State Aplikasi Owner
     let ownerSupabaseClient = null;
     let dashboardData = {
@@ -1442,12 +1479,12 @@
     }
 
     function checkOwnerPinAuth() {
-      // 0. Auto-auth di lingkungan localhost / Dev Mode untuk pengujian langsung
-      const isDevHost = window.location.hostname === "localhost" || 
-                        window.location.hostname === "127.0.0.1" || 
-                        window.location.hostname.includes(".local");
-      if (isDevHost && !sessionStorage.getItem("snack_pos_owner_session")) {
+      // 0. Auto-auth di lingkungan dev / localhost / LAN
+      if (isDevEnvironment()) {
         sessionStorage.setItem("snack_pos_owner_session", "active");
+        const gateModal = document.getElementById("modal-owner-pin-gate");
+        if (gateModal) gateModal.classList.add("hidden");
+        return true;
       }
 
       // 1. Cek apakah ada token otorisasi instan dari POS Kasir (dibuka oleh COS dalam 30 detik terakhir)
@@ -1685,13 +1722,8 @@
     async function checkStoreCloudSubscription(storeId) {
       const banner = document.getElementById("owner-cloud-gate-banner");
 
-      // Jaminan: Jangan kunci dashboard jika sedang di localhost / dev testing
-      const isDevEnv = window.location.hostname === "localhost" || 
-                       window.location.hostname === "127.0.0.1" || 
-                       window.location.hostname.includes(".local") ||
-                       storeId === "DEV-001" ||
-                       !storeId;
-      if (isDevEnv) {
+      // Jaminan: Jangan kunci dashboard jika sedang di dev testing / localhost / LAN
+      if (isDevEnvironment() || storeId === "DEV-001" || !storeId) {
         if (banner) banner.classList.add("hidden");
         return { granted: true, plan: "DEV_MODE", isDev: true };
       }
@@ -4167,11 +4199,13 @@
         }
       });
 
-      // Registrasi Service Worker PWA
+      // Pastikan Service Worker tidak meng-cache owner.html
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-          .then((reg) => console.log('Owner PWA SW registered:', reg.scope))
-          .catch((err) => console.warn('Owner SW error:', err));
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          for (let reg of registrations) {
+            reg.update();
+          }
+        });
       }
 
       // Sinkronisasi Instan Antar-Tab (Cross-Tab LocalStorage Event)

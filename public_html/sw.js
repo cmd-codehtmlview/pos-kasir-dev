@@ -1,8 +1,7 @@
-const CACHE_NAME = 'snackpos-cache-v97';
+const CACHE_NAME = 'snackpos-cache-v99';
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './owner.html',
   './products-data.js',
   './data/merchants-data.js',
   './data/fmcg_catalog.json',
@@ -45,7 +44,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate Event: Clean Old Caches & Purge any residual order pages
+// Activate Event: Clean Old Caches & Purge any residual order/owner pages
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -59,6 +58,9 @@ self.addEventListener('activate', (event) => {
     }).then(() => {
       return caches.open(CACHE_NAME).then((cache) => {
         return Promise.all([
+          cache.delete('./owner.html'),
+          cache.delete('/owner.html'),
+          cache.delete('owner.html'),
           cache.delete('./order.html'),
           cache.delete('/order.html'),
           cache.delete('/order'),
@@ -78,9 +80,9 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   const path = url.pathname.toLowerCase();
 
-  // JANGAN PERNAH intercept atau cache halaman checkout order, portal owner, dan Supabase API
-  // Hal ini memastikan ponsel/tablet pengguna selalu mendapatkan data & tampilan live server
-  if (path.includes('order') || path.includes('v-portal') || url.hostname.includes('supabase.co')) {
+  // JANGAN PERNAH intercept atau cache halaman order, owner monitoring, mockup, dan Supabase API
+  // Hal ini memastikan pengguna selalu mendapatkan data & tampilan live server terbaru
+  if (path.includes('order') || path.includes('owner') || path.includes('mockup') || path.includes('v-portal') || url.hostname.includes('supabase.co')) {
     return;
   }
 
