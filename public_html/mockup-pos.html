@@ -385,96 +385,12 @@
           <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full font-mono">Real-Time</span>
         </div>
 
-        <!-- SUB-MENU VALUASI: 1 BARIS COMPACT (EXPANDABLE) -->
-        <div class="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/70 transition">
-          <button 
-            type="button" 
-            onclick="toggleValuationAccordion()" 
-            class="w-full px-3 py-2.5 flex items-center justify-between text-left hover:bg-slate-100 transition cursor-pointer"
-            title="Klik untuk melihat rincian valuasi inventori toko"
-          >
-            <div class="flex items-center gap-2 min-w-0 pr-2">
-              <span class="text-sm shrink-0">💎</span>
-              <div class="flex items-center gap-1.5 flex-wrap truncate text-xs">
-                <span class="font-extrabold text-slate-900">Valuasi Inventori:</span>
-                <span class="font-bold text-indigo-700 font-mono">Modal Rp 28,65M</span>
-                <span class="text-slate-300">•</span>
-                <span class="font-bold text-amber-700 font-mono">Jual Rp 37,8M</span>
-                <span class="text-slate-300">•</span>
-                <span class="font-bold text-emerald-700 font-mono">Laba +Rp 9,15M</span>
-              </div>
-            </div>
-            <div class="flex items-center gap-1 text-slate-400 font-bold text-xs shrink-0">
-              <span id="valuation-chevron" class="text-xs transition-transform duration-200">▼</span>
-            </div>
-          </button>
-
-          <!-- KONTEN RINCIAN LENGKAP VALUASI -->
-          <div id="valuation-accordion-content" class="hidden p-3 bg-white border-t border-slate-200 space-y-2.5">
-            <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-              <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
-                <span>💎</span>
-                <span>Rincian Valuasi Aset Toko (Real-Time)</span>
-              </span>
-              <span class="text-[10px] text-slate-500 font-mono font-bold bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
-                145 Jenis SKU
-              </span>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-              <div class="bg-indigo-50/60 p-2.5 rounded-xl border border-indigo-100 flex flex-col justify-between min-w-0">
-                <div class="flex items-center justify-between text-indigo-700 text-xs">
-                  <span class="font-bold uppercase tracking-wider text-[9px] truncate">Nilai Modal (HPP)</span>
-                  <span class="text-sm shrink-0">💰</span>
-                </div>
-                <div class="font-bebas text-lg sm:text-xl text-indigo-950 tracking-wider truncate mt-0.5">
-                  Rp 28.650.000
-                </div>
-                <span class="text-[8px] text-indigo-600/90 truncate">Modal Fisik di Rak Toko</span>
-              </div>
-
-              <div class="bg-cyan-50/60 p-2.5 rounded-xl border border-cyan-100 flex flex-col justify-between min-w-0">
-                <div class="flex items-center justify-between text-cyan-700 text-xs">
-                  <span class="font-bold uppercase tracking-wider text-[9px] truncate">Total Fisik Stok</span>
-                  <span class="text-sm shrink-0">📦</span>
-                </div>
-                <div class="font-bebas text-lg sm:text-xl text-cyan-950 tracking-wider truncate mt-0.5">
-                  3.420 PCS
-                </div>
-                <span class="text-[8px] text-cyan-600/90 truncate">145 SKU Toko & Gudang</span>
-              </div>
-
-              <div class="bg-amber-50/60 p-2.5 rounded-xl border border-amber-100 flex flex-col justify-between min-w-0">
-                <div class="flex items-center justify-between text-amber-700 text-xs">
-                  <span class="font-bold uppercase tracking-wider text-[9px] truncate">Potensi Nilai Jual</span>
-                  <span class="text-sm shrink-0">🏷️</span>
-                </div>
-                <div class="font-bebas text-lg sm:text-xl text-amber-950 tracking-wider truncate mt-0.5">
-                  Rp 37.800.000
-                </div>
-                <span class="text-[8px] text-amber-600/90 truncate">Gross Jika Habis Terjual</span>
-              </div>
-
-              <div class="bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-100 flex flex-col justify-between min-w-0">
-                <div class="flex items-center justify-between text-emerald-700 text-xs">
-                  <span class="font-bold uppercase tracking-wider text-[9px] truncate">Proyeksi Laba Stok</span>
-                  <span class="text-sm shrink-0">📈</span>
-                </div>
-                <div class="font-bebas text-lg sm:text-xl text-emerald-950 tracking-wider truncate mt-0.5">
-                  +Rp 9.150.000
-                </div>
-                <span class="text-[8px] text-emerald-700 font-bold truncate">Margin Keuntungan 24.2%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- 4 Tombol Laporan Ritel Utama (Grid 2 Kolom Rapi 2x2) -->
         <div class="grid grid-cols-2 gap-2">
           <button type="button" onclick="openMockupReportsModal('sales')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base shrink-0">📈</span>
             <div class="min-w-0">
-              <span class="block truncate">Omzet & Laba</span>
+              <span class="block truncate">Omzet & Laba Real</span>
               <span class="text-[9px] text-slate-400 font-normal block truncate">Laba Bersih & Margin %</span>
             </div>
           </button>
@@ -485,18 +401,18 @@
               <span class="text-[9px] text-slate-400 font-normal block truncate">Top 10 Fast-Moving</span>
             </div>
           </button>
+          <button type="button" onclick="openMockupReportsModal('valuation')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+            <span class="text-base shrink-0">💎</span>
+            <div class="min-w-0">
+              <span class="block truncate">Valuasi Stok Toko</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Modal HPP & Nilai Jual</span>
+            </div>
+          </button>
           <button type="button" onclick="openMockupReportsModal('lowstock')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
             <span class="text-base shrink-0">⚠️</span>
             <div class="min-w-0">
               <span class="block truncate">Stok Kritis / Habis</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Usulan Order (RO)</span>
-            </div>
-          </button>
-          <button type="button" onclick="openMockupReportsModal('lpb')" class="p-2.5 bg-slate-50 hover:bg-indigo-50 text-left rounded-xl border border-slate-200 hover:border-indigo-300 transition flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-            <span class="text-base shrink-0">🚚</span>
-            <div class="min-w-0">
-              <span class="block truncate">Rekap Faktur LPB</span>
-              <span class="text-[9px] text-slate-400 font-normal block truncate">Barang Masuk & Utang</span>
+              <span class="text-[9px] text-slate-400 font-normal block truncate">Alert Out-of-Stock</span>
             </div>
           </button>
         </div>
@@ -848,11 +764,11 @@
         <button id="tab-btn-rep-top" onclick="switchMockupReportsTab('top')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
           🏆 Top 10 Laris
         </button>
+        <button id="tab-btn-rep-valuation" onclick="switchMockupReportsTab('valuation')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+          💎 Valuasi Stok
+        </button>
         <button id="tab-btn-rep-lowstock" onclick="switchMockupReportsTab('lowstock')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
           ⚠️ Stok Kritis
-        </button>
-        <button id="tab-btn-rep-lpb" onclick="switchMockupReportsTab('lpb')" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
-          🚚 Rekap LPB
         </button>
       </div>
 
@@ -1006,37 +922,61 @@
           </div>
         </div>
 
-        <!-- PANEL 4: REKAP FAKTUR LPB -->
-        <div id="panel-rep-lpb" class="hidden space-y-3">
-          <div class="grid grid-cols-2 gap-2">
-            <div class="p-3 bg-blue-50/70 border border-blue-200 rounded-2xl">
-              <span class="text-[10px] font-bold text-blue-800 uppercase block">Total Belanja Bulan Ini</span>
-              <div class="font-bebas text-xl text-blue-950 mt-0.5 tracking-wider">Rp 8.450.000</div>
-              <span class="text-[9px] text-blue-600 block mt-0.5">6 Faktur Masuk (LPB)</span>
-            </div>
-            <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-2xl">
-              <span class="text-[10px] font-bold text-amber-800 uppercase block">Sisa Utang Tempo</span>
-              <div class="font-bebas text-xl text-amber-950 mt-0.5 tracking-wider">Rp 3.250.000</div>
-              <span class="text-[9px] text-amber-700 font-bold block mt-0.5">2 Faktur Jatuh Tempo</span>
-            </div>
+        <!-- PANEL 3: VALUASI STOK & ASET TOKO -->
+        <div id="panel-rep-valuation" class="hidden space-y-3">
+          <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+            <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
+              <span>💎</span>
+              <span>Rincian Valuasi Aset Toko (Real-Time)</span>
+            </span>
+            <span class="text-[10px] text-slate-500 font-mono font-bold bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+              145 Jenis SKU
+            </span>
           </div>
-          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-            <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider block">Faktur Terakhir:</span>
-            <div class="space-y-1.5 text-[11px]">
-              <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-100">
-                <div>
-                  <span class="font-bold text-slate-900 block">LPB-2026-003 • Aneka Snack Jaya</span>
-                  <span class="text-[9px] text-slate-400">20/09/2026 • 20 SKU</span>
-                </div>
-                <span class="font-mono font-black text-emerald-700">Rp 3.200.000 (LUNAS)</span>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-indigo-50/60 p-2.5 rounded-xl border border-indigo-100 flex flex-col justify-between min-w-0">
+              <div class="flex items-center justify-between text-indigo-700 text-xs">
+                <span class="font-bold uppercase tracking-wider text-[9px] truncate">Nilai Modal (HPP)</span>
+                <span class="text-sm shrink-0">💰</span>
               </div>
-              <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-100">
-                <div>
-                  <span class="font-bold text-slate-900 block">LPB-2026-004 • CV Gurih Prima</span>
-                  <span class="text-[9px] text-slate-400">21/09/2026 • 15 SKU</span>
-                </div>
-                <span class="font-mono font-black text-amber-700">Rp 3.250.000 (TEMPO)</span>
+              <div class="font-bebas text-lg sm:text-xl text-indigo-950 tracking-wider truncate mt-0.5">
+                Rp 28.650.000
               </div>
+              <span class="text-[8px] text-indigo-600/90 truncate">Modal Fisik di Rak Toko</span>
+            </div>
+
+            <div class="bg-cyan-50/60 p-2.5 rounded-xl border border-cyan-100 flex flex-col justify-between min-w-0">
+              <div class="flex items-center justify-between text-cyan-700 text-xs">
+                <span class="font-bold uppercase tracking-wider text-[9px] truncate">Total Fisik Stok</span>
+                <span class="text-sm shrink-0">📦</span>
+              </div>
+              <div class="font-bebas text-lg sm:text-xl text-cyan-950 tracking-wider truncate mt-0.5">
+                3.420 PCS
+              </div>
+              <span class="text-[8px] text-cyan-600/90 truncate">145 SKU Toko & Gudang</span>
+            </div>
+
+            <div class="bg-amber-50/60 p-2.5 rounded-xl border border-amber-100 flex flex-col justify-between min-w-0">
+              <div class="flex items-center justify-between text-amber-700 text-xs">
+                <span class="font-bold uppercase tracking-wider text-[9px] truncate">Potensi Nilai Jual</span>
+                <span class="text-sm shrink-0">🏷️</span>
+              </div>
+              <div class="font-bebas text-lg sm:text-xl text-amber-950 tracking-wider truncate mt-0.5">
+                Rp 37.800.000
+              </div>
+              <span class="text-[8px] text-amber-600/90 truncate">Gross Jika Habis Terjual</span>
+            </div>
+
+            <div class="bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-100 flex flex-col justify-between min-w-0">
+              <div class="flex items-center justify-between text-emerald-700 text-xs">
+                <span class="font-bold uppercase tracking-wider text-[9px] truncate">Proyeksi Laba Stok</span>
+                <span class="text-sm shrink-0">📈</span>
+              </div>
+              <div class="font-bebas text-lg sm:text-xl text-emerald-950 tracking-wider truncate mt-0.5">
+                +Rp 9.150.000
+              </div>
+              <span class="text-[8px] text-emerald-700 font-bold truncate">Margin Keuntungan 24.2%</span>
             </div>
           </div>
         </div>
@@ -1517,7 +1457,7 @@
       }
     }
 
-    // Modal Pusat Laporan & Analitik Toko (Omzet, Top Laris, Stok Kritis, Rekap LPB)
+    // Modal Pusat Laporan & Analitik Toko (Omzet, Top Laris, Valuasi Stok, Stok Kritis)
     function openMockupReportsModal(defaultTab = 'sales') {
       const modal = document.getElementById('mockup-reports-modal');
       if (modal) modal.classList.remove('hidden');
@@ -1530,7 +1470,7 @@
     }
 
     function switchMockupReportsTab(tab) {
-      const tabs = ['sales', 'top', 'lowstock', 'lpb'];
+      const tabs = ['sales', 'top', 'valuation', 'lowstock'];
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-btn-rep-${t}`);
         const panel = document.getElementById(`panel-rep-${t}`);
