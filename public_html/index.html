@@ -195,9 +195,9 @@
             <span id="bluetooth-status-label" class="hidden sm:inline font-bold tracking-tight">BT OFF</span>
           </div>
 
-          <!-- Indikator Cloud Supabase -->
-          <div id="cloud-status-indicator" class="cloud-status-badge cloud-offline cursor-pointer text-[10px] sm:text-xs" onclick="syncToSupabase(false)" title="Klik untuk sinkronisasi manual ke Supabase [F9]">
-            ⚪ <span class="hidden sm:inline">OFFLINE</span>
+          <!-- Indikator Cloud Supabase (Otomatis 30 Detik & Klik Manual [F9]) -->
+          <div id="cloud-status-indicator" class="cloud-status-badge cloud-online cursor-pointer text-[10px] sm:text-xs transition-all hover:scale-105 active:scale-95" onclick="triggerManualSync()" title="Cloud Terhubung • Sinkron Otomatis Tiap 30 Detik • Klik untuk Sinkron Manual Sekarang [F9]">
+            🟢 <span>ONLINE</span> <span class="hidden sm:inline text-[10px] opacity-90 font-mono font-bold">(Auto 30s)</span>
           </div>
 
           <!-- Jam Digital Live (Vertikal: Hari/Tanggal & Jam agar ringkas & tidak bertumpuk) -->

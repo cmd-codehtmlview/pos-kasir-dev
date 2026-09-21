@@ -69,10 +69,15 @@
       <!-- Kanan: Dot Status (Hijau/Merah), Jam & Tanggal Minimalis, Tombol SIS Ringkas -->
       <div class="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
         
-        <!-- Dot Online (Hijau) / Offline (Merah) -->
-        <div id="status-indicator" class="flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-lg bg-black/25 border border-white/15 text-[10px] font-semibold text-white cursor-pointer" title="Status Jaringan: Online">
+        <!-- Dot Status Online (Hijau 30s) / Offline (Merah) & Tombol Klik Sinkron Manual -->
+        <div 
+          id="status-indicator" 
+          onclick="triggerMockupManualSync()" 
+          class="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-black/25 hover:bg-black/40 border border-white/20 text-[10px] font-semibold text-white cursor-pointer active:scale-95 transition shadow-xs" 
+          title="Cloud Terhubung • Sinkron Otomatis Tiap 30 Detik • Klik untuk Sinkron Manual Sekarang"
+        >
           <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
-          <span id="status-label" class="hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300">ONLINE</span>
+          <span id="status-label" class="hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300">AUTO 30s</span>
         </div>
 
         <!-- Jam & Tanggal Minimalis (Tampil Rapi di HP & Komputer) -->
@@ -467,6 +472,31 @@
         </div>
       </div>
 
+      <!-- KARTU STATUS SINKRONISASI CLOUD & TOMBOL MANUAL SYNC -->
+      <div class="bg-gradient-to-br from-emerald-950/90 via-slate-900 to-slate-900 rounded-2xl p-3.5 border border-emerald-500/40 text-white shadow-sm space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
+            <h3 class="text-xs font-black uppercase tracking-wider text-emerald-300 truncate">SINKRONISASI CLOUD REAL-TIME</h3>
+          </div>
+          <span class="text-[9px] font-mono bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-500/40 text-emerald-300 font-bold flex-shrink-0">Tiap 30 Detik</span>
+        </div>
+        <p class="text-[11px] text-slate-300 leading-snug">
+          Semua transaksi kasir, LPB supplier, retur barang, dan perubahan Stock Opname (SO) tersinkron otomatis ke Cloud.
+        </p>
+        <div class="pt-1 flex items-center justify-between gap-2">
+          <span id="drawer-last-sync" class="text-[10px] text-emerald-300/80 font-mono truncate">Sync: Baru saja</span>
+          <button 
+            onclick="triggerMockupManualSync()" 
+            class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 rounded-xl font-extrabold text-[11px] transition flex items-center gap-1.5 shadow-sm cursor-pointer flex-shrink-0"
+            title="Klik untuk sinkronisasi seluruh data ke cloud sekarang"
+          >
+            <span>🔄</span>
+            <span>Sinkron Manual</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Shortcut Link ke Dashboard Owner -->
       <a href="owner.html" target="_blank" class="block p-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-xs text-center border border-slate-700 transition shadow-sm">
         📊 Buka Portal Owner Lengkap (Analisis HP) ↗
@@ -505,42 +535,106 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Status Jaringan (Dot Hijau Online / Merah Offline)
-    function updateNetworkStatus(forceOffline) {
+    // Status Jaringan & Sinkronisasi Cloud (Dot Hijau Online / Merah Offline)
+    let isMockupSyncing = false;
+    let mockupLastSyncTime = "--:--:--";
+
+    function updateNetworkStatus(status = "online", label = "") {
       const dot = document.getElementById('status-dot');
-      const label = document.getElementById('status-label');
+      const labelEl = document.getElementById('status-label');
       const container = document.getElementById('status-indicator');
-      const isOnline = forceOffline === undefined ? navigator.onLine : !forceOffline;
+      const drawerSync = document.getElementById('drawer-last-sync');
 
       if (!dot) return;
 
-      if (isOnline) {
+      if (status === "online") {
         dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
-        if (label) {
-          label.textContent = "ONLINE";
-          label.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300";
+        if (labelEl) {
+          labelEl.textContent = label || "AUTO 30s";
+          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300";
         }
-        if (container) container.title = "Status: Online (Siap Transaksi)";
+        if (container) container.title = `Cloud Terhubung • Auto-Sync Tiap 30 Detik • Terakhir: ${mockupLastSyncTime} • Klik untuk Sinkron Manual`;
+        if (drawerSync) drawerSync.textContent = `Sync: ${mockupLastSyncTime}`;
+      } else if (status === "syncing") {
+        dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
+        if (labelEl) {
+          labelEl.textContent = "SYNC...";
+          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-amber-300";
+        }
+        if (container) container.title = "Sedang menyinkronkan data penjualan, LPB, retur & stock opname...";
       } else {
         dot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.8)]";
-        if (label) {
-          label.textContent = "OFFLINE";
-          label.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-rose-300";
+        if (labelEl) {
+          labelEl.textContent = "OFFLINE";
+          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-rose-300";
         }
         if (container) container.title = "Status: Terputus / Offline (Mode Kasir Standalone)";
       }
     }
 
-    window.addEventListener('online', () => updateNetworkStatus());
-    window.addEventListener('offline', () => updateNetworkStatus());
-    updateNetworkStatus();
+    // Toast Notifikasi Kasir Mockup
+    function showMockupToast(msg, type = "success") {
+      const existing = document.getElementById("mockup-pos-toast");
+      if (existing) existing.remove();
 
-    // Klik indikator status untuk simulasi online/offline toggle saat demo
-    document.getElementById('status-indicator')?.addEventListener('click', function() {
+      const toast = document.createElement("div");
+      toast.id = "mockup-pos-toast";
+      toast.className = `fixed top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl shadow-xl border text-xs font-bold flex items-center gap-2 transition-all duration-300 animate-bounce ${
+        type === "success" ? "bg-emerald-950 text-emerald-200 border-emerald-500/50" : "bg-rose-950 text-rose-200 border-rose-500/50"
+      }`;
+      toast.innerHTML = `<span>${type === "success" ? "🟢" : "⚠️"}</span> <span>${msg}</span>`;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Fungsi Trigger Sinkronisasi Manual (Bisa diklik dari header dot & Drawer SIS)
+    async function triggerMockupManualSync() {
+      if (isMockupSyncing) return;
+      isMockupSyncing = true;
+      updateNetworkStatus("syncing");
+
+      try {
+        // Simulasi pengunggahan data transaksi kasir, LPB, retur, dan SO
+        await new Promise(r => setTimeout(r, 600));
+
+        const now = new Date();
+        mockupLastSyncTime = now.toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        updateNetworkStatus("online", `SYNC ${mockupLastSyncTime.slice(0, 5)}`);
+        showMockupToast(`Data Kasir, LPB, Retur & SO Berhasil Disinkronkan (${mockupLastSyncTime})`, "success");
+      } catch (err) {
+        updateNetworkStatus("offline");
+        showMockupToast("Gagal sinkronisasi: Periksa jaringan.", "error");
+      } finally {
+        isMockupSyncing = false;
+      }
+    }
+
+    // Auto-Sync Otomatis Tiap 30 Detik (Di Latar Belakang)
+    function triggerMockupAutoSync() {
+      if (!navigator.onLine || isMockupSyncing) return;
+      
       const dot = document.getElementById('status-dot');
-      const isCurrentlyOnline = dot && dot.classList.contains('bg-emerald-400');
-      updateNetworkStatus(isCurrentlyOnline);
-    });
+      if (dot) dot.classList.add('scale-125');
+
+      setTimeout(() => {
+        const now = new Date();
+        mockupLastSyncTime = now.toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        updateNetworkStatus("online", `SYNC ${mockupLastSyncTime.slice(0, 5)}`);
+        if (dot) dot.classList.remove('scale-125');
+      }, 500);
+    }
+
+    // Mulai Timer Auto-Sync 30 Detik
+    setInterval(triggerMockupAutoSync, 30000);
+
+    window.addEventListener('online', () => updateNetworkStatus("online"));
+    window.addEventListener('offline', () => updateNetworkStatus("offline"));
+    updateNetworkStatus("online");
 
     // Toggle SIS Drawer
     function toggleSisDrawer() {

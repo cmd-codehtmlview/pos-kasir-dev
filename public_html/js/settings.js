@@ -8,7 +8,8 @@ function isDevEnvironment() {
   const p = window.location.port;
   const path = window.location.pathname;
   return h.startsWith('dev.') || h.includes('-dev.') || h.includes('dev-') || h.includes('preview') || 
-         h === 'localhost' || h === '127.0.0.1' || p === '8080' || p === '8081' || path.includes('/dev');
+         h.includes('trycloudflare.com') || h.includes('pages.dev') || h.includes('ngrok') ||
+         h === 'localhost' || h === '127.0.0.1' || p === '8080' || p === '8081' || p === '8085' || path.includes('/dev');
 }
 
 // Fungsi menjamin Store ID unik dan tidak bentrok

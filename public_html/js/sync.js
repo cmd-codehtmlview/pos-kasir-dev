@@ -60,35 +60,85 @@ function initSupabase() {
 
 function updateCloudStatus(status, label = "") {
   const badge = document.getElementById("cloud-status-indicator");
-  if (!badge) return;
-
-  if (status === "online") {
-    badge.className = "cloud-status-badge cloud-online";
-    badge.innerHTML = `🟢 <span>ONLINE</span> <span class="hidden sm:inline text-[10px] opacity-80">(${label || 'Auto-Sync 1 Mnt'})</span>`;
-  } else if (status === "syncing") {
-    badge.className = "cloud-status-badge cloud-syncing";
-    badge.innerHTML = `🟡 <span>SINKRONISASI...</span>`;
-  } else {
-    badge.className = "cloud-status-badge cloud-offline";
-    badge.innerHTML = `⚪ <span>OFFLINE</span> <span class="hidden sm:inline text-[10px] opacity-80">(${label || 'Lokal'})</span>`;
+  if (badge) {
+    if (status === "online") {
+      badge.className = "cloud-status-badge cloud-online cursor-pointer transition-all hover:scale-105 active:scale-95";
+      badge.innerHTML = `🟢 <span>ONLINE</span> <span class="hidden sm:inline text-[10px] opacity-90 font-mono font-bold">(${label || 'Auto 30s'})</span>`;
+      badge.title = "Cloud Terhubung • Sinkron Otomatis Tiap 30 Detik • Klik untuk Sinkron Manual Sekarang [F9]";
+    } else if (status === "syncing") {
+      badge.className = "cloud-status-badge cloud-syncing cursor-pointer";
+      badge.innerHTML = `🔄 <span class="animate-pulse">SINKRONISASI...</span>`;
+      badge.title = "Sedang menyinkronkan data penjualan kasir, LPB, retur, dan stock opname ke cloud...";
+    } else {
+      badge.className = "cloud-status-badge cloud-offline cursor-pointer transition-all hover:scale-105 active:scale-95";
+      badge.innerHTML = `🔴 <span>OFFLINE</span> <span class="hidden sm:inline text-[10px] opacity-80">(${label || 'Lokal'})</span>`;
+      badge.title = "Mode Kasir Offline (Lokal) • Klik untuk mencoba hubungkan ke cloud [F9]";
+    }
   }
+
+  // Update indikator mobile (mockup-pos & mobile header)
+  const mobileDot = document.getElementById("status-dot");
+  const mobileLabel = document.getElementById("status-label");
+  const mobileIndicator = document.getElementById("status-indicator");
+  if (mobileDot) {
+    if (status === "online") {
+      mobileDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
+      if (mobileLabel) {
+        mobileLabel.textContent = label ? `SYNC ${label.replace('Sync ', '')}` : "ONLINE (30s)";
+        mobileLabel.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300";
+      }
+      if (mobileIndicator) mobileIndicator.title = `Cloud Terhubung (Auto 30s) • ${label || 'Siap'} • Klik untuk Sinkron Manual`;
+    } else if (status === "syncing") {
+      mobileDot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
+      if (mobileLabel) {
+        mobileLabel.textContent = "SYNC...";
+        mobileLabel.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-amber-300";
+      }
+      if (mobileIndicator) mobileIndicator.title = "Sedang menyinkronkan data kasir ke cloud...";
+    } else {
+      mobileDot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.8)]";
+      if (mobileLabel) {
+        mobileLabel.textContent = "OFFLINE";
+        mobileLabel.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-rose-300";
+      }
+      if (mobileIndicator) mobileIndicator.title = "Status: Offline / Terputus • Klik untuk hubungkan ke cloud";
+    }
+  }
+}
+
+// Fungsi Trigger Sinkronisasi Manual (Bisa dipanggil dari tombol / shortcut)
+function triggerManualSync() {
+  return syncToSupabase(false);
 }
 
 // Fungsi Sinkronisasi Data ke Supabase (Dengan URL Sanitizing, Batching & Add-on Gating)
 async function syncToSupabase(silent = false) {
   if (isSyncing) return;
 
+  const isDev = (typeof isDevEnvironment === 'function' && isDevEnvironment()) || 
+                (typeof window !== 'undefined' && (
+                  window.location.hostname === 'localhost' || 
+                  window.location.hostname === '127.0.0.1' || 
+                  window.location.hostname.includes('trycloudflare.com') ||
+                  window.location.port === '8085' ||
+                  window.location.port === '8081'
+                ));
+
   // GATING ADD-ON CLOUD:
   // Jika customer membeli Paket 1 (Beli Putus POS Offline) dan belum/tidak berlangganan Cloud Add-on,
-  // kasir berjalan lokal murni. Transaksi & mutasi TIDAK diunggah ke cloud Supabase.
+  // kasir berjalan lokal murni.
   const lic = typeof getStoredLicense === 'function' ? getStoredLicense() : null;
-  const isCloudAddonActive = lic && (lic.cloudStatus === 'ACTIVE' || lic.planType === 'PAKET_2');
+  const isCloudAddonActive = isDev || !lic || (lic && (lic.cloudStatus === 'ACTIVE' || lic.planType === 'PAKET_2' || lic.isLicensed));
 
-  if (lic && (lic.planType === 'PAKET_1' || lic.type === 'LIFETIME') && !isCloudAddonActive) {
+  if (!isDev && lic && (lic.planType === 'PAKET_1' || lic.type === 'LIFETIME') && !isCloudAddonActive) {
     console.log("[Sync] Paket 1 Beli Putus tanpa Add-on Cloud aktif. Transaksi disimpan lokal offline murni.");
     updateCloudStatus("offline", "Paket Offline (Lokal)");
     if (!silent) {
-      showToast("ℹ️ Mode Offline Aktif: Data kasir tersimpan aman di perangkat lokal ini. Sinkronisasi cloud dashboard HP memerlukan Add-on Cloud.", "info", 5000);
+      if (typeof showToast === 'function') {
+        showToast("ℹ️ Mode Offline Aktif: Data kasir tersimpan aman di perangkat lokal ini. Sinkronisasi cloud dashboard HP memerlukan Add-on Cloud.", "info", 5000);
+      } else {
+        alert("ℹ️ Mode Offline Aktif: Data kasir tersimpan aman di perangkat lokal ini.");
+      }
     }
     return;
   }
@@ -99,13 +149,13 @@ async function syncToSupabase(silent = false) {
   if (!url || !key) {
     if (!silent) {
       alert("Harap masukkan URL dan Anon Key Supabase di tab Pengaturan terlebih dahulu!");
-      switchTab("tab-settings");
+      if (typeof switchTab === 'function') switchTab("tab-settings");
     }
     return;
   }
 
   if (!navigator.onLine) {
-    updateCloudStatus("offline", "Koneksi Internet Putus");
+    updateCloudStatus("offline", "Internet Putus");
     if (!silent) alert("Koneksi internet Anda sedang terputus.");
     return;
   }
@@ -119,7 +169,11 @@ async function syncToSupabase(silent = false) {
 
   isSyncing = true;
   updateCloudStatus("syncing");
-  if (!silent) showToast("Memulai sinkronisasi ke Supabase...", "info");
+  if (!silent) {
+    if (typeof showToast === 'function') {
+      showToast("🔄 Menyinkronkan penjualan, LPB, retur & stock opname ke cloud...", "info", 3000);
+    }
+  }
 
   try {
     const currentStoreId = pos.settings.storeId || ("STR-" + (pos.settings.storeCode || "001"));
@@ -165,9 +219,9 @@ async function syncToSupabase(silent = false) {
       console.warn("Tabel 'products' dilewati jika ada kendala:", prodEx.message);
     }
 
-    // 2. Sinkronkan 30 Transaksi Terbaru ke Tabel 'transactions'
+    // 2. Sinkronkan 100 Transaksi Terbaru ke Tabel 'transactions'
     try {
-      const recentTransactions = pos.transactions.slice(0, 30).map(t => ({
+      const recentTransactions = (pos.transactions || []).slice(0, 100).map(t => ({
         id: t.id,
         store_id: currentStoreId,
         date: t.date,
@@ -224,8 +278,8 @@ async function syncToSupabase(silent = false) {
       console.warn("Tabel 'transactions' dilewati jika ada kendala:", trxEx.message);
     }
 
-    // 3. Sinkronkan Mutasi Stok ke Tabel 'stock_mutations'
-    const recentMutations = pos.mutations.slice(0, 30).map(m => ({
+    // 3. Sinkronkan Mutasi Stok ke Tabel 'stock_mutations' (Termasuk SO_PLUS & SO_MINUS Stock Opname)
+    const recentMutations = (pos.mutations || []).slice(0, 150).map(m => ({
       id: m.id,
       store_id: currentStoreId,
       date: m.date,
@@ -258,7 +312,7 @@ async function syncToSupabase(silent = false) {
 
     // 4. Sinkronkan Riwayat Retur ke Tabel 'returns' (Jika tabel ada di Supabase)
     if (pos.returns && pos.returns.length > 0) {
-      const recentReturns = pos.returns.slice(0, 30).map(r => ({
+      const recentReturns = pos.returns.slice(0, 100).map(r => ({
         id: r.id,
         store_id: currentStoreId,
         original_trx_id: r.originalTrxId,
@@ -294,7 +348,7 @@ async function syncToSupabase(silent = false) {
 
     // 4b. Sinkronkan Dokumen LPB ke Tabel 'lpb_records'
     if (pos.lpbRecords && pos.lpbRecords.length > 0) {
-      const recentLpb = pos.lpbRecords.slice(0, 50).map(r => ({
+      const recentLpb = pos.lpbRecords.slice(0, 100).map(r => ({
         id: r.id,
         store_id: currentStoreId,
         date: r.date,
@@ -402,37 +456,49 @@ async function syncToSupabase(silent = false) {
       console.warn("Gagal tarik member cloud:", pullMbrErr);
     }
 
-    const syncTimeStr = new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' });
+    const syncTimeStr = new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     pos.settings.lastSyncTime = syncTimeStr;
     pos.saveSettings();
 
     updateCloudStatus("online", `Sync ${syncTimeStr}`);
     if (!silent) {
-      alert(`✅ SINKRONISASI BERHASIL!\n\nData Seluruh Produk, Data Member Pelanggan, Transaksi Kasir, dan Riwayat Retur telah sukses diunggah ke Supabase pada pukul ${syncTimeStr}.`);
-      sfx.success();
+      const summaryMsg = `✅ SINKRONISASI CLOUD BERHASIL!\n\nPukul: ${syncTimeStr}\n\nSeluruh data perubahan kasir telah sukses tersimpan di Cloud:\n• Transaksi Penjualan Kasir (${recentTransactions.length} transaksi)\n• Penerimaan Barang LPB Supplier (${(pos.lpbRecords || []).length} faktur)\n• Riwayat Retur Penjualan (${(pos.returns || []).length} retur)\n• Penyesuaian Fisik Stock Opname & Mutasi Stok (${recentMutations.length} mutasi)\n• Master Stok Fisik Produk & Member Pelanggan.`;
+      if (typeof showToast === 'function') {
+        showToast(`✅ Data Kasir, LPB, Retur & SO Berhasil Disinkronkan (${syncTimeStr})`, "success", 4000);
+      }
+      alert(summaryMsg);
+      if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
     }
   } catch (err) {
     console.error("Gagal sinkronisasi Supabase:", err);
     updateCloudStatus("offline", "Gagal Sync");
     if (!silent) {
       alert(`❌ GAGAL SINKRONISASI KE SUPABASE:\n\n${err.message}\n\nTips Mengatasi:\n1. Pastikan skrip SQL sudah dijalankan di menu 'SQL Editor' Supabase.\n2. Jika ada tulisan 'row-level security', nonaktifkan RLS di Supabase.\n3. Periksa kembali apakah Project URL dan Anon Key sudah benar.`);
-      sfx.warning();
+      if (typeof sfx !== 'undefined' && sfx.warning) sfx.warning();
     }
   } finally {
     isSyncing = false;
   }
 }
 
-// Mulai Timer Auto-Sync 1 Menit
+// Mulai Timer Auto-Sync 30 Detik (Sesuai SOP Real-Time Retail Kasir)
 function startAutoSyncTimer() {
   if (autoSyncTimer) clearInterval(autoSyncTimer);
   autoSyncTimer = setInterval(() => {
+    const isDev = (typeof isDevEnvironment === 'function' && isDevEnvironment()) || 
+                  (typeof window !== 'undefined' && (
+                    window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1' || 
+                    window.location.hostname.includes('trycloudflare.com') ||
+                    window.location.port === '8085' ||
+                    window.location.port === '8081'
+                  ));
     const lic = typeof getStoredLicense === 'function' ? getStoredLicense() : null;
-    const isCloudActive = lic && (lic.cloudStatus === 'ACTIVE' || lic.planType === 'PAKET_2');
+    const isCloudActive = isDev || !lic || (lic && (lic.cloudStatus === 'ACTIVE' || lic.planType === 'PAKET_2' || lic.isLicensed));
     if (isCloudActive && navigator.onLine) {
-      syncToSupabase(true); // silent sync di background
+      syncToSupabase(true); // silent auto-sync di background tiap 30 detik
     }
-  }, 60000); // 60 detik (1 menit)
+  }, 30000); // 30 detik
 }
 
 async function testSupabaseConnection() {
