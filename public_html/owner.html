@@ -268,9 +268,32 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2 text-xs text-slate-400">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-        <span>Kasir Toko Aktif: <strong class="text-white font-mono" id="active-cashier-label">POS 01 (Kasir 1)</strong></span>
+      <div class="flex items-center gap-2">
+        <!-- Quick Dummy Data Buttons -->
+        <button 
+          type="button"
+          onclick="seedRealisticOwnerData(true)" 
+          id="btn-seed-dummy"
+          class="px-2.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-md transition cursor-pointer active:scale-95"
+          title="Isi data simulasi 30 hari & produk untuk melihat grafik & laporan realtime"
+        >
+          <span>⚡</span>
+          <span>Isi Dummy 30 Hari</span>
+        </button>
+        <button 
+          type="button"
+          onclick="clearDummyData()" 
+          class="px-2 py-1.5 bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-300 font-bold rounded-xl text-xs border border-slate-700 hover:border-rose-800 flex items-center gap-1 transition cursor-pointer"
+          title="Kosongkan data simulasi demo"
+        >
+          <span>🗑️</span>
+          <span class="hidden sm:inline">Reset</span>
+        </button>
+
+        <div class="flex items-center gap-2 text-xs text-slate-400 ml-1">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Kasir Toko Aktif: <strong class="text-white font-mono" id="active-cashier-label">POS 01 (Kasir 1)</strong></span>
+        </div>
       </div>
     </div>
 
@@ -1247,6 +1270,14 @@
             <span>🔓 Buka Dashboard</span>
           </button>
 
+          <button 
+            type="button" 
+            onclick="quickDevLogin()"
+            class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <span>⚡ Masuk Cepat (Mode Dev / PIN: 1234)</span>
+          </button>
+
           <a 
             href="index.html" 
             class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5"
@@ -1379,6 +1410,14 @@
     }
 
     function checkOwnerPinAuth() {
+      // 0. Auto-auth di lingkungan localhost / Dev Mode untuk pengujian langsung
+      const isDevHost = window.location.hostname === "localhost" || 
+                        window.location.hostname === "127.0.0.1" || 
+                        window.location.hostname.includes(".local");
+      if (isDevHost && !sessionStorage.getItem("snack_pos_owner_session")) {
+        sessionStorage.setItem("snack_pos_owner_session", "active");
+      }
+
       // 1. Cek apakah ada token otorisasi instan dari POS Kasir (dibuka oleh COS dalam 30 detik terakhir)
       try {
         const token = localStorage.getItem("snack_pos_owner_auth_token");
@@ -1408,6 +1447,16 @@
         }
         return false;
       }
+    }
+
+    function quickDevLogin() {
+      sessionStorage.setItem("snack_pos_owner_session", "active");
+      const gateModal = document.getElementById("modal-owner-pin-gate");
+      if (gateModal) gateModal.classList.add("hidden");
+      showToast("Masuk sebagai Mode Dev / Owner (PIN: 1234)", "success");
+      initOwnerSupabase();
+      fetchDashboardData();
+      startAutoRefreshTimer();
     }
 
     function submitOwnerPinAuth(e) {
@@ -1603,6 +1652,18 @@
     // Cek Akses Langganan Cloud Dashboard (Paket 1 Add-on / Paket 2 SaaS)
     async function checkStoreCloudSubscription(storeId) {
       const banner = document.getElementById("owner-cloud-gate-banner");
+
+      // Jaminan: Jangan kunci dashboard jika sedang di localhost / dev testing
+      const isDevEnv = window.location.hostname === "localhost" || 
+                       window.location.hostname === "127.0.0.1" || 
+                       window.location.hostname.includes(".local") ||
+                       storeId === "DEV-001" ||
+                       !storeId;
+      if (isDevEnv) {
+        if (banner) banner.classList.add("hidden");
+        return { granted: true, plan: "DEV_MODE", isDev: true };
+      }
+
       if (!banner) return;
 
       try {
@@ -1885,7 +1946,8 @@
       }
 
       // Cek apakah data lokal browser cocok dengan store_id aktif (mencegah kebocoran data toko lain)
-      const isLocalMatchingStore = !activeStoreId || !dashboardData.settings?.storeId || (dashboardData.settings.storeId === activeStoreId);
+      const isDevHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname.includes(".local");
+      const isLocalMatchingStore = isDevHost || !activeStoreId || !dashboardData.settings?.storeId || (dashboardData.settings.storeId === activeStoreId) || (activeStoreId === "DEV-001");
 
       // Default gunakan data lokal jika store ID cocok
       dashboardData.transactions = (isLocalMatchingStore && Array.isArray(localTrx)) ? localTrx : [];
@@ -3458,7 +3520,10 @@
         dateMap[t.date] += (t.grandTotal || 0);
       });
 
-      const labels = Object.keys(dateMap).sort().slice(-14);
+      let sliceCount = -14;
+      if (currentDateFilter === "30days" || currentDateFilter === "all") sliceCount = -30;
+      else if (currentDateFilter === "7days") sliceCount = -7;
+      const labels = Object.keys(dateMap).sort().slice(sliceCount);
       const dataValues = labels.map(d => dateMap[d]);
 
       if (revenueChartInstance) {
@@ -3685,10 +3750,259 @@
       }, 1000);
     }
 
+    // ==========================================
+    // GENERATOR DATA DUMMY REALISTIS 30 HARI
+    // ==========================================
+    function seedRealisticOwnerData(force = false) {
+      const existingProd = localStorage.getItem("snack_pos_products");
+      if (!force && existingProd) {
+        try {
+          const parsed = JSON.parse(existingProd);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return false;
+          }
+        } catch (e) {}
+      }
+
+      // 1. Katalog Produk Retail & Snack Realistis (26 SKU)
+      const products = [
+        { id: "PRD-001", barcode: "8992775211011", name: "Basreng Pedas Daun Jeruk 100g", category: "Snack Pedas", unit: "Pcs", costPrice: 7500, price: 12000, stock: 85, minStock: 10 },
+        { id: "PRD-002", barcode: "8992775211028", name: "Keripik Singkong Balado 150g", category: "Keripik", unit: "Pcs", costPrice: 8000, price: 13000, stock: 65, minStock: 10 },
+        { id: "PRD-003", barcode: "8992775211035", name: "Keripik Pisang Cokelat Lumer 120g", category: "Keripik", unit: "Pcs", costPrice: 10000, price: 16000, stock: 45, minStock: 8 },
+        { id: "PRD-004", barcode: "8992775211042", name: "Makaroni Spiral Pedas Gurih 100g", category: "Snack Pedas", unit: "Pcs", costPrice: 4500, price: 8000, stock: 120, minStock: 15 },
+        { id: "PRD-005", barcode: "8992775211059", name: "Sus Kering Isi Keju Renyah 100g", category: "Kue Kering", unit: "Pcs", costPrice: 9000, price: 15000, stock: 50, minStock: 10 },
+        { id: "PRD-006", barcode: "8992775211066", name: "Kacang Bawang Goreng Renyah 200g", category: "Kacang", unit: "Pcs", costPrice: 12000, price: 18000, stock: 75, minStock: 10 },
+        { id: "PRD-007", barcode: "8992775211073", name: "Chitato Sapi Panggang 68g", category: "Snack Pabrik", unit: "Pcs", costPrice: 9500, price: 13500, stock: 35, minStock: 10 },
+        { id: "PRD-008", barcode: "8992775211080", name: "Lays Rumput Laut 68g", category: "Snack Pabrik", unit: "Pcs", costPrice: 9500, price: 13500, stock: 30, minStock: 8 },
+        { id: "PRD-009", barcode: "8992775211097", name: "Teh Botol Sosro Kotak 450ml", category: "Minuman", unit: "Pcs", costPrice: 4000, price: 6500, stock: 95, minStock: 20 },
+        { id: "PRD-010", barcode: "8992775211103", name: "Aqua Botol Mineral 600ml", category: "Minuman", unit: "Pcs", costPrice: 2200, price: 4000, stock: 140, minStock: 24 },
+        { id: "PRD-011", barcode: "8992775211110", name: "Pocari Sweat Botol 500ml", category: "Minuman", unit: "Pcs", costPrice: 6200, price: 9000, stock: 40, minStock: 12 },
+        { id: "PRD-012", barcode: "8992775211127", name: "Ultra Milk Cokelat 250ml", category: "Minuman", unit: "Pcs", costPrice: 5000, price: 7500, stock: 65, minStock: 15 },
+        { id: "PRD-013", barcode: "8992775211134", name: "Indomie Goreng Spesial 85g", category: "Sembako", unit: "Bks", costPrice: 2800, price: 3500, stock: 220, minStock: 40 },
+        { id: "PRD-014", barcode: "8992775211141", name: "Mie Sedaap Goreng Original", category: "Sembako", unit: "Bks", costPrice: 2700, price: 3500, stock: 180, minStock: 40 },
+        { id: "PRD-015", barcode: "8992775211158", name: "Silverqueen Almond Chocolate 58g", category: "Cokelat", unit: "Pcs", costPrice: 12500, price: 17500, stock: 28, minStock: 6 },
+        { id: "PRD-016", barcode: "8992775211165", name: "Beng-Beng Regular 25g", category: "Cokelat", unit: "Pcs", costPrice: 1800, price: 2500, stock: 110, minStock: 20 },
+        { id: "PRD-017", barcode: "8992775211172", name: "Qtela Singkong Original 180g", category: "Keripik", unit: "Pcs", costPrice: 8500, price: 12500, stock: 42, minStock: 10 },
+        { id: "PRD-018", barcode: "8992775211189", name: "Kusuka Keripik Singkong BBQ", category: "Keripik", unit: "Pcs", costPrice: 9000, price: 13000, stock: 38, minStock: 8 },
+        { id: "PRD-019", barcode: "8992775211196", name: "Oreo Vanilla Sandwich 133g", category: "Biskuit", unit: "Pcs", costPrice: 7500, price: 11000, stock: 45, minStock: 10 },
+        { id: "PRD-020", barcode: "8992775211202", name: "Tango Wafer Cokelat 130g", category: "Biskuit", unit: "Pcs", costPrice: 6500, price: 9500, stock: 55, minStock: 12 },
+        { id: "PRD-021", barcode: "8992775211219", name: "Pringles Original 107g", category: "Snack Pabrik", unit: "Pcs", costPrice: 19000, price: 26000, stock: 25, minStock: 5 },
+        { id: "PRD-022", barcode: "8992775211226", name: "Kacang Kulit Garuda 375g", category: "Kacang", unit: "Pcs", costPrice: 22000, price: 28500, stock: 30, minStock: 6 },
+        { id: "PRD-023", barcode: "8992775211233", name: "Good Day Cappuccino 250ml", category: "Minuman", unit: "Pcs", costPrice: 5500, price: 8000, stock: 70, minStock: 15 },
+        { id: "PRD-024", barcode: "8992775211240", name: "Floridina Orange Juice 350ml", category: "Minuman", unit: "Pcs", costPrice: 2500, price: 4000, stock: 80, minStock: 20 },
+        { id: "PRD-025", barcode: "8992775211257", name: "Pilux Makaroni Keju Pedas 100g", category: "Snack Pedas", unit: "Pcs", costPrice: 5000, price: 8500, stock: 4, minStock: 10 },
+        { id: "PRD-026", barcode: "8992775211264", name: "Seblak Kering Bantat Ekstra Pedas", category: "Snack Pedas", unit: "Pcs", costPrice: 6000, price: 10000, stock: 3, minStock: 10 }
+      ];
+
+      // 2. Member Pelanggan
+      const members = [
+        { id: "MBR-001", name: "Ahmad Fauzi", phone: "081234567891", points: 1450, totalSpend: 1450000 },
+        { id: "MBR-002", name: "Dewi Lestari", phone: "081234567892", points: 820, totalSpend: 820000 },
+        { id: "MBR-003", name: "Budi Santoso", phone: "081234567893", points: 2300, totalSpend: 2300000 },
+        { id: "MBR-004", name: "Rina Wijaya", phone: "081234567894", points: 550, totalSpend: 550000 },
+        { id: "MBR-005", name: "Eko Prasetyo", phone: "081234567895", points: 180, totalSpend: 180000 },
+        { id: "MBR-006", name: "Siti Rahmawati", phone: "081234567896", points: 3100, totalSpend: 3100000 }
+      ];
+
+      // 3. Transaksi Selama 30 Hari (Realistis dari H-29 sampai Hari Ini)
+      const transactions = [];
+      const paymentMethods = ["cash", "cash", "cash", "qris", "qris", "transfer"];
+      const cashiers = ["Kasir 1 (Siti)", "Kasir 2 (Budi)", "Kasir 1 (Siti)"];
+      const now = new Date();
+
+      let trxCounter = 1000;
+      for (let dayOffset = 29; dayOffset >= 0; dayOffset--) {
+        const d = new Date(now.getTime() - (dayOffset * 24 * 60 * 60 * 1000));
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        const dateStr = `${yyyy}-${mm}-${dd}`;
+
+        const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+        const trxCountPerDay = isWeekend ? Math.floor(Math.random() * 4) + 6 : Math.floor(Math.random() * 4) + 4;
+
+        for (let i = 0; i < trxCountPerDay; i++) {
+          trxCounter++;
+          const hour = 8 + Math.floor(Math.random() * 13);
+          const min = Math.floor(Math.random() * 60);
+          const sec = Math.floor(Math.random() * 60);
+          const timeStr = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+          const createdAt = `${dateStr}T${timeStr}.000Z`;
+
+          const itemCount = Math.floor(Math.random() * 3) + 1;
+          const cartItems = [];
+          let totalCost = 0;
+          let subtotal = 0;
+
+          const shuffled = [...products].sort(() => 0.5 - Math.random());
+          for (let k = 0; k < itemCount; k++) {
+            const p = shuffled[k];
+            const qty = Math.floor(Math.random() * 3) + 1;
+            const cost = Number(p.costPrice) || 0;
+            const price = Number(p.price) || 0;
+            const itemSubtotal = qty * price;
+            const itemCost = qty * cost;
+            const itemProfit = itemSubtotal - itemCost;
+
+            cartItems.push({
+              id: p.id,
+              barcode: p.barcode,
+              name: p.name,
+              category: p.category,
+              qty: qty,
+              costPrice: cost,
+              price: price,
+              subtotal: itemSubtotal,
+              profit: itemProfit
+            });
+
+            totalCost += itemCost;
+            subtotal += itemSubtotal;
+          }
+
+          const grandTotal = subtotal;
+          const profit = grandTotal - totalCost;
+          const method = paymentMethods[Math.floor(Math.random() * paymentMethods.length)];
+          const cashier = cashiers[Math.floor(Math.random() * cashiers.length)];
+
+          transactions.push({
+            id: `TRX-${yyyy}${mm}${dd}-${String(trxCounter).slice(-4)}`,
+            date: dateStr,
+            time: timeStr,
+            createdAt: createdAt,
+            cashier: cashier,
+            shift: hour < 15 ? "Shift 1 (Pagi)" : "Shift 2 (Siang)",
+            items: cartItems,
+            subtotal: subtotal,
+            discountAmount: 0,
+            grandTotal: grandTotal,
+            totalCost: totalCost,
+            profit: profit,
+            paymentMethod: method,
+            cashTendered: method === "cash" ? Math.ceil(grandTotal / 10000) * 10000 : grandTotal,
+            changeAmount: method === "cash" ? (Math.ceil(grandTotal / 10000) * 10000) - grandTotal : 0,
+            storeId: "DEV-001"
+          });
+        }
+      }
+
+      // 4. Retur Transaksi
+      const returns = [
+        {
+          id: "RET-20260918-001",
+          date: new Date(now.getTime() - 4 * 86400000).toISOString().split('T')[0],
+          time: "14:10:00",
+          invoiceNumber: "TRX-20260918-1025",
+          cashierName: "Kasir 1 (Siti)",
+          reason: "Kemasan Basreng Bocor / Sobek",
+          restocked: false,
+          totalRefund: 12000,
+          items: [{ name: "Basreng Pedas Daun Jeruk 100g", returnQty: 1, price: 12000, costPrice: 7500, refundSubtotal: 12000 }]
+        }
+      ];
+
+      // 5. Stock Opname Mutasi
+      const mutations = [
+        {
+          id: "MUT-001",
+          date: new Date(now.getTime() - 2 * 86400000).toISOString().split('T')[0],
+          type: "OPNAME",
+          productId: "PRD-001",
+          productName: "Basreng Pedas Daun Jeruk 100g",
+          qty: -1,
+          costPrice: 7500,
+          reason: "Selisih Audit Fisik (1 pcs tercecer/rusak)",
+          createdAt: new Date(now.getTime() - 2 * 86400000).toISOString()
+        },
+        {
+          id: "MUT-002",
+          date: new Date(now.getTime() - 10 * 86400000).toISOString().split('T')[0],
+          type: "OPNAME",
+          productId: "PRD-010",
+          productName: "Aqua Botol Mineral 600ml",
+          qty: 2,
+          costPrice: 2200,
+          reason: "Surplus Audit Fisik Rak",
+          createdAt: new Date(now.getTime() - 10 * 86400000).toISOString()
+        }
+      ];
+
+      // 6. LPB (Penerimaan Barang)
+      const lpbRecords = [
+        {
+          id: "LPB-20260920-001",
+          date: new Date(now.getTime() - 2 * 86400000).toISOString().split('T')[0],
+          docNumber: "DO-SNK-8891",
+          supplier: "CV Snack Nusantara Barokah",
+          totalItems: 120,
+          totalValue: 980000,
+          receivedBy: "Kepala Toko",
+          status: "DITERIMA"
+        },
+        {
+          id: "LPB-20260912-002",
+          date: new Date(now.getTime() - 10 * 86400000).toISOString().split('T')[0],
+          docNumber: "DO-BVRG-3312",
+          supplier: "PT Distribusi Minuman Segar",
+          totalItems: 250,
+          totalValue: 1450000,
+          receivedBy: "Kepala Toko",
+          status: "DITERIMA"
+        }
+      ];
+
+      // 7. Pengaturan Toko Demo
+      const settings = {
+        storeId: "DEV-001",
+        storeName: "SNACKPOS STORE (DEMO DEV)",
+        address: "Jl. Raya Retail No. 88, Jakarta",
+        phone: "0812-3456-7890",
+        supervisorPin: "1234"
+      };
+
+      // Simpan ke LocalStorage
+      localStorage.setItem("snack_pos_products", JSON.stringify(products));
+      localStorage.setItem("snack_pos_transactions", JSON.stringify(transactions));
+      localStorage.setItem("snack_pos_returns", JSON.stringify(returns));
+      localStorage.setItem("snack_pos_mutations", JSON.stringify(mutations));
+      localStorage.setItem("snack_pos_lpb_records", JSON.stringify(lpbRecords));
+      localStorage.setItem("snack_pos_members", JSON.stringify(members));
+      localStorage.setItem("snack_pos_settings", JSON.stringify(settings));
+      localStorage.setItem("snack_pos_owner_store_id", "DEV-001");
+      sessionStorage.setItem("snack_pos_owner_session", "active");
+
+      showToast(`⚡ ${products.length} Produk & ${transactions.length} Transaksi 30 Hari Berhasil Dimuat!`, "success");
+
+      // Auto refresh dashboard view
+      fetchDashboardData();
+      return true;
+    }
+
+    function clearDummyData() {
+      if (!confirm("Kosongkan data simulasi demo dan reset ke data awal?")) return;
+      localStorage.removeItem("snack_pos_products");
+      localStorage.removeItem("snack_pos_transactions");
+      localStorage.removeItem("snack_pos_returns");
+      localStorage.removeItem("snack_pos_mutations");
+      localStorage.removeItem("snack_pos_lpb_records");
+      localStorage.removeItem("snack_pos_members");
+      showToast("Data lokal toko berhasil direset.", "info");
+      fetchDashboardData();
+    }
+
     // Inisialisasi Saat Dokumen Dimuat
     document.addEventListener("DOMContentLoaded", () => {
       setInterval(updateClock, 1000);
       updateClock();
+
+      // Otomatis isi data dummy jika di localhost dan data produk masih kosong
+      const isDevHost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      if (isDevHost) {
+        const prodRaw = localStorage.getItem("snack_pos_products");
+        if (!prodRaw || prodRaw === "[]") {
+          seedRealisticOwnerData(false);
+        }
+      }
 
       const isAuthed = checkOwnerPinAuth();
       if (isAuthed) {
