@@ -367,7 +367,7 @@ function toggleScannerAutoEnter(enabled) {
 const ALL_SETTING_SECTIONS = [
   "sec-store", "sec-scanner", "sec-printer", 
   "sec-employees", "sec-attendance", "sec-member-points", 
-  "sec-payment-gateway", "sec-supabase", "sec-license", "sec-backup"
+  "sec-payment-gateway", "sec-license", "sec-backup"
 ];
 
 function toggleSettingSection(secId) {

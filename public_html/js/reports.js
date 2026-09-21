@@ -307,8 +307,92 @@ function renderReports() {
   renderKlerkHistoryTable();
   renderLpbReportsTable();
 
+  // Render Rincian Valuasi Inventori Toko
+  renderValuationReport(isAuth);
+
   // Pastikan tombol sensor laba di header menampilkan status yang sesuai
   if (typeof updateDashboardButtonState === "function") updateDashboardButtonState();
+}
+
+// Render Rincian Valuasi Aset Inventori Toko (1 Baris Ringkas & Rincian Lengkap Portal Owner)
+function renderValuationReport(isAuth) {
+  const prodList = (typeof pos !== "undefined" && Array.isArray(pos.products)) ? pos.products : [];
+  const totalSku = prodList.length;
+  const totalQty = prodList.reduce((sum, p) => sum + Math.max(0, Number(p.stock) || 0), 0);
+  const totalCost = prodList.reduce((sum, p) => {
+    const stock = Math.max(0, Number(p.stock) || 0);
+    const buyPrice = Number(p.costPrice) || Number(p.buyPrice) || 0;
+    return sum + (stock * buyPrice);
+  }, 0);
+  const totalRetail = prodList.reduce((sum, p) => {
+    const stock = Math.max(0, Number(p.stock) || 0);
+    const price = Number(p.price) || 0;
+    return sum + (stock * price);
+  }, 0);
+  const totalProfit = Math.max(0, totalRetail - totalCost);
+  const marginPct = totalRetail > 0 ? ((totalProfit / totalRetail) * 100).toFixed(1) : "0.0";
+
+  // Elements in 1-line bar
+  const barHpp = document.getElementById("rep-val-bar-hpp");
+  const barRetail = document.getElementById("rep-val-bar-retail");
+  const barProfit = document.getElementById("rep-val-bar-profit");
+  const badgeSku = document.getElementById("rep-val-badge-sku");
+
+  if (barHpp) {
+    barHpp.textContent = isAuth ? `Modal ${formatRupiah(totalCost)}` : "Modal 🔒 ••••••";
+  }
+  if (barRetail) {
+    barRetail.textContent = isAuth ? `Jual ${formatRupiah(totalRetail)}` : "Jual 🔒 ••••••";
+  }
+  if (barProfit) {
+    barProfit.textContent = isAuth ? `Laba +${formatRupiah(totalProfit)} (${marginPct}%)` : "Laba 🔒 ••••••";
+  }
+  if (badgeSku) {
+    badgeSku.textContent = `${totalSku} Jenis SKU`;
+  }
+
+  // Cards in expanded view
+  const cardHpp = document.getElementById("rep-val-card-hpp");
+  const cardQty = document.getElementById("rep-val-card-qty");
+  const cardSku = document.getElementById("rep-val-card-sku");
+  const cardRetail = document.getElementById("rep-val-card-retail");
+  const cardProfit = document.getElementById("rep-val-card-profit");
+  const cardMargin = document.getElementById("rep-val-card-margin");
+
+  if (cardHpp) {
+    cardHpp.textContent = isAuth ? formatRupiah(totalCost) : "🔒 ••••••";
+  }
+  if (cardQty) {
+    cardQty.textContent = `${totalQty.toLocaleString('id-ID')} Pcs`;
+  }
+  if (cardSku) {
+    cardSku.textContent = `${totalSku} Jenis Produk (SKU)`;
+  }
+  if (cardRetail) {
+    cardRetail.textContent = isAuth ? formatRupiah(totalRetail) : "🔒 ••••••";
+  }
+  if (cardProfit) {
+    cardProfit.textContent = isAuth ? `+${formatRupiah(totalProfit)}` : "🔒 ••••••";
+  }
+  if (cardMargin) {
+    cardMargin.textContent = isAuth ? `Estimasi Margin ${marginPct}%` : "Margin 🔒 •••";
+  }
+}
+
+// Toggle Valuasi Report Accordion (1 Baris Ringkas -> Buka Rincian Lengkap)
+function toggleValuationReportAccordion() {
+  const content = document.getElementById("report-valuation-content");
+  const chevron = document.getElementById("report-valuation-chevron");
+  if (content) {
+    const isHidden = content.classList.contains("hidden");
+    if (isHidden) {
+      content.classList.remove("hidden");
+      if (chevron) chevron.style.transform = "rotate(180deg)";
+    } else {
+      content.classList.add("hidden");
+      if (chevron) chevron.style.transform = "rotate(0deg)";
+    }
+  }
 }
 
 // Render Tabel Riwayat Penerimaan Barang (LPB per Supplier) di Tab Laporan Kasir

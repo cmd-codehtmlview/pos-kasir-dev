@@ -577,6 +577,113 @@
             <span>Dashboard Online ↗</span>
           </button>
         </div>
+      <!-- SUB-MENU / ACCORDION: VALUASI ASET INVENTORI TOKO (1 BARIS DAPAT DI-EXPAND DENGAN TEMA PUTIH) -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+        <button 
+          type="button" 
+          onclick="toggleValuationReportAccordion()" 
+          class="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer"
+          title="Klik untuk membuka / menutup rincian valuasi inventori toko"
+        >
+          <div class="flex items-center gap-2 sm:gap-2.5 min-w-0 pr-2">
+            <span class="text-base shrink-0">💎</span>
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs">
+              <span class="font-extrabold text-slate-900">Valuasi Inventori Toko (Real-Time):</span>
+              <span id="rep-val-bar-hpp" class="font-bold text-indigo-700 font-mono">Modal: Memuat...</span>
+              <span class="text-slate-300">•</span>
+              <span id="rep-val-bar-retail" class="font-bold text-amber-700 font-mono">Jual: Memuat...</span>
+              <span class="text-slate-300">•</span>
+              <span id="rep-val-bar-profit" class="font-bold text-emerald-700 font-mono">Laba: Memuat...</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 text-slate-400 font-bold text-xs shrink-0">
+            <span class="text-[11px] text-slate-500 hidden sm:inline">Rincian Lengkap</span>
+            <span id="report-valuation-chevron" class="text-xs transition-transform duration-200">▼</span>
+          </div>
+        </button>
+
+        <!-- KONTEN RINCIAN LENGKAP VALUASI (TEMA PUTIH SESUAI MENU SETTING & PORTAL OWNER) -->
+        <div id="report-valuation-content" class="hidden p-3.5 sm:p-4 bg-slate-50/50 border-t border-slate-200 space-y-3">
+          <div class="flex items-center justify-between pb-1.5 border-b border-slate-200">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <span>💎</span>
+              <span>Rincian Valuasi Aset Inventori Toko (Real-Time Stok & Rupiah)</span>
+            </span>
+            <span id="rep-val-badge-sku" class="text-[10px] sm:text-[11px] text-slate-500 font-mono font-bold bg-white px-2.5 py-0.5 rounded-full border border-slate-200 shadow-2xs">
+              Memuat SKU...
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+            <!-- VALUASI 1: MODAL HPP TERTANAM -->
+            <div class="bg-white p-3.5 rounded-2xl border border-indigo-100 shadow-xs flex flex-col justify-between min-w-0">
+              <div class="min-w-0">
+                <div class="flex items-center justify-between text-indigo-700 text-xs">
+                  <span class="font-bold uppercase tracking-wider text-[10px] truncate">Nilai Modal Aset Barang (HPP)</span>
+                  <span class="text-base shrink-0">💰</span>
+                </div>
+                <div id="rep-val-card-hpp" class="text-xl sm:text-2xl font-black text-indigo-950 font-mono mt-1 tracking-tight truncate">
+                  Rp 0
+                </div>
+              </div>
+              <div class="mt-2 pt-2 border-t border-indigo-50/80 flex items-center justify-between text-[10px] text-indigo-600">
+                <span class="truncate">Modal Tertanam di Rak</span>
+                <span class="font-bold font-mono shrink-0">Modal Fisik</span>
+              </div>
+            </div>
+
+            <!-- VALUASI 2: TOTAL FISIK STOK (QTY & SKU) -->
+            <div class="bg-white p-3.5 rounded-2xl border border-cyan-100 shadow-xs flex flex-col justify-between min-w-0">
+              <div class="min-w-0">
+                <div class="flex items-center justify-between text-cyan-700 text-xs">
+                  <span class="font-bold uppercase tracking-wider text-[10px] truncate">Total Fisik Stok Barang</span>
+                  <span class="text-base shrink-0">📦</span>
+                </div>
+                <div id="rep-val-card-qty" class="text-xl sm:text-2xl font-black text-cyan-950 font-mono mt-1 tracking-tight truncate">
+                  0 Pcs
+                </div>
+              </div>
+              <div class="mt-2 pt-2 border-t border-cyan-50/80 flex items-center justify-between text-[10px] text-cyan-600">
+                <span id="rep-val-card-sku" class="truncate">0 Jenis Produk (SKU)</span>
+                <span class="font-bold shrink-0">Toko & Gudang</span>
+              </div>
+            </div>
+
+            <!-- VALUASI 3: POTENSI NILAI PENJUALAN -->
+            <div class="bg-white p-3.5 rounded-2xl border border-amber-100 shadow-xs flex flex-col justify-between min-w-0">
+              <div class="min-w-0">
+                <div class="flex items-center justify-between text-amber-700 text-xs">
+                  <span class="font-bold uppercase tracking-wider text-[10px] truncate">Potensi Nilai Penjualan</span>
+                  <span class="text-base shrink-0">🏷️</span>
+                </div>
+                <div id="rep-val-card-retail" class="text-xl sm:text-2xl font-black text-amber-950 font-mono mt-1 tracking-tight truncate">
+                  Rp 0
+                </div>
+              </div>
+              <div class="mt-2 pt-2 border-t border-amber-50/80 flex items-center justify-between text-[10px] text-amber-600">
+                <span class="truncate">Jika Semua Stok Terjual</span>
+                <span class="font-bold font-mono shrink-0">Gross Retail</span>
+              </div>
+            </div>
+
+            <!-- VALUASI 4: PROYEKSI LABA DARI STOK -->
+            <div class="bg-white p-3.5 rounded-2xl border border-emerald-100 shadow-xs flex flex-col justify-between min-w-0">
+              <div class="min-w-0">
+                <div class="flex items-center justify-between text-emerald-700 text-xs">
+                  <span class="font-bold uppercase tracking-wider text-[10px] truncate">Proyeksi Laba dari Stok</span>
+                  <span class="text-base shrink-0">📈</span>
+                </div>
+                <div id="rep-val-card-profit" class="text-xl sm:text-2xl font-black text-emerald-950 font-mono mt-1 tracking-tight truncate">
+                  Rp 0
+                </div>
+              </div>
+              <div class="mt-2 pt-2 border-t border-emerald-50/80 flex items-center justify-between text-[10px] text-emerald-700 font-bold">
+                <span id="rep-val-card-margin" class="truncate">Estimasi Margin 0%</span>
+                <span class="font-bold shrink-0">Profit Toko</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- KPI METRIC CARDS -->
@@ -1672,66 +1779,9 @@
             </div>
           </div>
 
-          <!-- SUB-MENU: INTEGRASI DATABASE CLOUD SUPABASE -->
-          <div id="setting-item-sec-supabase" class="setting-item transition-colors">
-            
-            <button 
-              type="button" 
-              onclick="toggleSettingSection('sec-supabase')" 
-              class="w-full px-4 sm:px-5 py-3.5 flex items-center justify-between hover:bg-slate-50/90 transition-colors text-left cursor-pointer focus:outline-none"
-            >
-              <div class="flex items-center gap-3 min-w-0 pr-2">
-                <span class="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-base shrink-0">☁️</span>
-                <span class="font-black text-xs sm:text-sm text-slate-900 truncate">Integrasi Database Cloud Supabase</span>
-              </div>
-              <div class="flex items-center gap-2 shrink-0">
-                <span id="badge-supabase-status" class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-teal-100 text-teal-800">Multi-Device Sync</span>
-                <span id="chevron-sec-supabase" class="text-slate-400 font-bold text-xs transition-transform duration-200">▼</span>
-              </div>
-            </button>
-            
-            <div id="content-sec-supabase" class="hidden p-4 sm:p-5 bg-slate-50/30 border-t border-slate-100 space-y-4">
-              <!-- Panduan Ringkas Sub-Menu (Hanya Muncul Saat Dibuka) -->
-              <div class="p-3.5 bg-teal-50/70 border-teal-200/80 rounded-xl text-xs flex items-start gap-2.5">
-                <span class="text-base shrink-0">ℹ️</span>
-                <div>
-                  <p class="font-bold text-teal-950">Integrasi Database Cloud Supabase</p>
-                  <p class="text-[11px] text-teal-900/90 mt-0.5 leading-relaxed">Koneksikan terminal kasir POS ke project Supabase untuk sinkronisasi otomatis multi-device, laporan owner online, dan backup data awan secara berkala.</p>
-                </div>
-              </div>
-
-              <div class="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shrink-0 shadow-sm font-bold">
-                    ☁️
-                  </div>
-                  <div>
-                    <div class="flex items-center gap-2">
-                      <span class="font-black text-xs sm:text-sm text-emerald-950">Server Database Cloud Resmi</span>
-                      <span class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-200 text-emerald-900 border border-emerald-300">TERHUBUNG & AMAN</span>
-                    </div>
-                    <p class="text-[11px] text-emerald-800/90 mt-0.5 leading-relaxed">
-                      Kredensial cloud server resmi terinjeksi otomatis oleh sistem. Katalog produk, transaksi, dan stok kasir terlindungi dan tersinkronisasi.
-                    </p>
-                  </div>
-                </div>
-                <button type="button" onclick="testSupabaseConnection()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-black shadow-xs cursor-pointer shrink-0 transition">
-                  Tes Koneksi Cloud
-                </button>
-              </div>
-
-              <!-- Hidden input kredensial untuk kompatibilitas script bawaan -->
-              <input type="hidden" id="setting-supabase-url" value="">
-              <input type="hidden" id="setting-supabase-key" value="">
-
-              <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-slate-600">
-                <span>Sinkronkan katalog produk, riwayat transaksi, dan stok opname.</span>
-                <button type="button" onclick="syncToSupabase(false)" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-xl font-bold flex items-center gap-1.5 shadow-xs cursor-pointer transition">
-                  <span>🔄 [F9] Sinkronkan Sekarang</span>
-                </button>
-              </div>
-            </div>
-          </div>
+          <!-- Hidden input kredensial Supabase untuk kompatibilitas script bawaan (Sinkronisasi diatur melalui Header POS) -->
+          <input type="hidden" id="setting-supabase-url" value="">
+          <input type="hidden" id="setting-supabase-key" value="">
         </div>
       </div>
 
