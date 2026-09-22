@@ -6897,7 +6897,7 @@
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
   <script src="js/scanner.js?v=99"></script>
-  <script src="js/cart.js?v=99"></script>
+  <script src="js/cart.js?v=100"></script>
   <script src="js/printer.js?v=120"></script>
   <script src="js/checkout.js?v=107"></script>
   <script src="js/member.js?v=107"></script>
@@ -6913,7 +6913,7 @@
   <script src="js/employees.js?v=120"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=120"></script>
+  <script src="js/app.js?v=121"></script>
   <script>
     // Live Search untuk Barcode Scanner Kasir Utama (Ketik Live & Dropdown Cepat)
     function handlePosLiveSearch(rawVal) {
@@ -7240,7 +7240,7 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=99')
+        navigator.serviceWorker.register('./sw.js?v=100')
           .then((registration) => {
             registration.update();
             console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
