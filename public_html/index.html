@@ -4033,13 +4033,13 @@
         <div class="grid grid-cols-2 gap-2">
           <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl">
             <span class="text-[10px] font-bold text-slate-500 uppercase block">Omzet Bersih Toko</span>
-            <div class="font-bebas text-2xl text-slate-900 mt-0.5 tracking-wider">Rp 2.450.000</div>
-            <span class="text-[9px] text-slate-500 block mt-0.5">34 Transaksi Selesai</span>
+            <div id="sis-report-net-turnover" class="font-bebas text-2xl text-slate-900 mt-0.5 tracking-wider">Rp 0</div>
+            <span id="sis-report-trx-count" class="text-[9px] text-slate-500 block mt-0.5">0 Transaksi Selesai</span>
           </div>
           <div class="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl">
             <span class="text-[10px] font-bold text-emerald-800 uppercase block">Laba Bersih Real</span>
-            <div class="font-bebas text-2xl text-emerald-900 mt-0.5 tracking-wider">+Rp 630.000</div>
-            <span class="text-[9px] text-emerald-700 font-bold block mt-0.5">Margin Laba: 25.7%</span>
+            <div id="sis-report-net-profit" class="font-bebas text-2xl text-emerald-900 mt-0.5 tracking-wider">+Rp 0</div>
+            <span id="sis-report-profit-margin" class="text-[9px] text-emerald-700 font-bold block mt-0.5">Margin Laba: 0.0%</span>
           </div>
         </div>
 
@@ -4048,29 +4048,20 @@
           <div class="space-y-1.5 text-[11px]">
             <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200/80">
               <span class="font-bold text-slate-800 flex items-center gap-1.5"><span>💵</span> Tunai di Laci Kasir</span>
-              <span class="font-mono font-black text-slate-900">Rp 1.650.000 (23 nota)</span>
+              <span id="sis-report-cash-sales" class="font-mono font-black text-slate-900">Rp 0 (0 nota)</span>
             </div>
             <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200/80">
-              <span class="font-bold text-indigo-700 flex items-center gap-1.5"><span>📱</span> QRIS & Non-Tunai</span>
-              <span class="font-mono font-black text-slate-900">Rp 800.000 (11 nota)</span>
+              <span class="font-bold text-indigo-700 flex items-center gap-1.5"><span>📱</span> QRIS &amp; Non-Tunai</span>
+              <span id="sis-report-qris-sales" class="font-mono font-black text-slate-900">Rp 0 (0 nota)</span>
             </div>
           </div>
         </div>
 
         <div class="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
           <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Top 5 Produk Paling Laku Hari Ini:</span>
-          <div class="space-y-1 text-[11px]">
-            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200/80">
-              <span class="font-bold text-slate-900">1. Keripik Singkong Balado 250g</span>
-              <span class="font-mono font-black text-slate-900">42 PCS</span>
-            </div>
-            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200/80">
-              <span class="font-bold text-slate-900">2. Makaroni Pedas Daun Jeruk</span>
-              <span class="font-mono font-black text-slate-900">35 PCS</span>
-            </div>
-            <div class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200/80">
-              <span class="font-bold text-slate-900">3. Basreng Pedas Gurih 200g</span>
-              <span class="font-mono font-black text-slate-900">28 PCS</span>
+          <div id="sis-report-top-products" class="space-y-1 text-[11px]">
+            <div class="p-3 text-center text-slate-400 bg-white border border-dashed border-slate-200 rounded-xl text-xs">
+              Belum ada produk terjual hari ini.
             </div>
           </div>
         </div>
@@ -4078,7 +4069,7 @@
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-report')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Tutup</button>
-        <button onclick="printShiftReportReceipt()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5">
+        <button onclick="printSisShiftReportReceipt()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5">
           <span>🖨️</span>
           <span>Cetak Rekap Laporan</span>
         </button>
@@ -4415,46 +4406,50 @@
         <div class="p-3.5 bg-purple-50/40 border border-purple-200/70 rounded-2xl flex items-center justify-between">
           <div>
             <span class="text-[10px] uppercase tracking-wider font-extrabold text-purple-600">Total Omzet Bersih</span>
-            <h4 class="text-xl font-black text-slate-900 font-mono mt-0.5">Rp 3.485.000</h4>
+            <h4 id="sis-recap-net-turnover" class="text-xl font-black text-slate-900 font-mono mt-0.5">Rp 0</h4>
           </div>
-          <span class="px-2.5 py-1 bg-purple-100 text-purple-800 rounded-full font-bold text-[10px]">28 Struk</span>
+          <span id="sis-recap-trx-count" class="px-2.5 py-1 bg-purple-100 text-purple-800 rounded-full font-bold text-[10px]">0 Struk</span>
         </div>
         <div class="space-y-2">
           <span class="font-bold text-slate-700 text-[11px] uppercase tracking-wider">Rincian Pembayaran Masuk</span>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2 font-mono">
             <div class="flex justify-between text-slate-700">
               <span>💵 Uang Tunai (Cash)</span>
-              <span class="font-bold text-slate-900">Rp 2.150.000</span>
+              <span id="sis-recap-cash-in" class="font-bold text-slate-900">Rp 0</span>
             </div>
             <div class="flex justify-between text-slate-700">
               <span>📱 QRIS / ShopeePay / GoPay</span>
-              <span class="font-bold text-slate-900">Rp 1.185.000</span>
+              <span id="sis-recap-qris-in" class="font-bold text-slate-900">Rp 0</span>
             </div>
             <div class="flex justify-between text-slate-700">
               <span>💳 Transfer Bank / Debit</span>
-              <span class="font-bold text-slate-900">Rp 150.000</span>
+              <span id="sis-recap-transfer-in" class="font-bold text-slate-900">Rp 0</span>
             </div>
             <div class="border-t border-slate-200 pt-2 flex justify-between text-slate-700">
               <span>🎁 Potongan Poin Member</span>
-              <span class="font-bold text-indigo-700">-Rp 15.000</span>
+              <span id="sis-recap-points-cut" class="font-bold text-indigo-700">-Rp 0</span>
             </div>
             <div class="flex justify-between text-slate-700">
               <span>↩️ Retur Pembelian</span>
-              <span class="font-bold text-rose-600">-Rp 35.000</span>
+              <span id="sis-recap-return-cut" class="font-bold text-rose-600">-Rp 0</span>
+            </div>
+            <div class="flex justify-between text-slate-700">
+              <span>📥 Setoran Kas (Cash Drop)</span>
+              <span id="sis-recap-cashdrop-cut" class="font-bold text-amber-700">-Rp 0</span>
             </div>
           </div>
         </div>
         <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between font-mono">
           <div>
             <span class="text-[10px] text-amber-700 font-bold block">UANG FISIK DALAM LACI KASIR</span>
-            <span class="text-sm font-extrabold text-slate-900">Rp 2.350.000</span>
+            <span id="sis-recap-drawer-cash" class="text-sm font-extrabold text-slate-900">Rp 0</span>
           </div>
-          <span class="text-[10px] text-amber-800 font-sans font-medium">(Termasuk modal awal Rp 200rb)</span>
+          <span id="sis-recap-drawer-note" class="text-[10px] text-amber-800 font-sans font-medium">(Termasuk modal awal Rp 200rb)</span>
         </div>
       </div>
       <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
-        <button onclick="closeSisModal('sis-modal-recap')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Tutup</button>
-        <button onclick="printDailyRecapReceipt()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs active:scale-95 transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+        <button onclick="closeSisModal('sis-modal-recap')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer">Tutup</button>
+        <button onclick="printSisDailyRecapReceipt()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs active:scale-95 transition shadow-xs flex items-center gap-1.5 cursor-pointer">
           <span>🖨️</span><span>Cetak Rekap Kasir</span>
         </button>
       </div>
@@ -8905,6 +8900,7 @@
   <script src="js/sis-logistics.js?v=100"></script>
   <script src="js/sis-cashier-ops.js?v=100"></script>
   <script src="js/sis-store-crm.js?v=100"></script>
+  <script src="js/sis-analytics.js?v=100"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -9760,6 +9756,14 @@
         if (modalId === 'sis-modal-staff') {
           if (typeof initSisStaffModal === 'function') initSisStaffModal();
         }
+        // Jika membuka Laporan Penjualan Shift Kasir
+        if (modalId === 'sis-modal-report') {
+          if (typeof initSisReportModal === 'function') initSisReportModal();
+        }
+        // Jika membuka Rekap Kas & Transaksi Harian
+        if (modalId === 'sis-modal-recap') {
+          if (typeof initSisRecapModal === 'function') initSisRecapModal();
+        }
       }
     }
 
@@ -10518,7 +10522,7 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=106')
+        navigator.serviceWorker.register('./sw.js?v=107')
           .then((registration) => {
             registration.update();
             console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
