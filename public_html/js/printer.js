@@ -219,37 +219,80 @@ if (typeof window !== 'undefined') {
   window.printSpooler = printSpooler;
 }
 
-async function handleBluetoothIndicatorClick() {
-  if (!isBluetoothConnected()) {
-    // Coba konek kembali cepat ke printer sebelumnya tanpa harus membuka ulang dialog jika memungkinkan
-    if (bluetoothPrinterDevice || (pos?.settings?.lastPrinterName && typeof navigator !== 'undefined' && navigator.bluetooth?.getDevices)) {
-      showToast("Menyambungkan kembali ke printer...", "info");
-      const ok = await ensureBluetoothConnected(false);
-      if (ok) return;
-    }
-    connectBluetoothPrinter();
-  } else {
-    const modalDeviceName = document.getElementById("modal-bt-device-name");
-    const modalStatusDot = document.getElementById("modal-bt-status-dot");
-    const modalStatusText = document.getElementById("modal-bt-status-text");
-    const modalDetailText = document.getElementById("modal-bt-detail-text");
-    const modalPaperBadge = document.getElementById("modal-bt-paper-badge");
-    const modalQueueInfo = document.getElementById("modal-bt-queue-info");
+function updateQuickBluetoothModalUI() {
+  const modalDeviceName = document.getElementById("modal-bt-device-name");
+  const modalStatusDot = document.getElementById("modal-bt-status-dot");
+  const modalStatusText = document.getElementById("modal-bt-status-text");
+  const modalDetailText = document.getElementById("modal-bt-detail-text");
+  const modalPaperBadge = document.getElementById("modal-bt-paper-badge");
+  const modalQueueInfo = document.getElementById("modal-bt-queue-info");
+  const switchModeBtnText = document.getElementById("btn-modal-bt-switch-mode-text");
+  const connectBtn = document.getElementById("btn-modal-bt-connect");
 
+  const mode = (typeof pos !== "undefined" && pos.settings && pos.settings.printerDriverMode) || "bluetooth";
+  const paper = (typeof pos !== "undefined" && pos.settings && pos.settings.paperWidth) || "58mm";
+  if (modalPaperBadge) modalPaperBadge.textContent = paper;
+
+  if (mode === "system") {
+    if (modalDeviceName) modalDeviceName.textContent = "Dialog Cetak Sistem / Kabel USB";
+    if (modalStatusDot) modalStatusDot.className = "w-3 h-3 rounded-full bg-blue-500 shadow-sm";
+    if (modalStatusText) modalStatusText.textContent = "Mode Sistem Aktif (Bebas BT)";
+    if (modalDetailText) modalDetailText.textContent = "Mencetak via jendela print browser (USB/PDF/Android)";
+    if (switchModeBtnText) switchModeBtnText.textContent = "Beralih ke Bluetooth BLE";
+    if (connectBtn) connectBtn.classList.add("hidden");
+  } else if (mode === "rawbt") {
+    if (modalDeviceName) modalDeviceName.textContent = "RawBT Android Print Service";
+    if (modalStatusDot) modalStatusDot.className = "w-3 h-3 rounded-full bg-amber-500 shadow-sm";
+    if (modalStatusText) modalStatusText.textContent = "Jembatan RawBT Aktif";
+    if (modalDetailText) modalDetailText.textContent = "Mengirim data cetak via aplikasi RawBT";
+    if (switchModeBtnText) switchModeBtnText.textContent = "Beralih ke Bluetooth BLE";
+    if (connectBtn) connectBtn.classList.add("hidden");
+  } else {
+    // Mode Bluetooth
+    const connected = isBluetoothConnected();
     const devName = (bluetoothPrinterDevice && bluetoothPrinterDevice.name) || (typeof pos !== "undefined" && pos.settings && pos.settings.lastPrinterName) || "Printer VSC";
     if (modalDeviceName) modalDeviceName.textContent = devName;
-    if (modalStatusDot) modalStatusDot.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-sm";
-    if (modalStatusText) modalStatusText.textContent = "Terhubung & Siap";
-    if (modalDetailText) modalDetailText.textContent = "GATT BLE aktif • Driver: " + ((typeof pos !== "undefined" && pos.settings && pos.settings.printerDriverMode) || "bluetooth").toUpperCase();
-    if (modalPaperBadge) modalPaperBadge.textContent = (typeof pos !== "undefined" && pos.settings && pos.settings.paperWidth) || '58mm';
-    if (modalQueueInfo) {
-      const qLen = printSpooler.queue.length + (printSpooler.currentJob ? 1 : 0);
-      modalQueueInfo.textContent = qLen > 0 ? (qLen + " Tugas Aktif") : "0 Tugas (Siaga)";
-    }
+    if (switchModeBtnText) switchModeBtnText.textContent = "Ganti ke Mode Dialog Sistem / USB";
+    if (connectBtn) connectBtn.classList.remove("hidden");
 
-    if (typeof openModal === 'function') {
-      openModal("modal-bluetooth-quick");
+    if (connected) {
+      if (modalStatusDot) modalStatusDot.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-sm";
+      if (modalStatusText) modalStatusText.textContent = "Terhubung & Siap";
+      if (modalDetailText) modalDetailText.textContent = "GATT BLE aktif • Format: " + paper;
+    } else {
+      if (modalStatusDot) modalStatusDot.className = "w-3 h-3 rounded-full bg-slate-400";
+      if (modalStatusText) modalStatusText.textContent = "Terputus";
+      if (modalDetailText) modalDetailText.textContent = "Klik 'Cari & Hubungkan' di bawah untuk menyambungkan.";
     }
+  }
+
+  if (modalQueueInfo && typeof printSpooler !== "undefined") {
+    const qLen = printSpooler.queue.length + (printSpooler.currentJob ? 1 : 0);
+    modalQueueInfo.textContent = qLen > 0 ? (qLen + " Tugas Aktif") : "0 Tugas (Siaga)";
+  }
+}
+
+function togglePrinterDriverModeQuick() {
+  const current = (typeof pos !== 'undefined' && pos.settings && pos.settings.printerDriverMode) || 'bluetooth';
+  const newMode = (current === 'bluetooth') ? 'system' : 'bluetooth';
+  if (typeof changePrinterDriverMode === 'function') {
+    changePrinterDriverMode(newMode);
+  } else if (typeof pos !== 'undefined' && pos.settings) {
+    pos.settings.printerDriverMode = newMode;
+    pos.saveSettings();
+  }
+  updateBluetoothUI();
+  updateQuickBluetoothModalUI();
+  if (typeof updateSisPrinterModalUI === 'function') updateSisPrinterModalUI();
+}
+
+function handleBluetoothIndicatorClick() {
+  updateBluetoothUI();
+  updateQuickBluetoothModalUI();
+  if (typeof openModal === 'function' && document.getElementById('modal-bluetooth-quick')) {
+    openModal("modal-bluetooth-quick");
+  } else if (typeof openSisModal === 'function') {
+    openSisModal("sis-modal-printer");
   }
 }
 
@@ -1527,28 +1570,31 @@ function initUniversalPrinterDriver() {
 }
 
 async function testPrintReceipt() {
-  const mode = pos.settings.printerDriverMode || 'bluetooth';
+  const mode = (typeof pos !== 'undefined' && pos.settings && pos.settings.printerDriverMode) || 'bluetooth';
 
   if (mode === 'bluetooth') {
-    const isConnected = await ensureBluetoothConnected();
+    const isConnected = isBluetoothConnected() || (await ensureBluetoothConnected(false));
     if (!isConnected) {
-      const ok = confirm("Printer Bluetooth belum terhubung.\n\nApakah Anda ingin mencari dan menghubungkan printer VSC sekarang?");
+      const ok = confirm("Printer Bluetooth belum terhubung.\n\nKlik OK untuk mencari dan menghubungkan printer Bluetooth sekarang,\natau klik CANCEL untuk tes cetak via Dialog Sistem Browser (Kabel USB / PDF).");
       if (ok) {
         const connected = await connectBluetoothPrinter();
         if (!connected) return;
       } else {
+        showToast("Membuka tes cetak sistem browser...", "info");
+        preparePrintableTestReceipt();
+        setTimeout(() => { window.print(); }, 120);
         return;
       }
     }
 
     try {
-      showToast("Mengirim teks tes ke printer VSC...", "info");
+      showToast("Mengirim teks tes ke printer Bluetooth...", "info");
       const bytes = buildTestReceiptEscPos();
-      await sendBytesToBluetooth(bytes);
-      showToast("Tes cetak berhasil keluar di printer VSC! 🎉", "success");
+      await sendBytesToBluetooth(bytes, { id: 'test_' + Date.now(), title: 'Struk Uji Coba Printer', type: 'test' });
+      showToast("Tes cetak berhasil keluar di printer! 🎉", "success");
       if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
     } catch (err) {
-      alert("Gagal melakukan tes cetak: " + err.message);
+      alert("Gagal melakukan tes cetak Bluetooth: " + err.message + "\n\n💡 Saran: Coba alihkan mode ke 'Dialog Sistem / Kabel USB'.");
     }
   } else if (mode === 'rawbt') {
     try {
@@ -1559,11 +1605,15 @@ async function testPrintReceipt() {
       alert("Gagal kirim tes ke RawBT: " + err.message);
     }
   } else {
-    // Mode dialog sistem: siapkan struk uji coba visual dan buka dialog cetak sistem browser
+    // Mode dialog sistem (kabel USB / PDF / printer sistem OS)
+    showToast("Membuka dialog cetak sistem browser...", "info");
     preparePrintableTestReceipt();
-    window.print();
+    setTimeout(() => { window.print(); }, 120);
   }
 }
+
+window.testPrintReceipt = testPrintReceipt;
+window.printTestReceipt = testPrintReceipt;
 
 // Menyiapkan struk uji coba untuk pencetakan kabel USB / Dialog Sistem
 function preparePrintableTestReceipt() {
@@ -2629,3 +2679,10 @@ async function printLabelsNativeFast(products, copies = 1, mode = 'shelf') {
 
 window.buildNativeLabelEscPos = buildNativeLabelEscPos;
 window.printLabelsNativeFast = printLabelsNativeFast;
+window.updateQuickBluetoothModalUI = updateQuickBluetoothModalUI;
+window.togglePrinterDriverModeQuick = togglePrinterDriverModeQuick;
+window.handleBluetoothIndicatorClick = handleBluetoothIndicatorClick;
+window.connectBluetoothPrinter = connectBluetoothPrinter;
+window.disconnectBluetoothPrinter = disconnectBluetoothPrinter;
+window.printReceiptUniversal = printReceiptUniversal;
+window.isBluetoothConnected = isBluetoothConnected;

@@ -34,6 +34,11 @@ function switchTab(tabId) {
     footerSettingBtn.classList.toggle("ring-amber-300", isSetting);
   }
 
+  const mobBottomBar = document.getElementById("pos-mobile-bottom-bar");
+  if (mobBottomBar) {
+    mobBottomBar.classList.toggle("hidden", tabId !== "tab-pos");
+  }
+
   if (tabId === "tab-pos") {
     renderPosCart();
     setTimeout(() => {

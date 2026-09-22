@@ -2105,9 +2105,9 @@
     </section>
 
   </main>
-  <!-- ================= STICKY BOTTOM BAR KHUSUS HP (9:16 & 9:18 PORTRAIT) ================= -->
-  <!-- Hanya muncul di HP (lg:hidden): Total Tagihan & 1 Tombol Bayar Utama Tanpa Duplikasi -->
-  <div id="pos-mobile-bottom-bar" class="lg:hidden sticky bottom-0 left-0 right-0 z-30 bg-slate-900/95 backdrop-blur-md border-t-2 border-slate-700 px-4 py-3 shadow-2xl flex items-center justify-between gap-3 text-white">
+  <!-- ================= BOTTOM BAR KHUSUS HP (9:16 & 9:18 PORTRAIT) ================= -->
+  <!-- Muncul di HP (lg:hidden): Total Tagihan & 1 Tombol Bayar Utama Tanpa Terpotong -->
+  <div id="pos-mobile-bottom-bar" class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t-2 border-slate-700 px-4 pt-2.5 shadow-2xl flex items-center justify-between gap-3 text-white" style="padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));">
     <div class="min-w-0 flex-1">
       <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider truncate" id="mobile-cart-count-label">TOTAL TAGIHAN</div>
       <div id="cart-grand-total-val" class="font-bebas text-3xl sm:text-4xl text-amber-400 tracking-wider font-bold leading-none truncate">
@@ -2115,7 +2115,7 @@
       </div>
     </div>
     <!-- SATU TOMBOL BAYAR UTAMA -->
-    <button type="button" onclick="openCheckoutModal()" class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl font-black text-sm shadow-lg flex items-center gap-2 border-2 border-emerald-400 cursor-pointer flex-shrink-0">
+    <button type="button" onclick="openCheckoutModal()" class="px-5 sm:px-6 py-3 sm:py-3.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-xl font-black text-xs sm:text-sm shadow-lg flex items-center gap-2 border-2 border-emerald-400 cursor-pointer flex-shrink-0">
       <span>💳</span>
       <span>BAYAR [F12]</span>
     </button>
@@ -2391,7 +2391,7 @@
     </div>
 
     <!-- Drawer Footer (Clean Minimalist Action Bar Tanpa Tombol Tutup Dobel) -->
-    <div class="p-3.5 bg-white border-t border-slate-200 flex items-center justify-between gap-2 flex-shrink-0">
+    <div class="p-3.5 bg-white border-t border-slate-200 flex items-center justify-between gap-2 flex-shrink-0" style="padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));">
       <div class="flex items-center gap-2 min-w-0 text-xs text-slate-500 font-medium">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
         <span class="truncate">SnackPOS Cloud Active</span>
@@ -2764,44 +2764,17 @@
           <span class="absolute left-2.5 top-2.5 text-slate-400">🔍</span>
         </div>
 
-        <div class="space-y-2">
+        <div id="sis-receipts-list-container" class="space-y-2">
+          <!-- Diisi otomatis oleh renderSisReceiptsList() dari pos.transactions -->
           <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between hover:bg-slate-100/70 transition">
             <div>
-              <span class="font-black text-slate-900 text-xs block font-mono">TRX-20260922-0034</span>
-              <span class="text-[10px] text-slate-500 block">12:45 WIB • 3 Item • Kasir 01</span>
-              <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 font-bold text-[9px] rounded-full border border-emerald-200">💵 TUNAI</span>
+              <span class="font-black text-slate-900 text-xs block font-mono">TRX-TERBARU</span>
+              <span class="text-[10px] text-slate-500 block">Transaksi Terakhir Kasir</span>
+              <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 font-bold text-[9px] rounded-full border border-emerald-200">💵 SIAP CETAK</span>
             </div>
             <div class="text-right">
-              <span class="font-black text-slate-900 font-mono text-sm block">Rp 45.000</span>
-              <button onclick="showMockupToast('🖨️ Mencetak ulang struk TRX-0034...', 'success');" class="mt-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-[10px] border border-slate-200 cursor-pointer transition">
-                🖨️ Cetak Ulang
-              </button>
-            </div>
-          </div>
-
-          <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between hover:bg-slate-100/70 transition">
-            <div>
-              <span class="font-black text-slate-900 text-xs block font-mono">TRX-20260922-0033</span>
-              <span class="text-[10px] text-slate-500 block">12:30 WIB • 8 Item • Kasir 01</span>
-              <span class="inline-block mt-1 px-2 py-0.5 bg-indigo-50 text-indigo-700 font-bold text-[9px] rounded-full border border-indigo-200">📱 QRIS TOKO</span>
-            </div>
-            <div class="text-right">
-              <span class="font-black text-slate-900 font-mono text-sm block">Rp 120.000</span>
-              <button onclick="showMockupToast('🖨️ Mencetak ulang struk TRX-0033...', 'success');" class="mt-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-[10px] border border-slate-200 cursor-pointer transition">
-                🖨️ Cetak Ulang
-              </button>
-            </div>
-          </div>
-
-          <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between hover:bg-slate-100/70 transition">
-            <div>
-              <span class="font-black text-slate-900 text-xs block font-mono">TRX-20260922-0032</span>
-              <span class="text-[10px] text-slate-500 block">12:15 WIB • 2 Item • Kasir 01</span>
-              <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 font-bold text-[9px] rounded-full border border-emerald-200">💵 TUNAI</span>
-            </div>
-            <div class="text-right">
-              <span class="font-black text-slate-900 font-mono text-sm block">Rp 35.000</span>
-              <button onclick="showMockupToast('🖨️ Mencetak ulang struk TRX-0032...', 'success');" class="mt-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-[10px] border border-slate-200 cursor-pointer transition">
+              <span class="font-black text-slate-900 font-mono text-sm block">-</span>
+              <button onclick="if (typeof lastCompletedTransaction !== 'undefined' && lastCompletedTransaction) { reprintTransactionById(lastCompletedTransaction.id); } else { showToast('Belum ada transaksi kasir yang selesai untuk dicetak ulang.', 'warning'); }" class="mt-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-[10px] border border-slate-200 cursor-pointer transition">
                 🖨️ Cetak Ulang
               </button>
             </div>
@@ -3460,7 +3433,7 @@
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-label')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
-        <button onclick="showMockupToast('⚡ Mencetak Label Thermal (0.5s)...', 'success'); closeSisModal('sis-modal-label');" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5">
+        <button onclick="executeSisLabelPrint()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5">
           <span>⚡</span><span>Cetak Kilat (0.5s)</span>
         </button>
       </div>
@@ -4140,7 +4113,7 @@
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-report')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Tutup</button>
-        <button onclick="showMockupToast('🖨️ Mencetak Laporan Rekap Penjualan Shift Kasir...', 'success');" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5">
+        <button onclick="printShiftReportReceipt()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5">
           <span>🖨️</span>
           <span>Cetak Rekap Laporan</span>
         </button>
@@ -4159,48 +4132,74 @@
           </div>
           <div>
             <h3 class="font-extrabold text-sm text-slate-900 tracking-tight">Setting Printer Thermal Kasir</h3>
-            <p class="text-[11px] text-slate-500 font-medium">Koneksi Bluetooth BLE & Lebar Kertas Struk</p>
+            <p class="text-[11px] text-slate-500 font-medium">Koneksi Bluetooth BLE, USB / Sistem & Lebar Kertas</p>
           </div>
         </div>
         <button onclick="closeSisModal('sis-modal-printer')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 font-bold flex items-center justify-center text-xs transition cursor-pointer border border-slate-200/60 active:scale-95">✕</button>
       </div>
 
       <!-- Modal Body -->
-      <div class="p-4 space-y-3.5 text-xs">
-        <!-- Kartu Status Bluetooth Real-Time -->
+      <div class="p-4 space-y-3.5 text-xs overflow-y-auto flex-1">
+        <!-- Kartu Status Printer Real-Time -->
         <div class="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span class="font-black text-slate-900 text-xs">VSC MP-58M (Portabel)</span>
+              <span id="sis-printer-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+              <span id="sis-printer-device-name" class="font-black text-slate-900 text-xs">Belum Terhubung</span>
             </div>
-            <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[9px] rounded-full uppercase">
-              TERHUBUNG
+            <span id="sis-printer-status-badge" class="px-2 py-0.5 bg-slate-200 text-slate-700 border border-slate-300 font-bold text-[9px] rounded-full uppercase">
+              TERPUTUS
             </span>
           </div>
           <div class="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-600 pt-1 border-t border-slate-200">
-            <div>Jalur: <strong class="text-slate-900">Web Bluetooth BLE</strong></div>
-            <div>Baterai: <strong class="text-emerald-700">85% (Optimal)</strong></div>
-            <div>Auto-Sleep: <strong class="text-indigo-700">Anti-Sleep Aktif (25s)</strong></div>
-            <div>Driver: <strong class="text-slate-900">ESC/POS Native</strong></div>
+            <div>Jalur: <strong id="sis-printer-mode-text" class="text-slate-900">Bluetooth BLE</strong></div>
+            <div>Format: <strong id="sis-printer-paper-text" class="text-emerald-700">58mm (32 Kolom)</strong></div>
           </div>
         </div>
 
-        <!-- Tombol Sambungkan Baru / Ganti Device -->
-        <button onclick="showMockupToast('🔍 Membuka dialog Bluetooth Chrome untuk mencari printer...', 'info');" class="w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer">
-          <span>🔍</span>
-          <span>Cari & Sambungkan Printer Bluetooth Baru</span>
-        </button>
+        <!-- Pilihan Jalur / Driver Mode Printer -->
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Metode / Jalur Printer:</label>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" id="sis-driver-btn-bluetooth" onclick="selectSisPrinterDriver('bluetooth')" class="py-2 px-1 text-center rounded-xl border-2 border-slate-900 bg-slate-50 font-bold text-slate-900 text-[10px] transition cursor-pointer">
+              <span>📱</span><br>Bluetooth BLE
+            </button>
+            <button type="button" id="sis-driver-btn-system" onclick="selectSisPrinterDriver('system')" class="py-2 px-1 text-center rounded-xl border border-slate-300 bg-white font-medium text-slate-600 text-[10px] hover:border-slate-400 transition cursor-pointer">
+              <span>📄</span><br>Sistem / USB / PDF
+            </button>
+            <button type="button" id="sis-driver-btn-rawbt" onclick="selectSisPrinterDriver('rawbt')" class="py-2 px-1 text-center rounded-xl border border-slate-300 bg-white font-medium text-slate-600 text-[10px] hover:border-slate-400 transition cursor-pointer">
+              <span>🚀</span><br>RawBT Android
+            </button>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi Bluetooth (Hanya tampil jika mode Bluetooth aktif) -->
+        <div id="sis-printer-bluetooth-actions" class="space-y-2">
+          <button type="button" onclick="connectBluetoothPrinter()" class="w-full py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95">
+            <span>🔍</span>
+            <span>Cari & Sambungkan Printer Bluetooth (BLE)</span>
+          </button>
+          <button type="button" id="sis-printer-btn-disconnect" onclick="disconnectBluetoothPrinter(); updateSisPrinterModalUI();" class="hidden w-full py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer">
+            <span>🔌</span>
+            <span>Putuskan Koneksi Bluetooth</span>
+          </button>
+        </div>
+
+        <!-- Info Mode Sistem (Tampil saat mode sistem/USB/PDF) -->
+        <div id="sis-printer-system-info" class="hidden p-3 bg-blue-50 border border-blue-200 rounded-xl text-[11px] text-blue-900 space-y-1">
+          <p class="font-bold flex items-center gap-1"><span>📄</span> Mode Dialog Cetak Sistem Browser Aktif</p>
+          <p class="text-blue-700 text-[10px]">Struk langsung dicetak via popup cetak browser. Cocok untuk printer kabel USB, printer Android Print Service, atau simpan file PDF tanpa perlu Bluetooth.</p>
+        </div>
 
         <!-- Lebar Kertas -->
         <div>
           <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Ukuran Kertas Thermal Struk</label>
           <div class="grid grid-cols-2 gap-2">
-            <button class="p-2.5 border-2 border-slate-900 bg-slate-50 rounded-xl font-bold text-slate-900 text-xs flex items-center justify-center gap-1.5">
+            <button type="button" id="sis-paper-58-btn" onclick="selectSisPaperWidth('58mm')" class="p-2.5 border-2 border-slate-900 bg-slate-50 rounded-xl font-bold text-slate-900 text-xs flex items-center justify-center gap-1.5 cursor-pointer transition">
               <span>🧾</span>
               <span>58 mm (Standar POS)</span>
             </button>
-            <button class="p-2.5 border border-slate-300 hover:border-slate-400 rounded-xl font-medium text-slate-600 text-xs flex items-center justify-center gap-1.5">
+            <button type="button" id="sis-paper-80-btn" onclick="selectSisPaperWidth('80mm')" class="p-2.5 border border-slate-300 hover:border-slate-400 bg-white rounded-xl font-medium text-slate-600 text-xs flex items-center justify-center gap-1.5 cursor-pointer transition">
               <span>📃</span>
               <span>80 mm (Lebar)</span>
             </button>
@@ -4208,7 +4207,7 @@
         </div>
 
         <!-- Tes Print -->
-        <button onclick="showMockupToast('🖨️ Sample struk tes 58mm berhasil dikirim ke printer!', 'success');" class="w-full py-3 bg-slate-900 hover:bg-black text-white font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+        <button type="button" onclick="testPrintReceipt()" class="w-full py-3 bg-slate-900 hover:bg-black text-white font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
           <span>🖨️</span>
           <span>Tes Cetak Sample Struk</span>
         </button>
@@ -4479,7 +4478,7 @@
       </div>
       <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-recap')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Tutup</button>
-        <button onclick="showMockupToast('🖨️ Mencetak Rekap Harian Kasir...', 'info')" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs active:scale-95 transition shadow-xs flex items-center gap-1.5">
+        <button onclick="printDailyRecapReceipt()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs active:scale-95 transition shadow-xs flex items-center gap-1.5 cursor-pointer">
           <span>🖨️</span><span>Cetak Rekap Kasir</span>
         </button>
       </div>
@@ -8867,11 +8866,20 @@
             class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <span>🔍</span>
-            <span>Cari & Hubungkan Printer VSC</span>
+            <span>Cari & Hubungkan Printer VSC (BLE)</span>
+          </button>
+          <button 
+            id="btn-modal-bt-switch-mode" 
+            type="button"
+            onclick="togglePrinterDriverModeQuick();" 
+            class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
+          >
+            <span>📄</span>
+            <span id="btn-modal-bt-switch-mode-text">Ganti ke Mode Dialog Sistem / USB / PDF</span>
           </button>
           <div class="grid grid-cols-2 gap-2">
             <button 
-              onclick="printTestReceipt(); closeModal('modal-bluetooth-quick');" 
+              onclick="testPrintReceipt(); closeModal('modal-bluetooth-quick');" 
               class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
             >
               <span>🖨️</span>
@@ -8896,28 +8904,28 @@
   <script src="js/db.js?v=120"></script>
   <script src="js/store.js?v=99"></script>
   <script src="js/license.js?v=120"></script>
-  <script src="js/sync.js?v=102"></script>
+  <script src="js/sync.js?v=103"></script>
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=102"></script>
-  <script src="js/cart.js?v=102"></script>
-  <script src="js/printer.js?v=122"></script>
-  <script src="js/checkout.js?v=107"></script>
-  <script src="js/member.js?v=107"></script>
-  <script src="js/returns.js?v=99"></script>
-  <script src="js/stock-opname.js?v=99"></script>
-  <script src="js/klerk.js?v=99"></script>
-  <script src="js/inventory.js?v=107"></script>
+  <script src="js/scanner.js?v=103"></script>
+  <script src="js/cart.js?v=103"></script>
+  <script src="js/printer.js?v=123"></script>
+  <script src="js/checkout.js?v=108"></script>
+  <script src="js/member.js?v=108"></script>
+  <script src="js/returns.js?v=100"></script>
+  <script src="js/stock-opname.js?v=100"></script>
+  <script src="js/klerk.js?v=100"></script>
+  <script src="js/inventory.js?v=108"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/import-products.js?v=99"></script>
-  <script src="js/repack.js?v=99"></script>
-  <script src="js/reports.js?v=101"></script>
-  <script src="js/settings.js?v=120"></script>
-  <script src="js/employees.js?v=120"></script>
+  <script src="js/import-products.js?v=100"></script>
+  <script src="js/repack.js?v=100"></script>
+  <script src="js/reports.js?v=102"></script>
+  <script src="js/settings.js?v=121"></script>
+  <script src="js/employees.js?v=121"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=121"></script>
+  <script src="js/app.js?v=122"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -9501,10 +9509,210 @@
       if (footerResult) footerResult.classList.remove('hidden');
 
       showMockupToast('💾 Data fisik klerk terkunci & hasil rekonsiliasi keluar!', 'success');
+
+      // Rekam data klerk aktif untuk pencetakan struk
+      const klerkRec = {
+        id: 'KLERK-' + Date.now(),
+        date: new Date().toISOString(),
+        cashier: KLERK_SYSTEM_DATA.cashier,
+        shift: KLERK_SYSTEM_DATA.shift,
+        initialFloat: KLERK_SYSTEM_DATA.initialFloat,
+        cashSales: KLERK_SYSTEM_DATA.systemCashSales,
+        nonCashSales: KLERK_SYSTEM_DATA.systemNonCash.reduce((acc, c) => acc + c.amount, 0),
+        totalExpected: targetCash,
+        actualCash: inputCash,
+        difference: diff,
+        notes: (document.getElementById('klerk-input-notes')?.value || '').trim()
+      };
+      if (typeof window !== 'undefined') {
+        window.activeKlerkRecord = klerkRec;
+        window.lastCompletedKlerk = klerkRec;
+      }
     }
 
-    function printKlerkReceipt() {
-      showMockupToast('🖨️ Mencetak Struk Closing Klerk ke printer thermal...', 'success');
+    // ================= SIS PRINTER CONTROLLER =================
+    function updateSisPrinterModalUI() {
+      const dot = document.getElementById("sis-printer-status-dot");
+      const devNameEl = document.getElementById("sis-printer-device-name");
+      const badge = document.getElementById("sis-printer-status-badge");
+      const modeText = document.getElementById("sis-printer-mode-text");
+      const paperText = document.getElementById("sis-printer-paper-text");
+      const btnBt = document.getElementById("sis-driver-btn-bluetooth");
+      const btnSys = document.getElementById("sis-driver-btn-system");
+      const btnRaw = document.getElementById("sis-driver-btn-rawbt");
+      const btActions = document.getElementById("sis-printer-bluetooth-actions");
+      const sysInfo = document.getElementById("sis-printer-system-info");
+      const disconnectBtn = document.getElementById("sis-printer-btn-disconnect");
+      const btn58 = document.getElementById("sis-paper-58-btn");
+      const btn80 = document.getElementById("sis-paper-80-btn");
+
+      const mode = (typeof pos !== "undefined" && pos.settings && pos.settings.printerDriverMode) || "bluetooth";
+      const paper = (typeof pos !== "undefined" && pos.settings && pos.settings.paperWidth) || "58mm";
+
+      if (paperText) paperText.textContent = paper === "80mm" ? "80mm (48 Kolom)" : "58mm (32 Kolom)";
+
+      // Highlight Paper Width Buttons
+      if (btn58 && btn80) {
+        if (paper === "80mm") {
+          btn80.className = "p-2.5 border-2 border-slate-900 bg-slate-50 rounded-xl font-bold text-slate-900 text-xs flex items-center justify-center gap-1.5 cursor-pointer transition";
+          btn58.className = "p-2.5 border border-slate-300 hover:border-slate-400 bg-white rounded-xl font-medium text-slate-600 text-xs flex items-center justify-center gap-1.5 cursor-pointer transition";
+        } else {
+          btn58.className = "p-2.5 border-2 border-slate-900 bg-slate-50 rounded-xl font-bold text-slate-900 text-xs flex items-center justify-center gap-1.5 cursor-pointer transition";
+          btn80.className = "p-2.5 border border-slate-300 hover:border-slate-400 bg-white rounded-xl font-medium text-slate-600 text-xs flex items-center justify-center gap-1.5 cursor-pointer transition";
+        }
+      }
+
+      // Highlight Driver Buttons
+      const activeBtnCls = "py-2 px-1 text-center rounded-xl border-2 border-slate-900 bg-slate-50 font-bold text-slate-900 text-[10px] transition cursor-pointer";
+      const inactiveBtnCls = "py-2 px-1 text-center rounded-xl border border-slate-300 bg-white font-medium text-slate-600 text-[10px] hover:border-slate-400 transition cursor-pointer";
+
+      if (btnBt) btnBt.className = (mode === "bluetooth") ? activeBtnCls : inactiveBtnCls;
+      if (btnSys) btnSys.className = (mode === "system") ? activeBtnCls : inactiveBtnCls;
+      if (btnRaw) btnRaw.className = (mode === "rawbt") ? activeBtnCls : inactiveBtnCls;
+
+      if (mode === "system") {
+        if (modeText) modeText.textContent = "Dialog Sistem / USB / PDF";
+        if (devNameEl) devNameEl.textContent = "Printer USB / Dialog OS / PDF";
+        if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-blue-500";
+        if (badge) {
+          badge.textContent = "SIAP (SISTEM)";
+          badge.className = "px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 font-bold text-[9px] rounded-full uppercase";
+        }
+        if (btActions) btActions.classList.add("hidden");
+        if (sysInfo) sysInfo.classList.remove("hidden");
+      } else if (mode === "rawbt") {
+        if (modeText) modeText.textContent = "RawBT Android";
+        if (devNameEl) devNameEl.textContent = "RawBT Print Service";
+        if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
+        if (badge) {
+          badge.textContent = "SIAP (RAWBT)";
+          badge.className = "px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 font-bold text-[9px] rounded-full uppercase";
+        }
+        if (btActions) btActions.classList.add("hidden");
+        if (sysInfo) sysInfo.classList.add("hidden");
+      } else {
+        // Bluetooth
+        if (modeText) modeText.textContent = "Web Bluetooth BLE";
+        if (btActions) btActions.classList.remove("hidden");
+        if (sysInfo) sysInfo.classList.add("hidden");
+
+        const connected = (typeof isBluetoothConnected === "function") && isBluetoothConnected();
+        const devName = (typeof bluetoothPrinterDevice !== "undefined" && bluetoothPrinterDevice && bluetoothPrinterDevice.name) ||
+                        (typeof pos !== "undefined" && pos.settings && pos.settings.lastPrinterName) || "Printer VSC";
+
+        if (devNameEl) devNameEl.textContent = connected ? devName : (pos?.settings?.lastPrinterName ? (pos.settings.lastPrinterName + " (Siaga)") : "Belum Terhubung");
+
+        if (connected) {
+          if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+          if (badge) {
+            badge.textContent = "TERHUBUNG";
+            badge.className = "px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[9px] rounded-full uppercase";
+          }
+          if (disconnectBtn) disconnectBtn.classList.remove("hidden");
+        } else {
+          if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-slate-400";
+          if (badge) {
+            badge.textContent = "TERPUTUS";
+            badge.className = "px-2 py-0.5 bg-slate-200 text-slate-700 border border-slate-300 font-bold text-[9px] rounded-full uppercase";
+          }
+          if (disconnectBtn) disconnectBtn.classList.add("hidden");
+        }
+      }
+    }
+
+    function selectSisPrinterDriver(mode) {
+      if (typeof changePrinterDriverMode === "function") {
+        changePrinterDriverMode(mode);
+      } else if (typeof pos !== "undefined" && pos.settings) {
+        pos.settings.printerDriverMode = mode;
+        pos.saveSettings();
+      }
+      updateSisPrinterModalUI();
+      if (typeof updateBluetoothUI === "function") updateBluetoothUI();
+      if (typeof updateQuickBluetoothModalUI === "function") updateQuickBluetoothModalUI();
+    }
+
+    function selectSisPaperWidth(width) {
+      if (typeof changePaperWidth === "function") {
+        changePaperWidth(width);
+      } else if (typeof pos !== "undefined" && pos.settings) {
+        pos.settings.paperWidth = width;
+        pos.saveSettings();
+      }
+      updateSisPrinterModalUI();
+      if (typeof updateBluetoothUI === "function") updateBluetoothUI();
+      if (typeof updateQuickBluetoothModalUI === "function") updateQuickBluetoothModalUI();
+    }
+
+    // Eksekusi Cetak Label dari SIS Modal 7
+    function executeSisLabelPrint() {
+      if (typeof openBatchPrintModal === "function") {
+        closeSisModal("sis-modal-label");
+        openBatchPrintModal(typeof currentLabelMode !== "undefined" ? currentLabelMode : "shelf");
+      } else {
+        showToast("⚡ Mengirim perintah cetak label ke printer...", "info");
+        closeSisModal("sis-modal-label");
+      }
+    }
+
+    // Cetak Laporan Shift dari SIS Modal 13
+    function printShiftReportReceipt() {
+      showToast("Mempersiapkan cetak laporan shift kasir...", "info");
+      if (typeof printSalesReport === "function") {
+        printSalesReport();
+      } else {
+        window.print();
+      }
+    }
+
+    // Cetak Rekap Harian Kasir dari SIS Modal 19
+    function printDailyRecapReceipt() {
+      showToast("Mencetak rekap kas & transaksi harian...", "info");
+      window.print();
+    }
+
+    // Render Riwayat Struk dari SIS Modal 2
+    function renderSisReceiptsList() {
+      const container = document.getElementById("sis-receipts-list-container");
+      if (!container) return;
+      const transactions = (typeof pos !== "undefined" && pos.transactions && pos.transactions.length > 0) 
+        ? pos.transactions 
+        : (typeof lastCompletedTransaction !== "undefined" && lastCompletedTransaction ? [lastCompletedTransaction] : []);
+
+      if (transactions.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center text-slate-400 bg-slate-50 border border-slate-200/80 rounded-2xl">
+            <div class="text-3xl mb-1">🧾</div>
+            <p class="font-bold text-xs text-slate-600">Belum Ada Transaksi Kasir</p>
+            <p class="text-[10px] text-slate-400 mt-0.5">Selesaikan transaksi di kasir untuk melihat riwayat struk.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Render 8 transaksi terbaru
+      const recent = [...transactions].reverse().slice(0, 8);
+      container.innerHTML = recent.map((t) => {
+        const grandTotal = t.grandTotal || t.total || 0;
+        const itemCount = (t.items || []).reduce((acc, i) => acc + (i.qty || 1), 0);
+        const timeStr = t.time || (t.date ? new Date(t.date).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "Hari Ini");
+        const method = (t.paymentMethod || t.payment || "TUNAI").toUpperCase();
+        return `
+          <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between hover:bg-slate-100/70 transition">
+            <div>
+              <span class="font-black text-slate-900 text-xs block font-mono">TRX-${t.id}</span>
+              <span class="text-[10px] text-slate-500 block">${timeStr} • ${itemCount} Item • ${t.cashier || 'Kasir'}</span>
+              <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 font-bold text-[9px] rounded-full border border-emerald-200">${method}</span>
+            </div>
+            <div class="text-right">
+              <span class="font-black text-slate-900 font-mono text-sm block">${typeof formatRupiah === 'function' ? formatRupiah(grandTotal) : 'Rp ' + grandTotal.toLocaleString('id-ID')}</span>
+              <button onclick="reprintTransactionById('${t.id}')" class="mt-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-[10px] border border-slate-200 cursor-pointer transition">
+                🖨️ Cetak Ulang
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // ================= SIS ACTION SCREEN CONTROLLERS =================
@@ -9516,6 +9724,14 @@
         // Jika membuka klerk, reset form ke mode input fisik
         if (modalId === 'sis-modal-klerk') {
           resetKlerkForm();
+        }
+        // Jika membuka setting printer, refresh status real-time
+        if (modalId === 'sis-modal-printer') {
+          updateSisPrinterModalUI();
+        }
+        // Jika membuka riwayat struk, render daftar transaksi
+        if (modalId === 'sis-modal-receipts') {
+          renderSisReceiptsList();
         }
       }
     }
@@ -10485,7 +10701,7 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=102')
+        navigator.serviceWorker.register('./sw.js?v=103')
           .then((registration) => {
             registration.update();
             console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
