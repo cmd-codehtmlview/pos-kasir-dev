@@ -2808,49 +2808,49 @@
         <div>
           <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nomor Struk Transaksi Pembeli *</label>
           <div class="flex gap-2">
-            <input type="text" value="TRX-20260922-0034" class="flex-1 px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:border-slate-800" />
-            <button onclick="showMockupToast('🔍 Nota TRX-0034 ditemukan!', 'success');" class="px-3.5 py-2 bg-slate-900 hover:bg-black text-white font-bold rounded-xl cursor-pointer shadow-xs transition">Cari</button>
+            <input type="text" id="sis-retur-invoice-input" placeholder="Masukkan ID struk TRX-..." class="flex-1 px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:border-blue-600" />
+            <button type="button" onclick="searchSisTransactionForRetur()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl cursor-pointer shadow-xs transition">Cari</button>
+          </div>
+          <!-- Quick Chips Struk Terakhir -->
+          <div class="mt-2">
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Struk Terakhir:</span>
+            <div id="sis-retur-recent-chips" class="flex flex-wrap gap-1"></div>
           </div>
         </div>
 
         <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
           <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Pilih Item yang Diretur:</span>
-          <div class="space-y-1.5 text-[11px]">
-            <label class="flex items-center justify-between p-2 bg-white rounded-xl border border-slate-200 cursor-pointer">
-              <div class="flex items-center gap-2">
-                <input type="checkbox" checked class="w-4 h-4 text-slate-900 rounded" />
-                <div>
-                  <span class="font-bold text-slate-900 block">Keripik Singkong Balado 250g</span>
-                  <span class="text-[10px] text-slate-400">Harga: Rp 15.000 • Beli 2 PCS</span>
-                </div>
-              </div>
-              <span class="font-mono font-bold text-slate-800">Retur: 1 PCS</span>
-            </label>
+          <div id="sis-retur-items-container" class="space-y-1.5 max-h-48 overflow-y-auto">
+            <div class="p-4 text-center text-slate-400 bg-white border border-dashed border-slate-200 rounded-xl text-xs">
+              Masukkan nomor struk transaksi atau pilih struk terakhir di atas.
+            </div>
           </div>
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Alasan Retur / Komplain</label>
-          <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-slate-800 bg-white">
-            <option>Kemasan Bocor / Melempem (Cacat Pabrik)</option>
-            <option>Salah Ambil Varian Rasa oleh Pembeli</option>
-            <option>Salah Input Qty Kasir</option>
+          <select id="sis-retur-reason" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-blue-600 bg-white">
+            <option value="Kemasan Rusak / Cacat Pabrik">Kemasan Bocor / Melempem (Cacat Pabrik)</option>
+            <option value="Salah Ambil Varian Rasa oleh Pembeli">Salah Ambil Varian Rasa oleh Pembeli</option>
+            <option value="Salah Input Qty Kasir">Salah Input Qty Kasir</option>
+            <option value="Kadaluarsa / Expired">Produk Kadaluarsa</option>
+            <option value="Lain-lain">Lain-lain</option>
           </select>
         </div>
 
         <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-2xl flex items-center justify-between">
           <div>
             <span class="text-[10px] text-amber-800 font-bold uppercase block">Uang Kembali ke Konsumen:</span>
-            <span class="font-black text-amber-950 text-sm font-mono">Rp 15.000</span>
+            <span id="sis-retur-total-refund" class="font-black text-amber-950 text-sm font-mono">Rp 0</span>
           </div>
-          <span class="text-[10px] text-amber-800 font-bold bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-200">Wajib PIN Supervisor</span>
+          <span class="text-[10px] text-amber-800 font-bold bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-200">Stok Otomatis Kembali</span>
         </div>
       </div>
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-retur')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
-        <button onclick="showMockupToast('↩️ Retur Berhasil Diproses! Cetak Nota Retur...', 'success'); closeSisModal('sis-modal-retur');" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
-          💾 Proses Retur & Restitusi
+        <button onclick="processSisRetur()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
+          💾 Proses Retur &amp; Cetak Nota
         </button>
       </div>
     </div>
@@ -2873,27 +2873,41 @@
       </div>
 
       <div class="p-4 space-y-3.5 text-xs">
-        <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-[11px] text-slate-700 leading-relaxed">
-          💡 <strong>Ketentuan Ritel:</strong> Tarik kas dilakukan saat akumulasi tunai di laci kasir melebihi Rp 1.500.000 untuk mencegah risiko keamanan.
+        <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-[11px] text-slate-700 leading-relaxed flex items-center justify-between">
+          <div>
+            <span class="block text-[10px] text-slate-400 font-bold uppercase">Kas Fisik di Laci Saat Ini:</span>
+            <span id="sis-cashdrop-drawer-cash" class="text-sm font-black font-mono text-emerald-700">Rp 0</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold">Siap Disetor</span>
         </div>
+
         <div>
-          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nominal yang Disetor ke Brankas *</label>
-          <input type="text" value="1.000.000" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-black text-slate-900 text-base focus:outline-none focus:border-slate-800" />
+          <div class="flex items-center justify-between mb-1">
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">Nominal Setoran ke Brankas (Rp) *</label>
+            <div class="flex gap-1">
+              <button type="button" onclick="setSisCashDropPreset(500000)" class="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 rounded text-[9px] font-mono font-bold text-slate-700">500rb</button>
+              <button type="button" onclick="setSisCashDropPreset(1000000)" class="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 rounded text-[9px] font-mono font-bold text-slate-700">1jt</button>
+              <button type="button" onclick="setSisCashDropAllRemaining()" class="px-1.5 py-0.5 bg-emerald-100 hover:bg-emerald-200 rounded text-[9px] font-bold text-emerald-800">Semua</button>
+            </div>
+          </div>
+          <input type="number" id="sis-cashdrop-amount" value="1000000" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-black text-slate-900 text-base focus:outline-none focus:border-slate-800 text-right" />
         </div>
+
         <div>
           <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Supervisor / COS Penerima Brankas *</label>
-          <input type="text" value="Ahmad COS (Kepala Toko)" readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl font-bold text-slate-700" />
+          <input type="text" id="sis-cashdrop-supervisor" value="Ahmad COS (Kepala Toko)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-slate-800" />
         </div>
+
         <div>
           <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Catatan Setoran</label>
-          <input type="text" placeholder="Contoh: Tarik kas shift siang jam 13:00" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-slate-800" />
+          <input type="text" id="sis-cashdrop-notes" placeholder="Contoh: Tarik kas shift siang jam 13:00" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-slate-800" />
         </div>
       </div>
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-cashdrop')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
-        <button onclick="showMockupToast('📥 Setoran Cash Drop Rp 1.000.000 Berhasil Dicatat!', 'success'); closeSisModal('sis-modal-cashdrop');" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
-          💾 Simpan & Cetak Bukti Setor
+        <button onclick="saveSisCashDrop()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
+          💾 Simpan &amp; Cetak Bukti Setor
         </button>
       </div>
     </div>
@@ -4007,11 +4021,11 @@
       <div class="p-4 space-y-3.5 text-xs">
         <div>
           <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">PIN Pejabat Toko (COS / Supervisor) *</label>
-          <input type="password" value="1234" maxlength="6" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-black text-slate-900 text-center tracking-widest text-base focus:outline-none focus:border-slate-800" />
+          <input type="password" id="sis-pin-cos" value="1234" maxlength="8" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-black text-slate-900 text-center tracking-widest text-base focus:outline-none focus:border-amber-500" />
         </div>
         <div>
           <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">PIN Asisten Toko (ACOS) *</label>
-          <input type="password" value="5678" maxlength="6" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-black text-slate-900 text-center tracking-widest text-base focus:outline-none focus:border-slate-800" />
+          <input type="password" id="sis-pin-acos" value="5678" maxlength="8" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-black text-slate-900 text-center tracking-widest text-base focus:outline-none focus:border-amber-500" />
         </div>
 
         <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
@@ -4035,7 +4049,7 @@
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-pin')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
-        <button onclick="showMockupToast('🔐 PIN Otorisasi Berhasil Diperbarui!', 'success'); closeSisModal('sis-modal-pin');" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
+        <button onclick="saveSisPin()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
           💾 Simpan PIN Baru
         </button>
       </div>
@@ -8921,6 +8935,7 @@
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=122"></script>
   <script src="js/sis-logistics.js?v=100"></script>
+  <script src="js/sis-cashier-ops.js?v=100"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -9744,10 +9759,23 @@
         if (modalId === 'sis-modal-waste') {
           if (typeof initSisWasteModal === 'function') initSisWasteModal();
         }
+        // Jika membuka Retur Transaksi
+        if (modalId === 'sis-modal-retur') {
+          if (typeof initSisReturModal === 'function') initSisReturModal();
+        }
+        // Jika membuka Tarik Kas / Cash Drop
+        if (modalId === 'sis-modal-cashdrop') {
+          if (typeof initSisCashDropModal === 'function') initSisCashDropModal();
+        }
+        // Jika membuka Setting PIN Supervisor
+        if (modalId === 'sis-modal-pin') {
+          if (typeof initSisPinModal === 'function') initSisPinModal();
+        }
       }
     }
 
     function closeSisModal(modalId) {
+      if (typeof stopSisScan === 'function') stopSisScan();
       const modal = document.getElementById(modalId);
       if (modal) modal.classList.add('hidden');
     }
@@ -10501,7 +10529,7 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=104')
+        navigator.serviceWorker.register('./sw.js?v=105')
           .then((registration) => {
             registration.update();
             console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
