@@ -148,6 +148,15 @@
               </button>
               <button 
                 type="button" 
+                onclick="toggleSisDrawer()" 
+                class="ml-0.5 px-1.5 py-0.5 bg-slate-900/80 hover:bg-black text-white rounded text-[9px] font-black transition-all flex items-center gap-0.5 flex-shrink-0 cursor-pointer shadow-xs border border-white/20 md:hidden" 
+                title="Buka Menu SIS"
+              >
+                <span>📑</span>
+                <span>SIS</span>
+              </button>
+              <button 
+                type="button" 
                 id="btn-header-store-login" 
                 onclick="openStoreLoginOrAccountModal()" 
                 class="ml-1 px-2 py-0.5 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded text-[9px] sm:text-[10px] font-black transition-all flex items-center gap-1 flex-shrink-0 cursor-pointer shadow-xs border border-yellow-300" 
@@ -178,6 +187,15 @@
           >
             <span>📦</span>
             <span>Semua Produk</span>
+          </button>
+          <button 
+            type="button" 
+            onclick="toggleSisDrawer()" 
+            class="px-3 py-1.5 rounded-lg text-xs font-black transition-all bg-white/15 hover:bg-white/25 text-white flex items-center gap-1.5 cursor-pointer border border-white/20 shadow-xs"
+            title="Buka Menu Sistem Informasi Swalayan / Toko"
+          >
+            <span>📑</span>
+            <span>Menu SIS</span>
           </button>
         </nav>
 
@@ -238,7 +256,7 @@
                   title="Pasang Member untuk transaksi ini"
                 >
                   <span>👤</span>
-                  <span id="active-member-label">+ Member (No. HP)</span>
+                  <span id="active-member-label">+ member</span>
                 </button>
                 <button 
                   id="btn-remove-member" 
@@ -284,14 +302,17 @@
                 📋
               </button>
 
-              <!-- Simbol Minimalis: Scan Barcode Kamera -->
+              <!-- Simbol Minimalis: Scan Barcode Kamera Flat Minimalis -->
               <button 
                 type="button"
                 onclick="openPosCameraScanner()" 
-                class="w-8 h-8 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white flex items-center justify-center text-sm font-black shadow-2xs transition-all cursor-pointer" 
+                class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-600 hover:text-slate-900 border border-slate-300 flex items-center justify-center shadow-2xs transition-all cursor-pointer" 
                 title="Scan Barcode Kamera HP / Laptop [Alt+C]"
               >
-                📷
+                <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
               </button>
             </div>
 
@@ -332,7 +353,7 @@
                 <th class="hidden md:table-cell py-2.5 px-3 w-12 text-center">No</th>
                 <th class="hidden sm:table-cell py-2.5 px-3 w-36">PLU / Barcode</th>
                 <th class="py-2.5 px-2.5 sm:px-3">Nama Produk</th>
-                <th class="py-2.5 px-2 sm:px-3 w-28 sm:w-32 text-center">Qty</th>
+                <th class="py-2.5 px-2 sm:px-3 w-32 sm:w-36 text-center">Qty &amp; Tier</th>
                 <th class="hidden lg:table-cell py-2.5 px-3 w-20 text-center">Satuan</th>
                 <th class="hidden sm:table-cell py-2.5 px-3 w-28 text-right">Harga</th>
                 <th class="hidden lg:table-cell py-2.5 px-3 w-24 text-right">Diskon</th>
@@ -2192,6 +2213,272 @@
       <span class="text-[10px] font-bold tracking-tight mt-0.5">Setting</span>
     </button>
   </nav>
+
+  <!-- ================= SIS DRAWER (SISTEM INFORMASI TOKO MINIMALIS & BERSIH) ================= -->
+  <div id="sis-drawer-backdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 hidden transition-opacity" onclick="toggleSisDrawer()"></div>
+  
+  <div id="sis-drawer" class="fixed top-0 right-0 bottom-0 w-full max-w-xl bg-slate-50 z-50 shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out border-l border-slate-200">
+    
+    <!-- Drawer Header (Clean Modern SaaS Style) -->
+    <div class="px-5 py-3.5 bg-white text-slate-900 flex items-center justify-between border-b border-slate-200/90 shadow-2xs flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-sm shadow-xs flex-shrink-0">
+          🏢
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="font-extrabold text-sm tracking-tight text-slate-900">STORE INFORMATION SYSTEM</h2>
+            <span class="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[9px] font-bold border border-slate-200">SIS</span>
+          </div>
+          <p class="text-[11px] text-slate-500 font-medium">Pusat Administrasi, Logistik &amp; Pengaturan Toko</p>
+        </div>
+      </div>
+      <button onclick="toggleSisDrawer()" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 font-bold flex items-center justify-center text-xs transition active:scale-95 cursor-pointer border border-slate-200" title="Tutup Menu SIS [Esc]">
+        ✕
+      </button>
+    </div>
+
+    <!-- Drawer Content (6 Kategori Bersih Monokrom; Accordion Simetris) -->
+    <div class="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3" id="sis-list-container">
+      
+      <!-- 1. OPERASIONAL KAS & KASIR -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden transition">
+        <button type="button" onclick="toggleSisCategory(1)" class="w-full px-4 py-3.5 bg-white hover:bg-slate-50 text-left flex items-center justify-between gap-3 cursor-pointer group transition select-none">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-slate-200/80 text-slate-700 border border-slate-200/70 flex items-center justify-center text-lg shrink-0 transition shadow-2xs">📋</span>
+            <span class="font-bold text-sm text-slate-900 group-hover:text-retail-red transition truncate">Operasional Kas &amp; Kasir</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+              <svg id="sis-cat-arrow-1" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </span>
+          </div>
+        </button>
+        <div id="sis-cat-sub-1" class="hidden border-t border-slate-100 divide-y divide-slate-100 bg-slate-50/40">
+          <button type="button" onclick="openModal('modal-klerk'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">📋</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Closing Kasir [F11]</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="openModal('modal-retur-transaksi'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">↩️</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Retur Belanja Konsumen</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="openModal('modal-mutations'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">📥</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Tarik Kas / Mutasi Kas</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. LOGISTIK, GUDANG & INVENTORI -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden transition">
+        <button type="button" onclick="toggleSisCategory(2)" class="w-full px-4 py-3.5 bg-white hover:bg-slate-50 text-left flex items-center justify-between gap-3 cursor-pointer group transition select-none">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-slate-200/80 text-slate-700 border border-slate-200/70 flex items-center justify-center text-lg shrink-0 transition shadow-2xs">📦</span>
+            <span class="font-bold text-sm text-slate-900 group-hover:text-retail-red transition truncate">Logistik, Gudang &amp; Inventori</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+              <svg id="sis-cat-arrow-2" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </span>
+          </div>
+        </button>
+        <div id="sis-cat-sub-2" class="hidden border-t border-slate-100 divide-y divide-slate-100 bg-slate-50/40">
+          <button type="button" onclick="openMutationModal(); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">📦</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Penerimaan Barang (LPB)</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="switchTab('tab-inventory'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">🔍</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Master &amp; Cek Harga Produk</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="openBatchPrintModal('shelf'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">🏷️</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Cetak Label Rak &amp; Barcode (Dual-Mode)</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="openStockOpnameModal(); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">📊</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Stock Opname Fisik (SO)</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="openModal('modal-mutations'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">🗑️</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Barang Rusak (Waste BAP)</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="openRepackModal(); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">🔄</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Repack Bal ke Ecer</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. LOYALITAS & MEMBER PELANGGAN -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden transition">
+        <button type="button" onclick="toggleSisCategory(3)" class="w-full px-4 py-3.5 bg-white hover:bg-slate-50 text-left flex items-center justify-between gap-3 cursor-pointer group transition select-none">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-slate-200/80 text-slate-700 border border-slate-200/70 flex items-center justify-center text-lg shrink-0 transition shadow-2xs">💳</span>
+            <span class="font-bold text-sm text-slate-900 group-hover:text-retail-red transition truncate">Loyalitas &amp; Member Pelanggan</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+              <svg id="sis-cat-arrow-3" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </span>
+          </div>
+        </button>
+        <div id="sis-cat-sub-3" class="hidden border-t border-slate-100 divide-y divide-slate-100 bg-slate-50/40">
+          <button type="button" onclick="openMemberModal('search'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">👥</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Database Member (Cari &amp; Daftar)</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="openMemberModal('list'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">🎁</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Aturan &amp; Poin Reward Member</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 4. PERSONIL TOKO & KEAMANAN -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden transition">
+        <button type="button" onclick="toggleSisCategory(4)" class="w-full px-4 py-3.5 bg-white hover:bg-slate-50 text-left flex items-center justify-between gap-3 cursor-pointer group transition select-none">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-slate-200/80 text-slate-700 border border-slate-200/70 flex items-center justify-center text-lg shrink-0 transition shadow-2xs">👤</span>
+            <span class="font-bold text-sm text-slate-900 group-hover:text-retail-red transition truncate">Personil Toko &amp; Keamanan</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+              <svg id="sis-cat-arrow-4" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </span>
+          </div>
+        </button>
+        <div id="sis-cat-sub-4" class="hidden border-t border-slate-100 divide-y divide-slate-100 bg-slate-50/40">
+          <button type="button" onclick="openModal('modal-employee-login'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">👤</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Karyawan &amp; Hak Akses Kasir</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="switchTab('tab-settings'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">🔐</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">PIN &amp; Otoritas Supervisor</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 5. LAPORAN OPERASIONAL TOKO -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden transition">
+        <button type="button" onclick="toggleSisCategory(5)" class="w-full px-4 py-3.5 bg-white hover:bg-slate-50 text-left flex items-center justify-between gap-3 cursor-pointer group transition select-none">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-slate-200/80 text-slate-700 border border-slate-200/70 flex items-center justify-center text-lg shrink-0 transition shadow-2xs">📊</span>
+            <span class="font-bold text-sm text-slate-900 group-hover:text-retail-red transition truncate">Laporan Operasional Toko</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+              <svg id="sis-cat-arrow-5" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </span>
+          </div>
+        </button>
+        <div id="sis-cat-sub-5" class="hidden border-t border-slate-100 divide-y divide-slate-100 bg-slate-50/40">
+          <button type="button" onclick="switchTab('tab-reports'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">📊</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Laporan Penjualan Shift [F10]</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="switchTab('tab-reports'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">📑</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Rekap Kas &amp; Transaksi Harian</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 6. PENGATURAN SISTEM TOKO -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden transition">
+        <button type="button" onclick="toggleSisCategory(6)" class="w-full px-4 py-3.5 bg-white hover:bg-slate-50 text-left flex items-center justify-between gap-3 cursor-pointer group transition select-none">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-slate-200/80 text-slate-700 border border-slate-200/70 flex items-center justify-center text-lg shrink-0 transition shadow-2xs">⚙️</span>
+            <span class="font-bold text-sm text-slate-900 group-hover:text-retail-red transition truncate">Pengaturan Sistem Toko</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="w-7 h-7 rounded-lg bg-slate-100 group-hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+              <svg id="sis-cat-arrow-6" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </span>
+          </div>
+        </button>
+        <div id="sis-cat-sub-6" class="hidden border-t border-slate-100 divide-y divide-slate-100 bg-slate-50/40">
+          <button type="button" onclick="openModal('modal-printer-help'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">🖨️</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Setting Printer Kasir Thermal</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="switchTab('tab-settings'); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">🏪</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Profil &amp; Informasi Toko</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+          <button type="button" onclick="openStoreLoginOrAccountModal(); toggleSisDrawer();" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">☁️</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Lisensi, Akun &amp; Backup Cloud</span>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="p-3 bg-white border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+      <span>SnackPOS Retail System</span>
+      <span class="font-mono text-[10px] text-slate-400">v3.5 SIS</span>
+    </div>
+
+  </div>
+
 
   <!-- ================= MODALS & POPUPS ================= -->
 
@@ -6669,9 +6956,59 @@
       if (dropdown) dropdown.classList.add("hidden");
     }
 
+    // ================= SIS DRAWER & DUAL-VIEW CATALOG =================
+    function toggleSisDrawer() {
+      const drawer = document.getElementById('sis-drawer');
+      const backdrop = document.getElementById('sis-drawer-backdrop');
+      if (!drawer || !backdrop) return;
+
+      const isClosed = drawer.classList.contains('translate-x-full');
+      if (isClosed) {
+        backdrop.classList.remove('hidden');
+        drawer.classList.remove('translate-x-full');
+      } else {
+        drawer.classList.add('translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    function toggleSisCategory(catIndex) {
+      const sub = document.getElementById(`sis-cat-sub-${catIndex}`);
+      const arrow = document.getElementById(`sis-cat-arrow-${catIndex}`);
+      if (!sub) return;
+
+      const isHidden = sub.classList.contains('hidden');
+      for (let i = 1; i <= 6; i++) {
+        const otherSub = document.getElementById(`sis-cat-sub-${i}`);
+        const otherArrow = document.getElementById(`sis-cat-arrow-${i}`);
+        if (otherSub && i !== catIndex) otherSub.classList.add('hidden');
+        if (otherArrow && i !== catIndex) otherArrow.classList.remove('rotate-180');
+      }
+
+      if (isHidden) {
+        sub.classList.remove('hidden');
+        if (arrow) arrow.classList.add('rotate-180');
+      } else {
+        sub.classList.add('hidden');
+        if (arrow) arrow.classList.remove('rotate-180');
+      }
+    }
+
+    let posCatalogViewMode = 'list';
+    let currentPosLiveItems = [];
+    let currentPosLiveQuery = '';
+
+    function setPosCatalogViewMode(mode) {
+      posCatalogViewMode = mode;
+      renderPosLiveSearchDropdown(currentPosLiveItems, currentPosLiveQuery);
+    }
+
     function renderPosLiveSearchDropdown(items, queryLabel) {
       const dropdown = document.getElementById("pos-live-search-dropdown");
       if (!dropdown) return;
+
+      currentPosLiveItems = items || [];
+      currentPosLiveQuery = queryLabel || '';
 
       if (items.length === 0) {
         dropdown.innerHTML = `
@@ -6683,45 +7020,100 @@
         return;
       }
 
-      dropdown.innerHTML = `
-        <div class="p-2.5 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between border-b border-slate-100">
-          <span>Katalog Produk Kasir (${items.length} Item)</span>
+      // Header dengan Tab Switcher Dual-View (List & Grid)
+      const headerHtml = `
+        <div class="p-2.5 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between border-b border-slate-100 flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span>Katalog (${items.length} Item)</span>
+            <div class="inline-flex bg-slate-200/80 p-0.5 rounded-lg text-[10px] font-black">
+              <button 
+                type="button" 
+                onclick="setPosCatalogViewMode('list')" 
+                class="px-2 py-0.5 rounded-md transition ${posCatalogViewMode === 'list' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500 hover:text-slate-800'}"
+              >
+                ☰ List
+              </button>
+              <button 
+                type="button" 
+                onclick="setPosCatalogViewMode('grid')" 
+                class="px-2 py-0.5 rounded-md transition ${posCatalogViewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500 hover:text-slate-800'}"
+              >
+                ⊞ Grid
+              </button>
+            </div>
+          </div>
           <button onclick="hidePosLiveSearch()" class="text-slate-400 hover:text-slate-600 font-black cursor-pointer">✕ Tutup</button>
         </div>
-        <div class="divide-y divide-slate-100">
-          ${items.map(p => `
-            <div onclick="addToCart('${p.id}'); hidePosLiveSearch();" class="p-2.5 hover:bg-yellow-50/80 transition-colors flex items-center justify-between gap-2.5 cursor-pointer group">
-              <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                <img src="${getProductImageSrc(p)}" alt="${p.name}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-slate-200" loading="lazy" onerror="this.onerror=null; this.src=getProductThumbnailSvg('${(p.category || '').replace(/'/g, "\\'")}', '${(p.name || '').replace(/'/g, "\\'")}');">
-                <div class="min-w-0 flex-1">
-                  <!-- Baris Nama Produk & Tombol + Tambah Berdampingan -->
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">${p.name}</span>
-                    <!-- Tombol Tambah di Samping Nama Produk Sesuai Permintaan -->
-                    <button 
-                      type="button" 
-                      onclick="event.stopPropagation(); addToCart('${p.id}'); hidePosLiveSearch();" 
-                      class="px-2 py-0.5 bg-alfa-red hover:bg-red-700 active:scale-95 text-white rounded-md text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
-                      title="Tambah ke Keranjang Kasir"
-                    >
-                      <span>+</span>
-                      <span>Tambah</span>
-                    </button>
-                  </div>
-                  <div class="text-[10px] text-slate-400 font-mono flex items-center gap-2 mt-0.5">
-                    <span>PLU: ${p.barcode || p.id}</span>
-                    <span>•</span>
-                    <span>Stok: <strong class="${p.stock <= p.minStock ? 'text-rose-600 font-bold' : 'text-slate-700'}">${p.stock} ${p.unit || 'pcs'}</strong></span>
-                  </div>
+      `;
+
+      let contentHtml = '';
+      if (posCatalogViewMode === 'grid') {
+        contentHtml = `
+          <div class="p-2.5 grid grid-cols-2 sm:grid-cols-3 gap-2 overflow-y-auto max-h-[380px] bg-slate-50/50">
+            ${items.map(p => `
+              <div 
+                onclick="addToCart('${p.id}'); hidePosLiveSearch();" 
+                class="bg-white border border-slate-200 hover:border-alfa-red rounded-xl p-2 flex flex-col justify-between hover:shadow-xs transition cursor-pointer group select-none"
+              >
+                <div class="flex items-center justify-between gap-1 mb-1.5">
+                  <span class="text-xl">${p.emoji || '🍪'}</span>
+                  <span class="px-1 py-0.2 rounded bg-slate-100 text-slate-600 text-[9px] font-mono font-bold">
+                    Stok: ${p.stock}
+                  </span>
+                </div>
+                <div class="space-y-0.5 mb-1.5">
+                  <h5 class="font-extrabold text-xs text-slate-900 line-clamp-2 leading-tight group-hover:text-alfa-red">${p.name}</h5>
+                  <p class="text-[9px] text-slate-400 font-mono truncate">${p.barcode || p.id}</p>
+                </div>
+                <div class="flex items-center justify-between pt-1 border-t border-slate-100 mt-auto">
+                  <span class="font-mono font-black text-xs text-alfa-red">${formatRupiah(p.price)}</span>
+                  <button 
+                    type="button" 
+                    onclick="event.stopPropagation(); addToCart('${p.id}'); hidePosLiveSearch();" 
+                    class="w-6 h-6 rounded-md bg-alfa-red hover:bg-red-700 active:scale-95 text-white font-black text-xs flex items-center justify-center shadow-2xs cursor-pointer"
+                  >+</button>
                 </div>
               </div>
-              <div class="text-right flex-shrink-0 font-mono font-black text-xs sm:text-sm text-alfa-red">
-                ${formatRupiah(p.price)}
+            `).join("")}
+          </div>
+        `;
+      } else {
+        contentHtml = `
+          <div class="divide-y divide-slate-100 overflow-y-auto max-h-[380px]">
+            ${items.map(p => `
+              <div onclick="addToCart('${p.id}'); hidePosLiveSearch();" class="p-2.5 hover:bg-yellow-50/80 transition-colors flex items-center justify-between gap-2.5 cursor-pointer group">
+                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                  <img src="${getProductImageSrc(p)}" alt="${p.name}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-slate-200" loading="lazy" onerror="this.onerror=null; this.src=getProductThumbnailSvg('${(p.category || '').replace(/'/g, "\\'")}', '${(p.name || '').replace(/'/g, "\\'")}');">
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">${p.name}</span>
+                      <button 
+                        type="button" 
+                        onclick="event.stopPropagation(); addToCart('${p.id}'); hidePosLiveSearch();" 
+                        class="px-2 py-0.5 bg-alfa-red hover:bg-red-700 active:scale-95 text-white rounded-md text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
+                        title="Tambah ke Keranjang Kasir"
+                      >
+                        <span>+</span>
+                        <span>Tambah</span>
+                      </button>
+                    </div>
+                    <div class="text-[10px] text-slate-400 font-mono flex items-center gap-2 mt-0.5">
+                      <span>PLU: ${p.barcode || p.id}</span>
+                      <span>•</span>
+                      <span>Stok: <strong class="${p.stock <= p.minStock ? 'text-rose-600 font-bold' : 'text-slate-700'}">${p.stock} ${p.unit || 'pcs'}</strong></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right flex-shrink-0 font-mono font-black text-xs sm:text-sm text-alfa-red">
+                  ${formatRupiah(p.price)}
+                </div>
               </div>
-            </div>
-          `).join("")}
-        </div>
-      `;
+            `).join("")}
+          </div>
+        `;
+      }
+
+      dropdown.innerHTML = headerHtml + contentHtml;
       dropdown.classList.remove("hidden");
     }
 

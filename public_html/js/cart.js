@@ -37,22 +37,70 @@ function togglePosViewMode(mode) {
 
 function recalculateItemWholesale(item, product) {
   if (!product || !item) return;
-  const minQty = product.wholesaleMinQty || (product.hasMultiUnit ? 12 : 0);
-  const wholesalePrice = product.wholesalePrice || (product.hasMultiUnit && product.lusinPrice ? Math.round(product.lusinPrice / 12) : 0);
-  const hasWholesale = !!((product.hasWholesale || product.hasMultiUnit) && minQty > 1 && wholesalePrice > 0);
 
-  if (hasWholesale && item.qty >= minQty) {
-    item.price = wholesalePrice;
+  // Siapkan tier harga A/B/C
+  item.priceA = product.price || 0;
+  item.priceB = product.wholesalePrice || product.priceB || Math.round((product.price || 0) * 0.9);
+  item.priceC = product.priceC || (product.lusinPrice ? Math.round(product.lusinPrice / 12) : Math.round((product.price || 0) * 0.8));
+
+  const minQtyB = product.wholesaleMinQty || (product.hasMultiUnit ? 12 : 3);
+  const minQtyC = product.minQtyC || product.partaiMinQty || 12;
+
+  // Cek apakah toggle master otomatis aktif
+  let autoTierEnabled = true;
+  try {
+    const autoSetting = localStorage.getItem("snack_pos_auto_multiharga");
+    if (autoSetting !== null) autoTierEnabled = JSON.parse(autoSetting);
+  } catch(e) {}
+
+  // Jika kasir belum memilih tier secara manual dan auto-switch aktif
+  if (!item.tierManual && autoTierEnabled) {
+    if (item.qty >= minQtyC && item.priceC > 0) {
+      item.tier = 'C';
+    } else if (item.qty >= minQtyB && item.priceB > 0) {
+      item.tier = 'B';
+    } else {
+      item.tier = 'A';
+    }
+  } else if (!item.tier) {
+    item.tier = 'A';
+  }
+
+  // Terapkan harga sesuai tier yang aktif
+  if (item.tier === 'C') {
+    item.price = item.priceC;
     item.isWholesale = true;
-    item.wholesaleMinQty = minQty;
-    item.wholesaleSaved = Math.max(0, (product.price - wholesalePrice) * item.qty);
+    item.wholesaleMinQty = minQtyC;
+    item.wholesaleSaved = Math.max(0, (item.priceA - item.priceC) * item.qty);
+  } else if (item.tier === 'B') {
+    item.price = item.priceB;
+    item.isWholesale = true;
+    item.wholesaleMinQty = minQtyB;
+    item.wholesaleSaved = Math.max(0, (item.priceA - item.priceB) * item.qty);
   } else {
-    item.price = product.price;
+    item.tier = 'A';
+    item.price = item.priceA;
     item.isWholesale = false;
-    item.wholesaleMinQty = minQty;
+    item.wholesaleMinQty = minQtyB;
     item.wholesaleSaved = 0;
   }
 }
+
+function changeCartItemTier(index, tier) {
+  if (!pos.cart || !pos.cart[index]) return;
+  const item = pos.cart[index];
+  const product = pos.products.find(p => p.id === item.id);
+  if (!product) return;
+
+  item.tier = tier;
+  item.tierManual = true; // Tandai bahwa kasir sengaja memilih tier manual
+  recalculateItemWholesale(item, product);
+
+  if (typeof sfx !== 'undefined' && sfx.beep) sfx.beep();
+  showToast(`🏷️ ${item.name}: Tier ${tier} aktif (@${formatRupiah(item.price)})`, "info");
+  renderPosCart();
+}
+
 
 function addToCart(productId, quantity = 1) {
   const product = pos.products.find(p => p.id === productId);
@@ -312,29 +360,47 @@ function renderPosCart() {
             <div class="min-w-0">
               <span class="font-bold text-slate-800 text-xs sm:text-sm block leading-snug truncate max-w-[140px] sm:max-w-xs">${item.name}</span>
               <span class="sm:hidden text-[10px] text-slate-500 font-mono block">@ ${formatRupiah(item.price)}</span>
-              ${item.isWholesale ? `
+              ${item.tier && item.tier !== 'A' ? `
+                <span class="text-[9px] sm:text-[10px] font-bold ${item.tier === 'C' ? 'text-purple-800 bg-purple-100 border-purple-300' : 'text-amber-800 bg-amber-100 border-amber-300'} border px-1.5 py-0.2 rounded-md inline-flex items-center gap-1 mt-0.5" title="Tier Harga ${item.tier} Aktif">
+                  🏷️ Tier ${item.tier} (${item.tier === 'C' ? 'Partai' : 'Grosir'}) • Hemat ${formatAngka(item.wholesaleSaved)}
+                </span>
+              ` : (item.isWholesale ? `
                 <span class="text-[9px] sm:text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.2 rounded-md inline-flex items-center gap-1 mt-0.5" title="Harga grosir otomatis aktif">
                   🏷️ Grosir • Hemat ${formatAngka(item.wholesaleSaved)}
                 </span>
-              ` : ''}
+              ` : '')}
             </div>
           </div>
         </td>
         <td class="py-2 px-1 sm:px-3 text-center">
-          <div class="inline-flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden shadow-xs">
-            <button onclick="event.stopPropagation(); updateCartQtyByIndex(${idx}, ${item.qty - 1})" class="qty-btn-touch bg-slate-100 hover:bg-rose-100 text-slate-700 font-bold active:bg-rose-200 cursor-pointer">-</button>
-            <input 
-              type="number" 
-              min="1" 
-              max="${p ? p.stock : 9999}" 
-              value="${item.qty}"
-              onclick="event.stopPropagation(); this.select();"
-              onchange="updateCartQtyByIndex(${idx}, this.value)"
-              onkeydown="if(event.key === 'Enter'){ this.blur(); }"
-              class="w-11 sm:w-14 text-center font-black text-slate-900 text-xs sm:text-sm bg-white border-x border-slate-200 focus:bg-amber-50 focus:outline-none py-1"
-              title="Klik untuk ketik kuantiti langsung"
-            />
-            <button onclick="event.stopPropagation(); updateCartQtyByIndex(${idx}, ${item.qty + 1})" class="qty-btn-touch bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold active:bg-emerald-200 cursor-pointer">+</button>
+          <div class="inline-flex items-center gap-1">
+            <div class="inline-flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden shadow-xs">
+              <button onclick="event.stopPropagation(); updateCartQtyByIndex(${idx}, ${item.qty - 1})" class="qty-btn-touch bg-slate-100 hover:bg-rose-100 text-slate-700 font-bold active:bg-rose-200 cursor-pointer">-</button>
+              <input 
+                type="number" 
+                min="1" 
+                max="${p ? p.stock : 9999}" 
+                value="${item.qty}"
+                onclick="event.stopPropagation(); this.select();"
+                onchange="updateCartQtyByIndex(${idx}, this.value)"
+                onkeydown="if(event.key === 'Enter'){ this.blur(); }"
+                class="w-9 sm:w-12 text-center font-black text-slate-900 text-xs sm:text-sm bg-white border-x border-slate-200 focus:bg-amber-50 focus:outline-none py-1"
+                title="Klik untuk ketik kuantiti langsung"
+              />
+              <button onclick="event.stopPropagation(); updateCartQtyByIndex(${idx}, ${item.qty + 1})" class="qty-btn-touch bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold active:bg-emerald-200 cursor-pointer">+</button>
+            </div>
+            <!-- Dropdown Multi-Harga A / B / C Kasir -->
+            <div class="relative inline-block" onclick="event.stopPropagation();">
+              <select 
+                onchange="changeCartItemTier(${idx}, this.value)"
+                class="px-1 sm:px-1.5 py-1 text-[10px] sm:text-xs font-black rounded-lg border cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all ${item.tier === 'C' ? 'bg-purple-100 text-purple-900 border-purple-300' : item.tier === 'B' ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-slate-100 text-slate-800 border-slate-300'}"
+                title="Pilih Tier Harga Manual: A (Satuan), B (Grosir), C (Partai)"
+              >
+                <option value="A" ${(!item.tier || item.tier === 'A') ? 'selected' : ''}>A</option>
+                <option value="B" ${item.tier === 'B' ? 'selected' : ''}>B</option>
+                <option value="C" ${item.tier === 'C' ? 'selected' : ''}>C</option>
+              </select>
+            </div>
           </div>
         </td>
         <td class="hidden lg:table-cell py-2 px-3 text-slate-500 text-center font-medium">${item.unit || 'Pcs'}</td>

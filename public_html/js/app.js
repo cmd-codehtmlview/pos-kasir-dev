@@ -77,6 +77,11 @@ function setupKeyboardShortcuts() {
     const code = e.code;
 
     if (key === "Escape" || code === "Escape") {
+      const sisDrawer = document.getElementById('sis-drawer');
+      if (sisDrawer && !sisDrawer.classList.contains('translate-x-full')) {
+        if (typeof toggleSisDrawer === 'function') toggleSisDrawer();
+        return;
+      }
       const loginModal = document.getElementById("modal-employee-login");
       if (loginModal && !loginModal.classList.contains("hidden") && !pos.currentUser) {
         return; // Jangan tutup modal login saat kasir terkunci / belum login
