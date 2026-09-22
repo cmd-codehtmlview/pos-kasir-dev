@@ -1244,14 +1244,56 @@
         </div>
 
         <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-800 text-xs uppercase tracking-wider">Scan Barcode Barang Datang:</span>
-            <button onclick="showMockupToast('📷 Scanner Aktif...', 'success');" class="text-slate-600 hover:text-slate-900 font-bold text-[10px] cursor-pointer">📷 Scan Barcode</button>
+          <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Pencarian &amp; Scan Produk Datang:</span>
+          
+          <div class="relative w-full">
+            <div class="bg-white p-2 rounded-xl border border-slate-300 focus-within:border-emerald-600 shadow-2xs flex items-center gap-2 transition">
+              <span class="text-slate-400 pl-1 text-xs flex-shrink-0">🔍</span>
+              <input 
+                type="text" 
+                id="lpb-product-search" 
+                placeholder="Scan barcode / ketik live nama produk datang..." 
+                value="8992761111001"
+                class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent"
+                oninput="handleLogisticsSearch(this.value, 'lpb')"
+                autocomplete="off"
+              />
+              <div class="flex items-center gap-1.5 flex-shrink-0">
+                <!-- Tombol List Produk -->
+                <button 
+                  type="button" 
+                  onclick="toggleLogisticsCatalog('lpb')" 
+                  class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                  title="Tampilkan List Produk Toko"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                </button>
+                <!-- Tombol Camera Scanner Flat Minimalis -->
+                <button 
+                  type="button" 
+                  onclick="triggerLogisticsCameraScan('lpb')" 
+                  class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                  title="Scan Barcode Kamera HP / Webcam"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Dropdown Hasil Live Ketik / List Produk LPB -->
+            <div id="lpb-search-dropdown" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+            </div>
           </div>
-          <div class="flex gap-2">
-            <input type="text" placeholder="Scan barcode produk datang..." value="8992761111001" class="flex-1 px-3 py-1.5 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-slate-800" />
-            <input type="number" value="24" class="w-16 px-2 py-1.5 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center text-xs focus:outline-none focus:border-slate-800" />
-            <button onclick="showMockupToast('✅ Item berhasil ditambahkan ke faktur!', 'success');" class="px-3 py-1.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs transition">+ Tambah</button>
+
+          <div class="flex items-center gap-2 pt-1">
+            <span class="text-[11px] text-slate-500 font-medium">Qty Diterima:</span>
+            <input type="number" id="lpb-qty-input" value="24" class="w-20 px-2 py-1.5 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center text-xs focus:outline-none focus:border-emerald-600" />
+            <button type="button" onclick="addLpbItemFromSearch()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs transition ml-auto flex items-center gap-1">
+              <span>+</span><span>Tambah ke Faktur</span>
+            </button>
           </div>
         </div>
 
@@ -1325,9 +1367,44 @@
 
       <!-- Tab 1: Katalog Produk & Multi-Harga -->
       <div id="prod-tab-content-list" class="p-4 overflow-y-auto space-y-3 flex-1 text-xs">
-        <div class="relative">
-          <input type="text" placeholder="Cari barcode atau nama snack..." class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-emerald-600" />
-          <span class="absolute left-2.5 top-2.5 text-slate-400">🔍</span>
+        <div class="relative w-full">
+          <div class="bg-white p-2 rounded-xl border border-slate-300 focus-within:border-emerald-600 shadow-2xs flex items-center gap-2 transition">
+            <span class="text-slate-400 pl-1 text-xs flex-shrink-0">🔍</span>
+            <input 
+              type="text" 
+              id="products-search-input" 
+              placeholder="Scan barcode / ketik live nama snack..." 
+              class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent"
+              oninput="handleLogisticsSearch(this.value, 'products')"
+              autocomplete="off"
+            />
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <!-- Tombol List Produk -->
+              <button 
+                type="button" 
+                onclick="toggleLogisticsCatalog('products')" 
+                class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                title="Tampilkan Semua Produk"
+              >
+                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+              </button>
+              <!-- Tombol Camera Scanner Flat Minimalis -->
+              <button 
+                type="button" 
+                onclick="triggerLogisticsCameraScan('products')" 
+                class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                title="Scan Barcode Kamera"
+              >
+                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <!-- Dropdown Hasil Live Ketik / List Produk -->
+          <div id="products-search-dropdown" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+          </div>
         </div>
 
         <div class="space-y-2.5">
@@ -1588,6 +1665,47 @@
           <p class="text-center text-[10px] text-slate-500">Format stiker barcode label untuk ditempel langsung di kemasan pouch / plastik snack.</p>
         </div>
 
+        <!-- Search & Scan Barcode Label Rak -->
+        <div class="relative w-full">
+          <div class="bg-white p-2 rounded-xl border border-slate-300 focus-within:border-emerald-600 shadow-2xs flex items-center gap-2 transition">
+            <span class="text-slate-400 pl-1 text-xs flex-shrink-0">🔍</span>
+            <input 
+              type="text" 
+              id="label-product-search" 
+              placeholder="Scan barcode / ketik live nama produk untuk dicetak..." 
+              class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent"
+              oninput="handleLogisticsSearch(this.value, 'label')"
+              autocomplete="off"
+            />
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <!-- Tombol List Produk -->
+              <button 
+                type="button" 
+                onclick="toggleLogisticsCatalog('label')" 
+                class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                title="Tampilkan List Produk Toko"
+              >
+                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+              </button>
+              <!-- Tombol Camera Scanner Flat Minimalis -->
+              <button 
+                type="button" 
+                onclick="triggerLogisticsCameraScan('label')" 
+                class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                title="Scan Barcode Kamera Label"
+              >
+                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <!-- Dropdown Hasil Live Ketik / List Produk Label -->
+          <div id="label-search-dropdown" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+          </div>
+        </div>
+
         <!-- Daftar Pilihan Produk -->
         <div class="space-y-1.5">
           <div class="flex items-center justify-between">
@@ -1651,9 +1769,45 @@
       </div>
 
       <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
-        <div class="flex gap-2">
-          <input type="text" placeholder="Scan barcode barang di lorong rak..." value="8992761111002" class="flex-1 px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:border-slate-800" />
-          <button onclick="showMockupToast('🔍 SKU Basreng dimuat', 'success');" class="px-3.5 py-2 bg-slate-900 hover:bg-black text-white font-bold rounded-xl cursor-pointer shadow-xs transition">Cari</button>
+        <div class="relative w-full">
+          <div class="bg-white p-2 rounded-xl border border-slate-300 focus-within:border-emerald-600 shadow-2xs flex items-center gap-2 transition">
+            <span class="text-slate-400 pl-1 text-xs flex-shrink-0">🔍</span>
+            <input 
+              type="text" 
+              id="so-product-search" 
+              placeholder="Scan barcode di lorong rak / ketik live nama snack..." 
+              value="8992761111002"
+              class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent font-mono" 
+              oninput="handleLogisticsSearch(this.value, 'so')"
+              autocomplete="off"
+            />
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <!-- Tombol List Produk -->
+              <button 
+                type="button" 
+                onclick="toggleLogisticsCatalog('so')" 
+                class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                title="Tampilkan List Produk SO"
+              >
+                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+              </button>
+              <!-- Tombol Camera Scanner Flat Minimalis -->
+              <button 
+                type="button" 
+                onclick="triggerLogisticsCameraScan('so')" 
+                class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                title="Scan Barcode Rak Kamera"
+              >
+                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <!-- Dropdown Hasil Live Ketik / List Produk SO -->
+          <div id="so-search-dropdown" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+          </div>
         </div>
 
         <div class="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2.5">
@@ -1705,12 +1859,48 @@
       </div>
 
       <div class="p-4 space-y-3.5 text-xs">
-        <div>
-          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Pilih Produk Rusak *</label>
-          <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 bg-white focus:outline-none focus:border-slate-800">
-            <option>Keripik Tempe Renyah 150g (Kemasan Bocor)</option>
-            <option>Emping Melinjo Manis 200g (Kadaluarsa)</option>
-          </select>
+        <div class="space-y-1">
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">Pilih Produk Rusak (Scan / Ketik Live) *</label>
+          <div class="relative w-full">
+            <div class="bg-white p-2 rounded-xl border border-slate-300 focus-within:border-emerald-600 shadow-2xs flex items-center gap-2 transition">
+              <span class="text-slate-400 pl-1 text-xs flex-shrink-0">🔍</span>
+              <input 
+                type="text" 
+                id="waste-product-search" 
+                placeholder="Scan barcode / ketik live nama snack rusak..." 
+                value="Keripik Tempe Renyah 150g"
+                class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent" 
+                oninput="handleLogisticsSearch(this.value, 'waste')"
+                autocomplete="off"
+              />
+              <div class="flex items-center gap-1.5 flex-shrink-0">
+                <!-- Tombol List Produk -->
+                <button 
+                  type="button" 
+                  onclick="toggleLogisticsCatalog('waste')" 
+                  class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                  title="Tampilkan List Produk Toko"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                </button>
+                <!-- Tombol Camera Scanner Flat Minimalis -->
+                <button 
+                  type="button" 
+                  onclick="triggerLogisticsCameraScan('waste')" 
+                  class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                  title="Scan Barcode Kamera Barang Rusak"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <!-- Dropdown Hasil Live Ketik / List Produk Waste -->
+            <div id="waste-search-dropdown" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+            </div>
+          </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
@@ -1757,12 +1947,48 @@
       </div>
 
       <div class="p-4 space-y-3.5 text-xs">
-        <div>
-          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Pilih Produk Bal Mentah *</label>
-          <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 bg-white focus:outline-none focus:border-slate-800">
-            <option>Keripik Singkong Bal 5 Kg (Stok: 3 Bal)</option>
-            <option>Makaroni Bal 10 Kg (Stok: 2 Bal)</option>
-          </select>
+        <div class="space-y-1">
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">Pilih Produk Bal Mentah (Scan / Ketik Live) *</label>
+          <div class="relative w-full">
+            <div class="bg-white p-2 rounded-xl border border-slate-300 focus-within:border-emerald-600 shadow-2xs flex items-center gap-2 transition">
+              <span class="text-slate-400 pl-1 text-xs flex-shrink-0">🔍</span>
+              <input 
+                type="text" 
+                id="repack-product-search" 
+                placeholder="Scan barcode bal / ketik live nama snack..." 
+                value="Keripik Singkong Bal 5 Kg"
+                class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent" 
+                oninput="handleLogisticsSearch(this.value, 'repack')"
+                autocomplete="off"
+              />
+              <div class="flex items-center gap-1.5 flex-shrink-0">
+                <!-- Tombol List Produk -->
+                <button 
+                  type="button" 
+                  onclick="toggleLogisticsCatalog('repack')" 
+                  class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                  title="Tampilkan List Produk Toko"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                </button>
+                <!-- Tombol Camera Scanner Flat Minimalis -->
+                <button 
+                  type="button" 
+                  onclick="triggerLogisticsCameraScan('repack')" 
+                  class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                  title="Scan Barcode Kamera Bal"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <!-- Dropdown Hasil Live Ketik / List Produk Repack -->
+            <div id="repack-search-dropdown" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+            </div>
+          </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
@@ -3469,6 +3695,146 @@
         input.focus();
       }
     }
+
+    // =========================================================================
+    // FITUR PENCARIAN LIVE KETIK, LIST PRODUK & SCANNER KAMERA UNTUK LOGISTIK SIS
+    // =========================================================================
+    function handleLogisticsSearch(query, context) {
+      const q = (query || "").trim().toLowerCase();
+      const dropdown = document.getElementById(`${context}-search-dropdown`);
+      if (!dropdown) return;
+
+      if (!q) {
+        dropdown.classList.add('hidden');
+        dropdown.innerHTML = "";
+        return;
+      }
+
+      const matches = mockCatalog.filter(p => 
+        p.name.toLowerCase().includes(q) || 
+        p.barcode.includes(q)
+      );
+
+      renderLogisticsDropdown(matches, context);
+    }
+
+    function toggleLogisticsCatalog(context) {
+      const dropdown = document.getElementById(`${context}-search-dropdown`);
+      const inputId = (
+        context === 'lpb' ? 'lpb-product-search' :
+        context === 'products' ? 'products-search-input' :
+        context === 'label' ? 'label-product-search' :
+        context === 'so' ? 'so-product-search' :
+        context === 'waste' ? 'waste-product-search' :
+        'repack-product-search'
+      );
+      const input = document.getElementById(inputId);
+      if (!dropdown) return;
+
+      if (!dropdown.classList.contains('hidden') && (!input || !input.value || input.value.trim() === "")) {
+        dropdown.classList.add('hidden');
+      } else {
+        renderLogisticsDropdown(mockCatalog, context);
+        if (input) input.focus();
+      }
+    }
+
+    function triggerLogisticsCameraScan(context) {
+      showMockupToast('📷 Kamera Scanner Aktif (0.3s)... Barcode Terdeteksi!', 'success');
+      const sample = mockCatalog[Math.floor(Math.random() * mockCatalog.length)];
+      selectLogisticsProduct(sample.id, context);
+    }
+
+    function renderLogisticsDropdown(items, context) {
+      const dropdown = document.getElementById(`${context}-search-dropdown`);
+      if (!dropdown) return;
+
+      if (items.length === 0) {
+        dropdown.innerHTML = `
+          <div class="p-3 text-center text-xs text-slate-400 bg-white">
+            Produk tidak ditemukan
+          </div>
+        `;
+        dropdown.classList.remove('hidden');
+        return;
+      }
+
+      dropdown.innerHTML = items.map(p => `
+        <div 
+          onclick="selectLogisticsProduct('${p.id}', '${context}')" 
+          class="p-2.5 hover:bg-emerald-50/80 transition flex items-center justify-between gap-2 cursor-pointer group bg-white"
+        >
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="text-base">${p.icon || '🍘'}</span>
+            <div class="min-w-0">
+              <span class="font-bold text-xs text-slate-900 group-hover:text-emerald-700 block truncate">${p.name}</span>
+              <span class="text-[10px] text-slate-400 font-mono block">${p.barcode} • Stok: ${p.stock} ${p.unit}</span>
+            </div>
+          </div>
+          <span class="font-mono font-bold text-xs text-emerald-700 shrink-0">Rp ${p.price.toLocaleString('id-ID')}</span>
+        </div>
+      `).join("");
+
+      dropdown.classList.remove('hidden');
+    }
+
+    function selectLogisticsProduct(productId, context) {
+      const p = mockCatalog.find(item => item.id === productId);
+      if (!p) return;
+
+      const dropdown = document.getElementById(`${context}-search-dropdown`);
+      if (dropdown) dropdown.classList.add('hidden');
+
+      if (context === 'lpb') {
+        const input = document.getElementById('lpb-product-search');
+        if (input) input.value = `${p.name} (${p.barcode})`;
+        showMockupToast(`✅ ${p.name} dipilih untuk Faktur LPB`, 'success');
+      } else if (context === 'products') {
+        const input = document.getElementById('products-search-input');
+        if (input) input.value = p.name;
+        showMockupToast(`🔍 Master ${p.name} dimuat`, 'info');
+      } else if (context === 'label') {
+        const input = document.getElementById('label-product-search');
+        if (input) input.value = p.name;
+        showMockupToast(`🏷️ Label ${p.name} siap dicetak`, 'success');
+      } else if (context === 'so') {
+        const input = document.getElementById('so-product-search');
+        if (input) input.value = p.barcode;
+        const soName = document.querySelector('#sis-modal-so .font-black.text-slate-900.text-xs');
+        if (soName) soName.textContent = p.name;
+        const soSys = document.querySelector('#sis-modal-so .font-mono.font-black.text-slate-800');
+        if (soSys) soSys.textContent = `${p.stock} ${p.unit.toUpperCase()}`;
+        showMockupToast(`📊 Data SO ${p.name} dimuat (Stok: ${p.stock})`, 'success');
+      } else if (context === 'waste') {
+        const input = document.getElementById('waste-product-search');
+        if (input) input.value = `${p.name} (Stok: ${p.stock})`;
+        showMockupToast(`🗑️ ${p.name} dipilih untuk BAP Waste`, 'info');
+      } else if (context === 'repack') {
+        const input = document.getElementById('repack-product-search');
+        if (input) input.value = `${p.name} Bal`;
+        showMockupToast(`🔄 ${p.name} dipilih untuk Repack`, 'info');
+      }
+    }
+
+    function addLpbItemFromSearch() {
+      const input = document.getElementById('lpb-product-search');
+      const qtyInput = document.getElementById('lpb-qty-input');
+      const val = input ? input.value : 'Keripik Tempe Renyah';
+      const qty = qtyInput ? qtyInput.value : '24';
+      showMockupToast(`📥 ${val} (+${qty} bks) ditambahkan ke Faktur LPB!`, 'success');
+    }
+
+    // Auto-close dropdown logistik saat klik di luar
+    document.addEventListener('click', function(e) {
+      ['lpb', 'products', 'label', 'so', 'waste', 'repack'].forEach(ctx => {
+        const dd = document.getElementById(`${ctx}-search-dropdown`);
+        const searchBox = dd ? dd.closest('.relative') : null;
+        if (dd && searchBox && !searchBox.contains(e.target)) {
+          dd.classList.add('hidden');
+        }
+      });
+    });
+
   </script>
 
 </body>
