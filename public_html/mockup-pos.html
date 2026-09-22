@@ -3638,8 +3638,7 @@
 
     // Tambah Produk dari Katalog ke Tabel Kasir (Mendukung Multi-Harga A/B/C)
     function addMockItemFromCatalog(productId) {
-      const sourceCatalog = (context === 'repack-origin') ? mockBulkCatalog : mockCatalog;
-      const p = sourceCatalog.find(item => item.id === productId);
+      const p = mockCatalog.find(item => item.id === productId);
       if (!p) return;
 
       const table = document.getElementById('mock-cart-table');
@@ -3781,6 +3780,14 @@
       }
     }
 
+    // Katalog Bahan Baku Bal Mentah (Khusus Produk Asal Repacking)
+    const mockBulkCatalog = [
+      { id: "B1", barcode: "8992761111901", name: "Keripik Singkong Bal 5 Kg", price: 110000, stock: 3, unit: "Bal", icon: "📦" },
+      { id: "B2", barcode: "8992761111902", name: "Makaroni Bantet Bal 10 Kg", price: 180000, stock: 2, unit: "Bal", icon: "📦" },
+      { id: "B3", barcode: "8992761111903", name: "Basreng Mentah Curah Bal 5 Kg", price: 130000, stock: 4, unit: "Bal", icon: "📦" },
+      { id: "B4", barcode: "8992761111904", name: "Kacang Tanah Kupas Bal 10 Kg", price: 220000, stock: 5, unit: "Bal", icon: "📦" }
+    ];
+
     // =========================================================================
     // FITUR PENCARIAN LIVE KETIK, LIST PRODUK & SCANNER KAMERA UNTUK LOGISTIK SIS
     // =========================================================================
@@ -3868,7 +3875,8 @@
     }
 
     function selectLogisticsProduct(productId, context) {
-      const p = mockCatalog.find(item => item.id === productId);
+      const sourceList = (context === 'repack-origin') ? mockBulkCatalog : mockCatalog;
+      const p = sourceList.find(item => item.id === productId);
       if (!p) return;
 
       const dropdown = document.getElementById(`${context}-search-dropdown`);
@@ -3931,13 +3939,6 @@
     });
 
 
-    // Katalog Bahan Baku Bal Mentah (Khusus Produk Asal Repacking)
-    const mockBulkCatalog = [
-      { id: "B1", barcode: "8992761111901", name: "Keripik Singkong Bal 5 Kg", price: 110000, stock: 3, unit: "Bal", icon: "📦" },
-      { id: "B2", barcode: "8992761111902", name: "Makaroni Bantet Bal 10 Kg", price: 180000, stock: 2, unit: "Bal", icon: "📦" },
-      { id: "B3", barcode: "8992761111903", name: "Basreng Mentah Curah Bal 5 Kg", price: 130000, stock: 4, unit: "Bal", icon: "📦" },
-      { id: "B4", barcode: "8992761111904", name: "Kacang Tanah Kupas Bal 10 Kg", price: 220000, stock: 5, unit: "Bal", icon: "📦" }
-    ];
 
     function updateRepackSummary() {
       const qOrigin = document.getElementById('repack-qty-origin')?.value || '1';
