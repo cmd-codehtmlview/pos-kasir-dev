@@ -1,4 +1,4 @@
-const CACHE_NAME = 'snackpos-cache-v105';
+const CACHE_NAME = 'snackpos-cache-v106';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -33,6 +33,7 @@ const STATIC_ASSETS = [
   './js/printer.js',
   './js/sis-logistics.js',
   './js/sis-cashier-ops.js',
+  './js/sis-store-crm.js',
   './js/app.js'
 ];
 
