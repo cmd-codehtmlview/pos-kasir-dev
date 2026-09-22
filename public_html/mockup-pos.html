@@ -146,34 +146,39 @@
             onkeydown="if(event.key==='Enter') handleMockupEnterSearch()"
           />
           
-          <!-- Simbol Minimalis: Lihat All Produk & Scan Barcode Kamera (Tombol Tambah di Kolom Dihilangkan) -->
-          <div class="flex items-center gap-1 flex-shrink-0">
-            <!-- Simbol Minimalis: Lihat All Produk -->
+          <!-- Simbol Minimalis: Tampilkan Galeri & List Produk serta Scan Barcode Kamera -->
+          <div class="flex items-center gap-1.5 flex-shrink-0">
+            <!-- Simbol Minimalis: Tampilkan Semua Produk Toko (Pilihan List & Galeri Grid) -->
             <button 
               type="button" 
               onclick="toggleMockupAllProducts()" 
-              class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center text-xs sm:text-sm font-bold transition border border-slate-200 cursor-pointer" 
-              title="Lihat Semua Produk Toko"
+              class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+              title="Tampilkan Produk (Pilihan List & Galeri Grid)"
             >
-              📋
+              <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
             </button>
             
-            <!-- Simbol Minimalis: Scan Barcode Kamera -->
+            <!-- Simbol Minimalis: Scan Barcode Kamera (Flat Minimalis Sederhana) -->
             <button 
               type="button" 
               onclick="triggerMockupCameraScan()" 
-              class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white active:scale-95 flex items-center justify-center text-xs sm:text-sm font-bold transition shadow-2xs cursor-pointer" 
+              class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
               title="Scan Barcode Kamera HP / Webcam"
             >
-              📷
+              <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
             </button>
           </div>
         </div>
 
-        <!-- Dropdown Live Search (Dengan Tombol + Tambah di Samping Nama Produk) -->
+        <!-- Dropdown Live Search & Galeri Produk (Dengan Pilihan Tampilan List & Grid) -->
         <div 
           id="mock-live-search-dropdown" 
-          class="hidden absolute z-40 left-0 right-0 top-full mt-1.5 bg-white border-2 border-retail-red/70 rounded-2xl shadow-2xl max-h-72 overflow-y-auto divide-y divide-slate-100"
+          class="hidden absolute z-40 left-0 right-0 top-full mt-1.5 bg-white border border-slate-300 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] sm:max-h-[32rem]"
         >
           <!-- Diisi otomatis oleh handleMockupLiveSearch() -->
         </div>
@@ -193,9 +198,8 @@
               onkeydown="if(event.key==='Enter') applyMockMember()"
             />
           </div>
-          <button type="button" onclick="applyMockMember()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex-shrink-0 cursor-pointer shadow-xs flex items-center gap-1 active:scale-95">
-            <span>+</span>
-            <span>Tambah Member</span>
+          <button type="button" onclick="applyMockMember()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex-shrink-0 cursor-pointer shadow-xs flex items-center gap-1 active:scale-95" title="Tambah Member">
+            <span>+ member</span>
           </button>
         </div>
 
@@ -2736,7 +2740,7 @@
       qtyEl.textContent = currentQty;
 
       // Auto Tier Detection jika diizinkan (atau kasir manual tetap dihormati)
-      const tierSelect = row.querySelector('.tier-selector');
+      const tierSelect = row.querySelector('.tier-selector, .item-tier-select');
       const minB = parseInt(row.getAttribute('data-min-b')) || 10;
       const minC = parseInt(row.getAttribute('data-min-c')) || 50;
 
@@ -2764,7 +2768,7 @@
       if (!tierSelect || !qtyEl || !unitPriceEl || !totalPriceEl) return;
 
       const tier = tierSelect.value;
-      const priceA = parseInt(row.getAttribute('data-price-a')) || 12000;
+      const priceA = parseInt(row.getAttribute('data-price-a') || row.getAttribute('data-base-price')) || 12000;
       const priceB = parseInt(row.getAttribute('data-price-b')) || 10500;
       const priceC = parseInt(row.getAttribute('data-price-c')) || 9200;
       const qty = parseInt(qtyEl.textContent) || 1;
@@ -3110,19 +3114,29 @@
       }
     });
 
-    // Katalog Master Produk Mockup Kasir
+    // Katalog Master Produk Mockup Kasir (Lengkap dengan Icon Galeri & Multi-Harga)
     const mockCatalog = [
-      { id: "P1", barcode: "8992761111001", name: "Keripik Tempe Renyah 150g", price: 12000, stock: 45, unit: "Bks" },
-      { id: "P2", barcode: "8992761111002", name: "Basreng Pedas Daun Jeruk 200g", price: 15000, stock: 32, unit: "Bks" },
-      { id: "P3", barcode: "8992761111003", name: "Makaroni Bantet Super Pedas", price: 8500, stock: 60, unit: "Bks" },
-      { id: "P4", barcode: "8992761111004", name: "Keripik Kaca Original 100g", price: 10000, stock: 24, unit: "Bks" },
-      { id: "P5", barcode: "8992761111005", name: "Usus Crispy Renyah Gurih 120g", price: 14000, stock: 18, unit: "Bks" },
-      { id: "P6", barcode: "8992761111006", name: "Cimol Kering Pedas Balado", price: 9000, stock: 40, unit: "Bks" },
-      { id: "P7", barcode: "8992761111007", name: "Seblak Kering Komplit Level 5", price: 11000, stock: 15, unit: "Bks" },
-      { id: "P8", barcode: "8992761111008", name: "Kacang Bali Gurih Asin 250g", price: 18000, stock: 28, unit: "Bks" },
-      { id: "P9", barcode: "8992761111009", name: "Pilus Rumput Laut Crispy", price: 7500, stock: 55, unit: "Bks" },
-      { id: "P10", barcode: "8992761111010", name: "Mie Lidi Si Umang Pedas 130g", price: 13500, stock: 22, unit: "Bks" }
+      { id: "P1", barcode: "8992761111001", name: "Keripik Tempe Renyah 150g", price: 12000, priceB: 10500, priceC: 9200, stock: 45, unit: "Bks", icon: "🍘", category: "Keripik" },
+      { id: "P2", barcode: "8992761111002", name: "Basreng Pedas Daun Jeruk 200g", price: 15000, priceB: 13500, priceC: 12000, stock: 32, unit: "Bks", icon: "🌶️", category: "Pedas" },
+      { id: "P3", barcode: "8992761111003", name: "Makaroni Bantet Super Pedas", price: 8500, priceB: 7500, priceC: 6800, stock: 60, unit: "Bks", icon: "🍝", category: "Pedas" },
+      { id: "P4", barcode: "8992761111004", name: "Keripik Kaca Original 100g", price: 10000, priceB: 9000, priceC: 8000, stock: 24, unit: "Bks", icon: "✨", category: "Keripik" },
+      { id: "P5", barcode: "8992761111005", name: "Usus Crispy Renyah Gurih 120g", price: 14000, priceB: 12500, priceC: 11000, stock: 18, unit: "Bks", icon: "🍗", category: "Gorengan" },
+      { id: "P6", barcode: "8992761111006", name: "Cimol Kering Pedas Balado", price: 9000, priceB: 8000, priceC: 7200, stock: 40, unit: "Bks", icon: "🍡", category: "Pedas" },
+      { id: "P7", barcode: "8992761111007", name: "Seblak Kering Komplit Level 5", price: 11000, priceB: 9800, priceC: 8800, stock: 15, unit: "Bks", icon: "🔥", category: "Pedas" },
+      { id: "P8", barcode: "8992761111008", name: "Kacang Bali Gurih Asin 250g", price: 18000, priceB: 16000, priceC: 14500, stock: 28, unit: "Bks", icon: "🥜", category: "Kacang" },
+      { id: "P9", barcode: "8992761111009", name: "Pilus Rumput Laut Crispy", price: 7500, priceB: 6800, priceC: 6000, stock: 55, unit: "Bks", icon: "🟢", category: "Snack" },
+      { id: "P10", barcode: "8992761111010", name: "Mie Lidi Si Umang Pedas 130g", price: 13500, priceB: 12000, priceC: 10800, stock: 22, unit: "Bks", icon: "🥢", category: "Pedas" }
     ];
+
+    // State Tampilan Katalog: 'list' atau 'grid' (Galeri Produk)
+    let catalogViewMode = 'list';
+    let currentCatalogItems = mockCatalog;
+    let currentCatalogLabel = 'Semua Produk Toko';
+
+    function setCatalogViewMode(mode) {
+      catalogViewMode = mode;
+      renderMockupLiveDropdown(currentCatalogItems, currentCatalogLabel);
+    }
 
     // Live Search Otomatis (Ketik Langsung Muncul Hasil)
     function handleMockupLiveSearch(query) {
@@ -3142,10 +3156,12 @@
         p.barcode.includes(q)
       );
 
-      renderMockupLiveDropdown(matches, q);
+      currentCatalogItems = matches;
+      currentCatalogLabel = `Pencarian: "${query}"`;
+      renderMockupLiveDropdown(matches, currentCatalogLabel);
     }
 
-    // Toggle Tampilkan Seluruh Produk (Tombol Minimalis 📋)
+    // Toggle Tampilkan Seluruh Produk (Tombol Minimalis)
     function toggleMockupAllProducts() {
       const dropdown = document.getElementById('mock-live-search-dropdown');
       const input = document.getElementById('mock-barcode-input');
@@ -3154,19 +3170,22 @@
       if (!dropdown.classList.contains('hidden') && (!input.value || input.value.trim() === "")) {
         dropdown.classList.add('hidden');
       } else {
-        renderMockupLiveDropdown(mockCatalog, "Semua Produk Toko");
+        currentCatalogItems = mockCatalog;
+        currentCatalogLabel = "Semua Produk Toko";
+        renderMockupLiveDropdown(mockCatalog, currentCatalogLabel);
         if (input) input.focus();
       }
     }
 
-    // Render Dropdown Hasil Pencarian (Tombol + Tambah Ditaruh di Samping Nama Produk)
+    // Render Dropdown Hasil Pencarian & Galeri Produk (Dengan Pilihan Tampilan List dan Grid)
     function renderMockupLiveDropdown(items, queryLabel) {
       const dropdown = document.getElementById('mock-live-search-dropdown');
       if (!dropdown) return;
 
       if (items.length === 0) {
         dropdown.innerHTML = `
-          <div class="p-4 text-center text-xs text-slate-400">
+          <div class="p-6 text-center text-xs text-slate-400 bg-white">
+            <span class="text-2xl block mb-1">🔍</span>
             Produk tidak ditemukan untuk "<strong>${queryLabel}</strong>"
           </div>
         `;
@@ -3174,47 +3193,140 @@
         return;
       }
 
-      dropdown.innerHTML = `
-        <div class="p-2 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between border-b border-slate-100">
-          <span>Hasil Pencarian: ${items.length} Produk</span>
-          <button onclick="document.getElementById('mock-live-search-dropdown').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black">✕ Tutup</button>
-        </div>
-        <div class="divide-y divide-slate-100">
-          ${items.map(p => `
-            <div class="p-2.5 hover:bg-amber-50/70 transition-colors flex items-center justify-between gap-2.5 cursor-pointer group" onclick="addMockItemFromCatalog('${p.id}')">
-              <div class="min-w-0 flex-1">
-                <!-- Baris Nama Produk & Tombol + Tambah Berdampingan -->
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">${p.name}</span>
-                  <!-- Tombol Tambah Produk di Samping Nama Produk Sesuai Permintaan -->
-                  <button 
-                    type="button" 
-                    onclick="event.stopPropagation(); addMockItemFromCatalog('${p.id}');" 
-                    class="px-2 py-0.5 bg-retail-red hover:bg-red-700 active:scale-95 text-white rounded-lg text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
-                    title="Tambah Produk ke Keranjang"
-                  >
-                    <span>+</span>
-                    <span>Tambah</span>
-                  </button>
-                </div>
-                <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
-                  <span>${p.barcode}</span>
-                  <span>•</span>
-                  <span>Stok: <strong class="text-slate-700">${p.stock} ${p.unit}</strong></span>
-                </div>
-              </div>
-              <div class="text-right flex-shrink-0 font-mono font-black text-xs sm:text-sm text-retail-red">
-                Rp ${p.price.toLocaleString('id-ID')}
-              </div>
+      // Header Bar dengan Pilihan Mode Tampilan (List vs Grid Galeri) & Tombol Tutup
+      const headerHtml = `
+        <div class="p-2 sm:p-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2 flex-shrink-0 select-none">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="text-xs font-black text-slate-900 tracking-tight">Katalog Produk</span>
+            <span class="px-1.5 py-0.5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-bold">${items.length}</span>
+            <span class="text-[10px] text-slate-400 font-medium hidden sm:inline truncate max-w-[120px]">• ${queryLabel}</span>
+          </div>
+          
+          <div class="flex items-center gap-1.5 flex-shrink-0">
+            <!-- Switcher List vs Grid Galeri -->
+            <div class="flex items-center bg-slate-200/90 p-0.5 rounded-xl text-[11px] font-bold">
+              <button 
+                type="button" 
+                onclick="event.stopPropagation(); setCatalogViewMode('list')" 
+                class="px-2.5 py-1 rounded-lg transition flex items-center gap-1 cursor-pointer ${catalogViewMode === 'list' ? 'bg-white text-slate-900 shadow-2xs font-extrabold' : 'text-slate-600 hover:text-slate-900'}"
+                title="Tampilan List"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <span>List</span>
+              </button>
+              <button 
+                type="button" 
+                onclick="event.stopPropagation(); setCatalogViewMode('grid')" 
+                class="px-2.5 py-1 rounded-lg transition flex items-center gap-1 cursor-pointer ${catalogViewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs font-extrabold' : 'text-slate-600 hover:text-slate-900'}"
+                title="Tampilan Grid Galeri"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                <span>Grid</span>
+              </button>
             </div>
-          `).join("")}
+
+            <!-- Tombol Tutup Dropdown -->
+            <button 
+              type="button"
+              onclick="document.getElementById('mock-live-search-dropdown').classList.add('hidden')" 
+              class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-xs font-bold transition cursor-pointer"
+              title="Tutup Katalog"
+            >✕</button>
+          </div>
         </div>
       `;
 
+      let contentHtml = '';
+      if (catalogViewMode === 'grid') {
+        // Tampilan Mode Grid (Galeri Produk Kartu Visual)
+        contentHtml = `
+          <div class="p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 overflow-y-auto flex-1 bg-slate-50/50">
+            ${items.map(p => `
+              <div 
+                onclick="addMockItemFromCatalog('${p.id}')"
+                class="bg-white border border-slate-200 hover:border-retail-red rounded-2xl p-2.5 flex flex-col justify-between hover:shadow-md transition-all cursor-pointer group relative overflow-hidden select-none"
+              >
+                <!-- Thumbnail / Icon Visual -->
+                <div class="w-full h-20 sm:h-24 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50/60 border border-amber-100/80 flex flex-col items-center justify-center relative mb-2 group-hover:scale-[1.02] transition">
+                  <span class="text-3xl sm:text-4xl">${p.icon || '🍘'}</span>
+                  <span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md bg-white/95 text-slate-700 text-[9px] font-mono font-bold shadow-2xs border border-slate-100">
+                    Stok: ${p.stock}
+                  </span>
+                </div>
+
+                <!-- Informasi Snack -->
+                <div class="space-y-0.5 mb-2">
+                  <h4 class="font-extrabold text-xs text-slate-900 leading-snug line-clamp-2 group-hover:text-retail-red transition">
+                    ${p.name}
+                  </h4>
+                  <p class="text-[9px] text-slate-400 font-mono truncate">${p.barcode}</p>
+                </div>
+
+                <!-- Harga & Tombol Tambah Cepat -->
+                <div class="flex items-center justify-between pt-1.5 border-t border-slate-100 mt-auto">
+                  <span class="font-mono font-black text-xs sm:text-sm text-retail-red">
+                    Rp ${p.price.toLocaleString('id-ID')}
+                  </span>
+                  <button 
+                    type="button" 
+                    onclick="event.stopPropagation(); addMockItemFromCatalog('${p.id}');"
+                    class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-retail-red hover:bg-red-700 active:scale-90 text-white font-black text-xs flex items-center justify-center shadow-xs transition cursor-pointer"
+                    title="Tambah ke Keranjang"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      } else {
+        // Tampilan Mode List (Daftar Baris Rapi)
+        contentHtml = `
+          <div class="divide-y divide-slate-100 overflow-y-auto flex-1 bg-white">
+            ${items.map(p => `
+              <div 
+                class="p-2.5 hover:bg-amber-50/70 transition-colors flex items-center justify-between gap-2.5 cursor-pointer group" 
+                onclick="addMockItemFromCatalog('${p.id}')"
+              >
+                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-800 border border-amber-200/60 flex items-center justify-center text-lg flex-shrink-0">
+                    ${p.icon || '🍘'}
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">${p.name}</span>
+                      <button 
+                        type="button" 
+                        onclick="event.stopPropagation(); addMockItemFromCatalog('${p.id}');" 
+                        class="px-2 py-0.5 bg-retail-red hover:bg-red-700 active:scale-95 text-white rounded-lg text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
+                        title="Tambah Produk ke Keranjang"
+                      >
+                        <span>+</span>
+                        <span>Tambah</span>
+                      </button>
+                    </div>
+                    <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                      <span>${p.barcode}</span>
+                      <span>•</span>
+                      <span>Stok: <strong class="text-slate-700">${p.stock} ${p.unit}</strong></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right flex-shrink-0 font-mono font-black text-xs sm:text-sm text-retail-red">
+                  Rp ${p.price.toLocaleString('id-ID')}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      dropdown.innerHTML = headerHtml + contentHtml;
       dropdown.classList.remove('hidden');
     }
 
-    // Tambah Produk dari Katalog ke Tabel Kasir
+    // Tambah Produk dari Katalog ke Tabel Kasir (Mendukung Multi-Harga A/B/C)
     function addMockItemFromCatalog(productId) {
       const p = mockCatalog.find(item => item.id === productId);
       if (!p) return;
@@ -3223,27 +3335,57 @@
       const input = document.getElementById('mock-barcode-input');
       const dropdown = document.getElementById('mock-live-search-dropdown');
 
-      const count = table.children.length + 1;
-      const row = document.createElement('div');
-      row.className = "p-3 grid grid-cols-12 gap-2 items-center hover:bg-slate-50 text-xs transition bg-amber-50/30";
-      row.innerHTML = `
-        <span class="col-span-1 text-center font-bold text-slate-400">${count}</span>
-        <div class="col-span-5 min-w-0">
-          <h4 class="font-extrabold text-slate-900 text-sm truncate">${p.name}</h4>
-          <p class="text-[10px] text-slate-400 font-mono">${p.barcode} • Sisa ${p.stock}</p>
-        </div>
-        <div class="col-span-2 flex items-center justify-center gap-1.5">
-          <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">-</button>
-          <span class="font-black text-sm w-5 text-center">1</span>
-          <button class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center">+</button>
-        </div>
-        <span class="col-span-2 text-right font-mono font-semibold text-slate-600">${p.price.toLocaleString('id-ID')}</span>
-        <div class="col-span-2 text-right font-mono font-extrabold text-slate-900 text-sm flex items-center justify-end gap-1">
-          <span>${p.price.toLocaleString('id-ID')}</span>
-          <button onclick="this.closest('.grid').remove()" class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-1">✕</button>
-        </div>
-      `;
-      table.appendChild(row);
+      // Cek apakah produk sudah ada di keranjang kasir
+      const existingRow = Array.from(table.children).find(row => {
+        const titleEl = row.querySelector('h4');
+        return titleEl && titleEl.textContent.trim() === p.name;
+      });
+
+      if (existingRow) {
+        // Tambah kuantiti +1 jika sudah ada
+        const plusBtn = existingRow.querySelectorAll('button')[1];
+        if (plusBtn) {
+          updateMockItemQty(plusBtn, 1);
+        }
+      } else {
+        const count = table.children.length + 1;
+        const row = document.createElement('div');
+        row.className = "p-2.5 sm:p-3 grid grid-cols-12 gap-1.5 sm:gap-2 items-center hover:bg-slate-50 text-xs transition bg-amber-50/20";
+        row.setAttribute('data-product-id', p.id);
+        row.setAttribute('data-base-price', p.price);
+        row.setAttribute('data-price-a', p.price);
+        row.setAttribute('data-price-b', p.priceB || Math.round(p.price * 0.9));
+        row.setAttribute('data-price-c', p.priceC || Math.round(p.price * 0.8));
+        row.setAttribute('data-min-b', '10');
+        row.setAttribute('data-min-c', '50');
+
+        row.innerHTML = `
+          <span class="col-span-1 text-center font-bold text-slate-400 hidden sm:inline">${count}</span>
+          <div class="col-span-5 sm:col-span-4 min-w-0">
+            <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">${p.name}</h4>
+            <p class="text-[10px] text-slate-400 font-mono truncate item-unit-label">@${p.price.toLocaleString('id-ID')} • ${p.barcode}</p>
+          </div>
+          <div class="col-span-3 sm:col-span-2 flex items-center justify-center gap-1">
+            <button type="button" onclick="updateMockItemQty(this, -1)" class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+            <span class="font-black text-xs sm:text-sm w-4 sm:w-5 text-center item-qty">1</span>
+            <button type="button" onclick="updateMockItemQty(this, 1)" class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
+          </div>
+          <div class="col-span-1 flex items-center justify-center">
+            <select onchange="onMockTierChange(this)" class="tier-selector item-tier-select px-1 sm:px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 font-black text-[11px] rounded-lg border border-slate-300 text-slate-800 cursor-pointer focus:outline-none focus:ring-1 focus:ring-slate-500" title="Pilih Tier Harga (A: Satuan, B: Grosir, C: Pabrik)">
+              <option value="A" selected>A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </div>
+          <span class="col-span-2 text-right font-mono font-semibold text-slate-600 hidden sm:inline item-unit-price">${p.price.toLocaleString('id-ID')}</span>
+          <div class="col-span-3 sm:col-span-2 text-right font-mono font-extrabold text-slate-900 text-xs sm:text-sm flex items-center justify-end gap-1">
+            <span class="truncate item-total-price">${p.price.toLocaleString('id-ID')}</span>
+            <button type="button" onclick="this.closest('.grid').remove(); updateMockCartSummary();" class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-0.5 cursor-pointer" title="Hapus item">✕</button>
+          </div>
+        `;
+        table.appendChild(row);
+        updateMockCartSummary();
+      }
 
       showMockupToast(`+1 ${p.name} masuk keranjang`, "success");
 
