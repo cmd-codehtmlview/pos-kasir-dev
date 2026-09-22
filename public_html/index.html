@@ -59,7 +59,7 @@
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-bebas { font-family: 'Bebas Neue', sans-serif; }
   </style>
-  <link rel="stylesheet" href="style.css?v=121">
+  <link rel="stylesheet" href="style.css?v=122">
 
   <!-- PWA Manifest & App Icons -->
   <link rel="manifest" id="app-manifest" href="manifest.json">
@@ -227,7 +227,7 @@
   </header>
 
   <!-- ================= KONTEN UTAMA ================= -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 lg:p-6 pb-36 sm:pb-44 no-print">
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 lg:p-6 pb-24 sm:pb-28 lg:pb-16 no-print">
 
     <!-- TAB 1: KASIR TRANSAKSI UTAMA (POS) -->
     <!-- TAB 1: KASIR TRANSAKSI UTAMA (COCKPIT TRANSAKSI MODERN) -->
@@ -325,8 +325,8 @@
             </div>
           </div>
 
-          <!-- Tabel Daftar Belanja Kasir (Tinggi Adaptif di Layar HP 9:16 & 9:18) -->
-          <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col h-[300px] sm:h-[380px] lg:h-[calc(100vh-250px)] lg:min-h-[440px]">
+          <!-- Tabel Daftar Belanja Kasir (Tinggi Adaptif di Layar HP & Desktop) -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col pos-cart-table-container">
             
             <!-- Header Tabel (Kolom Tier Harga A/B/C di samping Qty) -->
             <div class="bg-slate-800 text-white text-xs font-bold px-3 py-2.5 grid grid-cols-12 gap-1.5 sm:gap-2 uppercase tracking-wider">
@@ -8898,7 +8898,7 @@
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
   <script src="js/scanner.js?v=103"></script>
-  <script src="js/cart.js?v=103"></script>
+  <script src="js/cart.js?v=104"></script>
   <script src="js/printer.js?v=124"></script>
   <script src="js/checkout.js?v=108"></script>
   <script src="js/member.js?v=108"></script>
@@ -10552,7 +10552,7 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=111')
+        navigator.serviceWorker.register('./sw.js?v=112')
           .then((registration) => {
             registration.update();
             console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

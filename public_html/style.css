@@ -1001,3 +1001,34 @@ html, body {
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+@media (min-width: 640px) {
+  #print-spooler-widget.closing {
+    transform: translate(-50%, 15px) !important;
+  }
+}
+
+/* =========================================================
+   ADAPTIVE POS CART TABLE CONTAINER (MOBILE & DESKTOP)
+   Mengisi tinggi layar HP secara adaptif, memangkas ruang
+   kosong di bawah tabel & mendekatkan ke bilah tombol bayar
+   ========================================================= */
+.pos-cart-table-container {
+  height: calc(100vh - 310px);
+  height: calc(100dvh - 310px);
+  min-height: 350px;
+}
+
+@media (min-width: 640px) {
+  .pos-cart-table-container {
+    height: 380px;
+    min-height: 380px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pos-cart-table-container {
+    height: calc(100vh - 250px);
+    min-height: 440px;
+  }
+}
