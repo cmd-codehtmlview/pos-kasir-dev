@@ -161,9 +161,64 @@ function selectLogisticsProduct(productId, context) {
   }
 }
 
+function triggerLogisticsCameraScan(context) {
+  const titleMap = {
+    'products': 'Scan Master Produk',
+    'product-form': 'Scan Barcode Form Produk',
+    'lpb': 'Scan Barcode LPB (Faktur Masuk)',
+    'label': 'Scan Barcode Cetak Label Rak',
+    'so': 'Scan Barcode Stock Opname',
+    'waste': 'Scan Barcode BAP Barang Rusak',
+    'repack-origin': 'Scan Barcode Produk Asal (Bal/Dus)',
+    'repack-target': 'Scan Barcode Produk Tujuan (Pcs)'
+  };
+  const title = titleMap[context] || 'Scan Barcode Logistik';
+
+  if (typeof openPosCameraScanner === 'function') {
+    openPosCameraScanner((barcode) => {
+      handleLogisticsScannedBarcode(barcode, context);
+    }, title);
+  } else if (typeof openBarcodeCameraScanner === 'function') {
+    openBarcodeCameraScanner('pos-barcode-search');
+  } else {
+    const manualBarcode = prompt(`[Scanner Kamera ${title}]\nMasukkan barcode barang (atau gunakan scanner barcode USB):`);
+    if (manualBarcode) {
+      handleLogisticsScannedBarcode(manualBarcode, context);
+    }
+  }
+}
+
+function stopSisScan() {
+  if (typeof closePosCameraScanner === 'function') {
+    closePosCameraScanner();
+  }
+}
+
 function handleLogisticsScannedBarcode(scannedCode, context) {
   const code = (scannedCode || '').trim();
   if (!code) return;
+
+  // 1. Kasus khusus: scan langsung ke field Barcode pada form Master Produk
+  if (context === 'product-form') {
+    const barcodeInput = document.getElementById('sis-prod-barcode');
+    if (barcodeInput) {
+      barcodeInput.value = code;
+      const nameInput = document.getElementById('sis-prod-name');
+      if (nameInput) nameInput.focus();
+    }
+    const catalog = getLogisticsCatalog('products');
+    const existing = catalog.find(p => p.barcode === code);
+    if (existing) {
+      if (typeof showToast === 'function') {
+        showToast(`ℹ️ Barcode ${code} sudah terdaftar pada: ${existing.name}`, 'warning');
+      }
+    } else {
+      if (typeof showToast === 'function') {
+        showToast(`📷 Barcode ${code} berhasil diisi ke form`, 'success');
+      }
+    }
+    return;
+  }
 
   const catalog = getLogisticsCatalog(context);
   const matched = catalog.find(p => (p.barcode && p.barcode === code) || (p.id && String(p.id).toLowerCase() === code.toLowerCase()));
@@ -174,9 +229,29 @@ function handleLogisticsScannedBarcode(scannedCode, context) {
       showToast(`📷 ${matched.name} (${code}) berhasil di-scan`, 'success');
     }
   } else {
+    // Jika tidak ditemukan di katalog produk
+    if (context === 'products') {
+      const input = document.getElementById('products-search-input');
+      if (input) {
+        input.value = code;
+        renderSisProductsModal(code);
+      }
+      if (typeof showToast === 'function') {
+        showToast(`📷 Barcode ${code} belum terdaftar. Menyiapkan form produk baru...`, 'info', 3000);
+      }
+      setTimeout(() => {
+        switchProductModalTab('form');
+        resetSisProductForm();
+        const barcodeInput = document.getElementById('sis-prod-barcode');
+        if (barcodeInput) barcodeInput.value = code;
+        const nameInput = document.getElementById('sis-prod-name');
+        if (nameInput) nameInput.focus();
+      }, 300);
+      return;
+    }
+
     const inputMap = {
       'lpb': 'lpb-product-search',
-      'products': 'products-search-input',
       'label': 'label-product-search',
       'so': 'so-product-search',
       'waste': 'waste-product-search',
@@ -188,9 +263,10 @@ function handleLogisticsScannedBarcode(scannedCode, context) {
     if (input) {
       input.value = code;
       input.focus();
+      handleLogisticsSearch(code, context);
     }
     if (typeof showToast === 'function') {
-      showToast(`📷 Barcode ${code} terdeteksi, tidak ditemukan di katalog.`, 'info');
+      showToast(`📷 Barcode [${code}] terdeteksi, tetapi belum ada di katalog gudang.`, 'warning');
     }
   }
 }
@@ -1116,5 +1192,8 @@ if (typeof window !== 'undefined') {
 
   window.updateRepackSummary = updateRepackSummary;
   window.executeRepackProcess = executeRepackProcess;
+
+  window.triggerLogisticsCameraScan = triggerLogisticsCameraScan;
+  window.stopSisScan = stopSisScan;
 }
 

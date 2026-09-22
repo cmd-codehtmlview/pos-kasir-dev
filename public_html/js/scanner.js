@@ -141,8 +141,9 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
   // Simpan callback kustom jika dipanggil dari modul luar (misal: SIS Logistik Gudang)
   activeScannerCustomCallback = typeof customCallback === "function" ? customCallback : null;
 
-  // Verifikasi HTTPS untuk izin kamera modern
-  if (location.protocol === "http:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+  // Verifikasi HTTPS untuk izin kamera modern (kecuali localhost / local IP)
+  const isLocalIp = location.hostname.startsWith("192.168.") || location.hostname.startsWith("10.") || location.hostname.startsWith("172.");
+  if (location.protocol === "http:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1" && !isLocalIp) {
     const targetUrl = "https://" + (location.hostname === "2.27.165.72" ? "2.27.165.72.sslip.io" : location.hostname) + location.pathname + location.search + location.hash;
     showToast("Akses kamera membutuhkan koneksi aman (HTTPS). Mengalihkan...", "info", 3000);
     setTimeout(() => {
@@ -162,8 +163,25 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
     titleEl.textContent = customTitle || "Scan Barcode Kasir";
   }
 
+  // Tampilan badge mode dan bar keranjang
+  const cartBar = document.getElementById("pos-scanner-cart-bar");
+  const modeBadge = document.getElementById("pos-camera-mode-badge");
+  if (activeScannerCustomCallback) {
+    if (cartBar) cartBar.classList.add("hidden");
+    if (modeBadge) {
+      modeBadge.textContent = "Mode Logistik";
+      modeBadge.className = "px-2 py-0.5 text-[9px] font-black uppercase rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
+    }
+  } else {
+    if (cartBar) cartBar.classList.remove("hidden");
+    if (modeBadge) {
+      modeBadge.textContent = posScannerMultiScanMode ? "Multi-Scan ON" : "1x Scan Mode";
+      modeBadge.className = "px-2 py-0.5 text-[9px] font-black uppercase rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 animate-pulse";
+    }
+    updatePosScannerCartSummary();
+  }
+
   openModal("modal-pos-camera-scanner");
-  updatePosScannerCartSummary();
 
   const loadingEl = document.getElementById("pos-camera-scanner-loading");
   const readerEl = document.getElementById("pos-camera-scanner-reader");
@@ -353,9 +371,12 @@ function onPosBarcodeDetected(decodedText) {
   // Jika ini adalah custom callback dari SIS Logistik Gudang (LPB, SO, Repack, Master Produk, Label, Waste)
   if (typeof activeScannerCustomCallback === "function") {
     const cb = activeScannerCustomCallback;
-    activeScannerCustomCallback = null;
     closePosCameraScanner();
-    cb(code);
+    try {
+      cb(code);
+    } catch (err) {
+      console.error("[SIS Camera] Callback error:", err);
+    }
     return;
   }
 
@@ -455,6 +476,10 @@ async function closePosCameraScanner() {
 
   const hadCustomCallback = Boolean(activeScannerCustomCallback);
   activeScannerCustomCallback = null;
+
+  // Pulihkan tampilan bilah ringkasan kasir
+  const cartBar = document.getElementById("pos-scanner-cart-bar");
+  if (cartBar) cartBar.classList.remove("hidden");
 
   // Kembalikan fokus ke kotak pencarian barcode kasir hanya jika bukan dari modal kustom
   if (!hadCustomCallback) {

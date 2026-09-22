@@ -3125,7 +3125,10 @@
           <div>
             <div class="flex items-center justify-between mb-1">
               <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">Barcode / SKU *</label>
-              <button type="button" onclick="document.getElementById('sis-prod-barcode').value = '899' + Math.floor(1000000000 + Math.random() * 9000000000);" class="text-[9px] text-emerald-700 hover:underline font-bold">Acak</button>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="triggerLogisticsCameraScan('product-form')" class="text-[9px] text-emerald-700 hover:underline font-bold flex items-center gap-0.5 cursor-pointer">📷 Scan</button>
+                <button type="button" onclick="document.getElementById('sis-prod-barcode').value = '899' + Math.floor(1000000000 + Math.random() * 9000000000);" class="text-[9px] text-slate-500 hover:underline font-bold cursor-pointer">Acak</button>
+              </div>
             </div>
             <input type="text" id="sis-prod-barcode" placeholder="Contoh: 899276..." class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
           </div>
@@ -7695,7 +7698,7 @@
       </div>
 
       <!-- Ringkasan Keranjang Live di Dalam Modal Scanner -->
-      <div class="p-3 bg-slate-800/80 border-t border-slate-800 flex items-center justify-between gap-2">
+      <div id="pos-scanner-cart-bar" class="p-3 bg-slate-800/80 border-t border-slate-800 flex items-center justify-between gap-2">
         <div class="flex items-center gap-2 min-w-0">
           <span class="text-xl">🛒</span>
           <div class="min-w-0">
@@ -10522,7 +10525,7 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=107')
+        navigator.serviceWorker.register('./sw.js?v=108')
           .then((registration) => {
             registration.update();
             console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
