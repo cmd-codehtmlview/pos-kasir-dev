@@ -349,7 +349,7 @@ function renderPosCart() {
 
   if (pos.cart.length === 0) {
     tableBody.innerHTML = `
-      <div class="flex flex-col items-center justify-center h-full min-h-[260px] py-12 px-4 text-center text-slate-400">
+      <div class="flex flex-col items-center justify-center h-full min-h-[200px] py-8 px-4 text-center text-slate-400">
         <div class="text-4xl mb-2">🛒</div>
         <p class="font-bold text-slate-600 text-sm">BELUM ADA BARANG YANG DI-SCAN</p>
         <p class="text-xs text-slate-400 mt-1">Arahkan scanner ke barcode atau ketik nama produk di kolom pencarian.</p>

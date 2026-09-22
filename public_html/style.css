@@ -770,35 +770,47 @@ html, body {
 /* =========================================================
    PENGATURAN RUANG SCROLL KONTEN TAB AGAR TIDAK TERTUTUP BAR FUNGSI
    ========================================================= */
-#tab-pos,
 #tab-inventory,
 #tab-reports,
 #tab-settings {
-  padding-bottom: 9rem !important;
+  padding-bottom: 6rem;
+}
+
+#tab-pos {
+  padding-bottom: 1.5rem;
 }
 
 /* =========================================================
    PENGATURAN TAMPILAN RESPONSIVE MOBILE / SMARTPHONE (HP)
    ========================================================= */
 @media (max-width: 768px) {
-  /* Hilangkan horizontal overflow berlebih */
-  html, body {
+  html {
     overflow-x: hidden;
-    touch-action: manipulation;
   }
 
-  /* Padding bawah untuk memberi ruang navigasi mobile & tombol */
+  body {
+    overflow-x: hidden;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Padding bawah untuk memberi ruang navigasi mobile & tombol tanpa tumpang tindih */
   main {
-    padding-bottom: 7.5rem !important;
+    padding-bottom: 6rem !important;
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
   }
 
-  #tab-pos,
+  #tab-pos {
+    padding-bottom: 1rem !important;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+
   #tab-inventory,
   #tab-reports,
   #tab-settings {
-    padding-bottom: 7.5rem !important;
+    padding-bottom: 6rem !important;
   }
 
   /* Display LED lebih proporsional di layar kecil */
@@ -1010,19 +1022,32 @@ html, body {
 
 /* =========================================================
    ADAPTIVE POS CART TABLE CONTAINER (MOBILE & DESKTOP)
-   Mengisi tinggi layar HP secara adaptif, memangkas ruang
-   kosong di bawah tabel & mendekatkan ke bilah tombol bayar
+   Tinggi proporsional, 1-finger scroll mulus, tanpa tumpang tindih
    ========================================================= */
 .pos-cart-table-container {
-  height: calc(100vh - 310px);
-  height: calc(100dvh - 310px);
-  min-height: 350px;
+  height: calc(100vh - 360px);
+  height: calc(100dvh - 360px);
+  min-height: 250px;
+  max-height: 440px;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+#pos-items-table-body {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: auto;
+}
+
+#pos-items-table-body > div {
+  touch-action: pan-y;
 }
 
 @media (min-width: 640px) {
   .pos-cart-table-container {
     height: 380px;
     min-height: 380px;
+    max-height: none;
   }
 }
 
@@ -1030,5 +1055,6 @@ html, body {
   .pos-cart-table-container {
     height: calc(100vh - 250px);
     min-height: 440px;
+    max-height: none;
   }
 }
