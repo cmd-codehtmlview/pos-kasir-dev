@@ -289,7 +289,7 @@ function getCartTotals() {
   return { subtotal, totalCost, totalQty, discountAmount, grandTotal, estimatedProfit };
 }
 
-// Render Tabel Kasir Retail & Display LED
+/// Render Tabel Kasir Retail & Display LED (Modern 12-Col Grid)
 function renderPosCart() {
   const currentPos = (typeof pos !== 'undefined' && pos) || (typeof window !== 'undefined' && window.pos);
   if (!currentPos || !currentPos.cart) return;
@@ -297,18 +297,34 @@ function renderPosCart() {
   const tableBody = document.getElementById("pos-items-table-body");
   const ledTotal = document.getElementById("led-total-amount");
   const ledItemsCount = document.getElementById("led-items-count");
+  const ledSubtotal = document.getElementById("led-subtotal-amount");
+  const ledTax = document.getElementById("led-tax-amount");
   const bottomTotal = document.getElementById("cart-grand-total-val");
+  const mobCountLabel = document.getElementById("mobile-cart-count-label");
+  const discountVal = document.getElementById("cart-discount-val");
   const totals = getCartTotals();
 
   // Update Display LED Angka Besar (Retail Style)
   if (ledTotal) {
     ledTotal.textContent = formatRupiah(totals.grandTotal);
   }
+  if (bottomTotal) {
+    bottomTotal.textContent = formatRupiah(totals.grandTotal);
+  }
+  if (ledSubtotal) {
+    ledSubtotal.textContent = formatRupiah(totals.subtotal || totals.grandTotal);
+  }
+  if (ledTax) {
+    ledTax.textContent = formatRupiah(totals.tax || 0);
+  }
   if (ledItemsCount) {
     ledItemsCount.textContent = `${pos.cart.length} Item (${totals.totalQty} pcs)`;
   }
-  if (bottomTotal) {
-    bottomTotal.textContent = formatRupiah(totals.grandTotal);
+  if (mobCountLabel) {
+    mobCountLabel.textContent = `TOTAL TAGIHAN (${pos.cart.length} ITEM)`;
+  }
+  if (discountVal) {
+    discountVal.textContent = formatRupiah(totals.discount || 0);
   }
 
   // 1. Auto-Persist keranjang aktif kasir (Simpan ke LocalStorage agar kebal Refresh / Mati Lampu)
@@ -319,108 +335,94 @@ function renderPosCart() {
   // 2. Sinkronkan visual lencana Member jika ada member aktif
   if (pos.activeMember) {
     const label = document.getElementById("active-member-label");
-    const btn = document.getElementById("btn-select-member");
     const removeBtn = document.getElementById("btn-remove-member");
     if (label) label.textContent = `${pos.activeMember.name} (${pos.activeMember.points || 0} Poin)`;
-    if (btn) btn.className = "px-2.5 py-0.5 bg-emerald-100 border border-emerald-300 text-emerald-900 rounded-lg text-[10px] sm:text-xs font-black flex items-center gap-1 shadow-2xs";
     if (removeBtn) removeBtn.classList.remove("hidden");
+  } else {
+    const label = document.getElementById("active-member-label");
+    const removeBtn = document.getElementById("btn-remove-member");
+    if (label) label.textContent = "+ member";
+    if (removeBtn) removeBtn.classList.add("hidden");
   }
 
   if (!tableBody) return;
 
   if (pos.cart.length === 0) {
     tableBody.innerHTML = `
-      <tr>
-        <td colspan="8" class="py-16 text-center text-slate-400">
-          <div class="text-4xl mb-2">🛒</div>
-          <p class="font-bold text-slate-600 text-sm">BELUM ADA BARANG YANG DI-SCAN</p>
-          <p class="text-xs text-slate-400 mt-1">Arahkan scanner ke barcode atau ketik nama produk di kolom [F2].</p>
-        </td>
-      </tr>
+      <div class="flex flex-col items-center justify-center py-16 px-4 text-center text-slate-400">
+        <div class="text-4xl mb-2">🛒</div>
+        <p class="font-bold text-slate-600 text-sm">BELUM ADA BARANG YANG DI-SCAN</p>
+        <p class="text-xs text-slate-400 mt-1">Arahkan scanner ke barcode atau ketik nama produk di kolom pencarian.</p>
+      </div>
     `;
     return;
   }
 
   tableBody.innerHTML = pos.cart.map((item, idx) => {
-    const isLatest = item.id === pos.lastScannedId;
     const itemTotal = item.price * item.qty;
     const isSelected = idx === selectedCartIndex;
-    const p = pos.products.find(prod => prod.id === item.id);
+    const p = (pos.products || []).find(prod => prod.id === item.id) || {};
+    const basePrice = item.priceA || p.price || item.price;
+    const priceB = item.priceB || p.priceB || Math.round(basePrice * 0.9);
+    const priceC = item.priceC || p.priceC || Math.round(basePrice * 0.8);
 
     return `
-      <tr 
+      <div 
+        id="cart-row-${idx}"
         onclick="selectedCartIndex = ${idx}; renderPosCart();"
-        class="pos-table-row cursor-pointer text-xs ${isLatest ? 'active-scan-row' : ''} ${isSelected ? 'bg-blue-50 font-semibold' : ''}"
+        class="p-2.5 sm:p-3 grid grid-cols-12 gap-1.5 sm:gap-2 items-center hover:bg-slate-50 text-xs transition cursor-pointer ${isSelected ? 'bg-amber-50/40 border-l-4 border-amber-500' : ''}"
+        data-product-id="${item.id}"
+        data-base-price="${basePrice}"
+        data-price-a="${basePrice}"
+        data-price-b="${priceB}"
+        data-price-c="${priceC}"
       >
-        <td class="hidden md:table-cell py-2 px-3 text-center font-mono font-bold text-slate-500">${idx + 1}</td>
-        <td class="hidden sm:table-cell py-2 px-3 font-mono font-bold text-blue-700">${item.barcode}</td>
-        <td class="py-2 px-2.5 sm:px-3">
-          <div class="flex items-center gap-1.5 sm:gap-2">
-            <span class="text-base sm:text-lg">${item.emoji || '🍪'}</span>
-            <div class="min-w-0">
-              <span class="font-bold text-slate-800 text-xs sm:text-sm block leading-snug truncate max-w-[140px] sm:max-w-xs">${item.name}</span>
-              <span class="sm:hidden text-[10px] text-slate-500 font-mono block">@ ${formatRupiah(item.price)}</span>
-              ${item.tier && item.tier !== 'A' ? `
-                <span class="text-[9px] sm:text-[10px] font-bold ${item.tier === 'C' ? 'text-purple-800 bg-purple-100 border-purple-300' : 'text-amber-800 bg-amber-100 border-amber-300'} border px-1.5 py-0.2 rounded-md inline-flex items-center gap-1 mt-0.5" title="Tier Harga ${item.tier} Aktif">
-                  🏷️ Tier ${item.tier} (${item.tier === 'C' ? 'Partai' : 'Grosir'}) • Hemat ${formatAngka(item.wholesaleSaved)}
-                </span>
-              ` : (item.isWholesale ? `
-                <span class="text-[9px] sm:text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.2 rounded-md inline-flex items-center gap-1 mt-0.5" title="Harga grosir otomatis aktif">
-                  🏷️ Grosir • Hemat ${formatAngka(item.wholesaleSaved)}
-                </span>
-              ` : '')}
-            </div>
-          </div>
-        </td>
-        <td class="py-2 px-1 sm:px-3 text-center">
-          <div class="inline-flex items-center gap-1">
-            <div class="inline-flex items-center bg-white border border-slate-300 rounded-lg overflow-hidden shadow-xs">
-              <button onclick="event.stopPropagation(); updateCartQtyByIndex(${idx}, ${item.qty - 1})" class="qty-btn-touch bg-slate-100 hover:bg-rose-100 text-slate-700 font-bold active:bg-rose-200 cursor-pointer">-</button>
-              <input 
-                type="number" 
-                min="1" 
-                max="${p ? p.stock : 9999}" 
-                value="${item.qty}"
-                onclick="event.stopPropagation(); this.select();"
-                onchange="updateCartQtyByIndex(${idx}, this.value)"
-                onkeydown="if(event.key === 'Enter'){ this.blur(); }"
-                class="w-9 sm:w-12 text-center font-black text-slate-900 text-xs sm:text-sm bg-white border-x border-slate-200 focus:bg-amber-50 focus:outline-none py-1"
-                title="Klik untuk ketik kuantiti langsung"
-              />
-              <button onclick="event.stopPropagation(); updateCartQtyByIndex(${idx}, ${item.qty + 1})" class="qty-btn-touch bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold active:bg-emerald-200 cursor-pointer">+</button>
-            </div>
-            <!-- Dropdown Multi-Harga A / B / C Kasir -->
-            <div class="relative inline-block" onclick="event.stopPropagation();">
-              <select 
-                onchange="changeCartItemTier(${idx}, this.value)"
-                class="px-1 sm:px-1.5 py-1 text-[10px] sm:text-xs font-black rounded-lg border cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all ${item.tier === 'C' ? 'bg-purple-100 text-purple-900 border-purple-300' : item.tier === 'B' ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-slate-100 text-slate-800 border-slate-300'}"
-                title="Pilih Tier Harga Manual: A (Satuan), B (Grosir), C (Partai)"
-              >
-                <option value="A" ${(!item.tier || item.tier === 'A') ? 'selected' : ''}>A</option>
-                <option value="B" ${item.tier === 'B' ? 'selected' : ''}>B</option>
-                <option value="C" ${item.tier === 'C' ? 'selected' : ''}>C</option>
-              </select>
-            </div>
-          </div>
-        </td>
-        <td class="hidden lg:table-cell py-2 px-3 text-slate-500 text-center font-medium">${item.unit || 'Pcs'}</td>
-        <td class="hidden sm:table-cell py-2 px-3 text-right font-mono">${formatAngka(item.price)}</td>
-        <td class="hidden lg:table-cell py-2 px-3 text-right font-mono text-rose-600">${item.isWholesale ? formatAngka(item.wholesaleSaved) : '0'}</td>
-        <td class="py-2 px-2 sm:px-3 text-right">
-          <div class="flex items-center justify-end gap-1.5">
-            <span class="font-mono font-extrabold text-slate-900 text-xs sm:text-sm">${formatAngka(itemTotal)}</span>
-            <button onclick="event.stopPropagation(); removeCartItem(${idx})" class="sm:hidden p-1 text-slate-400 hover:text-rose-600 active:scale-95" title="Hapus">
-              ✕
-            </button>
-          </div>
-        </td>
-      </tr>
+        <span class="col-span-1 text-center font-bold text-slate-400 hidden sm:inline">${idx + 1}</span>
+        <div class="col-span-5 sm:col-span-4 min-w-0">
+          <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">${item.name}</h4>
+          <p class="text-[10px] text-slate-400 font-mono truncate item-unit-label">@${formatAngka(item.price)} • ${item.barcode || item.plu || '-'}</p>
+        </div>
+        <div class="col-span-3 sm:col-span-2 flex items-center justify-center gap-1" onclick="event.stopPropagation();">
+          <button type="button" onclick="updateCartQtyByIndex(${idx}, ${item.qty - 1})" class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
+          <span class="font-black text-xs sm:text-sm w-4 sm:w-5 text-center item-qty">${item.qty}</span>
+          <button type="button" onclick="updateCartQtyByIndex(${idx}, ${item.qty + 1})" class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
+        </div>
+        <div class="col-span-1 flex items-center justify-center" onclick="event.stopPropagation();">
+          <select 
+            onchange="changeCartItemTier(${idx}, this.value)" 
+            class="tier-selector item-tier-select px-1 sm:px-1.5 py-0.5 font-black text-[11px] rounded-lg border cursor-pointer focus:outline-none focus:ring-1 focus:ring-slate-500 ${item.tier === 'C' ? 'bg-purple-100 text-purple-900 border-purple-300' : item.tier === 'B' ? 'bg-amber-100 text-amber-900 border-amber-300' : 'bg-slate-100 text-slate-800 border-slate-300'}" 
+            title="Pilih Tier Harga (A: Satuan, B: Grosir, C: Pabrik)"
+          >
+            <option value="A" ${(!item.tier || item.tier === 'A') ? 'selected' : ''}>A</option>
+            <option value="B" ${item.tier === 'B' ? 'selected' : ''}>B</option>
+            <option value="C" ${item.tier === 'C' ? 'selected' : ''}>C</option>
+          </select>
+        </div>
+        <span class="col-span-2 text-right font-mono font-semibold text-slate-600 hidden sm:inline item-unit-price">${formatAngka(item.price)}</span>
+        <div class="col-span-3 sm:col-span-2 text-right font-mono font-extrabold text-slate-900 text-xs sm:text-sm flex items-center justify-end gap-1">
+          <span class="truncate item-total-price">${formatAngka(itemTotal)}</span>
+          <button type="button" onclick="event.stopPropagation(); removeCartItem(${idx})" class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-0.5 cursor-pointer" title="Hapus item">✕</button>
+        </div>
+      </div>
     `;
   }).join("");
 }
 
 function removeCartItem(idx) {
   voidCartItemByIndex(idx);
+}
+
+function quickTenderAction(type) {
+  if (!pos || !pos.cart || pos.cart.length === 0) {
+    if (typeof showToast === 'function') showToast("Keranjang transaksi masih kosong!", "warning");
+    return;
+  }
+  if (typeof openCheckoutModal === 'function') {
+    openCheckoutModal();
+    if (typeof quickCash === 'function') {
+      quickCash(type);
+    }
+  }
 }
 
 // Render Mode Grid Touchscreen (100 Foto Snack)
