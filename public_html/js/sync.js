@@ -94,6 +94,22 @@ function updateCloudStatus(status, label = "") {
   if (drawerSync && label) {
     drawerSync.textContent = `Sync: ${label}`;
   }
+
+  // Update indikator sub-header HP
+  const mobileDot = document.getElementById("mobile-cloud-dot");
+  const mobileLabel = document.getElementById("mobile-cloud-label");
+  if (mobileDot) {
+    if (status === "online") {
+      mobileDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
+      if (mobileLabel) mobileLabel.textContent = label ? `Sync ${label.replace('Sync ', '')}` : "Cloud Online";
+    } else if (status === "syncing") {
+      mobileDot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
+      if (mobileLabel) mobileLabel.textContent = "Syncing...";
+    } else {
+      mobileDot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0";
+      if (mobileLabel) mobileLabel.textContent = "Offline";
+    }
+  }
 }
 
 // Fungsi Trigger Sinkronisasi Manual (Bisa dipanggil dari tombol / shortcut)

@@ -327,6 +327,7 @@ function setupKeyboardShortcuts() {
 function updateLiveClock() {
   const dateEl = document.getElementById("live-date");
   const clockEl = document.getElementById("live-clock");
+  const mobileClockEl = document.getElementById("mobile-live-clock");
   const now = new Date();
   const dateStr = now.toLocaleDateString("id-ID", {
     weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'
@@ -336,6 +337,9 @@ function updateLiveClock() {
   if (clockEl) {
     if (!dateEl) clockEl.textContent = `${dateStr} • ${timeStr}`;
     else clockEl.textContent = timeStr;
+  }
+  if (mobileClockEl) {
+    mobileClockEl.textContent = timeStr;
   }
 }
 

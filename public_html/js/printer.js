@@ -2350,6 +2350,31 @@ function updateBluetoothUI() {
     }
   }
 
+  // Update indikator printer sub-header HP
+  const mobilePrinterDot = document.getElementById("mobile-printer-dot");
+  const mobilePrinterLabel = document.getElementById("mobile-printer-label");
+  if (mobilePrinterDot) {
+    if (isBusy) {
+      mobilePrinterDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping";
+      if (mobilePrinterLabel) mobilePrinterLabel.textContent = "Mencetak...";
+    } else if (connected) {
+      mobilePrinterDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse";
+      if (mobilePrinterLabel) mobilePrinterLabel.textContent = "Printer Siap";
+    } else if (isConnectingBluetooth || startupAutoConnectActive) {
+      mobilePrinterDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse";
+      if (mobilePrinterLabel) mobilePrinterLabel.textContent = "Konek...";
+    } else {
+      const hasSaved = Boolean(typeof pos !== 'undefined' && pos.settings && (pos.settings.lastPrinterName || pos.settings.lastPrinterId));
+      if (hasSaved) {
+        mobilePrinterDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500/80";
+        if (mobilePrinterLabel) mobilePrinterLabel.textContent = "Printer Siaga";
+      } else {
+        mobilePrinterDot.className = "w-1.5 h-1.5 rounded-full bg-slate-400";
+        if (mobilePrinterLabel) mobilePrinterLabel.textContent = "Printer Off";
+      }
+    }
+  }
+
   // 2. UPDATE FLOATING SPOOLER WIDGET
   if (widget && typeof printSpooler !== 'undefined') {
     if (isBusy) {

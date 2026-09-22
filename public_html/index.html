@@ -84,7 +84,7 @@
           if (document.getElementById('dev-environment-banner')) return;
           var b = document.createElement('div');
           b.id = 'dev-environment-banner';
-          b.className = 'bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 text-slate-950 px-3 py-1.5 text-xs font-black shadow-md flex items-center justify-between border-b-2 border-amber-700 z-50 sticky top-0 no-print select-none';
+          b.className = 'bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 text-slate-950 px-3 py-1.5 text-xs font-black shadow-md flex items-center justify-between border-b-2 border-amber-700 z-20 relative no-print select-none';
           b.innerHTML = '<div class="flex items-center gap-1.5 mx-auto text-center">' +
             '<span class="text-sm animate-pulse">⚠️</span>' +
             '<span class="tracking-wider uppercase">LINGKUNGAN PENGEMBANGAN [DEV TEST] — AREA UJI COBA</span>' +
@@ -111,15 +111,17 @@
 
   <!-- ================= HEADER KASIR RETAIL MINIMARKET ================= -->
   <!-- ================= TOP HEADER (Signature Red Retail & Minimalist Icons) ================= -->
-  <header class="bg-gradient-to-r from-red-700 via-red-600 to-red-700 text-white shadow-md sticky top-0 z-30 no-print select-none">
+  <header class="bg-gradient-to-r from-red-700 via-red-600 to-red-700 text-white shadow-md sticky top-0 z-30 no-print select-none" style="padding-top: env(safe-area-inset-top, 0px);">
+    
+    <!-- BARIS 1: Header Utama (Brand Toko, Kasir Aktif & Tombol Menu SIS) -->
     <div class="max-w-7xl mx-auto px-2.5 sm:px-4 py-2 flex items-center justify-between gap-2">
       
       <!-- Kiri: Brand & Info Kasir Aktif -->
-      <div class="flex items-center gap-2 min-w-0">
+      <div class="flex items-center gap-2 min-w-0 flex-1">
         <div class="w-8 h-8 rounded-xl bg-white text-red-600 flex items-center justify-center font-black text-sm shadow-xs border border-red-200 flex-shrink-0">
           🛍️
         </div>
-        <div class="min-w-0">
+        <div class="min-w-0 flex-1">
           <div class="flex items-center gap-1.5">
             <h1 id="top-header-store-name" class="font-black text-xs sm:text-sm tracking-tight leading-tight truncate uppercase">
               TOKO SNACK BERKAH
@@ -143,8 +145,8 @@
         </div>
       </div>
 
-      <!-- Tengah: Jam Digital, Hari, Tanggal, Bulan, Tahun & Detik Bahasa Indonesia -->
-      <div class="flex flex-col items-center justify-center text-center px-2.5 py-1 rounded-xl bg-black/20 border border-white/20 shadow-xs flex-shrink-0">
+      <!-- Tengah: Jam Digital, Hari, Tanggal & Detik (Hanya Tampil di Layar Tablet/PC >= sm) -->
+      <div class="hidden sm:flex flex-col items-center justify-center text-center px-2.5 py-1 rounded-xl bg-black/20 border border-white/20 shadow-xs flex-shrink-0">
         <span id="live-date" class="text-[9px] sm:text-[10px] text-red-100 font-semibold tracking-tight leading-none">
           --
         </span>
@@ -153,26 +155,26 @@
         </span>
       </div>
 
-      <!-- Kanan: Dot Status Cloud, Ikon Flat Printer, Tombol Kunci, Keluar, dan SIS -->
+      <!-- Kanan: Status Cloud & Printer (Layar Tablet/PC) serta Tombol SIS (Semua Layar) -->
       <div class="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
         
-        <!-- Dot Status Online (Hijau 30s) / Offline (Merah) -->
+        <!-- Dot Status Online (Desktop/Tablet) -->
         <div 
           id="cloud-status-indicator" 
           onclick="syncToSupabase(false)" 
-          class="h-8 px-2 sm:px-2.5 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-[10px] font-semibold text-white cursor-pointer active:scale-95 transition flex items-center gap-1.5 shadow-xs" 
+          class="hidden sm:flex h-8 px-2 sm:px-2.5 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-[10px] font-semibold text-white cursor-pointer active:scale-95 transition items-center gap-1.5 shadow-xs" 
           title="Cloud Supabase Terhubung • Klik untuk Sinkron Manual [F9]"
         >
           <span id="cloud-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
-          <span id="cloud-status-label" class="hidden sm:inline text-[10px] font-mono font-bold text-emerald-300">AUTO 30s</span>
+          <span id="cloud-status-label" class="text-[10px] font-mono font-bold text-emerald-300">AUTO 30s</span>
         </div>
 
-        <!-- Ikon Flat Printer Thermal Minimalis (Klik untuk Hubungkan / Menu Printer) -->
+        <!-- Ikon Flat Printer Thermal (Desktop/Tablet) -->
         <button 
           id="bluetooth-status-indicator"
           type="button"
           onclick="handleBluetoothIndicatorClick()"
-          class="h-8 w-8 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-white/90 hover:text-white transition active:scale-95 flex items-center justify-center cursor-pointer shadow-xs relative"
+          class="hidden sm:flex h-8 w-8 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-white/90 hover:text-white transition active:scale-95 items-center justify-center cursor-pointer shadow-xs relative"
           title="Printer Bluetooth • Klik untuk Sambungkan / Setting"
         >
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -183,7 +185,7 @@
           <span id="printer-status-dot" class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-slate-400 ring-1.5 ring-red-600"></span>
         </button>
 
-        <!-- Kunci Layar Kasir (Lock) -->
+        <!-- Kunci Layar Kasir (Lock - Desktop/Tablet) -->
         <button 
           type="button" 
           onclick="lockCashierScreen()" 
@@ -193,9 +195,9 @@
           🔒
         </button>
 
-        <!-- Tombol SIS Minimalis -->
+        <!-- Tombol SIS Minimalis (Tampil di Semua Layar HP & Desktop) -->
         <button 
-          type="button"
+          type="button" 
           onclick="toggleSisDrawer()" 
           class="h-8 px-2.5 sm:px-3 bg-white/20 hover:bg-white text-white hover:text-red-700 rounded-xl font-black text-xs transition active:scale-95 border border-white/40 cursor-pointer flex items-center gap-1.5 tracking-wider shadow-xs" 
           title="Buka Menu Sistem Informasi Toko (SIS)"
@@ -209,6 +211,51 @@
       </div>
 
     </div>
+
+    <!-- BARIS 2: SUB-HEADER RAMPING KHUSUS HP (SLIM OPERATIONAL RIBBON) -->
+    <div class="sm:hidden bg-red-950/85 text-white/90 border-t border-red-500/20 px-3 py-1 flex items-center justify-between text-[10px] shadow-inner select-none">
+      
+      <!-- Sub-Kiri: Status Cloud Sync -->
+      <button 
+        type="button" 
+        onclick="syncToSupabase(false)" 
+        class="flex items-center gap-1.5 text-red-100 hover:text-white active:scale-95 transition cursor-pointer font-bold py-0.5"
+        title="Status Cloud • Klik untuk Sinkron Manual [F9]"
+      >
+        <span id="mobile-cloud-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
+        <span id="mobile-cloud-label" class="tracking-tight">Cloud Online</span>
+      </button>
+
+      <!-- Pemisah Halus -->
+      <span class="text-red-400/30 text-[9px]">•</span>
+
+      <!-- Sub-Tengah: Status Printer Bluetooth -->
+      <button 
+        type="button" 
+        onclick="handleBluetoothIndicatorClick()" 
+        class="flex items-center gap-1 text-red-100 hover:text-white active:scale-95 transition cursor-pointer font-bold py-0.5"
+        title="Printer Thermal Bluetooth • Klik untuk Hubungkan / Setting"
+      >
+        <svg class="w-3 h-3 text-red-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        <span id="mobile-printer-label" class="tracking-tight">Printer Siap</span>
+        <span id="mobile-printer-dot" class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+      </button>
+
+      <!-- Pemisah Halus -->
+      <span class="text-red-400/30 text-[9px]">•</span>
+
+      <!-- Sub-Kanan: Jam Kasir Realtime HP -->
+      <div class="flex items-center gap-1 font-mono font-black text-amber-300 tracking-wider">
+        <span class="text-[9px] opacity-80">🕒</span>
+        <span id="mobile-live-clock">--:--:--</span>
+      </div>
+
+    </div>
+
   </header>
 
   <!-- ================= KONTEN UTAMA ================= -->
@@ -8914,13 +8961,15 @@
       const now = new Date();
       const clockEl = document.getElementById('header-clock');
       const dateEl = document.getElementById('header-date');
+      const mobileClock = document.getElementById('mobile-live-clock');
       
-      if (clockEl) {
-        const hh = String(now.getHours()).padStart(2, '0');
-        const mm = String(now.getMinutes()).padStart(2, '0');
-        const ss = String(now.getSeconds()).padStart(2, '0');
-        clockEl.textContent = `${hh}:${mm}:${ss}`;
-      }
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      const timeStr = `${hh}:${mm}:${ss}`;
+
+      if (clockEl) clockEl.textContent = timeStr;
+      if (mobileClock) mobileClock.textContent = timeStr;
       
       if (dateEl) {
         const day = INDO_DAYS[now.getDay()];
@@ -8943,29 +8992,39 @@
       const container = document.getElementById('cloud-status-indicator') || document.getElementById('status-indicator');
       const drawerSync = document.getElementById('drawer-last-sync');
 
-      if (!dot) return;
+      const mobileDot = document.getElementById('mobile-cloud-dot');
+      const mobileLabel = document.getElementById('mobile-cloud-label');
 
       if (status === "online") {
-        dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
         if (labelEl) {
           labelEl.textContent = label || "AUTO 30s";
-          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300";
+          labelEl.className = "text-[10px] font-mono font-bold text-emerald-300";
         }
+        if (mobileDot) mobileDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
+        if (mobileLabel) mobileLabel.textContent = label ? `Sync ${label}` : "Cloud Online";
+
         if (container) container.title = `Cloud Terhubung • Auto-Sync Tiap 30 Detik • Terakhir: ${mockupLastSyncTime} • Klik untuk Sinkron Manual`;
         if (drawerSync) drawerSync.textContent = `Sync: ${mockupLastSyncTime}`;
       } else if (status === "syncing") {
-        dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
         if (labelEl) {
           labelEl.textContent = "SYNC...";
-          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-amber-300";
+          labelEl.className = "text-[10px] font-mono font-bold text-amber-300";
         }
+        if (mobileDot) mobileDot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
+        if (mobileLabel) mobileLabel.textContent = "Syncing...";
+
         if (container) container.title = "Sedang menyinkronkan data penjualan, LPB, retur & stock opname...";
       } else {
-        dot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.8)]";
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.8)]";
         if (labelEl) {
           labelEl.textContent = "OFFLINE";
-          labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-rose-300";
+          labelEl.className = "text-[10px] font-mono font-bold text-rose-300";
         }
+        if (mobileDot) mobileDot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0";
+        if (mobileLabel) mobileLabel.textContent = "Offline";
+
         if (container) container.title = "Status: Terputus / Offline (Mode Kasir Standalone)";
       }
     }
@@ -10525,7 +10584,7 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=108')
+        navigator.serviceWorker.register('./sw.js?v=109')
           .then((registration) => {
             registration.update();
             console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
