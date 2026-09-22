@@ -1930,51 +1930,57 @@
     </div>
   </div>
 
-  <!-- ================= 10. MODAL REPACK BAL KE ECER ================= -->
+    <!-- ================= 10. MODAL REPACK BAL KE ECER (PRODUK ASAL -> PRODUK TUJUAN) ================= -->
   <div id="sis-modal-repack" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-[60] hidden flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="px-5 py-4 bg-white border-b border-slate-200/90 flex items-center justify-between">
+    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-emerald-200/80 overflow-hidden flex flex-col max-h-[92vh]">
+      <div class="px-5 py-4 bg-emerald-50/80 border-b border-emerald-200/80 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 border border-slate-200/80 flex items-center justify-center text-base shrink-0 shadow-2xs">
+          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-base shrink-0 shadow-2xs">
             🔄
           </div>
           <div>
-            <h3 class="font-extrabold text-sm text-slate-900 tracking-tight">Repack Bal ke Ecer</h3>
-            <p class="text-[11px] text-slate-500 font-medium">Pecah Stok Dus / Bal Besar Jadi Kemasan Eceran</p>
+            <h3 class="font-extrabold text-sm text-slate-900 tracking-tight">Repack Bal ke Eceran</h3>
+            <p class="text-[11px] text-emerald-700 font-medium">Konversi Stok: Produk Asal (Bal Mentah) ➔ Produk Tujuan (Kemasan Ecer)</p>
           </div>
         </div>
-        <button onclick="closeSisModal('sis-modal-repack')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 font-bold flex items-center justify-center text-xs transition cursor-pointer border border-slate-200/60 active:scale-95">✕</button>
+        <button onclick="closeSisModal('sis-modal-repack')" class="w-8 h-8 rounded-xl bg-emerald-100/70 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 font-bold flex items-center justify-center text-xs transition cursor-pointer active:scale-95">✕</button>
       </div>
 
-      <div class="p-4 space-y-3.5 text-xs">
-        <div class="space-y-1">
-          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">Pilih Produk Bal Mentah (Scan / Ketik Live) *</label>
+      <div class="p-4 sm:p-5 overflow-y-auto space-y-4 text-xs">
+        <!-- SEKSI 1: PRODUK ASAL (BAHAN BAKU / BAL DUS BESAR) -->
+        <div class="p-3.5 bg-amber-50/50 border border-amber-200/80 rounded-2xl space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-md bg-amber-200 text-amber-900 flex items-center justify-center text-[10px] font-black">1</span>
+              <span>PRODUK ASAL (Bal Mentah / Stok Berkurang ➖)</span>
+            </span>
+            <span class="text-[9px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">Bahan Baku</span>
+          </div>
+
           <div class="relative w-full">
-            <div class="bg-white p-2 rounded-xl border border-slate-300 focus-within:border-emerald-600 shadow-2xs flex items-center gap-2 transition">
+            <div class="bg-white p-2 rounded-xl border border-slate-300 focus-within:border-amber-500 shadow-2xs flex items-center gap-2 transition">
               <span class="text-slate-400 pl-1 text-xs flex-shrink-0">🔍</span>
               <input 
                 type="text" 
-                id="repack-product-search" 
-                placeholder="Scan barcode bal / ketik live nama snack..." 
-                value="Keripik Singkong Bal 5 Kg"
+                id="repack-origin-search" 
+                placeholder="Scan barcode bal / ketik live produk asal..." 
+                value="Keripik Singkong Bal 5 Kg (8992761111901)"
                 class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent" 
-                oninput="handleLogisticsSearch(this.value, 'repack')"
+                oninput="handleLogisticsSearch(this.value, 'repack-origin')"
                 autocomplete="off"
               />
               <div class="flex items-center gap-1.5 flex-shrink-0">
-                <!-- Tombol List Produk -->
                 <button 
                   type="button" 
-                  onclick="toggleLogisticsCatalog('repack')" 
+                  onclick="toggleLogisticsCatalog('repack-origin')" 
                   class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
-                  title="Tampilkan List Produk Toko"
+                  title="Pilih dari Katalog Bal Mentah"
                 >
                   <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
                 </button>
-                <!-- Tombol Camera Scanner Flat Minimalis -->
                 <button 
                   type="button" 
-                  onclick="triggerLogisticsCameraScan('repack')" 
+                  onclick="triggerLogisticsCameraScan('repack-origin')" 
                   class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
                   title="Scan Barcode Kamera Bal"
                 >
@@ -1985,30 +1991,107 @@
                 </button>
               </div>
             </div>
-            <!-- Dropdown Hasil Live Ketik / List Produk Repack -->
-            <div id="repack-search-dropdown" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+            <div id="repack-origin-search-dropdown" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
             </div>
           </div>
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Jumlah Bal Dipecah</label>
-            <input type="number" value="1" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center focus:outline-none focus:border-slate-800" />
+
+          <div class="flex items-center justify-between gap-3 pt-1">
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] text-slate-600 font-medium">Jumlah Bal Dipecah:</span>
+              <input type="number" id="repack-qty-origin" value="1" min="1" class="w-16 px-2 py-1.5 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center text-xs focus:outline-none focus:border-amber-500" oninput="updateRepackSummary()" />
+              <span class="text-[11px] font-bold text-slate-500">Bal</span>
+            </div>
+            <span class="text-[10px] text-amber-800 font-medium bg-amber-100/80 px-2 py-1 rounded-lg">Sisa Stok Asal: <strong>3 Bal</strong></span>
           </div>
-          <div>
-            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Hasil Kemasan Ecer</label>
-            <input type="number" value="25" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center focus:outline-none focus:border-slate-800" />
+        </div>
+
+        <!-- INDIKATOR PROSES KONVERSI REPACKING -->
+        <div class="flex items-center justify-center gap-2 text-slate-400 font-bold text-xs py-0.5 select-none">
+          <div class="h-px bg-slate-200 flex-1"></div>
+          <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] flex items-center gap-1.5 font-mono font-bold">
+            <span>⚙️</span><span>PROSES PACKING ULANG (REPACK)</span><span>⬇️</span>
+          </span>
+          <div class="h-px bg-slate-200 flex-1"></div>
+        </div>
+
+        <!-- SEKSI 2: PRODUK TUJUAN (HASIL KEMASAN ECERAN SIAP JUAL) -->
+        <div class="p-3.5 bg-emerald-50/50 border border-emerald-200/80 rounded-2xl space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-md bg-emerald-200 text-emerald-900 flex items-center justify-center text-[10px] font-black">2</span>
+              <span>PRODUK TUJUAN (Kemasan Ecer / Stok Bertambah ➕)</span>
+            </span>
+            <span class="text-[9px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">Produk Jual</span>
+          </div>
+
+          <div class="relative w-full">
+            <div class="bg-white p-2 rounded-xl border border-slate-300 focus-within:border-emerald-600 shadow-2xs flex items-center gap-2 transition">
+              <span class="text-slate-400 pl-1 text-xs flex-shrink-0">🔍</span>
+              <input 
+                type="text" 
+                id="repack-target-search" 
+                placeholder="Scan barcode eceran / ketik live produk tujuan..." 
+                value="Keripik Tempe Renyah 150g (8992761111001)"
+                class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent" 
+                oninput="handleLogisticsSearch(this.value, 'repack-target')"
+                autocomplete="off"
+              />
+              <div class="flex items-center gap-1.5 flex-shrink-0">
+                <button 
+                  type="button" 
+                  onclick="toggleLogisticsCatalog('repack-target')" 
+                  class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                  title="Pilih dari Katalog Eceran"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                </button>
+                <button 
+                  type="button" 
+                  onclick="triggerLogisticsCameraScan('repack-target')" 
+                  class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                  title="Scan Barcode Kamera Eceran"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div id="repack-target-search-dropdown" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between gap-3 pt-1">
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] text-slate-600 font-medium">Hasil Kemasan Ecer:</span>
+              <input type="number" id="repack-qty-target" value="25" min="1" class="w-20 px-2 py-1.5 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center text-xs focus:outline-none focus:border-emerald-600" oninput="updateRepackSummary()" />
+              <span class="text-[11px] font-bold text-slate-500">Bungkus</span>
+            </div>
+            <span class="text-[10px] text-emerald-800 font-medium bg-emerald-100/80 px-2 py-1 rounded-lg">Stok Rak Sekarang: <strong>45 Bks</strong></span>
           </div>
         </div>
-        <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-[11px] text-slate-700">
-          ⚙️ Sistem akan otomatis memotong 1 Bal Keripik (5kg) dan menambahkan 25 bungkus kemasan eceran 200g ke stok rak.
+
+        <!-- SIMULASI KALKULASI & AUDIT STOK -->
+        <div id="repack-summary-box" class="p-3.5 bg-slate-50 border border-slate-200/90 rounded-2xl space-y-1.5 font-mono text-[11px]">
+          <div class="flex items-center justify-between text-slate-700">
+            <span>📦 Mutasi Keluar Produk Asal:</span>
+            <span class="font-bold text-rose-600" id="repack-summary-out">-1 Bal (Sisa 2 Bal)</span>
+          </div>
+          <div class="flex items-center justify-between text-slate-700">
+            <span>🛍️ Mutasi Masuk Produk Tujuan:</span>
+            <span class="font-bold text-emerald-700" id="repack-summary-in">+25 Bungkus (Total Menjadi 70 Bks)</span>
+          </div>
+          <div class="border-t border-slate-200 pt-1 text-[10px] text-slate-500 font-sans leading-snug">
+            💡 <em>HPP per bungkus eceran otomatis dihitung proporsional dari total modal pembelian bal mentah.</em>
+          </div>
         </div>
       </div>
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-repack')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
-        <button onclick="showMockupToast('🔄 Repack Berhasil Diproses! Stok Eceran Bertambah', 'success'); closeSisModal('sis-modal-repack');" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
-          💾 Konversi & Update Stok
+        <button onclick="executeRepackProcess()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5">
+          <span>🔄</span><span>Eksekusi Repacking &amp; Update Stok</span>
         </button>
       </div>
     </div>
@@ -3377,7 +3460,8 @@
         return;
       }
 
-      const matches = mockCatalog.filter(p => 
+      const sourceCatalog = (context === 'repack-origin') ? mockBulkCatalog : mockCatalog;
+      const matches = sourceCatalog.filter(p => 
         p.name.toLowerCase().includes(q) || 
         p.barcode.includes(q)
       );
@@ -3554,7 +3638,8 @@
 
     // Tambah Produk dari Katalog ke Tabel Kasir (Mendukung Multi-Harga A/B/C)
     function addMockItemFromCatalog(productId) {
-      const p = mockCatalog.find(item => item.id === productId);
+      const sourceCatalog = (context === 'repack-origin') ? mockBulkCatalog : mockCatalog;
+      const p = sourceCatalog.find(item => item.id === productId);
       if (!p) return;
 
       const table = document.getElementById('mock-cart-table');
@@ -3710,7 +3795,8 @@
         return;
       }
 
-      const matches = mockCatalog.filter(p => 
+      const sourceCatalog = (context === 'repack-origin') ? mockBulkCatalog : mockCatalog;
+      const matches = sourceCatalog.filter(p => 
         p.name.toLowerCase().includes(q) || 
         p.barcode.includes(q)
       );
@@ -3726,7 +3812,9 @@
         context === 'label' ? 'label-product-search' :
         context === 'so' ? 'so-product-search' :
         context === 'waste' ? 'waste-product-search' :
-        'repack-product-search'
+        context === 'repack-origin' ? 'repack-origin-search' :
+        context === 'repack-target' ? 'repack-target-search' :
+        'repack-origin-search'
       );
       const input = document.getElementById(inputId);
       if (!dropdown) return;
@@ -3734,14 +3822,15 @@
       if (!dropdown.classList.contains('hidden') && (!input || !input.value || input.value.trim() === "")) {
         dropdown.classList.add('hidden');
       } else {
-        renderLogisticsDropdown(mockCatalog, context);
+        renderLogisticsDropdown((context === 'repack-origin' ? mockBulkCatalog : mockCatalog), context);
         if (input) input.focus();
       }
     }
 
     function triggerLogisticsCameraScan(context) {
       showMockupToast('📷 Kamera Scanner Aktif (0.3s)... Barcode Terdeteksi!', 'success');
-      const sample = mockCatalog[Math.floor(Math.random() * mockCatalog.length)];
+      const sourceCatalog = (context === 'repack-origin') ? mockBulkCatalog : mockCatalog;
+      const sample = sourceCatalog[Math.floor(Math.random() * sourceCatalog.length)];
       selectLogisticsProduct(sample.id, context);
     }
 
@@ -3809,10 +3898,16 @@
         const input = document.getElementById('waste-product-search');
         if (input) input.value = `${p.name} (Stok: ${p.stock})`;
         showMockupToast(`🗑️ ${p.name} dipilih untuk BAP Waste`, 'info');
-      } else if (context === 'repack') {
-        const input = document.getElementById('repack-product-search');
-        if (input) input.value = `${p.name} Bal`;
-        showMockupToast(`🔄 ${p.name} dipilih untuk Repack`, 'info');
+      } else if (context === 'repack-origin') {
+        const input = document.getElementById('repack-origin-search');
+        if (input) input.value = `${p.name} (${p.barcode})`;
+        showMockupToast(`📦 Produk Asal: ${p.name} dipilih`, 'info');
+        updateRepackSummary();
+      } else if (context === 'repack-target') {
+        const input = document.getElementById('repack-target-search');
+        if (input) input.value = `${p.name} (${p.barcode})`;
+        showMockupToast(`🛍️ Produk Tujuan: ${p.name} dipilih`, 'success');
+        updateRepackSummary();
       }
     }
 
@@ -3826,7 +3921,7 @@
 
     // Auto-close dropdown logistik saat klik di luar
     document.addEventListener('click', function(e) {
-      ['lpb', 'products', 'label', 'so', 'waste', 'repack'].forEach(ctx => {
+      ['lpb', 'products', 'label', 'so', 'waste', 'repack-origin', 'repack-target'].forEach(ctx => {
         const dd = document.getElementById(`${ctx}-search-dropdown`);
         const searchBox = dd ? dd.closest('.relative') : null;
         if (dd && searchBox && !searchBox.contains(e.target)) {
@@ -3834,6 +3929,34 @@
         }
       });
     });
+
+
+    // Katalog Bahan Baku Bal Mentah (Khusus Produk Asal Repacking)
+    const mockBulkCatalog = [
+      { id: "B1", barcode: "8992761111901", name: "Keripik Singkong Bal 5 Kg", price: 110000, stock: 3, unit: "Bal", icon: "📦" },
+      { id: "B2", barcode: "8992761111902", name: "Makaroni Bantet Bal 10 Kg", price: 180000, stock: 2, unit: "Bal", icon: "📦" },
+      { id: "B3", barcode: "8992761111903", name: "Basreng Mentah Curah Bal 5 Kg", price: 130000, stock: 4, unit: "Bal", icon: "📦" },
+      { id: "B4", barcode: "8992761111904", name: "Kacang Tanah Kupas Bal 10 Kg", price: 220000, stock: 5, unit: "Bal", icon: "📦" }
+    ];
+
+    function updateRepackSummary() {
+      const qOrigin = document.getElementById('repack-qty-origin')?.value || '1';
+      const qTarget = document.getElementById('repack-qty-target')?.value || '25';
+      const outEl = document.getElementById('repack-summary-out');
+      const inEl = document.getElementById('repack-summary-in');
+      if (outEl) outEl.textContent = `-${qOrigin} Bal (Sisa ${Math.max(0, 3 - parseInt(qOrigin))} Bal)`;
+      if (inEl) inEl.textContent = `+${qTarget} Bungkus (Total Menjadi ${45 + parseInt(qTarget)} Bks)`;
+    }
+
+    function executeRepackProcess() {
+      const qOrigin = document.getElementById('repack-qty-origin')?.value || '1';
+      const qTarget = document.getElementById('repack-qty-target')?.value || '25';
+      const origName = document.getElementById('repack-origin-search')?.value.split('(')[0] || 'Bal Mentah';
+      const targName = document.getElementById('repack-target-search')?.value.split('(')[0] || 'Kemasan Ecer';
+      
+      showMockupToast(`🔄 Repack Sukses: -${qOrigin} Bal (${origName.trim()}) ➔ +${qTarget} Bks (${targName.trim()})`, 'success');
+      closeSisModal('sis-modal-repack');
+    }
 
   </script>
 
