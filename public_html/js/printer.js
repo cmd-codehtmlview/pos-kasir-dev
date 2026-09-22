@@ -298,6 +298,11 @@ function handleBluetoothIndicatorClick() {
 
 function cancelOrClearPrintQueue() {
   if (typeof printSpooler !== 'undefined') {
+    // Abaikan jika tidak ada proses aktif atau antrean cetak
+    if (!printSpooler.isProcessing && (!printSpooler.queue || printSpooler.queue.length === 0)) {
+      return;
+    }
+
     // 1. Cooldown tap: abaikan ketukan kilat tidak sengaja pada tombol batal saat awal tugas cetak
     if (printSpooler.lastJobStartTime && (Date.now() - printSpooler.lastJobStartTime < 900)) {
       console.log("[PrintSpooler] Ignored accidental touch collision on cancel button");
@@ -2383,6 +2388,10 @@ function updateBluetoothUI() {
         printSpooler.hideWidgetTimer = null;
       }
 
+      widget.classList.remove("hidden");
+      widget.classList.add("active");
+      widget.classList.remove("closing");
+
       // Proteksi sentuhan HP: nonaktifkan tombol Batal selama 800ms pertama saat widget muncul
       const cancelBtn = document.getElementById("btn-spooler-cancel");
       if (cancelBtn && !widget.classList.contains("active")) {
@@ -2397,9 +2406,6 @@ function updateBluetoothUI() {
           }
         }, 800);
       }
-
-      widget.classList.add("active");
-      widget.classList.remove("closing");
 
       const cur = printSpooler.currentJob;
       const progress = cur ? cur.progress : 0;
@@ -2422,9 +2428,14 @@ function updateBluetoothUI() {
         printSpooler.hideWidgetTimer = setTimeout(() => {
           widget.classList.remove("active");
           widget.classList.add("closing");
-          setTimeout(() => widget.classList.remove("closing"), 400);
+          setTimeout(() => {
+            widget.classList.remove("closing");
+            widget.classList.add("hidden");
+          }, 400);
           printSpooler.hideWidgetTimer = null;
         }, 900);
+      } else if (!widget.classList.contains("active")) {
+        widget.classList.add("hidden");
       }
     }
   }

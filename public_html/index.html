@@ -59,7 +59,7 @@
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-bebas { font-family: 'Bebas Neue', sans-serif; }
   </style>
-  <link rel="stylesheet" href="style.css?v=120">
+  <link rel="stylesheet" href="style.css?v=121">
 
   <!-- PWA Manifest & App Icons -->
   <link rel="manifest" id="app-manifest" href="manifest.json">
@@ -8764,7 +8764,7 @@
   <!-- FLOATING REAL-TIME BLUETOOTH PRINT SPOOLER WIDGET -->
   <div 
     id="print-spooler-widget" 
-    class="fixed top-4 sm:top-auto sm:bottom-20 left-1/2 -translate-x-1/2 z-[9999] transition-all duration-300 transform -translate-y-12 sm:translate-y-24 opacity-0 pointer-events-none no-print max-w-md w-[92%] sm:w-auto"
+    class="hidden fixed bottom-24 sm:bottom-20 left-1/2 -translate-x-1/2 z-[9999] transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none no-print max-w-md w-[92%] sm:w-auto"
   >
     <div class="bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl border border-slate-700/80 flex items-center gap-3">
       <!-- Icon Animasi Printer -->
@@ -8802,7 +8802,7 @@
           id="btn-spooler-cancel" 
           type="button" 
           onclick="cancelOrClearPrintQueue()" 
-          class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 border border-rose-500/30 rounded-xl text-[10px] font-bold transition flex items-center gap-1 cursor-pointer pointer-events-auto"
+          class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 border border-rose-500/30 rounded-xl text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
           title="Batalkan tugas / bersihkan antrean macet"
         >
           <span>✕</span>
@@ -8899,7 +8899,7 @@
   <script src="js/html5-qrcode.min.js"></script>
   <script src="js/scanner.js?v=103"></script>
   <script src="js/cart.js?v=103"></script>
-  <script src="js/printer.js?v=123"></script>
+  <script src="js/printer.js?v=124"></script>
   <script src="js/checkout.js?v=108"></script>
   <script src="js/member.js?v=108"></script>
   <script src="js/returns.js?v=100"></script>
@@ -10552,7 +10552,7 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=110')
+        navigator.serviceWorker.register('./sw.js?v=111')
           .then((registration) => {
             registration.update();
             console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

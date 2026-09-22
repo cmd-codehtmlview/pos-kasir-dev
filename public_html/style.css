@@ -972,24 +972,32 @@ html, body {
    ========================================================= */
 #print-spooler-widget {
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-  pointer-events: none;
+  pointer-events: none !important;
   z-index: 9999 !important;
 }
 
+#print-spooler-widget:not(.active) {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+#print-spooler-widget:not(.active) * {
+  pointer-events: none !important;
+}
+
 #print-spooler-widget.active {
+  display: block !important;
   transform: translate(-50%, 0) !important;
   opacity: 1 !important;
   pointer-events: auto !important;
 }
 
-#print-spooler-widget.closing {
-  transform: translate(-50%, -15px) !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
+#print-spooler-widget.active #btn-spooler-cancel {
+  pointer-events: auto !important;
 }
 
-@media (min-width: 640px) {
-  #print-spooler-widget.closing {
-    transform: translate(-50%, 15px) !important;
-  }
+#print-spooler-widget.closing {
+  transform: translate(-50%, 20px) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
