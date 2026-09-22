@@ -59,50 +59,40 @@ function initSupabase() {
 }
 
 function updateCloudStatus(status, label = "") {
-  const badge = document.getElementById("cloud-status-indicator");
+  const badge = document.getElementById("cloud-status-indicator") || document.getElementById("status-indicator");
+  const dot = document.getElementById("cloud-status-dot") || document.getElementById("status-dot");
+  const labelEl = document.getElementById("cloud-status-label") || document.getElementById("status-label");
+
   if (badge) {
+    badge.className = "h-8 px-2 sm:px-2.5 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-[10px] font-semibold text-white cursor-pointer active:scale-95 transition flex items-center gap-1.5 shadow-xs";
+    
     if (status === "online") {
-      badge.className = "cloud-status-badge cloud-online cursor-pointer transition-all hover:scale-105 active:scale-95";
-      badge.innerHTML = `🟢 <span>ONLINE</span> <span class="hidden sm:inline text-[10px] opacity-90 font-mono font-bold">(${label || 'Auto 30s'})</span>`;
-      badge.title = "Cloud Terhubung • Sinkron Otomatis Tiap 30 Detik • Klik untuk Sinkron Manual Sekarang [F9]";
+      if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
+      if (labelEl) {
+        labelEl.textContent = label ? `SYNC ${label.replace('Sync ', '')}` : "AUTO 30s";
+        labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300";
+      }
+      badge.title = `Cloud Supabase Terhubung • Auto 30s • ${label || 'Siap'} • Klik untuk Sinkron Manual [F9]`;
     } else if (status === "syncing") {
-      badge.className = "cloud-status-badge cloud-syncing cursor-pointer";
-      badge.innerHTML = `🔄 <span class="animate-pulse">SINKRONISASI...</span>`;
-      badge.title = "Sedang menyinkronkan data penjualan kasir, LPB, retur, dan stock opname ke cloud...";
+      if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
+      if (labelEl) {
+        labelEl.textContent = "SYNC...";
+        labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-amber-300";
+      }
+      badge.title = "Sedang menyinkronkan data kasir ke cloud Supabase...";
     } else {
-      badge.className = "cloud-status-badge cloud-offline cursor-pointer transition-all hover:scale-105 active:scale-95";
-      badge.innerHTML = `🔴 <span>OFFLINE</span> <span class="hidden sm:inline text-[10px] opacity-80">(${label || 'Lokal'})</span>`;
-      badge.title = "Mode Kasir Offline (Lokal) • Klik untuk mencoba hubungkan ke cloud [F9]";
+      if (dot) dot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.8)]";
+      if (labelEl) {
+        labelEl.textContent = "OFFLINE";
+        labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-rose-300";
+      }
+      badge.title = "Status: Offline (Lokal) • Klik untuk mencoba hubungkan ke cloud [F9]";
     }
   }
 
-  // Update indikator mobile (mockup-pos & mobile header)
-  const mobileDot = document.getElementById("status-dot");
-  const mobileLabel = document.getElementById("status-label");
-  const mobileIndicator = document.getElementById("status-indicator");
-  if (mobileDot) {
-    if (status === "online") {
-      mobileDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
-      if (mobileLabel) {
-        mobileLabel.textContent = label ? `SYNC ${label.replace('Sync ', '')}` : "ONLINE (30s)";
-        mobileLabel.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300";
-      }
-      if (mobileIndicator) mobileIndicator.title = `Cloud Terhubung (Auto 30s) • ${label || 'Siap'} • Klik untuk Sinkron Manual`;
-    } else if (status === "syncing") {
-      mobileDot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
-      if (mobileLabel) {
-        mobileLabel.textContent = "SYNC...";
-        mobileLabel.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-amber-300";
-      }
-      if (mobileIndicator) mobileIndicator.title = "Sedang menyinkronkan data kasir ke cloud...";
-    } else {
-      mobileDot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.8)]";
-      if (mobileLabel) {
-        mobileLabel.textContent = "OFFLINE";
-        mobileLabel.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-rose-300";
-      }
-      if (mobileIndicator) mobileIndicator.title = "Status: Offline / Terputus • Klik untuk hubungkan ke cloud";
-    }
+  const drawerSync = document.getElementById('drawer-last-sync');
+  if (drawerSync && label) {
+    drawerSync.textContent = `Sync: ${label}`;
   }
 }
 

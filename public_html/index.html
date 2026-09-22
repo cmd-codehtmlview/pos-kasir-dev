@@ -7644,7 +7644,7 @@
   <!-- ============================================================ -->
   <!-- MODAL: PEMINDAI BARCODE KAMERA KASIR UTAMA (POS MULTI-SCAN) -->
   <!-- ============================================================ -->
-  <div id="modal-pos-camera-scanner" class="modal-backdrop fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-50 hidden no-print">
+  <div id="modal-pos-camera-scanner" class="modal-backdrop fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[75] hidden no-print">
     <div class="bg-slate-900 text-white w-full max-w-lg rounded-3xl shadow-2xl border-2 border-emerald-500 overflow-hidden flex flex-col max-h-[96vh]">
       
       <!-- Header Modal -->
@@ -8896,13 +8896,13 @@
   <script src="js/db.js?v=120"></script>
   <script src="js/store.js?v=99"></script>
   <script src="js/license.js?v=120"></script>
-  <script src="js/sync.js?v=99"></script>
+  <script src="js/sync.js?v=102"></script>
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=99"></script>
-  <script src="js/cart.js?v=101"></script>
-  <script src="js/printer.js?v=120"></script>
+  <script src="js/scanner.js?v=102"></script>
+  <script src="js/cart.js?v=102"></script>
+  <script src="js/printer.js?v=122"></script>
   <script src="js/checkout.js?v=107"></script>
   <script src="js/member.js?v=107"></script>
   <script src="js/returns.js?v=99"></script>
@@ -8952,9 +8952,9 @@
     let mockupLastSyncTime = "--:--:--";
 
     function updateNetworkStatus(status = "online", label = "") {
-      const dot = document.getElementById('status-dot');
-      const labelEl = document.getElementById('status-label');
-      const container = document.getElementById('status-indicator');
+      const dot = document.getElementById('cloud-status-dot') || document.getElementById('status-dot');
+      const labelEl = document.getElementById('cloud-status-label') || document.getElementById('status-label');
+      const container = document.getElementById('cloud-status-indicator') || document.getElementById('status-indicator');
       const drawerSync = document.getElementById('drawer-last-sync');
 
       if (!dot) return;
@@ -9982,10 +9982,60 @@
     }
 
     function triggerLogisticsCameraScan(context) {
-      showMockupToast('📷 Kamera Scanner Aktif (0.3s)... Barcode Terdeteksi!', 'success');
-      const sourceCatalog = (context === 'repack-origin') ? mockBulkCatalog : mockCatalog;
-      const sample = sourceCatalog[Math.floor(Math.random() * sourceCatalog.length)];
-      selectLogisticsProduct(sample.id, context);
+      const titles = {
+        'lpb': 'Scan Barcode Penerimaan Barang (LPB)',
+        'products': 'Scan Barcode Master & Cek Harga',
+        'label': 'Scan Barcode Cetak Label Rak',
+        'so': 'Scan Barcode Stock Opname Fisik',
+        'waste': 'Scan Barcode Barang Rusak (Waste)',
+        'repack-origin': 'Scan Barcode Bahan Asal (Bal Mentah)',
+        'repack-target': 'Scan Barcode Produk Tujuan Repack'
+      };
+      const title = titles[context] || 'Scan Barcode Logistik';
+
+      if (typeof openPosCameraScanner === 'function') {
+        openPosCameraScanner(function(scannedBarcode) {
+          handleLogisticsScannedBarcode(scannedBarcode, context);
+        }, title);
+      } else {
+        if (typeof showToast === 'function') showToast("Fitur kamera belum siap.", "warning");
+      }
+    }
+
+    function handleLogisticsScannedBarcode(scannedCode, context) {
+      const code = (scannedCode || '').trim();
+      if (!code) return;
+
+      const realProducts = (typeof pos !== 'undefined' && pos.products) ? pos.products : [];
+      const sourceList = (context === 'repack-origin') ? mockBulkCatalog : [...realProducts, ...mockCatalog];
+
+      const matched = sourceList.find(p => (p.barcode && p.barcode === code) || (p.id && String(p.id).toLowerCase() === code.toLowerCase()));
+
+      if (matched) {
+        selectLogisticsProduct(matched.id, context);
+        if (typeof showToast === 'function') {
+          showToast(`📷 ${matched.name} (${code}) berhasil di-scan`, 'success');
+        }
+      } else {
+        const inputMap = {
+          'lpb': 'lpb-product-search',
+          'products': 'products-search-input',
+          'label': 'label-product-search',
+          'so': 'so-product-search',
+          'waste': 'waste-product-search',
+          'repack-origin': 'repack-origin-search',
+          'repack-target': 'repack-target-search'
+        };
+        const inputId = inputMap[context];
+        const input = inputId ? document.getElementById(inputId) : null;
+        if (input) {
+          input.value = code;
+          input.focus();
+        }
+        if (typeof showToast === 'function') {
+          showToast(`📷 Barcode ${code} terdeteksi!`, 'info');
+        }
+      }
     }
 
     function renderLogisticsDropdown(items, context) {
@@ -10011,10 +10061,10 @@
             <span class="text-base">${p.icon || '🍘'}</span>
             <div class="min-w-0">
               <span class="font-bold text-xs text-slate-900 group-hover:text-emerald-700 block truncate">${p.name}</span>
-              <span class="text-[10px] text-slate-400 font-mono block">${p.barcode} • Stok: ${p.stock} ${p.unit}</span>
+              <span class="text-[10px] text-slate-400 font-mono block">${p.barcode || p.plu || '-'} • Stok: ${p.stock || 0} ${p.unit || 'Bks'}</span>
             </div>
           </div>
-          <span class="font-mono font-bold text-xs text-emerald-700 shrink-0">Rp ${p.price.toLocaleString('id-ID')}</span>
+          <span class="font-mono font-bold text-xs text-emerald-700 shrink-0">Rp ${(p.price || 0).toLocaleString('id-ID')}</span>
         </div>
       `).join("");
 
@@ -10022,8 +10072,9 @@
     }
 
     function selectLogisticsProduct(productId, context) {
-      const sourceList = (context === 'repack-origin') ? mockBulkCatalog : mockCatalog;
-      const p = sourceList.find(item => item.id === productId);
+      const realProducts = (typeof pos !== 'undefined' && pos.products) ? pos.products : [];
+      const sourceList = (context === 'repack-origin') ? mockBulkCatalog : [...realProducts, ...mockCatalog];
+      const p = sourceList.find(item => item.id === productId || item.barcode === productId);
       if (!p) return;
 
       const dropdown = document.getElementById(`${context}-search-dropdown`);
@@ -10434,7 +10485,7 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=101')
+        navigator.serviceWorker.register('./sw.js?v=102')
           .then((registration) => {
             registration.update();
             console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

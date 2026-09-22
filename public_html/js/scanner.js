@@ -135,8 +135,12 @@ const POS_SCANNER_COOLDOWN_MS = 1400;
 // Fallback native stream jika Html5Qrcode tidak tersedia
 let posNativeCameraStream = null;
 let posNativeAnimationId = null;
+let activeScannerCustomCallback = null;
 
-async function openPosCameraScanner() {
+async function openPosCameraScanner(customCallback = null, customTitle = null) {
+  // Simpan callback kustom jika dipanggil dari modul luar (misal: SIS Logistik Gudang)
+  activeScannerCustomCallback = typeof customCallback === "function" ? customCallback : null;
+
   // Verifikasi HTTPS untuk izin kamera modern
   if (location.protocol === "http:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
     const targetUrl = "https://" + (location.hostname === "2.27.165.72" ? "2.27.165.72.sslip.io" : location.hostname) + location.pathname + location.search + location.hash;
@@ -147,9 +151,15 @@ async function openPosCameraScanner() {
     return;
   }
 
-  // Pastikan berada di tab Kasir POS
-  if (typeof switchTab === "function") {
+  // Hanya alihkan tab jika bukan pemanggilan kustom dari modal (misal: bukan dari SIS)
+  if (!activeScannerCustomCallback && typeof switchTab === "function") {
     switchTab("tab-pos");
+  }
+
+  // Sesuaikan judul header scanner kamera jika ada
+  const titleEl = document.querySelector("#modal-pos-camera-scanner h3");
+  if (titleEl) {
+    titleEl.textContent = customTitle || "Scan Barcode Kasir";
   }
 
   openModal("modal-pos-camera-scanner");
@@ -340,6 +350,15 @@ function onPosBarcodeDetected(decodedText) {
     sfx.beep();
   }
 
+  // Jika ini adalah custom callback dari SIS Logistik Gudang (LPB, SO, Repack, Master Produk, Label, Waste)
+  if (typeof activeScannerCustomCallback === "function") {
+    const cb = activeScannerCustomCallback;
+    activeScannerCustomCallback = null;
+    closePosCameraScanner();
+    cb(code);
+    return;
+  }
+
   // Proses masukkan produk ke keranjang kasir
   processScannedBarcode(code);
 
@@ -434,11 +453,16 @@ async function closePosCameraScanner() {
 
   closeModal("modal-pos-camera-scanner");
 
-  // Kembalikan fokus ke kotak pencarian barcode kasir
-  setTimeout(() => {
-    const searchInput = document.getElementById("pos-barcode-search");
-    if (searchInput) searchInput.focus();
-  }, 100);
+  const hadCustomCallback = Boolean(activeScannerCustomCallback);
+  activeScannerCustomCallback = null;
+
+  // Kembalikan fokus ke kotak pencarian barcode kasir hanya jika bukan dari modal kustom
+  if (!hadCustomCallback) {
+    setTimeout(() => {
+      const searchInput = document.getElementById("pos-barcode-search");
+      if (searchInput) searchInput.focus();
+    }, 100);
+  }
 }
 
 // Tombol Switch Kamera (Kamera Depan vs Kamera Belakang)
