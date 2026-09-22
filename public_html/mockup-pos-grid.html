@@ -319,166 +319,182 @@
         ✕
       </button>
 </div>
-<!-- Drawer Content (Grid Layout: 5 Kategori Grid Utama -> Klik Kategori Tampil Grid Sub-Menu) -->
-<div class="flex-1 overflow-y-auto p-3.5 sm:p-4">
-<!-- LEVEL 1: 5 KARTU GRID KATEGORI UTAMA -->
-<div class="grid grid-cols-2 gap-3" id="sis-grid-main">
-<!-- 1. Operasional Kas & Kasir -->
-<button class="p-4 rounded-2xl bg-blue-50/70 hover:bg-blue-100/70 active:scale-95 border border-blue-200/90 shadow-2xs flex flex-col items-center justify-center text-center gap-2.5 transition cursor-pointer group select-none" onclick="showSisGridSub(1)" type="button">
-<div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 border border-blue-200 flex items-center justify-center text-2xl group-hover:scale-105 transition shadow-2xs">
-            📋
-          </div>
-<div>
-<span class="block font-extrabold text-xs sm:text-sm text-slate-900 group-hover:text-blue-700 transition leading-tight">Operasional Kas</span>
-<span class="inline-block text-[10px] font-bold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-full mt-1 border border-blue-200/70">4 Sub Menu</span>
-</div>
-</button>
-<!-- 2. Logistik & Inventori -->
-<button class="p-4 rounded-2xl bg-emerald-50/70 hover:bg-emerald-100/70 active:scale-95 border border-emerald-200/90 shadow-2xs flex flex-col items-center justify-center text-center gap-2.5 transition cursor-pointer group select-none" onclick="showSisGridSub(2)" type="button">
-<div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 border border-emerald-200 flex items-center justify-center text-2xl group-hover:scale-105 transition shadow-2xs">
-            📦
-          </div>
-<div>
-<span class="block font-extrabold text-xs sm:text-sm text-slate-900 group-hover:text-emerald-700 transition leading-tight">Logistik &amp; Stok</span>
-<span class="inline-block text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full mt-1 border border-emerald-200/70">6 Sub Menu</span>
-</div>
-</button>
-<!-- 3. Personil & Keamanan -->
-<button class="p-4 rounded-2xl bg-amber-50/70 hover:bg-amber-100/70 active:scale-95 border border-amber-200/90 shadow-2xs flex flex-col items-center justify-center text-center gap-2.5 transition cursor-pointer group select-none" onclick="showSisGridSub(3)" type="button">
-<div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 border border-amber-200 flex items-center justify-center text-2xl group-hover:scale-105 transition shadow-2xs">
-            👤
-          </div>
-<div>
-<span class="block font-extrabold text-xs sm:text-sm text-slate-900 group-hover:text-amber-700 transition leading-tight">Personil Toko</span>
-<span class="inline-block text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-full mt-1 border border-amber-200/70">2 Sub Menu</span>
-</div>
-</button>
-<!-- 4. Laporan Shift -->
-<button class="p-4 rounded-2xl bg-purple-50/70 hover:bg-purple-100/70 active:scale-95 border border-purple-200/90 shadow-2xs flex flex-col items-center justify-center text-center gap-2.5 transition cursor-pointer group select-none" onclick="showSisGridSub(4)" type="button">
-<div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 border border-purple-200 flex items-center justify-center text-2xl group-hover:scale-105 transition shadow-2xs">
-            📊
-          </div>
-<div>
-<span class="block font-extrabold text-xs sm:text-sm text-slate-900 group-hover:text-purple-700 transition leading-tight">Laporan Shift</span>
-<span class="inline-block text-[10px] font-bold text-purple-700 bg-purple-100/80 px-2 py-0.5 rounded-full mt-1 border border-purple-200/70">1 Sub Menu</span>
-</div>
-</button>
-<!-- 5. Pengaturan Sistem Toko (Full width tile) -->
-<button class="col-span-2 p-4 rounded-2xl bg-slate-100/80 hover:bg-slate-200/70 active:scale-95 border border-slate-200/90 shadow-2xs flex items-center justify-between gap-4 px-5 transition cursor-pointer group select-none text-left" onclick="showSisGridSub(5)" type="button">
-<div class="flex items-center gap-3.5">
-<div class="w-12 h-12 rounded-2xl bg-slate-200 text-slate-700 border border-slate-300/80 flex items-center justify-center text-2xl group-hover:scale-105 transition shadow-2xs">
-              ⚙️
+<!-- Drawer Content (Grid Accordion: 5 Kartu Kategori, klik kartu langsung gelar sub-grid di tempat) -->
+      <div class="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3" id="sis-accordion-container">
+        
+        <!-- 1. Operasional Kas & Kasir (Soft Blue) -->
+        <div class="rounded-2xl border border-blue-200/85 bg-white overflow-hidden shadow-2xs transition-all duration-200" id="sis-acc-card-1">
+          <button type="button" onclick="toggleSisAccordion(1)" class="w-full p-3 sm:p-3.5 bg-blue-50/70 hover:bg-blue-100/60 active:scale-[0.99] flex items-center justify-between gap-3 transition cursor-pointer select-none text-left">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 border border-blue-200/80 flex items-center justify-center text-xl shrink-0 shadow-2xs">📋</span>
+              <div class="min-w-0">
+                <span class="block font-extrabold text-xs sm:text-sm text-slate-900 leading-tight truncate">Operasional Kas</span>
+                <span class="inline-block text-[10px] font-bold text-blue-700 bg-blue-100/80 px-2 py-0.5 rounded-full mt-0.5 border border-blue-200/70">4 Sub Menu</span>
+              </div>
             </div>
-<div>
-<span class="block font-extrabold text-xs sm:text-sm text-slate-900 group-hover:text-slate-800 transition leading-tight">Pengaturan Sistem Toko</span>
-<span class="inline-block text-[10px] font-bold text-slate-600 bg-slate-200/80 px-2 py-0.5 rounded-full mt-1 border border-slate-300/70">4 Sub Menu</span>
-</div>
-</div>
-<span class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-400 group-hover:text-slate-700 flex items-center justify-center text-sm font-bold shadow-2xs">›</span>
-</button>
-</div>
-<!-- LEVEL 2: SUB-MENU GRID CONTAINER (DITAMPILKAN SAAT KATEGORI DIKLIK) -->
-<div class="hidden space-y-3" id="sis-grid-sub-view">
-<!-- Header Sub Menu dengan Tombol Kembali -->
-<div class="p-3 bg-white rounded-2xl border border-slate-200/90 shadow-2xs flex items-center justify-between gap-2" id="sis-grid-sub-header">
-<button class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition active:scale-95 cursor-pointer border border-slate-200" onclick="backToSisGridMain()" type="button">
-<span>‹</span>
-<span>Menu Utama</span>
-</button>
-<div class="flex items-center gap-2 min-w-0 text-right">
-<span class="text-base" id="sis-grid-sub-icon">📋</span>
-<h3 class="font-bold text-xs sm:text-sm text-slate-900 truncate" id="sis-grid-sub-title">Operasional Kas &amp; Kasir</h3>
-</div>
-</div>
-<!-- Sub Grid 1: Operasional Kas & Kasir (Soft Blue) -->
-<div class="hidden grid grid-cols-2 gap-2.5" id="sis-grid-sub-items-1">
-<button class="p-3.5 bg-blue-50/50 hover:bg-blue-100/70 text-center rounded-2xl border border-blue-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-klerk')" type="button">
-<span class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 border border-blue-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">📋</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-blue-800 transition">Closing Kasir</span>
-</button>
-<button class="p-3.5 bg-blue-50/50 hover:bg-blue-100/70 text-center rounded-2xl border border-blue-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-receipts')" type="button">
-<span class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 border border-blue-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">🧾</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-blue-800 transition">Riwayat Struk</span>
-</button>
-<button class="p-3.5 bg-blue-50/50 hover:bg-blue-100/70 text-center rounded-2xl border border-blue-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-retur')" type="button">
-<span class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 border border-blue-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">↩️</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-blue-800 transition">Retur Belanja</span>
-</button>
-<button class="p-3.5 bg-blue-50/50 hover:bg-blue-100/70 text-center rounded-2xl border border-blue-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-cashdrop')" type="button">
-<span class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 border border-blue-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">📥</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-blue-800 transition">Tarik Kas / Drop</span>
-</button>
-</div>
-<!-- Sub Grid 2: Logistik & Inventori (Soft Emerald) -->
-<div class="hidden grid grid-cols-2 gap-2.5" id="sis-grid-sub-items-2">
-<button class="p-3.5 bg-emerald-50/50 hover:bg-emerald-100/70 text-center rounded-2xl border border-emerald-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-lpb')" type="button">
-<span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">📦</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-emerald-800 transition">Penerimaan (LPB)</span>
-</button>
-<button class="p-3.5 bg-emerald-50/50 hover:bg-emerald-100/70 text-center rounded-2xl border border-emerald-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-products')" type="button">
-<span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">🔍</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-emerald-800 transition">Master &amp; Cek Harga</span>
-</button>
-<button class="p-3.5 bg-emerald-50/50 hover:bg-emerald-100/70 text-center rounded-2xl border border-emerald-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-label')" type="button">
-<span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">🏷️</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-emerald-800 transition">Label Rak Barcode</span>
-</button>
-<button class="p-3.5 bg-emerald-50/50 hover:bg-emerald-100/70 text-center rounded-2xl border border-emerald-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-so')" type="button">
-<span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">📊</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-emerald-800 transition">Stock Opname</span>
-</button>
-<button class="p-3.5 bg-emerald-50/50 hover:bg-emerald-100/70 text-center rounded-2xl border border-emerald-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-waste')" type="button">
-<span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">🗑️</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-emerald-800 transition">Barang Rusak</span>
-</button>
-<button class="p-3.5 bg-emerald-50/50 hover:bg-emerald-100/70 text-center rounded-2xl border border-emerald-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-repack')" type="button">
-<span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">🔄</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-emerald-800 transition">Repack Bal ke Ecer</span>
-</button>
-</div>
-<!-- Sub Grid 3: Personil Toko & Keamanan (Soft Amber) -->
-<div class="hidden grid grid-cols-2 gap-2.5" id="sis-grid-sub-items-3">
-<button class="p-3.5 bg-amber-50/50 hover:bg-amber-100/70 text-center rounded-2xl border border-amber-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-staff')" type="button">
-<span class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 border border-amber-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">👤</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-amber-800 transition">Karyawan &amp; Presensi</span>
-</button>
-<button class="p-3.5 bg-amber-50/50 hover:bg-amber-100/70 text-center rounded-2xl border border-amber-200/80 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-pin')" type="button">
-<span class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 border border-amber-200/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">🔐</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-amber-800 transition">PIN Otorisasi</span>
-</button>
-</div>
-<!-- Sub Grid 4: Laporan Operasional Kasir (Soft Purple) -->
-<div class="hidden grid grid-cols-1 gap-2.5" id="sis-grid-sub-items-4">
-<button class="p-4 bg-purple-50/50 hover:bg-purple-100/70 text-center rounded-2xl border border-purple-200/80 transition flex items-center justify-center gap-3 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-report')" type="button">
-<span class="w-11 h-11 rounded-xl bg-purple-100 text-purple-700 border border-purple-200/80 flex items-center justify-center text-xl shadow-2xs group-hover:scale-105 transition">📊</span>
-<div class="text-left">
-<span class="block font-bold text-xs sm:text-sm text-slate-900 group-hover:text-purple-800 transition">Laporan Penjualan Shift</span>
-<span class="text-[11px] text-purple-600 font-medium">Rekap Transaksi Kasir Hari Ini</span>
-</div>
-</button>
-</div>
-<!-- Sub Grid 5: Pengaturan Sistem Toko (Soft Slate) -->
-<div class="hidden grid grid-cols-2 gap-2.5" id="sis-grid-sub-items-5">
-<button class="p-3.5 bg-slate-100/60 hover:bg-slate-200/70 text-center rounded-2xl border border-slate-200/90 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-printer')" type="button">
-<span class="w-10 h-10 rounded-xl bg-slate-200 text-slate-700 border border-slate-300/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">🖨️</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-slate-800 transition">Setting Printer</span>
-</button>
-<button class="p-3.5 bg-slate-100/60 hover:bg-slate-200/70 text-center rounded-2xl border border-slate-200/90 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-profile')" type="button">
-<span class="w-10 h-10 rounded-xl bg-slate-200 text-slate-700 border border-slate-300/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">🏪</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-slate-800 transition">Profil Toko</span>
-</button>
-<button class="p-3.5 bg-slate-100/60 hover:bg-slate-200/70 text-center rounded-2xl border border-slate-200/90 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openSisModal('sis-modal-qris')" type="button">
-<span class="w-10 h-10 rounded-xl bg-slate-200 text-slate-700 border border-slate-300/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">💳</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-slate-800 transition">QRIS &amp; Bayar</span>
-</button>
-<button class="p-3.5 bg-slate-100/60 hover:bg-slate-200/70 text-center rounded-2xl border border-slate-200/90 transition flex flex-col items-center justify-center gap-2 cursor-pointer group shadow-2xs active:scale-95" onclick="openMockupAboutModal()" type="button">
-<span class="w-10 h-10 rounded-xl bg-slate-200 text-slate-700 border border-slate-300/80 flex items-center justify-center text-lg shadow-2xs group-hover:scale-105 transition">ℹ️</span>
-<span class="font-bold text-xs text-slate-900 group-hover:text-slate-800 transition">Tentang Aplikasi</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Drawer Footer (Clean Minimalist Action Bar) -->
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="w-7 h-7 rounded-lg bg-blue-100/70 text-blue-700 flex items-center justify-center text-[10px] font-bold transition-transform duration-200" id="sis-chevron-1">▼</span>
+            </div>
+          </button>
+          <div id="sis-acc-sub-1" class="hidden p-3 bg-blue-50/25 border-t border-blue-100/80">
+            <div class="grid grid-cols-2 gap-2.5">
+              <button type="button" onclick="openSisModal('sis-modal-klerk')" class="p-3 bg-white hover:bg-blue-50/80 text-center rounded-xl border border-blue-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-blue-100/80 text-blue-700 border border-blue-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">📋</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-blue-800 transition">Closing Kasir</span>
+              </button>
+              <button type="button" onclick="openSisModal('sis-modal-receipts')" class="p-3 bg-white hover:bg-blue-50/80 text-center rounded-xl border border-blue-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-blue-100/80 text-blue-700 border border-blue-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">🧾</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-blue-800 transition">Riwayat Struk</span>
+              </button>
+              <button type="button" onclick="openSisModal('sis-modal-retur')" class="p-3 bg-white hover:bg-blue-50/80 text-center rounded-xl border border-blue-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-blue-100/80 text-blue-700 border border-blue-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">↩️</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-blue-800 transition">Retur Belanja</span>
+              </button>
+              <button type="button" onclick="openSisModal('sis-modal-cashdrop')" class="p-3 bg-white hover:bg-blue-50/80 text-center rounded-xl border border-blue-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-blue-100/80 text-blue-700 border border-blue-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">📥</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-blue-800 transition">Tarik Kas / Drop</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Logistik & Inventori (Soft Emerald) -->
+        <div class="rounded-2xl border border-emerald-200/85 bg-white overflow-hidden shadow-2xs transition-all duration-200" id="sis-acc-card-2">
+          <button type="button" onclick="toggleSisAccordion(2)" class="w-full p-3 sm:p-3.5 bg-emerald-50/70 hover:bg-emerald-100/60 active:scale-[0.99] flex items-center justify-between gap-3 transition cursor-pointer select-none text-left">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-xl shrink-0 shadow-2xs">📦</span>
+              <div class="min-w-0">
+                <span class="block font-extrabold text-xs sm:text-sm text-slate-900 leading-tight truncate">Logistik &amp; Stok</span>
+                <span class="inline-block text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full mt-0.5 border border-emerald-200/70">6 Sub Menu</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="w-7 h-7 rounded-lg bg-emerald-100/70 text-emerald-700 flex items-center justify-center text-[10px] font-bold transition-transform duration-200" id="sis-chevron-2">▼</span>
+            </div>
+          </button>
+          <div id="sis-acc-sub-2" class="hidden p-3 bg-emerald-50/25 border-t border-emerald-100/80">
+            <div class="grid grid-cols-2 gap-2.5">
+              <button type="button" onclick="openSisModal('sis-modal-lpb')" class="p-3 bg-white hover:bg-emerald-50/80 text-center rounded-xl border border-emerald-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">📦</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-emerald-800 transition">Penerimaan (LPB)</span>
+              </button>
+              <button type="button" onclick="openSisModal('sis-modal-products')" class="p-3 bg-white hover:bg-emerald-50/80 text-center rounded-xl border border-emerald-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">🔍</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-emerald-800 transition">Master &amp; Cek Harga</span>
+              </button>
+              <button type="button" onclick="openSisModal('sis-modal-label')" class="p-3 bg-white hover:bg-emerald-50/80 text-center rounded-xl border border-emerald-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">🏷️</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-emerald-800 transition">Label Rak Barcode</span>
+              </button>
+              <button type="button" onclick="openSisModal('sis-modal-so')" class="p-3 bg-white hover:bg-emerald-50/80 text-center rounded-xl border border-emerald-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">📊</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-emerald-800 transition">Stock Opname</span>
+              </button>
+              <button type="button" onclick="openSisModal('sis-modal-waste')" class="p-3 bg-white hover:bg-emerald-50/80 text-center rounded-xl border border-emerald-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">🗑️</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-emerald-800 transition">Barang Rusak</span>
+              </button>
+              <button type="button" onclick="openSisModal('sis-modal-repack')" class="p-3 bg-white hover:bg-emerald-50/80 text-center rounded-xl border border-emerald-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-emerald-100/80 text-emerald-700 border border-emerald-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">🔄</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-emerald-800 transition">Repack Bal/Ecer</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Personil & Keamanan (Soft Amber) -->
+        <div class="rounded-2xl border border-amber-200/85 bg-white overflow-hidden shadow-2xs transition-all duration-200" id="sis-acc-card-3">
+          <button type="button" onclick="toggleSisAccordion(3)" class="w-full p-3 sm:p-3.5 bg-amber-50/70 hover:bg-amber-100/60 active:scale-[0.99] flex items-center justify-between gap-3 transition cursor-pointer select-none text-left">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 border border-amber-200/80 flex items-center justify-center text-xl shrink-0 shadow-2xs">👤</span>
+              <div class="min-w-0">
+                <span class="block font-extrabold text-xs sm:text-sm text-slate-900 leading-tight truncate">Personil Toko</span>
+                <span class="inline-block text-[10px] font-bold text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-full mt-0.5 border border-amber-200/70">2 Sub Menu</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="w-7 h-7 rounded-lg bg-amber-100/70 text-amber-700 flex items-center justify-center text-[10px] font-bold transition-transform duration-200" id="sis-chevron-3">▼</span>
+            </div>
+          </button>
+          <div id="sis-acc-sub-3" class="hidden p-3 bg-amber-50/25 border-t border-amber-100/80">
+            <div class="grid grid-cols-2 gap-2.5">
+              <button type="button" onclick="openSisModal('sis-modal-staff')" class="p-3 bg-white hover:bg-amber-50/80 text-center rounded-xl border border-amber-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-amber-100/80 text-amber-700 border border-amber-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">👤</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-amber-800 transition">Karyawan &amp; Shift</span>
+              </button>
+              <button type="button" onclick="openSisModal('sis-modal-pin')" class="p-3 bg-white hover:bg-amber-50/80 text-center rounded-xl border border-amber-200/70 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-amber-100/80 text-amber-700 border border-amber-200/70 flex items-center justify-center text-base group-hover:scale-105 transition">🔐</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-amber-800 transition">PIN Otorisasi</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Laporan Shift (Soft Purple) -->
+        <div class="rounded-2xl border border-purple-200/85 bg-white overflow-hidden shadow-2xs transition-all duration-200" id="sis-acc-card-4">
+          <button type="button" onclick="toggleSisAccordion(4)" class="w-full p-3 sm:p-3.5 bg-purple-50/70 hover:bg-purple-100/60 active:scale-[0.99] flex items-center justify-between gap-3 transition cursor-pointer select-none text-left">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 border border-purple-200/80 flex items-center justify-center text-xl shrink-0 shadow-2xs">📊</span>
+              <div class="min-w-0">
+                <span class="block font-extrabold text-xs sm:text-sm text-slate-900 leading-tight truncate">Laporan Shift</span>
+                <span class="inline-block text-[10px] font-bold text-purple-700 bg-purple-100/80 px-2 py-0.5 rounded-full mt-0.5 border border-purple-200/70">1 Sub Menu</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="w-7 h-7 rounded-lg bg-purple-100/70 text-purple-700 flex items-center justify-center text-[10px] font-bold transition-transform duration-200" id="sis-chevron-4">▼</span>
+            </div>
+          </button>
+          <div id="sis-acc-sub-4" class="hidden p-3 bg-purple-50/25 border-t border-purple-100/80">
+            <div class="grid grid-cols-1 gap-2.5">
+              <button type="button" onclick="openSisModal('sis-modal-report')" class="p-3.5 bg-white hover:bg-purple-50/80 text-left rounded-xl border border-purple-200/70 transition flex items-center gap-3 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-10 h-10 rounded-lg bg-purple-100 text-purple-700 border border-purple-200/70 flex items-center justify-center text-lg group-hover:scale-105 transition shrink-0">📊</span>
+                <div class="min-w-0">
+                  <span class="block font-bold text-xs sm:text-sm text-slate-900 group-hover:text-purple-800 transition">Laporan Penjualan Shift</span>
+                  <span class="text-[11px] text-purple-600 font-medium">Rekap Transaksi Kasir Hari Ini</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Pengaturan Sistem Toko (Soft Slate) -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-2xs transition-all duration-200" id="sis-acc-card-5">
+          <button type="button" onclick="toggleSisAccordion(5)" class="w-full p-3 sm:p-3.5 bg-slate-100/80 hover:bg-slate-200/70 active:scale-[0.99] flex items-center justify-between gap-3 transition cursor-pointer select-none text-left">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-10 h-10 rounded-xl bg-slate-200 text-slate-700 border border-slate-300/80 flex items-center justify-center text-xl shrink-0 shadow-2xs">⚙️</span>
+              <div class="min-w-0">
+                <span class="block font-extrabold text-xs sm:text-sm text-slate-900 leading-tight truncate">Pengaturan Sistem Toko</span>
+                <span class="inline-block text-[10px] font-bold text-slate-600 bg-slate-200/80 px-2 py-0.5 rounded-full mt-0.5 border border-slate-300/70">4 Sub Menu</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="w-7 h-7 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold transition-transform duration-200" id="sis-chevron-5">▼</span>
+            </div>
+          </button>
+          <div id="sis-acc-sub-5" class="hidden p-3 bg-slate-50/40 border-t border-slate-200/80">
+            <div class="grid grid-cols-2 gap-2.5">
+              <button type="button" onclick="openSisModal('sis-modal-printer')" class="p-3 bg-white hover:bg-slate-100 text-center rounded-xl border border-slate-200/90 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-slate-200 text-slate-700 border border-slate-300/80 flex items-center justify-center text-base group-hover:scale-105 transition">🖨️</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-slate-900 transition">Setting Printer</span>
+              </button>
+              <button type="button" onclick="openSisModal('sis-modal-profile')" class="p-3 bg-white hover:bg-slate-100 text-center rounded-xl border border-slate-200/90 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-slate-200 text-slate-700 border border-slate-300/80 flex items-center justify-center text-base group-hover:scale-105 transition">🏪</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-slate-900 transition">Profil Toko</span>
+              </button>
+              <button type="button" onclick="openSisModal('sis-modal-qris')" class="p-3 bg-white hover:bg-slate-100 text-center rounded-xl border border-slate-200/90 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-slate-200 text-slate-700 border border-slate-300/80 flex items-center justify-center text-base group-hover:scale-105 transition">💳</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-slate-900 transition">QRIS &amp; Bayar</span>
+              </button>
+              <button type="button" onclick="openMockupAboutModal()" class="p-3 bg-white hover:bg-slate-100 text-center rounded-xl border border-slate-200/90 transition flex flex-col items-center justify-center gap-1.5 cursor-pointer group shadow-2xs active:scale-95">
+                <span class="w-9 h-9 rounded-lg bg-slate-200 text-slate-700 border border-slate-300/80 flex items-center justify-center text-base group-hover:scale-105 transition">ℹ️</span>
+                <span class="font-bold text-xs text-slate-800 group-hover:text-slate-900 transition">Tentang Aplikasi</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- Drawer Footer (Clean Minimalist Action Bar) -->
 <div class="p-3.5 bg-white border-t border-slate-200 flex items-center justify-between gap-2 flex-shrink-0">
 <a class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-2xs" href="owner.html" target="_blank">
 <span>📊</span>
@@ -1775,57 +1791,45 @@
     updateNetworkStatus("online");
 
         // ================= SIS GRID CONTROLLERS =================
-    const sisCatTitles = {
-      1: { title: "Operasional Kas & Kasir", icon: "📋" },
-      2: { title: "Logistik, Gudang & Inventori", icon: "📦" },
-      3: { title: "Personil Toko & Keamanan", icon: "👤" },
-      4: { title: "Laporan Operasional Kasir", icon: "📊" },
-      5: { title: "Pengaturan Sistem Toko", icon: "⚙️" }
-    };
+    let currentOpenSisAcc = null;
 
-    function showSisGridSub(catIndex) {
-      const mainGrid = document.getElementById('sis-grid-main');
-      const subView = document.getElementById('sis-grid-sub-view');
-      const titleEl = document.getElementById('sis-grid-sub-title');
-      const iconEl = document.getElementById('sis-grid-sub-icon');
-
-      if (!mainGrid || !subView) return;
-
-      mainGrid.classList.add('hidden');
-      subView.classList.remove('hidden');
-
-      if (sisCatTitles[catIndex]) {
-        titleEl.textContent = sisCatTitles[catIndex].title;
-        iconEl.textContent = sisCatTitles[catIndex].icon;
-      }
-
+    function toggleSisAccordion(index) {
       for (let i = 1; i <= 5; i++) {
-        const itemContainer = document.getElementById(`sis-grid-sub-items-${i}`);
-        if (itemContainer) {
-          if (i === catIndex) {
-            itemContainer.classList.remove('hidden');
+        const sub = document.getElementById(`sis-acc-sub-${i}`);
+        const chev = document.getElementById(`sis-chevron-${i}`);
+        if (!sub || !chev) continue;
+
+        if (i === index) {
+          const isCurrentlyOpen = !sub.classList.contains('hidden');
+          if (isCurrentlyOpen) {
+            sub.classList.add('hidden');
+            chev.classList.remove('rotate-180');
+            currentOpenSisAcc = null;
           } else {
-            itemContainer.classList.add('hidden');
+            sub.classList.remove('hidden');
+            chev.classList.add('rotate-180');
+            currentOpenSisAcc = i;
           }
+        } else {
+          sub.classList.add('hidden');
+          chev.classList.remove('rotate-180');
         }
       }
     }
 
-    function backToSisGridMain() {
-      const mainGrid = document.getElementById('sis-grid-main');
-      const subView = document.getElementById('sis-grid-sub-view');
-      if (mainGrid && subView) {
-        subView.classList.add('hidden');
-        mainGrid.classList.remove('hidden');
-      }
-    }
-
-    // Toggle SIS Drawer (Selalu reset ke 5 kartu grid awal saat dibuka)
+    // Toggle SIS Drawer (Selalu reset semua akordion saat dibuka)
     function toggleSisDrawer() {
       const drawer = document.getElementById('sis-drawer');
       const backdrop = document.getElementById('sis-drawer-backdrop');
       if (drawer.classList.contains('translate-x-full')) {
-        backToSisGridMain();
+        // Reset all accordion items
+        for (let i = 1; i <= 5; i++) {
+          const sub = document.getElementById(`sis-acc-sub-${i}`);
+          const chev = document.getElementById(`sis-chevron-${i}`);
+          if (sub) sub.classList.add('hidden');
+          if (chev) chev.classList.remove('rotate-180');
+        }
+        currentOpenSisAcc = null;
         drawer.classList.remove('translate-x-full');
         backdrop.classList.remove('hidden');
       } else {
