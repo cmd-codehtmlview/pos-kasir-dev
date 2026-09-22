@@ -603,13 +603,21 @@ function clearSettingsSearch() {
 }
 
 function downloadDatabaseBackup() {
+  const currentPos = window.pos || pos;
+  if (!currentPos) return;
+
   const backup = {
     backupDate: new Date().toISOString(),
     version: "2.0.0-retail",
-    settings: pos.settings,
-    products: pos.products,
-    transactions: pos.transactions,
-    mutations: pos.mutations
+    settings: currentPos.settings,
+    products: currentPos.products || [],
+    transactions: currentPos.transactions || [],
+    mutations: currentPos.mutations || [],
+    members: currentPos.members || [],
+    employees: currentPos.employees || [],
+    lpbRecords: currentPos.lpbRecords || [],
+    returns: currentPos.returns || [],
+    klerkHistory: currentPos.klerkHistory || []
   };
 
   const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup, null, 2));
@@ -620,44 +628,84 @@ function downloadDatabaseBackup() {
   link.click();
   document.body.removeChild(link);
 
-  showToast("File backup database berhasil disimpan!", "success");
+  if (typeof showToast === "function") {
+    showToast("💾 File backup database (.json) berhasil diunduh!", "success");
+  }
 }
 
 function restoreDatabaseBackup(event) {
   const file = event.target.files[0];
   if (!file) return;
 
+  const currentPos = window.pos || pos;
+  if (!currentPos) return;
+
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
       const parsed = JSON.parse(e.target.result);
-      if (!parsed.products || !parsed.settings) throw new Error("Format file tidak valid!");
+      if (!parsed.products || !parsed.settings) throw new Error("Format file JSON tidak valid!");
 
-      if (confirm("Ganti seluruh data saat ini dengan file cadangan ini?")) {
-        pos.products = parsed.products;
-        pos.settings = { ...pos.settings, ...parsed.settings };
-        pos.transactions = parsed.transactions || [];
-        pos.mutations = parsed.mutations || [];
-        pos.cart = [];
+      if (confirm(`Pulihkan data dari backup ${parsed.backupDate || 'ini'}?\n\n• Produk: ${(parsed.products || []).length} SKU\n• Transaksi: ${(parsed.transactions || []).length} struk\n\nPerhatian: Data saat ini akan digantikan oleh file cadangan.`)) {
+        currentPos.products = parsed.products || [];
+        currentPos.settings = { ...currentPos.settings, ...parsed.settings };
+        currentPos.transactions = parsed.transactions || [];
+        currentPos.mutations = parsed.mutations || [];
+        if (parsed.members) currentPos.members = parsed.members;
+        if (parsed.employees) currentPos.employees = parsed.employees;
+        if (parsed.lpbRecords) currentPos.lpbRecords = parsed.lpbRecords;
+        if (parsed.returns) currentPos.returns = parsed.returns;
+        if (parsed.klerkHistory) currentPos.klerkHistory = parsed.klerkHistory;
+        currentPos.cart = [];
 
-        pos.saveProducts();
-        pos.saveSettings();
-        pos.saveTransactions();
-        pos.saveMutations();
+        currentPos.saveProducts();
+        currentPos.saveSettings();
+        currentPos.saveTransactions();
+        currentPos.saveMutations();
+        if (typeof currentPos.saveMembers === "function") currentPos.saveMembers();
+        if (typeof currentPos.saveEmployees === "function") currentPos.saveEmployees();
+        if (typeof currentPos.saveLpbRecords === "function") currentPos.saveLpbRecords();
+        if (typeof currentPos.saveReturns === "function") currentPos.saveReturns();
+        if (typeof currentPos.saveKlerkHistory === "function") currentPos.saveKlerkHistory();
 
-        loadSettingsToForm();
-        renderPosCart();
-        renderReports();
-        initSupabase();
+        if (typeof loadSettingsToForm === "function") loadSettingsToForm();
+        if (typeof renderPosCart === "function") renderPosCart();
+        if (typeof renderReports === "function") renderReports();
+        if (typeof renderInventoryTable === "function") renderInventoryTable();
+        if (typeof initSupabase === "function") initSupabase();
 
-        showToast("Database berhasil dipulihkan!", "success");
-        sfx.success();
+        if (typeof showToast === "function") showToast("Database berhasil dipulihkan dari file backup!", "success");
+        if (window.sfx && typeof window.sfx.success === "function") window.sfx.success();
+
+        // Refresh count badge jika modal backup terbuka
+        if (typeof initSisBackupModal === "function") initSisBackupModal();
       }
     } catch (err) {
       alert("Gagal membaca file backup: " + err.message);
     }
   };
   reader.readAsText(file);
+}
+
+function initSisBackupModal() {
+  const currentPos = window.pos || pos;
+  const prodCount = (currentPos && currentPos.products) ? currentPos.products.length : 0;
+  const trxCount = (currentPos && currentPos.transactions) ? currentPos.transactions.length : 0;
+  const memCount = (currentPos && currentPos.members) ? currentPos.members.length : 0;
+
+  const elProd = document.getElementById("sis-backup-prod-count");
+  const elTrx = document.getElementById("sis-backup-trx-count");
+  const elMem = document.getElementById("sis-backup-mem-count");
+
+  if (elProd) elProd.textContent = `${prodCount.toLocaleString('id-ID')} SKU`;
+  if (elTrx) elTrx.textContent = `${trxCount.toLocaleString('id-ID')} Struk`;
+  if (elMem) elMem.textContent = `${memCount.toLocaleString('id-ID')} Orang`;
+}
+
+if (typeof window !== "undefined") {
+  window.downloadDatabaseBackup = downloadDatabaseBackup;
+  window.restoreDatabaseBackup = restoreDatabaseBackup;
+  window.initSisBackupModal = initSisBackupModal;
 }
 
 // ==========================================

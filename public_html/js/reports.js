@@ -499,5 +499,141 @@ function exportTransactionsCSV() {
   link.click();
   document.body.removeChild(link);
 
-  showToast(isAuth ? "File Laporan Excel/CSV berhasil diunduh!" : "Laporan Excel/CSV diunduh (Nominal rupiah disensor untuk kasir)", "success");
+  showToast(isAuth ? "File Laporan CSV berhasil diunduh!" : "Laporan CSV diunduh (Nominal rupiah disensor untuk kasir)", "success");
 }
+
+function exportTransactionsToExcel() {
+  const transactions = (typeof getFilteredTransactions === "function" && getFilteredTransactions().length > 0)
+    ? getFilteredTransactions()
+    : ((window.pos && window.pos.transactions) ? window.pos.transactions : []);
+
+  if (!transactions || transactions.length === 0) {
+    if (typeof showToast === "function") showToast("Tidak ada transaksi untuk diekspor!", "warning");
+    else alert("Tidak ada transaksi untuk diekspor!");
+    return;
+  }
+
+  const isAuth = typeof isCurrentUserAuthorizedForFinancials === "function" ? isCurrentUserAuthorizedForFinancials() : true;
+
+  if (typeof XLSX !== "undefined") {
+    try {
+      const trxRows = transactions.map(t => {
+        const totalQty = (t.items || []).reduce((s, i) => s + (Number(i.qty) || 0), 0);
+        return {
+          "No Struk": t.id || "",
+          "Tanggal": t.date || "",
+          "Waktu": t.time || "",
+          "Kasir": t.cashier || "",
+          "Shift": t.shift || "Shift 1",
+          "Total Item": totalQty,
+          "Subtotal (Rp)": isAuth ? (t.subtotal || 0) : "***",
+          "Diskon (Rp)": isAuth ? (t.discountAmount || 0) : "***",
+          "Grand Total (Rp)": isAuth ? (t.grandTotal || 0) : "***",
+          "Total Modal HPP (Rp)": isAuth ? (t.totalCost || 0) : "***",
+          "Laba Bersih (Rp)": isAuth ? (t.profit || 0) : "***",
+          "Metode Bayar": t.paymentMethod || "TUNAI"
+        };
+      });
+
+      const itemRows = [];
+      transactions.forEach(t => {
+        (t.items || []).forEach(item => {
+          itemRows.push({
+            "No Struk": t.id || "",
+            "Tanggal": t.date || "",
+            "Barcode": item.id || item.barcode || "",
+            "Nama Produk": item.name || "",
+            "Harga Satuan": item.price || 0,
+            "Kuantitas": item.qty || 0,
+            "Total Harga": (item.price || 0) * (item.qty || 0)
+          });
+        });
+      });
+
+      const wb = XLSX.utils.book_new();
+      const wsTrx = XLSX.utils.json_to_sheet(trxRows);
+      XLSX.utils.book_append_sheet(wb, wsTrx, "Rekap Penjualan");
+
+      if (itemRows.length > 0) {
+        const wsItems = XLSX.utils.json_to_sheet(itemRows);
+        XLSX.utils.book_append_sheet(wb, wsItems, "Detail Item Terjual");
+      }
+
+      const today = new Date().toISOString().split("T")[0];
+      XLSX.writeFile(wb, `Laporan_Transaksi_SnackPOS_${today}.xlsx`);
+      if (typeof showToast === "function") {
+        showToast(isAuth ? "📥 Laporan Excel (.xlsx) berhasil diunduh!" : "📥 Laporan Excel diunduh (Nominal disensor untuk kasir)", "success");
+      }
+      return;
+    } catch (err) {
+      console.warn("Gagal ekspor XLSX via SheetJS, fallback ke CSV:", err);
+    }
+  }
+
+  // Fallback to CSV
+  exportTransactionsCSV();
+}
+
+function exportProductsToExcel() {
+  const products = (window.pos && window.pos.products) ? window.pos.products : [];
+  if (!products || products.length === 0) {
+    if (typeof showToast === "function") showToast("Tidak ada produk untuk diekspor!", "warning");
+    else alert("Tidak ada produk untuk diekspor!");
+    return;
+  }
+
+  const rows = products.map(p => ({
+    "Barcode": p.id || p.barcode || "",
+    "Nama Produk": p.name || "",
+    "Kategori": p.category || "Makanan Ringan & Biskuit",
+    "Harga Beli HPP": p.cost || 0,
+    "Harga Jual": p.price || 0,
+    "Harga Grosir B": p.priceB || "",
+    "Min Qty B": p.minB || "",
+    "Harga Grosir C": p.priceC || "",
+    "Min Qty C": p.minC || "",
+    "Stok": p.stock || 0,
+    "Satuan": p.unit || "Pcs"
+  }));
+
+  const today = new Date().toISOString().split("T")[0];
+
+  if (typeof XLSX !== "undefined") {
+    try {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, "Master Produk");
+      XLSX.writeFile(wb, `Master_Produk_SnackPOS_${today}.xlsx`);
+      if (typeof showToast === "function") showToast("📥 Master produk (.xlsx) berhasil diunduh!", "success");
+      return;
+    } catch (err) {
+      console.warn("Gagal ekspor XLSX via SheetJS, fallback ke CSV:", err);
+    }
+  }
+
+  // Fallback to CSV
+  let csv = "data:text/csv;charset=utf-8,\uFEFF";
+  csv += "Barcode,Nama Produk,Kategori,Harga Beli HPP,Harga Jual,Harga Grosir B,Min Qty B,Harga Grosir C,Min Qty C,Stok,Satuan\n";
+  rows.forEach(r => {
+    csv += [
+      `"${r["Barcode"]}"`, `"${(r["Nama Produk"] || '').replace(/"/g, '""')}"`,
+      `"${r["Kategori"]}"`, r["Harga Beli HPP"], r["Harga Jual"],
+      r["Harga Grosir B"], r["Min Qty B"], r["Harga Grosir C"], r["Min Qty C"],
+      r["Stok"], `"${r["Satuan"]}"`
+    ].join(",") + "\n";
+  });
+  const link = document.createElement("a");
+  link.href = encodeURI(csv);
+  link.download = `Master_Produk_SnackPOS_${today}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  if (typeof showToast === "function") showToast("📥 Master produk (.csv) berhasil diunduh!", "success");
+}
+
+if (typeof window !== "undefined") {
+  window.exportTransactionsCSV = exportTransactionsCSV;
+  window.exportTransactionsToExcel = exportTransactionsToExcel;
+  window.exportProductsToExcel = exportProductsToExcel;
+}
+
