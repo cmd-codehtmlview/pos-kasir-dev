@@ -64,27 +64,27 @@ function updateCloudStatus(status, label = "") {
   const labelEl = document.getElementById("cloud-status-label") || document.getElementById("status-label");
 
   if (badge) {
-    badge.className = "h-8 px-2 sm:px-2.5 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-[10px] font-semibold text-white cursor-pointer active:scale-95 transition flex items-center gap-1.5 shadow-xs";
+    badge.className = "flex items-center gap-1.5 text-white/90 hover:text-white active:scale-95 transition cursor-pointer font-bold px-2 py-0.5 rounded-full hover:bg-white/10";
     
     if (status === "online") {
-      if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
+      if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0 shadow-[0_0_6px_rgba(52,211,153,0.8)]";
       if (labelEl) {
-        labelEl.textContent = label ? `SYNC ${label.replace('Sync ', '')}` : "AUTO 30s";
-        labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-emerald-300";
+        labelEl.textContent = label ? `Sync ${label.replace('Sync ', '')}` : "Cloud Online";
+        labelEl.className = "tracking-tight text-[10px] sm:text-[11px] text-emerald-300 font-bold";
       }
       badge.title = `Cloud Supabase Terhubung • Auto 30s • ${label || 'Siap'} • Klik untuk Sinkron Manual [F9]`;
     } else if (status === "syncing") {
       if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
       if (labelEl) {
-        labelEl.textContent = "SYNC...";
-        labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-amber-300";
+        labelEl.textContent = "Syncing...";
+        labelEl.className = "tracking-tight text-[10px] sm:text-[11px] text-amber-300 font-bold";
       }
       badge.title = "Sedang menyinkronkan data kasir ke cloud Supabase...";
     } else {
-      if (dot) dot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0 shadow-[0_0_8px_rgba(244,63,94,0.8)]";
+      if (dot) dot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0 shadow-[0_0_6px_rgba(244,63,94,0.8)]";
       if (labelEl) {
-        labelEl.textContent = "OFFLINE";
-        labelEl.className = "hidden sm:inline text-[9px] sm:text-[10px] font-mono font-bold text-rose-300";
+        labelEl.textContent = "Offline";
+        labelEl.className = "tracking-tight text-[10px] sm:text-[11px] text-rose-300 font-bold";
       }
       badge.title = "Status: Offline (Lokal) • Klik untuk mencoba hubungkan ke cloud [F9]";
     }

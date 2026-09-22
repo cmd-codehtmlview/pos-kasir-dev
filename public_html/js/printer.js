@@ -2322,30 +2322,30 @@ function updateBluetoothUI() {
   // 1. UPDATE HEADER BADGE (Modern Retail Button & Micro Status Dot)
   const printerDot = document.getElementById("printer-status-dot");
   if (badge) {
-    badge.className = "h-8 w-8 rounded-xl bg-black/20 hover:bg-black/35 border border-white/20 text-white/90 hover:text-white transition active:scale-95 flex items-center justify-center cursor-pointer shadow-xs relative";
+    badge.className = "flex items-center gap-1.5 text-white/90 hover:text-white active:scale-95 transition cursor-pointer font-bold px-2 py-0.5 rounded-full hover:bg-white/10";
     
     if (isBusy) {
-      if (printerDot) printerDot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-1.5 ring-red-600 animate-ping";
+      if (printerDot) printerDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping";
       badge.title = `Sedang mencetak... ${(printSpooler && printSpooler.currentJob) ? printSpooler.currentJob.progress + '%' : ''}`;
-      if (label) label.textContent = "PRINT";
+      if (label) label.textContent = "Mencetak...";
     } else if (connected) {
-      if (printerDot) printerDot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-1.5 ring-red-600 animate-pulse";
+      if (printerDot) printerDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse";
       badge.title = `Printer ${devName} Terhubung & Siap. Klik untuk Setting / Rekonek.`;
-      if (label) label.textContent = shortDev + " SIAP";
+      if (label) label.textContent = "Printer Siap";
     } else if (isConnectingBluetooth || startupAutoConnectActive) {
-      if (printerDot) printerDot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 ring-1.5 ring-red-600 animate-pulse";
+      if (printerDot) printerDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse";
       badge.title = `Sedang menghubungkan ke ${devName}...`;
-      if (label) label.textContent = "KONEK...";
+      if (label) label.textContent = "Konek...";
     } else {
       const hasSaved = Boolean(typeof pos !== 'undefined' && pos.settings && (pos.settings.lastPrinterName || pos.settings.lastPrinterId));
       if (hasSaved) {
-        if (printerDot) printerDot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500/80 ring-1.5 ring-red-600";
+        if (printerDot) printerDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500/80";
         badge.title = `Printer ${devName} Siaga. Klik untuk menyambungkan kembali.`;
-        if (label) label.textContent = shortDev + " SIAGA";
+        if (label) label.textContent = "Printer Siaga";
       } else {
-        if (printerDot) printerDot.className = "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-slate-400 ring-1.5 ring-red-600";
+        if (printerDot) printerDot.className = "w-1.5 h-1.5 rounded-full bg-slate-400";
         badge.title = "Status Printer Bluetooth • Klik untuk Hubungkan / Menu Printer";
-        if (label) label.textContent = "BT OFF";
+        if (label) label.textContent = "Printer Off";
       }
     }
   }
