@@ -2919,15 +2919,17 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nomor Faktur Supplier *</label>
-            <input type="text" value="FAK-2026-8812" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:border-slate-800" />
+            <input type="text" id="lpb-invoice-no" placeholder="Contoh: FAK-2026-..." class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:border-slate-800" />
           </div>
           <div>
             <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nama Supplier / Distributor *</label>
-            <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-slate-800 bg-white">
-              <option>Aneka Snack Jaya (Distributor)</option>
-              <option>CV Gurih Prima</option>
-              <option>Snack Berkah UMKM</option>
-            </select>
+            <input type="text" id="lpb-supplier-name" list="lpb-supplier-suggestions" placeholder="Pilih / ketik nama supplier..." value="Aneka Snack Jaya (Distributor)" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-slate-800 bg-white" />
+            <datalist id="lpb-supplier-suggestions">
+              <option value="Aneka Snack Jaya (Distributor)">
+              <option value="CV Gurih Prima">
+              <option value="Snack Berkah UMKM">
+              <option value="Pusat Kerupuk Nusantara">
+            </datalist>
           </div>
         </div>
 
@@ -2940,8 +2942,7 @@
               <input 
                 type="text" 
                 id="lpb-product-search" 
-                placeholder="Scan barcode / ketik live nama produk datang..." 
-                value="8992761111001"
+                placeholder="Scan barcode / ketik nama produk masuk..." 
                 class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent"
                 oninput="handleLogisticsSearch(this.value, 'lpb')"
                 autocomplete="off"
@@ -2976,51 +2977,44 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-2 pt-1">
-            <span class="text-[11px] text-slate-500 font-medium">Qty Diterima:</span>
-            <input type="number" id="lpb-qty-input" value="24" class="w-20 px-2 py-1.5 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center text-xs focus:outline-none focus:border-emerald-600" />
-            <button type="button" onclick="addLpbItemFromSearch()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs transition ml-auto flex items-center gap-1">
-              <span>+</span><span>Tambah ke Faktur</span>
-            </button>
+          <div class="grid grid-cols-12 gap-2 pt-1 items-center">
+            <div class="col-span-5">
+              <span class="text-[10px] text-slate-500 font-bold block mb-0.5">Harga Beli HPP (Rp):</span>
+              <input type="number" id="lpb-cost-input" placeholder="HPP Satuan" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600" />
+            </div>
+            <div class="col-span-3">
+              <span class="text-[10px] text-slate-500 font-bold block mb-0.5">Qty Diterima:</span>
+              <input type="number" id="lpb-qty-input" value="10" class="w-full px-2 py-1.5 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center text-xs focus:outline-none focus:border-emerald-600" />
+            </div>
+            <div class="col-span-4 flex items-end">
+              <button type="button" onclick="addLpbItemFromSearch()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs transition flex items-center justify-center gap-1">
+                <span>+</span><span>Tambah</span>
+              </button>
+            </div>
           </div>
         </div>
 
         <div class="space-y-1.5">
-          <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px] block">Rincian Barang Diterima:</span>
-          <div class="p-2.5 bg-white border border-slate-200/80 rounded-xl flex items-center justify-between text-[11px]">
-            <div>
-              <span class="font-bold text-slate-900 block">Keripik Tempe Renyah 150g</span>
-              <span class="text-[10px] text-slate-400 font-mono">Beli: Rp 9.500 / Bks</span>
-            </div>
-            <div class="text-right">
-              <span class="font-black text-slate-900 font-mono text-xs block">24 Bks</span>
-              <span class="text-[10px] text-emerald-700 font-bold">Rp 228.000</span>
-            </div>
-          </div>
-          <div class="p-2.5 bg-white border border-slate-200/80 rounded-xl flex items-center justify-between text-[11px]">
-            <div>
-              <span class="font-bold text-slate-900 block">Basreng Pedas Daun Jeruk 200g</span>
-              <span class="text-[10px] text-slate-400 font-mono">Beli: Rp 11.000 / Bks</span>
-            </div>
-            <div class="text-right">
-              <span class="font-black text-slate-900 font-mono text-xs block">12 Bks</span>
-              <span class="text-[10px] text-emerald-700 font-bold">Rp 132.000</span>
+          <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px] block">Rincian Barang Diterima di Faktur:</span>
+          <div id="lpb-draft-container" class="space-y-1.5 max-h-48 overflow-y-auto">
+            <div class="p-4 text-center text-slate-400 bg-white border border-dashed border-slate-200 rounded-xl text-xs">
+              Belum ada produk ditambahkan ke faktur penerimaan ini.
             </div>
           </div>
         </div>
 
         <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between">
           <div>
-            <span class="text-[10px] text-slate-500 font-bold uppercase block">Total Nilai Faktur:</span>
-            <span class="font-black text-slate-900 text-sm font-mono">Rp 360.000 (2 SKU)</span>
+            <span id="lpb-summary-sku-info" class="text-[10px] text-slate-500 font-bold uppercase block">0 SKU, 0 Total Qty</span>
+            <span id="lpb-summary-total-val" class="font-black text-slate-900 text-sm font-mono">Rp 0</span>
           </div>
-          <span class="px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[10px] rounded-lg">Stok Otomatis Naik</span>
+          <span class="px-2.5 py-1 bg-emerald-100 border border-emerald-200 text-emerald-800 font-bold text-[10px] rounded-lg">Stok Otomatis Naik</span>
         </div>
       </div>
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-lpb')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
-        <button onclick="showMockupToast('📥 Faktur LPB Disimpan & Stok Bertambah!', 'success'); closeSisModal('sis-modal-lpb');" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
+        <button onclick="saveSisLpb()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
           💾 Simpan Faktur LPB
         </button>
       </div>
@@ -3095,92 +3089,70 @@
           </div>
         </div>
 
-        <div class="space-y-2.5">
-          <!-- Item 1 -->
-          <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl hover:border-emerald-300 transition space-y-2">
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="font-black text-slate-900 block text-xs">Keripik Tempe Renyah 150g</span>
-                <span class="text-[10px] text-slate-400 font-mono">8992761111001 • Modal HPP: Rp 9.500 • Stok: <strong class="text-emerald-700">45 Bks</strong></span>
-              </div>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">Auto Switch: ON</span>
-            </div>
-            <!-- Multi-Harga Badges -->
-            <div class="grid grid-cols-3 gap-1.5 text-center font-mono">
-              <div class="p-1.5 bg-white border border-slate-200 rounded-xl">
-                <span class="text-[9px] text-slate-500 font-bold block">A: ECERAN (Min 1)</span>
-                <span class="text-xs font-black text-slate-900">Rp 12.000</span>
-              </div>
-              <div class="p-1.5 bg-emerald-50 border border-emerald-200 rounded-xl">
-                <span class="text-[9px] text-emerald-700 font-bold block">B: GROSIR (Min 10)</span>
-                <span class="text-xs font-black text-emerald-900">Rp 10.500</span>
-              </div>
-              <div class="p-1.5 bg-blue-50 border border-blue-200 rounded-xl">
-                <span class="text-[9px] text-blue-700 font-bold block">C: PABRIK (Min 50)</span>
-                <span class="text-xs font-black text-blue-900">Rp 9.200</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Item 2 -->
-          <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl hover:border-emerald-300 transition space-y-2">
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="font-black text-slate-900 block text-xs">Basreng Pedas Daun Jeruk 200g</span>
-                <span class="text-[10px] text-slate-400 font-mono">8992761111002 • Modal HPP: Rp 11.000 • Stok: <strong class="text-emerald-700">32 Bks</strong></span>
-              </div>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">Auto Switch: ON</span>
-            </div>
-            <!-- Multi-Harga Badges -->
-            <div class="grid grid-cols-3 gap-1.5 text-center font-mono">
-              <div class="p-1.5 bg-white border border-slate-200 rounded-xl">
-                <span class="text-[9px] text-slate-500 font-bold block">A: ECERAN (Min 1)</span>
-                <span class="text-xs font-black text-slate-900">Rp 15.000</span>
-              </div>
-              <div class="p-1.5 bg-emerald-50 border border-emerald-200 rounded-xl">
-                <span class="text-[9px] text-emerald-700 font-bold block">B: GROSIR (Min 10)</span>
-                <span class="text-xs font-black text-emerald-900">Rp 13.500</span>
-              </div>
-              <div class="p-1.5 bg-blue-50 border border-blue-200 rounded-xl">
-                <span class="text-[9px] text-blue-700 font-bold block">C: PABRIK (Min 50)</span>
-                <span class="text-xs font-black text-blue-900">Rp 12.000</span>
-              </div>
-            </div>
+        <div id="sis-products-list-container" class="space-y-2.5">
+          <div class="p-8 text-center bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
+            <span class="text-3xl block mb-2">📦</span>
+            <p class="font-bold text-slate-700 text-xs">Memuat Katalog Produk...</p>
           </div>
         </div>
       </div>
 
       <!-- Tab 2: Form Setting Multi-Harga Baru -->
       <div id="prod-tab-content-form" class="hidden p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
+        <input type="hidden" id="sis-prod-id" value="">
+        <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+          <span id="sis-prod-form-heading" class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Tambah / Edit Master Produk</span>
+          <button type="button" onclick="resetSisProductForm()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-[10px] transition cursor-pointer">
+            🔄 Reset / Form Baru
+          </button>
+        </div>
+
         <div class="grid grid-cols-2 gap-2.5">
           <div>
-            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Barcode / SKU *</label>
-            <input type="text" placeholder="Contoh: 899276..." value="8992761111005" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
+            <div class="flex items-center justify-between mb-1">
+              <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">Barcode / SKU *</label>
+              <button type="button" onclick="document.getElementById('sis-prod-barcode').value = '899' + Math.floor(1000000000 + Math.random() * 9000000000);" class="text-[9px] text-emerald-700 hover:underline font-bold">Acak</button>
+            </div>
+            <input type="text" id="sis-prod-barcode" placeholder="Contoh: 899276..." class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
           </div>
           <div>
             <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Kategori Produk</label>
-            <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 bg-white focus:outline-none focus:border-emerald-600">
-              <option>Keripik &amp; Kerupuk</option>
-              <option>Kacang &amp; Biji-bijian</option>
-              <option>Basreng &amp; Pedas</option>
-              <option>Bolu &amp; Roti Kering</option>
+            <select id="sis-prod-category" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 bg-white focus:outline-none focus:border-emerald-600">
+              <option value="Makanan Ringan & Biskuit">Makanan Ringan & Biskuit</option>
+              <option value="Keripik & Kerupuk">Keripik & Kerupuk</option>
+              <option value="Kacang & Biji-bijian">Kacang & Biji-bijian</option>
+              <option value="Basreng & Pedas">Basreng & Pedas</option>
+              <option value="Bolu & Roti Kering">Bolu & Roti Kering</option>
+              <option value="Minuman Kemasan">Minuman Kemasan</option>
+              <option value="Bahan Baku & Bal Curah">Bahan Baku & Bal Curah</option>
+              <option value="Lain-lain">Lain-lain</option>
             </select>
           </div>
         </div>
 
         <div>
           <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nama Produk Snack *</label>
-          <input type="text" placeholder="Nama snack lengkap dengan gramatur..." value="Kacang Mete Panggang Super 250g" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
+          <input type="text" id="sis-prod-name" placeholder="Nama snack lengkap dengan gramatur..." class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
         </div>
 
-        <div class="grid grid-cols-2 gap-2.5">
+        <div class="grid grid-cols-3 gap-2">
           <div>
-            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Harga Beli HPP (Rp) *</label>
-            <input type="number" value="28000" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Harga Beli HPP *</label>
+            <input type="number" id="sis-prod-cost" placeholder="0" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Stok Awal Fisik Rak</label>
-            <input type="number" value="25" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Stok Fisik Rak</label>
+            <input type="number" id="sis-prod-stock" value="0" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Satuan</label>
+            <select id="sis-prod-unit" class="w-full px-2.5 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 bg-white focus:outline-none focus:border-emerald-600 text-xs">
+              <option value="Bks">Bks</option>
+              <option value="Pcs">Pcs</option>
+              <option value="Bal">Bal</option>
+              <option value="Dus">Dus</option>
+              <option value="Kg">Kg</option>
+            </select>
           </div>
         </div>
 
@@ -3196,17 +3168,17 @@
           <!-- Tier A -->
           <div class="grid grid-cols-12 gap-2 items-center bg-white p-2.5 rounded-xl border border-slate-200">
             <div class="col-span-4">
-              <span class="font-black text-slate-800 text-xs block">Harga A (Satuan)</span>
+              <span class="font-black text-slate-800 text-xs block">Harga A (Satuan) *</span>
               <span class="text-[9px] text-slate-400">Konsumen Umum</span>
             </div>
             <div class="col-span-5">
               <div class="flex items-center gap-1">
                 <span class="text-slate-400 text-[10px]">Rp</span>
-                <input type="number" value="35000" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-mono font-bold text-slate-900 text-xs text-right">
+                <input type="number" id="sis-prod-price-a" placeholder="0" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-mono font-bold text-slate-900 text-xs text-right focus:outline-none focus:border-emerald-600">
               </div>
             </div>
             <div class="col-span-3 text-right">
-              <span class="text-[10px] font-bold text-slate-500">Min 1 Bks</span>
+              <span class="text-[10px] font-bold text-slate-500">Min 1</span>
             </div>
           </div>
 
@@ -3219,12 +3191,12 @@
             <div class="col-span-5">
               <div class="flex items-center gap-1">
                 <span class="text-emerald-700 text-[10px]">Rp</span>
-                <input type="number" value="31500" class="w-full px-2 py-1.5 border border-emerald-300 bg-emerald-50/30 rounded-lg font-mono font-bold text-emerald-900 text-xs text-right">
+                <input type="number" id="sis-prod-price-b" placeholder="Otomatis 90%" class="w-full px-2 py-1.5 border border-emerald-300 bg-emerald-50/30 rounded-lg font-mono font-bold text-emerald-900 text-xs text-right focus:outline-none focus:border-emerald-600">
               </div>
             </div>
             <div class="col-span-3 flex items-center justify-end gap-1">
               <span class="text-[10px] text-slate-500 font-medium">Min:</span>
-              <input type="number" value="10" class="w-12 px-1.5 py-1 border border-slate-300 rounded-lg font-mono font-bold text-center text-xs">
+              <input type="number" id="sis-prod-min-b" value="10" class="w-12 px-1.5 py-1 border border-slate-300 rounded-lg font-mono font-bold text-center text-xs focus:outline-none focus:border-emerald-600">
             </div>
           </div>
 
@@ -3237,12 +3209,12 @@
             <div class="col-span-5">
               <div class="flex items-center gap-1">
                 <span class="text-blue-700 text-[10px]">Rp</span>
-                <input type="number" value="29000" class="w-full px-2 py-1.5 border border-blue-300 bg-blue-50/30 rounded-lg font-mono font-bold text-blue-900 text-xs text-right">
+                <input type="number" id="sis-prod-price-c" placeholder="Otomatis 80%" class="w-full px-2 py-1.5 border border-blue-300 bg-blue-50/30 rounded-lg font-mono font-bold text-blue-900 text-xs text-right focus:outline-none focus:border-blue-600">
               </div>
             </div>
             <div class="col-span-3 flex items-center justify-end gap-1">
               <span class="text-[10px] text-slate-500 font-medium">Min:</span>
-              <input type="number" value="50" class="w-12 px-1.5 py-1 border border-slate-300 rounded-lg font-mono font-bold text-center text-xs">
+              <input type="number" id="sis-prod-min-c" value="50" class="w-12 px-1.5 py-1 border border-slate-300 rounded-lg font-mono font-bold text-center text-xs focus:outline-none focus:border-blue-600">
             </div>
           </div>
 
@@ -3251,11 +3223,11 @@
             <div>
               <span class="font-black text-slate-900 text-xs block">Otomatis Switch Tier Saat Qty Tercapai</span>
               <span class="text-[10px] text-slate-500 leading-tight block">
-                Jika diaktifkan, kasir yang menambah kuantiti ≥ 10 otomatis turun ke Harga B, dan ≥ 50 ke Harga C. Kasir juga bebas mengganti tier manual di kolom kasir.
+                Jika diaktifkan, kasir yang menambah kuantiti otomatis turun ke Harga B atau C sesuai batas minimal.
               </span>
             </div>
             <label class="relative inline-flex items-center cursor-pointer shrink-0">
-              <input type="checkbox" checked class="sr-only peer">
+              <input type="checkbox" id="sis-prod-auto-switch" checked class="sr-only peer">
               <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
             </label>
           </div>
@@ -3264,7 +3236,7 @@
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-products')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Tutup</button>
-        <button onclick="showMockupToast('💾 Master Produk &amp; Multi-Harga Berhasil Disimpan!', 'success'); closeSisModal('sis-modal-products');" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
+        <button onclick="saveSisProduct()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
           💾 Simpan Master Produk
         </button>
       </div>
@@ -3499,31 +3471,43 @@
         </div>
 
         <div class="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2.5">
-          <span class="font-black text-slate-900 text-xs block">Basreng Pedas Daun Jeruk 200g</span>
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span id="so-product-name" class="font-black text-slate-900 text-xs block">Pilih Produk untuk SO...</span>
+              <span id="so-product-barcode" class="text-[10px] text-slate-400 font-mono block">-</span>
+            </div>
+            <span class="text-[9px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">Fisik vs Sistem</span>
+          </div>
+
           <div class="grid grid-cols-3 gap-2 text-center">
             <div class="p-2 bg-white rounded-xl border border-slate-200/80">
               <span class="text-[9px] text-slate-400 font-bold block uppercase">Stok Sistem</span>
-              <span class="font-mono font-black text-slate-800 text-sm">32 PCS</span>
+              <span id="so-system-stock" class="font-mono font-black text-slate-800 text-sm">0 PCS</span>
             </div>
-            <div class="p-2 bg-white rounded-xl border border-slate-300">
-              <span class="text-[9px] text-slate-500 font-bold block uppercase">Fisik Rak</span>
-              <input type="number" value="30" class="w-full text-center font-mono font-black text-slate-900 text-sm border-0 bg-transparent focus:outline-none" />
+            <div class="p-2 bg-white rounded-xl border border-emerald-300 ring-2 ring-emerald-100">
+              <span class="text-[9px] text-emerald-800 font-bold block uppercase">Fisik Nyata</span>
+              <input type="number" id="so-physical-qty" value="0" oninput="updateSisSoDifference()" class="w-full text-center font-mono font-black text-slate-900 text-sm border-0 bg-transparent focus:outline-none" />
             </div>
-            <div class="p-2 bg-rose-50 rounded-xl border border-rose-200">
-              <span class="text-[9px] text-rose-700 font-bold block uppercase">Selisih</span>
-              <span class="font-mono font-black text-rose-700 text-sm">-2 PCS</span>
+            <div id="so-diff-box" class="p-2 bg-emerald-50 rounded-xl border border-emerald-200">
+              <span class="text-[9px] text-slate-500 font-bold block uppercase">Selisih</span>
+              <span id="so-diff-val" class="font-mono font-black text-emerald-700 text-sm">0 PCS</span>
             </div>
           </div>
         </div>
 
-        <div class="p-3 bg-amber-50/70 border border-amber-200 rounded-xl text-[11px] text-amber-900">
-          ⚠️ Selisih minus 2 PCS akan dicatat dalam laporan audit kehilangan toko dan butuh approval COS.
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Catatan / Alasan Penyesuaian SO</label>
+          <input type="text" id="so-notes" placeholder="Contoh: Selisih susut fisik, rusak tidak tercatat, dll..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 text-xs focus:outline-none focus:border-slate-800" />
+        </div>
+
+        <div id="so-diff-warning" class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-700">
+          ℹ️ Masukkan jumlah fisik nyata hasil hitung di rak. Angka stok sistem akan disesuaikan saat disimpan.
         </div>
       </div>
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-so')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
-        <button onclick="showMockupToast('💾 Hasil Stock Opname Berhasil Disimpan!', 'success'); closeSisModal('sis-modal-so');" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
+        <button onclick="saveSisSo()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
           💾 Simpan Hasil SO
         </button>
       </div>
@@ -3555,8 +3539,7 @@
               <input 
                 type="text" 
                 id="waste-product-search" 
-                placeholder="Scan barcode / ketik live nama snack rusak..." 
-                value="Keripik Tempe Renyah 150g"
+                placeholder="Scan barcode / ketik nama snack rusak..." 
                 class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent" 
                 oninput="handleLogisticsSearch(this.value, 'waste')"
                 autocomplete="off"
@@ -3590,28 +3573,39 @@
             </div>
           </div>
         </div>
+
+        <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between">
+          <div class="min-w-0 pr-2">
+            <span id="waste-product-name" class="font-black text-slate-900 text-xs block truncate">Pilih Produk Rusak...</span>
+            <span id="waste-current-stock" class="text-[10px] text-slate-500 font-mono block">Stok Saat Ini: 0 Bks</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-extrabold shrink-0">BAP Waste</span>
+        </div>
+
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Jumlah Rusak (Qty)</label>
-            <input type="number" value="1" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center focus:outline-none focus:border-slate-800" />
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Jumlah Rusak (Qty) *</label>
+            <input type="number" id="waste-qty-input" value="1" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center focus:outline-none focus:border-slate-800" />
           </div>
           <div>
             <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Jenis Tindakan</label>
-            <select class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 bg-white focus:outline-none focus:border-slate-800">
-              <option>Pemusnahan Toko</option>
-              <option>Retur ke Supplier</option>
+            <select id="waste-action-select" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-800 bg-white focus:outline-none focus:border-slate-800">
+              <option value="Pemusnahan Toko">Pemusnahan Toko</option>
+              <option value="Retur ke Supplier">Retur ke Supplier</option>
+              <option value="Kadaluarsa / Expired">Kadaluarsa / Expired</option>
+              <option value="Rusak Kemasan / Pecah">Rusak Kemasan / Pecah</option>
             </select>
           </div>
         </div>
         <div>
-          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Keterangan Tambahan</label>
-          <input type="text" placeholder="Kemasan robek saat ditata di rak..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-slate-800" />
+          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Keterangan Alasan Rusak</label>
+          <input type="text" id="waste-notes-input" placeholder="Contoh: Kemasan robek saat ditata di rak, kempes..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-slate-800" />
         </div>
       </div>
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-waste')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
-        <button onclick="showMockupToast('🗑️ BAP Waste Berhasil Dicatat!', 'success'); closeSisModal('sis-modal-waste');" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
+        <button onclick="saveSisWaste()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
           💾 Simpan BAP Waste
         </button>
       </div>
@@ -8926,6 +8920,7 @@
   
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=122"></script>
+  <script src="js/sis-logistics.js?v=100"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -9733,6 +9728,22 @@
         if (modalId === 'sis-modal-receipts') {
           renderSisReceiptsList();
         }
+        // Jika membuka Master Produk, render daftar produk real
+        if (modalId === 'sis-modal-products') {
+          if (typeof renderSisProductsModal === 'function') renderSisProductsModal();
+        }
+        // Jika membuka LPB, inisialisasi nomor faktur dan draft item
+        if (modalId === 'sis-modal-lpb') {
+          if (typeof initSisLpbModal === 'function') initSisLpbModal();
+        }
+        // Jika membuka Stock Opname, muat produk terpilih & hitung selisih
+        if (modalId === 'sis-modal-so') {
+          if (typeof initSisSoModal === 'function') initSisSoModal();
+        }
+        // Jika membuka BAP Waste, muat produk terpilih & stok saat ini
+        if (modalId === 'sis-modal-waste') {
+          if (typeof initSisWasteModal === 'function') initSisWasteModal();
+        }
       }
     }
 
@@ -10151,196 +10162,6 @@
       { id: "B4", barcode: "8992761111904", name: "Kacang Tanah Kupas Bal 10 Kg", price: 220000, stock: 5, unit: "Bal", icon: "📦" }
     ];
 
-    // =========================================================================
-    // FITUR PENCARIAN LIVE KETIK, LIST PRODUK & SCANNER KAMERA UNTUK LOGISTIK SIS
-    // =========================================================================
-    function handleLogisticsSearch(query, context) {
-      const q = (query || "").trim().toLowerCase();
-      const dropdown = document.getElementById(`${context}-search-dropdown`);
-      if (!dropdown) return;
-
-      if (!q) {
-        dropdown.classList.add('hidden');
-        dropdown.innerHTML = "";
-        return;
-      }
-
-      const sourceCatalog = (context === 'repack-origin') ? mockBulkCatalog : mockCatalog;
-      const matches = sourceCatalog.filter(p => 
-        p.name.toLowerCase().includes(q) || 
-        p.barcode.includes(q)
-      );
-
-      renderLogisticsDropdown(matches, context);
-    }
-
-    function toggleLogisticsCatalog(context) {
-      const dropdown = document.getElementById(`${context}-search-dropdown`);
-      const inputId = (
-        context === 'lpb' ? 'lpb-product-search' :
-        context === 'products' ? 'products-search-input' :
-        context === 'label' ? 'label-product-search' :
-        context === 'so' ? 'so-product-search' :
-        context === 'waste' ? 'waste-product-search' :
-        context === 'repack-origin' ? 'repack-origin-search' :
-        context === 'repack-target' ? 'repack-target-search' :
-        'repack-origin-search'
-      );
-      const input = document.getElementById(inputId);
-      if (!dropdown) return;
-
-      if (!dropdown.classList.contains('hidden') && (!input || !input.value || input.value.trim() === "")) {
-        dropdown.classList.add('hidden');
-      } else {
-        renderLogisticsDropdown((context === 'repack-origin' ? mockBulkCatalog : mockCatalog), context);
-        if (input) input.focus();
-      }
-    }
-
-    function triggerLogisticsCameraScan(context) {
-      const titles = {
-        'lpb': 'Scan Barcode Penerimaan Barang (LPB)',
-        'products': 'Scan Barcode Master & Cek Harga',
-        'label': 'Scan Barcode Cetak Label Rak',
-        'so': 'Scan Barcode Stock Opname Fisik',
-        'waste': 'Scan Barcode Barang Rusak (Waste)',
-        'repack-origin': 'Scan Barcode Bahan Asal (Bal Mentah)',
-        'repack-target': 'Scan Barcode Produk Tujuan Repack'
-      };
-      const title = titles[context] || 'Scan Barcode Logistik';
-
-      if (typeof openPosCameraScanner === 'function') {
-        openPosCameraScanner(function(scannedBarcode) {
-          handleLogisticsScannedBarcode(scannedBarcode, context);
-        }, title);
-      } else {
-        if (typeof showToast === 'function') showToast("Fitur kamera belum siap.", "warning");
-      }
-    }
-
-    function handleLogisticsScannedBarcode(scannedCode, context) {
-      const code = (scannedCode || '').trim();
-      if (!code) return;
-
-      const realProducts = (typeof pos !== 'undefined' && pos.products) ? pos.products : [];
-      const sourceList = (context === 'repack-origin') ? mockBulkCatalog : [...realProducts, ...mockCatalog];
-
-      const matched = sourceList.find(p => (p.barcode && p.barcode === code) || (p.id && String(p.id).toLowerCase() === code.toLowerCase()));
-
-      if (matched) {
-        selectLogisticsProduct(matched.id, context);
-        if (typeof showToast === 'function') {
-          showToast(`📷 ${matched.name} (${code}) berhasil di-scan`, 'success');
-        }
-      } else {
-        const inputMap = {
-          'lpb': 'lpb-product-search',
-          'products': 'products-search-input',
-          'label': 'label-product-search',
-          'so': 'so-product-search',
-          'waste': 'waste-product-search',
-          'repack-origin': 'repack-origin-search',
-          'repack-target': 'repack-target-search'
-        };
-        const inputId = inputMap[context];
-        const input = inputId ? document.getElementById(inputId) : null;
-        if (input) {
-          input.value = code;
-          input.focus();
-        }
-        if (typeof showToast === 'function') {
-          showToast(`📷 Barcode ${code} terdeteksi!`, 'info');
-        }
-      }
-    }
-
-    function renderLogisticsDropdown(items, context) {
-      const dropdown = document.getElementById(`${context}-search-dropdown`);
-      if (!dropdown) return;
-
-      if (items.length === 0) {
-        dropdown.innerHTML = `
-          <div class="p-3 text-center text-xs text-slate-400 bg-white">
-            Produk tidak ditemukan
-          </div>
-        `;
-        dropdown.classList.remove('hidden');
-        return;
-      }
-
-      dropdown.innerHTML = items.map(p => `
-        <div 
-          onclick="selectLogisticsProduct('${p.id}', '${context}')" 
-          class="p-2.5 hover:bg-emerald-50/80 transition flex items-center justify-between gap-2 cursor-pointer group bg-white"
-        >
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="text-base">${p.icon || '🍘'}</span>
-            <div class="min-w-0">
-              <span class="font-bold text-xs text-slate-900 group-hover:text-emerald-700 block truncate">${p.name}</span>
-              <span class="text-[10px] text-slate-400 font-mono block">${p.barcode || p.plu || '-'} • Stok: ${p.stock || 0} ${p.unit || 'Bks'}</span>
-            </div>
-          </div>
-          <span class="font-mono font-bold text-xs text-emerald-700 shrink-0">Rp ${(p.price || 0).toLocaleString('id-ID')}</span>
-        </div>
-      `).join("");
-
-      dropdown.classList.remove('hidden');
-    }
-
-    function selectLogisticsProduct(productId, context) {
-      const realProducts = (typeof pos !== 'undefined' && pos.products) ? pos.products : [];
-      const sourceList = (context === 'repack-origin') ? mockBulkCatalog : [...realProducts, ...mockCatalog];
-      const p = sourceList.find(item => item.id === productId || item.barcode === productId);
-      if (!p) return;
-
-      const dropdown = document.getElementById(`${context}-search-dropdown`);
-      if (dropdown) dropdown.classList.add('hidden');
-
-      if (context === 'lpb') {
-        const input = document.getElementById('lpb-product-search');
-        if (input) input.value = `${p.name} (${p.barcode})`;
-        showMockupToast(`✅ ${p.name} dipilih untuk Faktur LPB`, 'success');
-      } else if (context === 'products') {
-        const input = document.getElementById('products-search-input');
-        if (input) input.value = p.name;
-        showMockupToast(`🔍 Master ${p.name} dimuat`, 'info');
-      } else if (context === 'label') {
-        const input = document.getElementById('label-product-search');
-        if (input) input.value = p.name;
-        showMockupToast(`🏷️ Label ${p.name} siap dicetak`, 'success');
-      } else if (context === 'so') {
-        const input = document.getElementById('so-product-search');
-        if (input) input.value = p.barcode;
-        const soName = document.querySelector('#sis-modal-so .font-black.text-slate-900.text-xs');
-        if (soName) soName.textContent = p.name;
-        const soSys = document.querySelector('#sis-modal-so .font-mono.font-black.text-slate-800');
-        if (soSys) soSys.textContent = `${p.stock} ${p.unit.toUpperCase()}`;
-        showMockupToast(`📊 Data SO ${p.name} dimuat (Stok: ${p.stock})`, 'success');
-      } else if (context === 'waste') {
-        const input = document.getElementById('waste-product-search');
-        if (input) input.value = `${p.name} (Stok: ${p.stock})`;
-        showMockupToast(`🗑️ ${p.name} dipilih untuk BAP Waste`, 'info');
-      } else if (context === 'repack-origin') {
-        const input = document.getElementById('repack-origin-search');
-        if (input) input.value = `${p.name} (${p.barcode})`;
-        showMockupToast(`📦 Produk Asal: ${p.name} dipilih`, 'info');
-        updateRepackSummary();
-      } else if (context === 'repack-target') {
-        const input = document.getElementById('repack-target-search');
-        if (input) input.value = `${p.name} (${p.barcode})`;
-        showMockupToast(`🛍️ Produk Tujuan: ${p.name} dipilih`, 'success');
-        updateRepackSummary();
-      }
-    }
-
-    function addLpbItemFromSearch() {
-      const input = document.getElementById('lpb-product-search');
-      const qtyInput = document.getElementById('lpb-qty-input');
-      const val = input ? input.value : 'Keripik Tempe Renyah';
-      const qty = qtyInput ? qtyInput.value : '24';
-      showMockupToast(`📥 ${val} (+${qty} bks) ditambahkan ke Faktur LPB!`, 'success');
-    }
-
     // Auto-close dropdown logistik saat klik di luar
     document.addEventListener('click', function(e) {
       ['lpb', 'products', 'label', 'so', 'waste', 'repack-origin', 'repack-target'].forEach(ctx => {
@@ -10351,27 +10172,6 @@
         }
       });
     });
-
-
-
-    function updateRepackSummary() {
-      const qOrigin = document.getElementById('repack-qty-origin')?.value || '1';
-      const qTarget = document.getElementById('repack-qty-target')?.value || '25';
-      const outEl = document.getElementById('repack-summary-out');
-      const inEl = document.getElementById('repack-summary-in');
-      if (outEl) outEl.textContent = `-${qOrigin} Bal (Sisa ${Math.max(0, 3 - parseInt(qOrigin))} Bal)`;
-      if (inEl) inEl.textContent = `+${qTarget} Bungkus (Total Menjadi ${45 + parseInt(qTarget)} Bks)`;
-    }
-
-    function executeRepackProcess() {
-      const qOrigin = document.getElementById('repack-qty-origin')?.value || '1';
-      const qTarget = document.getElementById('repack-qty-target')?.value || '25';
-      const origName = document.getElementById('repack-origin-search')?.value.split('(')[0] || 'Bal Mentah';
-      const targName = document.getElementById('repack-target-search')?.value.split('(')[0] || 'Kemasan Ecer';
-      
-      showMockupToast(`🔄 Repack Sukses: -${qOrigin} Bal (${origName.trim()}) ➔ +${qTarget} Bks (${targName.trim()})`, 'success');
-      closeSisModal('sis-modal-repack');
-    }
 
   </script>
 
@@ -10701,7 +10501,7 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=103')
+        navigator.serviceWorker.register('./sw.js?v=104')
           .then((registration) => {
             registration.update();
             console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
