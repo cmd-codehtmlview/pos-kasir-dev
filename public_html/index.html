@@ -287,17 +287,29 @@
                   </svg>
                 </button>
                 
-                <!-- Simbol Minimalis: Scan Barcode Kamera (Flat Minimalis Sederhana) -->
+                <!-- Tombol Test Scan Demo Cepat (Langsung di Layar Kasir!) -->
+                <button 
+                  type="button" 
+                  onclick="simulateBarcodeScanDemo()" 
+                  class="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black text-xs rounded-xl flex items-center gap-1 shadow-sm transition border border-amber-600 cursor-pointer shrink-0" 
+                  title="Simulasi scan produk langsung ke keranjang (Tanpa Kamera)"
+                >
+                  <span>🎲</span>
+                  <span class="font-extrabold text-[11px]">Test Scan</span>
+                </button>
+
+                <!-- Tombol Scan Barcode Kamera HP / Webcam -->
                 <button 
                   type="button" 
                   onclick="openPosCameraScanner()" 
-                  class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
+                  class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95 flex items-center gap-1 transition rounded-xl shadow-sm border border-emerald-700 cursor-pointer shrink-0" 
                   title="Scan Barcode Kamera HP / Webcam"
                 >
-                  <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
+                  <span class="text-[11px] font-bold hidden sm:inline">Kamera</span>
                 </button>
               </div>
             </div>
@@ -7775,8 +7787,8 @@
   <!-- ============================================================ -->
   <!-- MODAL: PEMINDAI BARCODE KAMERA KASIR UTAMA (POS MULTI-SCAN) -->
   <!-- ============================================================ -->
-  <div id="modal-pos-camera-scanner" class="modal-backdrop fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[90] hidden no-print">
-    <div class="bg-slate-900 text-white w-full max-w-lg rounded-3xl shadow-2xl border-2 border-emerald-500 overflow-hidden flex flex-col max-h-[96vh]">
+  <div id="modal-pos-camera-scanner" class="modal-backdrop fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 hidden no-print" style="z-index: 99999 !important;">
+    <div class="bg-slate-900 text-white w-full max-w-lg rounded-3xl shadow-2xl border-2 border-emerald-500 overflow-y-auto flex flex-col max-h-[96vh]">
       
       <!-- Header Modal -->
       <div class="p-3 sm:p-4 bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-900 border-b border-slate-700/80 flex items-center justify-between">
@@ -9051,7 +9063,7 @@
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=118"></script>
+  <script src="js/scanner.js?v=119"></script>
   <script src="js/cart.js?v=105"></script>
   <script src="js/printer.js?v=124"></script>
   <script src="js/checkout.js?v=108"></script>

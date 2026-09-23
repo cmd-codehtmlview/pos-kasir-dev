@@ -220,9 +220,16 @@ async function startPosCameraStream(targetDeviceId = null) {
 
   // Bersihkan dan sematkan video element baru
   readerEl.innerHTML = `
-    <video id="pos-live-camera-video" autoplay playsinline muted class="w-full h-full object-cover min-h-[280px] sm:min-h-[340px]"></video>
+    <video id="pos-live-camera-video" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover; min-height: 280px;"></video>
   `;
   const videoEl = document.getElementById("pos-live-camera-video");
+  if (videoEl) {
+    videoEl.muted = true;
+    videoEl.playsInline = true;
+    videoEl.setAttribute("playsinline", "");
+    videoEl.setAttribute("webkit-playsinline", "");
+    videoEl.setAttribute("muted", "");
+  }
 
   try {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -233,8 +240,8 @@ async function startPosCameraStream(targetDeviceId = null) {
     const preferredConstraints = {
       audio: false,
       video: posScannerSelectedDeviceId 
-        ? { deviceId: { exact: posScannerSelectedDeviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
-        : { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }
+        ? { deviceId: { exact: posScannerSelectedDeviceId } }
+        : { facingMode: { ideal: "environment" } }
     };
 
     try {
@@ -260,15 +267,23 @@ async function startPosCameraStream(targetDeviceId = null) {
       posScannerAvailableCameras = devices.filter(d => d.kind === "videoinput");
     } catch(e){}
 
-    const onStreamReady = () => {
-      videoEl.play().catch(e => console.warn("Video play notice:", e));
+    const onStreamReady = async () => {
+      try {
+        await videoEl.play();
+      } catch (e) {
+        console.warn("Video play notice:", e);
+      }
       if (loadingEl) loadingEl.classList.add("hidden");
       posScannerIsScanning = true;
       startPosDetectionLoop(videoEl);
     };
 
-    videoEl.onloadedmetadata = onStreamReady;
-    setTimeout(onStreamReady, 450);
+    videoEl.onloadedmetadata = () => onStreamReady();
+    setTimeout(() => {
+      if (loadingEl && !loadingEl.classList.contains("hidden")) {
+        onStreamReady();
+      }
+    }, 250);
 
   } catch (err) {
     console.error("Camera access error:", err);
