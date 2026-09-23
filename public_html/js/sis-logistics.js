@@ -340,6 +340,10 @@ function renderSisProductsModal(filterText = "") {
             <span class="px-2 py-0.5 rounded-full ${autoSwitch ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'} text-[9px] font-extrabold">
               Auto: ${autoSwitch ? 'ON' : 'OFF'}
             </span>
+            <button type="button" onclick="openSinglePrintModal('${p.id}')" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold rounded-lg text-[10px] transition cursor-pointer flex items-center gap-0.5" title="Cetak Label Rak & Barcode Produk Ini">
+              <span>🏷️</span>
+              <span>Label</span>
+            </button>
             <button type="button" onclick="editSisProduct('${p.id}')" class="px-2 py-1 bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-800 font-bold rounded-lg text-[10px] transition cursor-pointer" title="Edit Master & Harga">
               ✏️ Edit
             </button>
@@ -389,6 +393,15 @@ function resetSisProductForm() {
   const toggle = document.getElementById('sis-prod-auto-switch');
   if (toggle) toggle.checked = true;
 
+  // SOP: Tambah SKU baru stok fisik wajib 0 & terkunci
+  const stockEl = document.getElementById('sis-prod-stock');
+  if (stockEl) {
+    stockEl.value = '0';
+    stockEl.readOnly = true;
+  }
+  const directPrintBtn = document.getElementById('btn-sis-prod-direct-print');
+  if (directPrintBtn) directPrintBtn.classList.add('hidden');
+
   const heading = document.getElementById('sis-prod-form-heading');
   if (heading) heading.textContent = 'Tambah Produk & Multi-Harga Baru';
 }
@@ -410,6 +423,16 @@ function editSisProduct(productId) {
   setVal('sis-prod-cost', p.costPrice || p.cost || 0);
   setVal('sis-prod-stock', p.stock || 0);
   setVal('sis-prod-unit', p.unit || 'Bks');
+
+  // Stok produk hanya dapat diedit via LPB/SO/Retur
+  const stockEl = document.getElementById('sis-prod-stock');
+  if (stockEl) {
+    stockEl.value = p.stock || 0;
+    stockEl.readOnly = true;
+  }
+
+  const directPrintBtn = document.getElementById('btn-sis-prod-direct-print');
+  if (directPrintBtn) directPrintBtn.classList.remove('hidden');
   
   const priceA = p.price || 0;
   const priceB = p.priceB || (p.hasWholesale && p.wholesalePrice ? p.wholesalePrice : Math.round(priceA * 0.9));
@@ -430,20 +453,15 @@ function editSisProduct(productId) {
   if (heading) heading.textContent = `Edit Produk: ${p.name}`;
 
   switchProductModalTab('form');
-  setTimeout(() => {
-    const nameInp = document.getElementById('sis-prod-name');
-    if (nameInp) nameInp.focus();
-  }, 100);
 }
 
-function saveSisProduct() {
+function saveSisProduct(andPrint = false) {
   const getVal = id => (document.getElementById(id)?.value || "").trim();
   const id = getVal('sis-prod-id');
   const barcode = getVal('sis-prod-barcode');
   const category = getVal('sis-prod-category') || 'Makanan Ringan & Biskuit';
   const name = getVal('sis-prod-name');
   const costPrice = parseFloat(getVal('sis-prod-cost')) || 0;
-  const stock = parseInt(getVal('sis-prod-stock'), 10) || 0;
   const unit = getVal('sis-prod-unit') || 'Bks';
   const priceA = parseFloat(getVal('sis-prod-price-a')) || 0;
   const priceB = parseFloat(getVal('sis-prod-price-b')) || Math.round(priceA * 0.9);
@@ -454,17 +472,14 @@ function saveSisProduct() {
 
   if (!barcode) {
     alert("Harap masukkan Barcode / SKU!");
-    document.getElementById('sis-prod-barcode')?.focus();
     return;
   }
   if (!name) {
     alert("Harap masukkan Nama Produk!");
-    document.getElementById('sis-prod-name')?.focus();
     return;
   }
   if (priceA <= 0) {
     alert("Harap masukkan Harga Eceran (Harga A) dengan nilai lebih dari 0!");
-    document.getElementById('sis-prod-price-a')?.focus();
     return;
   }
 
@@ -480,15 +495,17 @@ function saveSisProduct() {
     return;
   }
 
+  let targetProductId = id;
+
   if (id) {
-    // Mode Update
+    // Mode Update: pertahankan stok yang ada (stok tidak boleh diubah sembarangan di master)
     const prod = pos.products.find(p => p.id === id);
     if (prod) {
       prod.barcode = barcode;
       prod.category = category;
       prod.name = name;
       prod.costPrice = costPrice;
-      prod.stock = stock;
+      // prod.stock tidak diubah, tetap sesuai database
       prod.unit = unit;
       prod.price = priceA;
       prod.priceA = priceA;
@@ -497,21 +514,21 @@ function saveSisProduct() {
       prod.priceC = priceC;
       prod.minQtyC = minC;
       prod.autoSwitchTier = autoSwitch;
-      // Kompatibilitas dengan field wholesale lama
       prod.hasWholesale = true;
       prod.wholesalePrice = priceB;
       prod.wholesaleMinQty = minB;
     }
   } else {
-    // Mode Tambah Baru
+    // Mode Tambah SKU Baru: STOK AWAL WAJIB 0 (Stok hanya masuk via LPB atau Retur)
     const newId = `PRD-${String(pos.products.length + 1).padStart(3, '0')}`;
+    targetProductId = newId;
     const newProduct = {
       id: newId,
       barcode: barcode,
       category: category,
       name: name,
       costPrice: costPrice,
-      stock: stock,
+      stock: 0, // STOK AWAL 0
       minStock: 5,
       unit: unit,
       price: priceA,
@@ -537,18 +554,40 @@ function saveSisProduct() {
     try { syncProducts(); } catch (e) { console.warn("Sync products error:", e); }
   }
 
-  // Refresh tampilan inventory dan kasir
+  // Refresh tampilan inventory, kasir, dan master produk
   if (typeof renderInventoryTable === 'function') renderInventoryTable();
   if (typeof renderPosCart === 'function') renderPosCart();
+  if (typeof renderSisProductsModal === 'function') renderSisProductsModal();
 
-  const toastMsg = `💾 Master Produk "${name}" & Multi-Harga berhasil disimpan!`;
-  if (typeof showMockupToast === 'function') {
-    showMockupToast(toastMsg, 'success');
-  } else if (typeof showToast === 'function') {
-    showToast(toastMsg, 'success');
+  if (andPrint) {
+    closeSisModal('sis-modal-products');
+    if (typeof openSinglePrintModal === 'function') {
+      openSinglePrintModal(targetProductId);
+    }
+    if (typeof showToast === 'function') {
+      showToast(`💾 Produk "${name}" disimpan. Membuka cetak label...`, 'success');
+    }
+  } else {
+    const toastMsg = id ? `💾 Perubahan produk "${name}" berhasil disimpan!` : `💾 Master Produk "${name}" berhasil ditambahkan! (Stok awal 0, masuk via LPB)`;
+    if (typeof showToast === 'function') {
+      showToast(toastMsg, 'success');
+    } else if (typeof showMockupToast === 'function') {
+      showMockupToast(toastMsg, 'success');
+    }
+    switchProductModalTab('list');
   }
+}
 
-  switchProductModalTab('list');
+function printCurrentSisProductLabel() {
+  const id = document.getElementById('sis-prod-id')?.value;
+  if (!id) {
+    alert("Pilih atau simpan produk terlebih dahulu sebelum mencetak label!");
+    return;
+  }
+  closeSisModal('sis-modal-products');
+  if (typeof openSinglePrintModal === 'function') {
+    openSinglePrintModal(id);
+  }
 }
 
 function deleteSisProduct(productId) {
@@ -1168,6 +1207,7 @@ if (typeof window !== 'undefined') {
   window.resetSisProductForm = resetSisProductForm;
   window.editSisProduct = editSisProduct;
   window.saveSisProduct = saveSisProduct;
+  window.printCurrentSisProductLabel = printCurrentSisProductLabel;
   window.deleteSisProduct = deleteSisProduct;
 
   window.initSisLpbModal = initSisLpbModal;

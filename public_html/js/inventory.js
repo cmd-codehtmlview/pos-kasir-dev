@@ -93,6 +93,11 @@ function toggleProductSelection(productId, isChecked) {
   }
   updateInventorySelectAllCheckbox();
   updateInventoryBatchBar();
+  if (typeof renderLabelPreview === 'function') renderLabelPreview();
+  if (typeof renderLabelProductPickerList === 'function') {
+    const searchVal = document.getElementById('label-picker-search')?.value || '';
+    renderLabelProductPickerList(searchVal);
+  }
 }
 
 function toggleSelectAllInventory(isChecked) {
@@ -1038,8 +1043,29 @@ function selectAllLabelsForPrinting() {
     updateInventoryBatchBar();
     renderInventoryTable();
     renderLabelPreview();
+    renderLabelProductPickerList();
     showToast(`Memilih seluruh ${pos.products.length} produk katalog untuk dicetak`, "info");
   }
+}
+
+function selectInStockLabelsForPrinting() {
+  selectedInventoryIds.clear();
+  let count = 0;
+  if (pos && pos.products && pos.products.length > 0) {
+    pos.products.forEach(p => {
+      if ((p.stock || 0) > 0) {
+        selectedInventoryIds.add(p.id);
+        selectedInventoryIds.add(String(p.id));
+        count++;
+      }
+    });
+  }
+  updateInventorySelectAllCheckbox();
+  updateInventoryBatchBar();
+  renderInventoryTable();
+  renderLabelPreview();
+  renderLabelProductPickerList();
+  showToast(`Memilih ${count} produk yang memiliki stok`, "info");
 }
 
 function clearLabelsSelection() {
@@ -1048,7 +1074,84 @@ function clearLabelsSelection() {
   updateInventoryBatchBar();
   renderInventoryTable();
   renderLabelPreview();
+  renderLabelProductPickerList();
   showToast("Pilihan produk label dikosongkan", "info");
+}
+
+function toggleLabelProductPicker(forceState = null) {
+  const panel = document.getElementById('label-product-picker-panel');
+  const arrow = document.getElementById('label-picker-arrow');
+  if (!panel) return;
+  const isHidden = panel.classList.contains('hidden');
+  const shouldOpen = forceState !== null ? forceState : isHidden;
+  if (shouldOpen) {
+    panel.classList.remove('hidden');
+    if (arrow) arrow.textContent = '▴';
+    renderLabelProductPickerList(document.getElementById('label-picker-search')?.value || '');
+  } else {
+    panel.classList.add('hidden');
+    if (arrow) arrow.textContent = '▾';
+  }
+}
+
+function filterLabelProductPicker(query) {
+  renderLabelProductPickerList(query);
+}
+
+function renderLabelProductPickerList(query = '') {
+  const listEl = document.getElementById('label-picker-product-list');
+  if (!listEl) return;
+  const products = (pos && Array.isArray(pos.products)) ? pos.products : [];
+  const q = (query || '').trim().toLowerCase();
+  const filtered = q ? products.filter(p => 
+    (p.name && p.name.toLowerCase().includes(q)) || 
+    (p.barcode && p.barcode.toLowerCase().includes(q)) ||
+    (p.category && p.category.toLowerCase().includes(q))
+  ) : products;
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = `<div class="p-4 text-center text-slate-400 font-bold text-xs">Tidak ada produk yang cocok dengan "${query}".</div>`;
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(p => {
+    const isChecked = selectedInventoryIds.has(p.id) || selectedInventoryIds.has(String(p.id));
+    const stockVal = p.stock || 0;
+    return `
+      <div class="p-2 flex items-center justify-between gap-2 hover:bg-slate-50 transition ${isChecked ? 'bg-amber-50/70' : ''}">
+        <label class="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer select-none">
+          <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleProductSelection('${p.id}', this.checked)" class="w-4 h-4 rounded text-alfa-red border-slate-300 focus:ring-0 cursor-pointer">
+          <div class="min-w-0">
+            <span class="font-bold text-slate-800 block text-xs truncate">${p.name}</span>
+            <span class="text-[10px] text-slate-400 font-mono block">
+              ${p.barcode || '-'} • Stok: <strong class="${stockVal > 0 ? 'text-emerald-700' : 'text-rose-600'}">${stockVal} ${p.unit || 'Bks'}</strong>
+            </span>
+          </div>
+        </label>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <span class="font-mono font-bold text-slate-900 text-xs">${formatRupiah(p.price)}</span>
+          <button type="button" onclick="isolateSingleProductForLabel('${p.id}')" class="px-2 py-0.5 bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-900 rounded-lg text-[10px] font-bold border border-slate-200 transition cursor-pointer" title="Pilih hanya produk ini untuk cetak label">
+            Hanya Ini
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function isolateSingleProductForLabel(productId) {
+  selectedInventoryIds.clear();
+  selectedInventoryIds.add(productId);
+  selectedInventoryIds.add(String(productId));
+  updateInventorySelectAllCheckbox();
+  updateInventoryBatchBar();
+  renderInventoryTable();
+  renderLabelPreview();
+  renderLabelProductPickerList(document.getElementById('label-picker-search')?.value || '');
+  const p = pos.products ? pos.products.find(item => item.id === productId || String(item.id) === String(productId)) : null;
+  if (p && typeof showToast === 'function') {
+    showToast(`🏷️ Memilih hanya "${p.name}"`, 'info');
+  }
 }
 
 function openBatchPrintModal(mode = 'shelf') {
@@ -1067,6 +1170,7 @@ function openBatchPrintModal(mode = 'shelf') {
 
   updateLabelModeButtons();
   openModal('modal-print-label');
+  toggleLabelProductPicker(false);
 
   const formatSelect = document.getElementById('label-print-format');
   if (formatSelect) {
@@ -1089,7 +1193,17 @@ function openSinglePrintModal(productId) {
   updateInventorySelectAllCheckbox();
   updateInventoryBatchBar();
   renderInventoryTable();
-  openBatchPrintModal('shelf');
+  openModal('modal-print-label');
+  toggleLabelProductPicker(false);
+  updateLabelModeButtons();
+
+  const formatSelect = document.getElementById('label-print-format');
+  if (formatSelect) {
+    currentLabelFormat = currentLabelMode === 'sticker' ? 'sticker-50x30' : 'thermal-58';
+    formatSelect.value = currentLabelFormat;
+  }
+
+  renderLabelPreview();
 }
 
 function switchLabelMode(mode) {

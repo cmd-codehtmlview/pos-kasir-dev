@@ -3231,8 +3231,10 @@
             <input type="number" id="sis-prod-cost" placeholder="0" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
           </div>
           <div>
-            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Stok Fisik Rak</label>
-            <input type="number" id="sis-prod-stock" value="0" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
+              Stok Fisik <span class="text-[9px] text-amber-600 font-bold">(Masuk via LPB/Retur)</span>
+            </label>
+            <input type="number" id="sis-prod-stock" value="0" readonly class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-500 bg-slate-100 text-xs focus:outline-none cursor-not-allowed" title="Stok awal produk baru adalah 0. Penambahan stok hanya dapat dilakukan melalui faktur LPB (Penerimaan Barang) atau Retur Penjualan.">
           </div>
           <div>
             <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Satuan</label>
@@ -3324,11 +3326,21 @@
         </div>
       </div>
 
-      <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
-        <button onclick="closeSisModal('sis-modal-products')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Tutup</button>
-        <button onclick="saveSisProduct()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
-          💾 Simpan Master Produk
-        </button>
+      <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-2">
+        <button type="button" onclick="closeSisModal('sis-modal-products')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Tutup</button>
+        <div class="flex items-center gap-2">
+          <button id="btn-sis-prod-direct-print" type="button" onclick="printCurrentSisProductLabel()" class="hidden px-3.5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5" title="Cetak label harga / stiker barcode untuk produk ini">
+            <span>🏷️</span>
+            <span>Cetak Label</span>
+          </button>
+          <button type="button" onclick="saveSisProduct(true)" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5" title="Simpan data produk dan langsung buka pop-up cetak label">
+            <span>🏷️</span>
+            <span>Simpan & Cetak Label</span>
+          </button>
+          <button type="button" onclick="saveSisProduct(false)" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
+            💾 Simpan Produk
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -5493,12 +5505,55 @@
               <div class="flex items-center gap-1.5">
                 <button type="button" onclick="selectAllLabelsForPrinting()" class="text-[10px] font-bold text-alfa-blue hover:underline cursor-pointer">Semua</button>
                 <span class="text-slate-300 text-[10px]">|</span>
+                <button type="button" onclick="selectInStockLabelsForPrinting()" class="text-[10px] font-bold text-emerald-600 hover:underline cursor-pointer">Ada Stok</button>
+                <span class="text-slate-300 text-[10px]">|</span>
                 <button type="button" onclick="clearLabelsSelection()" class="text-[10px] font-bold text-rose-600 hover:underline cursor-pointer">Reset</button>
               </div>
             </div>
-            <div id="label-print-products-summary" class="text-xs font-bold text-slate-700 truncate bg-slate-100 px-2 py-1.5 rounded-xl border border-slate-200">
-              0 produk dipilih
+            <button type="button" onclick="toggleLabelProductPicker()" class="w-full text-left text-xs font-bold text-slate-700 truncate bg-white hover:bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-300 flex items-center justify-between cursor-pointer transition shadow-2xs">
+              <span id="label-print-products-summary" class="truncate">0 produk dipilih</span>
+              <span class="text-[10px] text-emerald-700 font-extrabold flex items-center gap-1 shrink-0 ml-1">
+                <span>📋 Pilih Produk</span>
+                <span id="label-picker-arrow">▾</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Panel Pemilihan Produk (Bisa pilih salah satu, beberapa, atau cari spesifik) -->
+        <div id="label-product-picker-panel" class="hidden bg-white border border-slate-300 rounded-2xl p-2.5 sm:p-3 shadow-md space-y-2">
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1">
+              <input 
+                type="text" 
+                id="label-picker-search" 
+                placeholder="Ketik nama produk / barcode..." 
+                oninput="filterLabelProductPicker(this.value)"
+                class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-emerald-600 font-medium"
+              />
+              <span class="absolute left-2.5 top-1.5 text-slate-400 text-xs">🔍</span>
             </div>
+            <button 
+              type="button" 
+              onclick="triggerLogisticsCameraScan('label')" 
+              class="px-2.5 py-1.5 bg-slate-100 hover:bg-emerald-100 text-slate-700 hover:text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-1 border border-slate-200 cursor-pointer" 
+              title="Scan Barcode Kamera untuk Cari & Pilih Produk"
+            >
+              <span>📷</span>
+              <span class="hidden sm:inline">Scan</span>
+            </button>
+            <button 
+              type="button" 
+              onclick="toggleLabelProductPicker(false)" 
+              class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold cursor-pointer"
+            >
+              Tutup ✕
+            </button>
+          </div>
+
+          <!-- Daftar Produk dengan Checkbox -->
+          <div id="label-picker-product-list" class="max-h-44 sm:max-h-52 overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-xl text-xs">
+            <!-- Diisi otomatis oleh renderLabelProductPickerList() -->
           </div>
         </div>
       </div>
@@ -8875,7 +8930,7 @@
   <script src="js/returns.js?v=100"></script>
   <script src="js/stock-opname.js?v=100"></script>
   <script src="js/klerk.js?v=100"></script>
-  <script src="js/inventory.js?v=118"></script>
+  <script src="js/inventory.js?v=119"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/import-products.js?v=100"></script>
   <script src="js/repack.js?v=100"></script>
@@ -8885,7 +8940,7 @@
   
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=118"></script>
-  <script src="js/sis-logistics.js?v=101"></script>
+  <script src="js/sis-logistics.js?v=102"></script>
   <script src="js/sis-cashier-ops.js?v=100"></script>
   <script src="js/sis-store-crm.js?v=100"></script>
   <script src="js/sis-analytics.js?v=100"></script>
@@ -10565,7 +10620,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=123')
+          navigator.serviceWorker.register('./sw.js?v=124')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
