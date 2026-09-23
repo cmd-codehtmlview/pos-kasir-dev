@@ -10710,21 +10710,19 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       if (location.pathname.includes('/dev')) {
-        // Lingkungan Dev/Staging: Otomatis unregister service worker & bersihkan cache lama agar selalu live
+        // Lingkungan Dev/Staging: Otomatis unregister service worker & bersihkan seluruh cache agar selalu live
         window.addEventListener('load', () => {
-          navigator.serviceWorker.getRegistrations().then((regs) => {
-            for (let reg of regs) {
-              if (reg.scope.includes('/dev') || reg.scope.includes('sslip.io')) {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then((regs) => {
+              for (let reg of regs) {
                 reg.unregister();
               }
-            }
-          });
+            });
+          }
           if ('caches' in window) {
             caches.keys().then((keys) => {
               for (let k of keys) {
-                if (k.includes('v116') || k.includes('dev')) {
-                  caches.delete(k);
-                }
+                caches.delete(k);
               }
             });
           }
