@@ -12,7 +12,9 @@ function processScannedBarcode(rawCode) {
   const barcodeInput = document.getElementById("pos-barcode-search");
   if (barcodeInput) {
     barcodeInput.value = "";
-    barcodeInput.focus();
+    if (document.activeElement === barcodeInput) {
+      barcodeInput.blur();
+    }
   }
 
   let matched = null;

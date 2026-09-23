@@ -7,7 +7,9 @@ function openFindProductModal() {
   const searchInput = document.getElementById("find-product-query");
   if (searchInput) {
     searchInput.value = "";
-    setTimeout(() => searchInput.focus(), 150);
+    if (document.activeElement === searchInput) {
+      searchInput.blur();
+    }
   }
   if (typeof renderQuickFindProducts === "function") {
     renderQuickFindProducts();

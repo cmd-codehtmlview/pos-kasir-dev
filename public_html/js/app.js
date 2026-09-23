@@ -41,10 +41,7 @@ function switchTab(tabId) {
 
   if (tabId === "tab-pos") {
     renderPosCart();
-    setTimeout(() => {
-      const input = document.getElementById("pos-barcode-search");
-      if (input && window.innerWidth > 768) input.focus();
-    }, 100);
+    // Biarkan keyboard tetap tersembunyi; kasir cukup klik kolom jika ingin mengetik manual
   }
   if (tabId === "tab-inventory") renderInventoryTable();
   if (tabId === "tab-reports") renderReports();

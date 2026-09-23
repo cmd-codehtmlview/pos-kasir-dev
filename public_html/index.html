@@ -267,7 +267,6 @@
                 id="pos-barcode-search" 
                 placeholder="Scan barcode / ketik live nama produk..." 
                 class="w-full text-xs sm:text-sm font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent"
-                autofocus
                 autocomplete="off"
                 oninput="handlePosLiveSearch(this.value)"
                 onkeydown="if(event.key==='Enter') handlePosEnterSearch(event)"
@@ -5559,7 +5558,6 @@
           oninput="renderQuickFindProducts()"
           placeholder="Ketik nama produk / barcode..." 
           class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold"
-          autofocus
         />
       </div>
       <div id="find-product-list" class="p-3 space-y-2 overflow-y-auto flex-1 max-h-[380px]">
@@ -8873,15 +8871,15 @@
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=121"></script>
+  <script src="js/scanner.js?v=122"></script>
   <script src="js/cart.js?v=106"></script>
   <script src="js/printer.js?v=125"></script>
-  <script src="js/checkout.js?v=108"></script>
+  <script src="js/checkout.js?v=109"></script>
   <script src="js/member.js?v=108"></script>
   <script src="js/returns.js?v=100"></script>
   <script src="js/stock-opname.js?v=100"></script>
   <script src="js/klerk.js?v=100"></script>
-  <script src="js/inventory.js?v=117"></script>
+  <script src="js/inventory.js?v=118"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/import-products.js?v=100"></script>
   <script src="js/repack.js?v=100"></script>
@@ -8890,7 +8888,7 @@
   <script src="js/employees.js?v=121"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=117"></script>
+  <script src="js/app.js?v=118"></script>
   <script src="js/sis-logistics.js?v=100"></script>
   <script src="js/sis-cashier-ops.js?v=100"></script>
   <script src="js/sis-store-crm.js?v=100"></script>
@@ -10241,19 +10239,51 @@
       const input = document.getElementById("pos-barcode-search");
       if (!dropdown) return;
 
-      if (!dropdown.classList.contains("hidden") && (!input.value || input.value.trim() === "")) {
+      if (!dropdown.classList.contains("hidden") && (!input || !input.value || input.value.trim() === "")) {
         dropdown.classList.add("hidden");
+        if (input && document.activeElement === input) input.blur();
       } else {
         const allItems = (pos.products || []).slice(0, 40);
         renderPosLiveSearchDropdown(allItems, "Semua Produk Toko");
-        if (input) input.focus();
+        // Jangan auto-focus agar keyboard virtual tidak meloncat menutupi katalog!
+        if (input && document.activeElement === input) input.blur();
       }
     }
 
     function hidePosLiveSearch() {
       const dropdown = document.getElementById("pos-live-search-dropdown");
       if (dropdown) dropdown.classList.add("hidden");
+      const input = document.getElementById("pos-barcode-search");
+      if (input && document.activeElement === input) input.blur();
     }
+
+    // Enter Key Search pada Kolom Pencarian Kasir Utama
+    function handlePosEnterSearch(event) {
+      if (event) event.preventDefault();
+      const input = document.getElementById("pos-barcode-search");
+      const val = input ? input.value.trim() : "";
+      if (!val) return;
+
+      if (typeof processScannedBarcode === "function") {
+        processScannedBarcode(val);
+      }
+      if (input) {
+        input.value = "";
+        input.blur(); // Sembunyikan keyboard virtual setelah tekan Enter
+      }
+      hidePosLiveSearch();
+    }
+
+    // Klik di luar live search dropdown untuk menutup dan menurunkan keyboard
+    document.addEventListener("click", function(e) {
+      const dropdown = document.getElementById("pos-live-search-dropdown");
+      const searchBox = document.getElementById("pos-barcode-search")?.closest(".relative");
+      if (dropdown && !dropdown.classList.contains("hidden") && searchBox && !searchBox.contains(e.target)) {
+        dropdown.classList.add("hidden");
+        const input = document.getElementById("pos-barcode-search");
+        if (input && document.activeElement === input) input.blur();
+      }
+    });
 
     // ================= SIS DRAWER & DUAL-VIEW CATALOG =================
     function toggleSisDrawer() {
@@ -10559,7 +10589,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=119')
+          navigator.serviceWorker.register('./sw.js?v=120')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

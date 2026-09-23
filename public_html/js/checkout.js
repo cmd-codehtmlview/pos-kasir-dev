@@ -63,7 +63,9 @@ function openCheckoutModal() {
   const cashInput = document.getElementById("cash-received-input");
   if (cashInput) {
     cashInput.value = "";
-    setTimeout(() => cashInput.focus(), 150);
+    if (document.activeElement === cashInput) {
+      cashInput.blur();
+    }
   }
 
   selectPaymentMethod("cash");
