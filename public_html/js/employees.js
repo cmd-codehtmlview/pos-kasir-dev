@@ -291,10 +291,9 @@ function handleFirstTimeSetup(event) {
   showToast(`🎉 Selamat Datang! Akun COS ${cosEmployee.name} (${cosEmployee.nik}) aktif. Terminal kasir siap digunakan.`, "success", 6000);
   sfx.success();
 
-  setTimeout(() => {
-    const input = document.getElementById("pos-barcode-search");
-    if (input) input.focus();
-  }, 300);
+  if (document.activeElement && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
 }
 
 function lockCashierScreen() {

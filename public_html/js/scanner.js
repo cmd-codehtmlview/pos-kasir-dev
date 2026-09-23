@@ -436,11 +436,10 @@ async function closePosCameraScanner() {
 
   closeModal("modal-pos-camera-scanner");
 
-  // Kembalikan fokus ke kotak pencarian barcode kasir
-  setTimeout(() => {
-    const searchInput = document.getElementById("pos-barcode-search");
-    if (searchInput) searchInput.focus();
-  }, 100);
+  // Pastikan keyboard virtual tetap tertutup
+  if (document.activeElement && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
 }
 
 // Tombol Switch Kamera (Kamera Depan vs Kamera Belakang)

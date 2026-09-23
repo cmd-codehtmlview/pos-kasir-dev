@@ -784,14 +784,19 @@ html, body {
    PENGATURAN TAMPILAN RESPONSIVE MOBILE / SMARTPHONE (HP)
    ========================================================= */
 @media (max-width: 768px) {
-  html {
-    overflow-x: hidden;
-  }
-
-  body {
-    overflow-x: hidden;
+  html, body {
+    overflow-x: clip;
     touch-action: pan-y;
     -webkit-overflow-scrolling: touch;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 40;
   }
 
   /* Padding bawah untuk memberi ruang navigasi mobile & tombol tanpa tumpang tindih */

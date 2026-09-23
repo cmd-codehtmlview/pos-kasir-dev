@@ -59,7 +59,7 @@
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-bebas { font-family: 'Bebas Neue', sans-serif; }
   </style>
-  <link rel="stylesheet" href="style.css?v=125">
+  <link rel="stylesheet" href="style.css?v=126">
 
   <!-- PWA Manifest & App Icons -->
   <link rel="manifest" id="app-manifest" href="manifest.json">
@@ -131,7 +131,7 @@
 
   <!-- ================= HEADER KASIR RETAIL MINIMARKET ================= -->
   <!-- ================= TOP HEADER (Signature Red Retail & Minimalist Icons) ================= -->
-  <header class="bg-gradient-to-r from-red-700 via-red-600 to-red-700 text-white shadow-md sticky top-0 z-30 no-print select-none" style="padding-top: env(safe-area-inset-top, 0px);">
+  <header class="w-full left-0 right-0 bg-gradient-to-r from-red-700 via-red-600 to-red-700 text-white shadow-md sticky top-0 z-40 no-print select-none" style="padding-top: env(safe-area-inset-top, 0px);">
     
     <!-- BARIS 1: Header Utama (Brand Toko, Kasir Aktif & Tombol Menu SIS) -->
     <div class="max-w-7xl mx-auto px-2.5 sm:px-4 py-2 flex items-center justify-between gap-2">
@@ -265,6 +265,7 @@
               <input 
                 type="text" 
                 id="pos-barcode-search" 
+                tabindex="-1"
                 placeholder="Scan barcode / ketik live nama produk..." 
                 class="w-full text-xs sm:text-sm font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent"
                 autocomplete="off"
@@ -2683,7 +2684,6 @@
                 placeholder="0" 
                 oninput="handleKlerkInputFormat(this)"
                 class="w-full pl-11 pr-4 py-3 bg-white border-2 border-slate-300 focus:border-blue-600 rounded-xl font-mono font-black text-slate-900 text-lg focus:outline-none transition shadow-inner placeholder:text-slate-300"
-                autofocus
               />
             </div>
           </div>
@@ -5625,7 +5625,6 @@
             id="scanner-test-input" 
             placeholder="Arahkan laser scanner & tembak barcode..." 
             class="w-full px-4 py-3 text-sm font-mono font-bold bg-white border-2 border-dashed border-emerald-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-center text-slate-900"
-            autofocus
           />
         </div>
 
@@ -6325,7 +6324,6 @@
             maxlength="20"
             placeholder="• • • • • •"
             class="w-full px-3 py-2.5 bg-slate-50 border-2 border-slate-300 focus:border-indigo-600 rounded-xl font-mono font-black text-center text-lg tracking-widest text-slate-900 focus:outline-none transition"
-            autofocus
           />
         </div>
 
@@ -8204,7 +8202,6 @@
                 required 
                 placeholder="Contoh: Hendra Gunawan" 
                 class="w-full pl-9 pr-3 py-2 sm:py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 shadow-xs"
-                autofocus
               />
             </div>
           </div>
@@ -8378,7 +8375,6 @@
               required 
               placeholder="Ketik NIK Kasir (Contoh: 1001)" 
               class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-alfa-red"
-              autofocus
             />
           </div>
         </div>
@@ -8473,7 +8469,6 @@
             required 
             placeholder="Ketik NIK Pejabat (COS / ACOS)" 
             class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
-            autofocus
           />
         </div>
 
@@ -8865,13 +8860,13 @@
   <!-- Core Data & Storage -->
   <script src="products-data.js?v=99"></script>
   <script src="js/db.js?v=120"></script>
-  <script src="js/store.js?v=99"></script>
+  <script src="js/store.js?v=100"></script>
   <script src="js/license.js?v=120"></script>
   <script src="js/sync.js?v=104"></script>
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=122"></script>
+  <script src="js/scanner.js?v=123"></script>
   <script src="js/cart.js?v=106"></script>
   <script src="js/printer.js?v=125"></script>
   <script src="js/checkout.js?v=109"></script>
@@ -8885,7 +8880,7 @@
   <script src="js/repack.js?v=100"></script>
   <script src="js/reports.js?v=103"></script>
   <script src="js/settings.js?v=117"></script>
-  <script src="js/employees.js?v=121"></script>
+  <script src="js/employees.js?v=122"></script>
   
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=118"></script>
@@ -9065,6 +9060,13 @@
     function toggleSisDrawer() {
       const drawer = document.getElementById('sis-drawer');
       const backdrop = document.getElementById('sis-drawer-backdrop');
+      if (!drawer || !backdrop) return;
+
+      // Selalu blur elemen aktif agar keyboard virtual tidak pernah melompat saat buka/tutup menu SIS
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
+
       if (drawer.classList.contains('translate-x-full')) {
         // Reset: tutup semua sub-menu agar saat buka hanya 6 baris menu yang terlihat
         for (let i = 1; i <= 6; i++) {
@@ -9078,6 +9080,9 @@
       } else {
         drawer.classList.add('translate-x-full');
         backdrop.classList.add('hidden');
+        if (window.scrollY > 0) {
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        }
       }
     }
 
@@ -9783,9 +9788,15 @@
     }
 
     function closeSisModal(modalId) {
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
       if (typeof stopSisScan === 'function') stopSisScan();
       const modal = document.getElementById(modalId);
       if (modal) modal.classList.add('hidden');
+      if (window.scrollY > 0 && !document.querySelector('.modal-backdrop:not(.hidden)')) {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
     }
 
     // Keyboard Shortcuts POS Retail Standard (F-Keys & Escape)
@@ -10285,43 +10296,7 @@
       }
     });
 
-    // ================= SIS DRAWER & DUAL-VIEW CATALOG =================
-    function toggleSisDrawer() {
-      const drawer = document.getElementById('sis-drawer');
-      const backdrop = document.getElementById('sis-drawer-backdrop');
-      if (!drawer || !backdrop) return;
-
-      const isClosed = drawer.classList.contains('translate-x-full');
-      if (isClosed) {
-        backdrop.classList.remove('hidden');
-        drawer.classList.remove('translate-x-full');
-      } else {
-        drawer.classList.add('translate-x-full');
-        backdrop.classList.add('hidden');
-      }
-    }
-
-    function toggleSisCategory(catIndex) {
-      const sub = document.getElementById(`sis-cat-sub-${catIndex}`);
-      const arrow = document.getElementById(`sis-cat-arrow-${catIndex}`);
-      if (!sub) return;
-
-      const isHidden = sub.classList.contains('hidden');
-      for (let i = 1; i <= 6; i++) {
-        const otherSub = document.getElementById(`sis-cat-sub-${i}`);
-        const otherArrow = document.getElementById(`sis-cat-arrow-${i}`);
-        if (otherSub && i !== catIndex) otherSub.classList.add('hidden');
-        if (otherArrow && i !== catIndex) otherArrow.classList.remove('rotate-180');
-      }
-
-      if (isHidden) {
-        sub.classList.remove('hidden');
-        if (arrow) arrow.classList.add('rotate-180');
-      } else {
-        sub.classList.add('hidden');
-        if (arrow) arrow.classList.remove('rotate-180');
-      }
-    }
+    // ================= DUAL-VIEW CATALOG =================
 
     let posCatalogViewMode = 'list';
     let currentPosLiveItems = [];
@@ -10589,7 +10564,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=120')
+          navigator.serviceWorker.register('./sw.js?v=121')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

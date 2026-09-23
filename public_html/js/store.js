@@ -737,11 +737,17 @@ function openModal(modalId) {
 }
 
 function closeModal(modalId) {
+  if (document.activeElement && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
   const el = document.getElementById(modalId);
   if (el) el.classList.add("hidden");
   const anyOpen = document.querySelector(".modal-backdrop:not(.hidden)");
   if (!anyOpen) {
     document.body.classList.remove("modal-open");
+    if (window.scrollY > 0) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
   }
 }
 
