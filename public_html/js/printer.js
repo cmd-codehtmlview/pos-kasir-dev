@@ -620,6 +620,25 @@ async function ensureBluetoothConnected(silent = false) {
   return false;
 }
 
+/**
+ * Memastikan koneksi printer Bluetooth aktif.
+ * Jika belum terhubung atau koneksi putus, memunculkan pop-up dialog konfirmasi
+ * agar pengguna langsung diarahkan untuk menghubungkan printer Bluetooth.
+ * @param {string} docType - Nama dokumen (misal: "struk transaksi", "bukti retur", "dokumen LPB", "laporan klerk")
+ * @returns {Promise<boolean>}
+ */
+async function checkOrPromptBluetoothConnection(docType = "struk") {
+  const isConnected = isBluetoothConnected() || (await ensureBluetoothConnected(false));
+  if (isConnected) return true;
+
+  const ok = confirm(`⚠️ PRINTER BELUM TERHUBUNG!\n\nPrinter Bluetooth belum tersambung atau koneksi terputus.\n\nApakah Anda ingin mencari dan menghubungkan printer Bluetooth sekarang untuk mencetak ${docType}?`);
+  if (ok) {
+    const connected = await connectBluetoothPrinter();
+    return !!connected;
+  }
+  return false;
+}
+
 function disconnectBluetoothPrinter() {
   isUserExplicitlyDisconnected = true;
   if (bluetoothAutoReconnectTimer) {
@@ -1422,29 +1441,38 @@ function buildTestReceiptEscPos() {
 
 async function printReceiptUniversal(transaction = null, isAuto = false) {
   const trx = transaction || (typeof lastCompletedTransaction !== 'undefined' ? lastCompletedTransaction : null);
-  const mode = pos.settings.printerDriverMode || 'bluetooth';
+  if (!trx) {
+    if (!isAuto) showToast("Data transaksi tidak ditemukan untuk dicetak!", "warning");
+    return;
+  }
+  const mode = pos?.settings?.printerDriverMode || 'bluetooth';
 
   if (mode === 'bluetooth') {
-    const isConnected = await ensureBluetoothConnected();
+    const isConnected = await checkOrPromptBluetoothConnection("struk transaksi");
     if (isConnected) {
       try {
-        showToast("Mencetak struk ke printer VSC Bluetooth...", "info");
+        showToast("Mencetak struk ke printer Bluetooth...", "info");
         const bytes = buildReceiptEscPos(trx);
         await sendBytesToBluetooth(bytes, { id: trx.id, title: 'Struk Transaksi #' + trx.id, type: 'receipt' });
-        showToast("Struk berhasil dicetak di printer VSC! 🖨️", "success");
+        showToast("Struk berhasil dicetak di printer! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
         return;
       } catch (err) {
         console.warn("Gagal mencetak via Bluetooth:", err);
-        showToast(`Gagal kirim ke printer Bluetooth: ${err.message}`, "warning");
+        const retry = confirm(`Gagal mengirim ke printer Bluetooth: ${err.message}\n\nKoneksi printer terputus. Apakah ingin mencari dan menghubungkan ulang printer Bluetooth?`);
+        if (retry) {
+          const reconnected = await connectBluetoothPrinter();
+          if (reconnected) {
+            const bytes = buildReceiptEscPos(trx);
+            await sendBytesToBluetooth(bytes, { id: trx.id, title: 'Struk Transaksi #' + trx.id, type: 'receipt' });
+            showToast("Struk berhasil dicetak! 🖨️", "success");
+            if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+            return;
+          }
+        }
       }
     } else {
-      if (!isAuto) {
-        showToast("Printer Bluetooth belum terhubung. Membuka cetak sistem...", "info");
-      } else {
-        // Jika auto-print dan Bluetooth belum terhubung, tampilkan info tanpa memblokir kasir
-        showToast("Printer Bluetooth belum terhubung.", "info");
-        return;
-      }
+      return;
     }
   } else if (mode === 'rawbt') {
     try {
@@ -1459,14 +1487,10 @@ async function printReceiptUniversal(transaction = null, isAuto = false) {
     }
   }
 
-  // Fallback: Dialog Cetak Sistem Browser (Kabel USB / PC) - HANYA jika dipicu secara manual dan BUKAN di menu kasir
+  // Fallback: Dialog Cetak Sistem Browser (Kabel USB / PC) - jika mode adalah 'system'
   if (!isAuto && mode === 'system') {
-    const isPosTab = !document.getElementById("tab-pos")?.classList.contains("hidden");
-    if (isPosTab) {
-      return;
-    }
     if (typeof preparePrintableReceipt === 'function') {
-      preparePrintableReceipt();
+      preparePrintableReceipt(trx);
     }
     window.print();
   }
@@ -1479,23 +1503,34 @@ async function printReturReceiptUniversal(returRecord = null) {
     return;
   }
 
-  const mode = pos.settings.printerDriverMode || 'bluetooth';
+  const mode = pos?.settings?.printerDriverMode || 'bluetooth';
 
   if (mode === 'bluetooth') {
-    const isConnected = await ensureBluetoothConnected();
+    const isConnected = await checkOrPromptBluetoothConnection("bukti retur");
     if (isConnected) {
       try {
-        showToast("Mencetak struk retur ke printer VSC Bluetooth...", "info");
+        showToast("Mencetak struk retur ke printer Bluetooth...", "info");
         const bytes = buildReturReceiptEscPos(rtr);
-        await sendBytesToBluetooth(bytes, { id: 'test_' + Date.now(), title: 'Struk Uji Coba Printer VSC', type: 'test' });
-        showToast("Struk retur berhasil dicetak di printer VSC! 🖨️", "success");
+        await sendBytesToBluetooth(bytes, { id: rtr.id, title: 'Retur #' + rtr.id, type: 'retur' });
+        showToast("Struk retur berhasil dicetak di printer! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
         return;
       } catch (err) {
         console.warn("Gagal cetak retur via Bluetooth:", err);
-        showToast(`Gagal kirim ke printer Bluetooth: ${err.message}`, "warning");
+        const retry = confirm(`Gagal mengirim ke printer Bluetooth: ${err.message}\n\nKoneksi printer terputus. Apakah ingin menghubungkan ulang printer Bluetooth?`);
+        if (retry) {
+          const reconnected = await connectBluetoothPrinter();
+          if (reconnected) {
+            const bytes = buildReturReceiptEscPos(rtr);
+            await sendBytesToBluetooth(bytes, { id: rtr.id, title: 'Retur #' + rtr.id, type: 'retur' });
+            showToast("Struk retur berhasil dicetak di printer! 🖨️", "success");
+            if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+            return;
+          }
+        }
       }
     } else {
-      showToast("Printer Bluetooth belum terhubung. Menggunakan cetak sistem...", "info");
+      return;
     }
   } else if (mode === 'rawbt') {
     try {
@@ -1507,11 +1542,11 @@ async function printReturReceiptUniversal(returRecord = null) {
       console.warn("Gagal kirim retur ke RawBT:", err);
       showToast("Gagal kirim ke RawBT.", "warning");
     }
+  } else {
+    // Mode Sistem Browser
+    preparePrintableReturReceipt(rtr);
+    window.print();
   }
-
-  // Fallback: Dialog Cetak Sistem Browser (Kabel USB / PC / Mobile)
-  preparePrintableReturReceipt(rtr);
-  window.print();
 }
 
 function preparePrintableReturReceipt(returRecord) {
@@ -1545,21 +1580,31 @@ async function printKlerkReceiptUniversal(klerkRecord = null) {
   const mode = pos?.settings?.printerDriverMode || 'bluetooth';
 
   if (mode === 'bluetooth') {
-    const isConnected = await ensureBluetoothConnected(false);
+    const isConnected = await checkOrPromptBluetoothConnection("laporan setoran kasir (klerk)");
     if (isConnected) {
       try {
         showToast("Mencetak struk klerk ke printer Thermal Bluetooth...", "info");
         const bytes = buildKlerkReceiptEscPos(k);
-        await sendBytesToBluetooth(bytes);
+        await sendBytesToBluetooth(bytes, { id: k.id, title: 'Klerk #' + k.id, type: 'klerk' });
         showToast("Struk klerk berhasil dicetak di printer Thermal! 🖨️", "success");
         if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
         return;
       } catch (err) {
         console.warn("Gagal cetak klerk via Bluetooth:", err);
-        showToast(`Gagal kirim ke printer Bluetooth: ${err.message}`, "warning");
+        const retry = confirm(`Gagal mengirim ke printer Bluetooth: ${err.message}\n\nKoneksi printer terputus. Apakah ingin menghubungkan ulang printer Bluetooth?`);
+        if (retry) {
+          const reconnected = await connectBluetoothPrinter();
+          if (reconnected) {
+            const bytes = buildKlerkReceiptEscPos(k);
+            await sendBytesToBluetooth(bytes, { id: k.id, title: 'Klerk #' + k.id, type: 'klerk' });
+            showToast("Struk klerk berhasil dicetak di printer Thermal! 🖨️", "success");
+            if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+            return;
+          }
+        }
       }
     } else {
-      showToast("Printer Bluetooth belum terhubung. Menggunakan cetak sistem...", "info");
+      return;
     }
   } else if (mode === 'rawbt') {
     try {
@@ -1571,11 +1616,11 @@ async function printKlerkReceiptUniversal(klerkRecord = null) {
       console.warn("Gagal kirim klerk ke RawBT:", err);
       showToast("Gagal kirim ke RawBT.", "warning");
     }
+  } else {
+    // Mode Sistem Browser
+    preparePrintableKlerkReceipt(k);
+    window.print();
   }
-
-  // Fallback: Dialog Cetak Sistem Browser (Kabel USB / PC / Mobile)
-  preparePrintableKlerkReceipt(k);
-  window.print();
 }
 
 function preparePrintableKlerkReceipt(klerkRecord = null) {
@@ -2126,81 +2171,87 @@ async function printLabelsToBluetooth(products, copies = 1, mode = 'shelf', form
 function buildLpbReceiptEscPos(lpbDoc) {
   if (!lpbDoc) return new Uint8Array();
 
-  const storeName = (pos.settings.storeName || "TOKO SNACK BERKAH").toUpperCase();
-  const storeAddress = pos.settings.storeAddress || "";
-  const storePhone = pos.settings.storePhone || "";
-  const lineWidth = (pos.settings.paperWidth === "80mm") ? 48 : 32;
+  const is80 = (pos?.settings?.paperWidth) === "80mm";
+  const lineWidth = is80 ? 48 : 32;
+  const builder = new EscPosBuilder(lineWidth);
 
-  const sep = "-".repeat(lineWidth);
-  const sepD = "=".repeat(lineWidth);
+  const storeName = (pos?.settings?.storeName || "TOKO SNACK BERKAH").toUpperCase();
+  const storeAddress = pos?.settings?.storeAddress || "";
+  const storePhone = pos?.settings?.storePhone ? `Telp: ${pos.settings.storePhone}` : "";
+  const storeCode = pos?.settings?.storeCode || "T088";
+  const feedLines = parseInt(pos?.settings?.printerFeedLines, 10) || 3;
 
-  function padRight(str, len) { return String(str).slice(0, len).padEnd(len, " "); }
-  function padLeft(str, len) { return String(str).slice(0, len).padStart(len, " "); }
-  function formatRp(num) { return "Rp " + Number(num || 0).toLocaleString("id-ID"); }
+  function formatRp(num) {
+    if (num === null || num === undefined || isNaN(num)) return "0";
+    return new Intl.NumberFormat("id-ID").format(Math.round(num));
+  }
 
-  const builder = new EscPosBuilder();
+  // 1. HEADER TOKO
+  builder.init()
+    .alignCenter()
+    .bold(true)
+    .size(false, true)
+    .text(storeName)
+    .newline()
+    .sizeNormal()
+    .bold(false);
 
-  // ---- Header ----
-  builder.init();
-  builder.align("center");
-  builder.bold(true);
-  builder.text(storeName + "\n");
-  builder.bold(false);
-  if (storeAddress) builder.text(storeAddress + "\n");
-  if (storePhone) builder.text("Telp: " + storePhone + "\n");
-  builder.text(sep + "\n");
-  builder.bold(true);
-  builder.text("BUKTI PENERIMAAN BARANG\n");
-  builder.text("(LEMBAR LPB)\n");
-  builder.bold(false);
-  builder.text(sep + "\n");
+  if (storeAddress) builder.text(storeAddress).newline();
+  if (storePhone) builder.text(storePhone).newline();
 
-  // ---- Info Dokumen ----
-  builder.align("left");
-  builder.text("No. LPB  : " + lpbDoc.id + "\n");
-  builder.text("Tanggal  : " + lpbDoc.date + " " + (lpbDoc.time || "") + "\n");
-  builder.text("Supplier : " + (lpbDoc.supplierName || "-") + "\n");
-  builder.text("Faktur   : " + (lpbDoc.invoiceNo || "-") + "\n");
-  builder.text("Bayar    : " + (lpbDoc.paymentType || "KREDIT") + "\n");
-  if (lpbDoc.note) builder.text("Catatan  : " + lpbDoc.note + "\n");
-  builder.text("Operator : " + (lpbDoc.operator || "Kepala Toko") + "\n");
-  builder.text(sep + "\n");
+  builder.lineDashed('=')
+    .bold(true)
+    .text("*** LEMBAR LPB (PENERIMAAN BARANG) ***")
+    .newline()
+    .bold(false)
+    .lineDashed('-')
+    .alignLeft()
+    .lineLeftRight(`No. LPB  : ${lpbDoc.id}`, `${lpbDoc.date || ''}`)
+    .lineLeftRight(`Supplier : ${(lpbDoc.supplierName || '-').slice(0, 18)}`, `${lpbDoc.time || ''}`)
+    .lineLeftRight(`No.Faktur: ${(lpbDoc.invoiceNo || '-').slice(0, 18)}`, `Toko: ${storeCode}`)
+    .lineLeftRight(`Bayar    : ${lpbDoc.paymentType || 'KREDIT'}`, `Petugas: ${(lpbDoc.operator || 'Admin').slice(0, 10)}`);
 
-  // ---- Item Lines ----
-  (lpbDoc.items || []).forEach((item, idx) => {
-    if (lineWidth >= 42) {
-      builder.text((idx + 1) + ". " + item.productName + "\n");
-      const qtyHpp = "   " + item.qty + " pcs x " + formatRp(item.costPrice);
-      const subStr = formatRp(item.subtotal);
-      builder.text(padRight(qtyHpp, Math.max(0, lineWidth - subStr.length)) + subStr + "\n");
-    } else {
-      const shortName = (item.productName || "").slice(0, 14);
-      const qtyStr = item.qty + "x";
-      const subStr = formatRp(item.subtotal);
-      builder.text(padRight(shortName, 14) + padLeft(qtyStr, 4) + padLeft(subStr, 14) + "\n");
-    }
+  if (lpbDoc.note) {
+    builder.text(`Catatan  : ${lpbDoc.note}`).newline();
+  }
+  builder.lineDashed('-');
+
+  // 2. DAFTAR ITEM BARANG
+  const items = lpbDoc.items || [];
+  items.forEach((item, idx) => {
+    builder.alignLeft().text(`${idx + 1}. ${item.productName || item.name || 'Barang'}`).newline();
+    const qtyStr = `   ${item.qty || 1} ${item.unit || 'pcs'} x Rp ${formatRp(item.costPrice || 0)}`;
+    const subStr = `Rp ${formatRp(item.subtotal || 0)}`;
+    builder.lineLeftRight(qtyStr, subStr);
   });
 
-  builder.text(sep + "\n");
+  builder.lineDashed('-');
 
-  // ---- Total ----
-  builder.bold(true);
-  builder.text("TOTAL SKU : " + (lpbDoc.totalItems || (lpbDoc.items ? lpbDoc.items.length : 0)) + "  |  QTY : " + (lpbDoc.totalQty || 0) + "\n");
-  builder.text("TOTAL NILAI : " + formatRp(lpbDoc.totalValue || 0) + "\n");
-  builder.bold(false);
-  builder.text(sepD + "\n");
+  // 3. RINGKASAN TOTAL
+  const totalSku = lpbDoc.totalItems || items.length;
+  const totalQty = lpbDoc.totalQty || items.reduce((sum, it) => sum + (Number(it.qty) || 0), 0);
+  const totalNilai = lpbDoc.totalValue || items.reduce((sum, it) => sum + (Number(it.subtotal) || 0), 0);
 
-  // ---- Tanda Tangan ----
-  builder.align("center");
-  builder.text("\n");
-  builder.text("Diterima Oleh,       Supplier,\n");
-  builder.text("\n\n\n");
-  builder.text("(" + padRight(lpbDoc.operator || "Petugas", 14) + ") (____________)\n");
-  builder.text("\nTerima kasih atas kerjasamanya.\n");
-  builder.text(sep + "\n");
+  builder.lineLeftRight(`Total SKU : ${totalSku}`, `Total Qty : ${totalQty}`);
+  builder.bold(true)
+    .lineLeftRight("TOTAL NILAI FAKTUR", `Rp ${formatRp(totalNilai)}`)
+    .bold(false)
+    .lineDashed('=');
 
-  builder.feed(parseInt(pos.settings.printerFeedLines, 10) || 3);
-  builder.cut();
+  // 4. TANDA TANGAN
+  builder.alignCenter()
+    .newline()
+    .text("Diterima Oleh,            Pengirim/Supplier,")
+    .newline()
+    .newline()
+    .newline()
+    .text(`( ${lpbDoc.operator || 'Petugas'} )           ( _______________ )`)
+    .newline()
+    .newline()
+    .text("Barang diterima dalam kondisi baik & sesuai faktur.")
+    .newline()
+    .feed(feedLines)
+    .cut();
 
   return builder.getBytes();
 }
@@ -2297,21 +2348,31 @@ async function printLpbReceiptUniversal(lpbDoc) {
   const mode = pos?.settings?.printerDriverMode || 'bluetooth';
 
   if (mode === 'bluetooth') {
-    const isConnected = await ensureBluetoothConnected();
+    const isConnected = await checkOrPromptBluetoothConnection("dokumen LPB");
     if (isConnected) {
       try {
         showToast("Mencetak struk LPB ke printer Bluetooth...", "info");
         const bytes = buildLpbReceiptEscPos(lpbDoc);
-        await sendBytesToBluetooth(bytes);
+        await sendBytesToBluetooth(bytes, { id: lpbDoc.id, title: 'LPB #' + lpbDoc.id, type: 'lpb' });
         showToast("Struk LPB berhasil dicetak di printer! 🖨️", "success");
         if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
         return;
       } catch (err) {
         console.warn("Gagal cetak LPB via Bluetooth:", err);
-        showToast(`Gagal kirim Bluetooth: ${err.message}. Membuka cetak sistem...`, "warning");
+        const retry = confirm(`Gagal kirim ke printer Bluetooth: ${err.message}\n\nKoneksi printer terputus. Apakah ingin menghubungkan ulang printer Bluetooth?`);
+        if (retry) {
+          const reconnected = await connectBluetoothPrinter();
+          if (reconnected) {
+            const bytes = buildLpbReceiptEscPos(lpbDoc);
+            await sendBytesToBluetooth(bytes, { id: lpbDoc.id, title: 'LPB #' + lpbDoc.id, type: 'lpb' });
+            showToast("Struk LPB berhasil dicetak di printer! 🖨️", "success");
+            if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+            return;
+          }
+        }
       }
     } else {
-      showToast("Printer Bluetooth belum terhubung. Menggunakan cetak sistem...", "info");
+      return;
     }
   } else if (mode === 'rawbt') {
     try {
@@ -2322,14 +2383,14 @@ async function printLpbReceiptUniversal(lpbDoc) {
       return;
     } catch (err) {
       console.warn("Gagal kirim LPB ke RawBT:", err);
-      showToast("Gagal kirim ke RawBT. Membuka cetak sistem...", "warning");
+      showToast("Gagal kirim ke RawBT.", "warning");
     }
+  } else {
+    // Mode Sistem Browser
+    preparePrintableLpbReceipt(lpbDoc);
+    window.print();
+    if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
   }
-
-  // Fallback / Mode System: Dialog Cetak Sistem Browser (Kabel USB / PC / Mobile)
-  preparePrintableLpbReceipt(lpbDoc);
-  window.print();
-  if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
 }
 
 /**
@@ -2754,3 +2815,4 @@ window.connectBluetoothPrinter = connectBluetoothPrinter;
 window.disconnectBluetoothPrinter = disconnectBluetoothPrinter;
 window.printReceiptUniversal = printReceiptUniversal;
 window.isBluetoothConnected = isBluetoothConnected;
+window.checkOrPromptBluetoothConnection = checkOrPromptBluetoothConnection;

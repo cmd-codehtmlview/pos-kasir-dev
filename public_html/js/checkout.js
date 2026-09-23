@@ -457,9 +457,8 @@ function processPayment() {
   if (typeof syncSingleTransactionToCloud === "function") {
     syncSingleTransactionToCloud(transaction);
   }
-  // JANGAN tampilkan modal preview struk di menu kasir!
-  // Sesuai standar operasional minimarket, kasir langsung siap transaksi berikutnya
-  preparePrintableReceipt(transaction);
+  // Tampilkan kembali modal pratinjau struk kasir saat transaksi selesai
+  openReceiptModal(transaction);
   showToast("Transaksi Kasir Berhasil Diproses! ✅", "success");
 
   // Auto-Print Struk ke Printer Bluetooth / RawBT / Kiosk
@@ -643,12 +642,6 @@ function openReceiptModal(trx = null, force = false) {
   // Langsung siapkan juga container cetak printable-receipt-container agar langsung siap tanpa delay
   preparePrintableReceipt(transaction);
 
-  // Jangan tampilkan preview modal apapun jika kasir sedang di menu kasir (tab-pos)
-  const isPosTab = !document.getElementById("tab-pos")?.classList.contains("hidden");
-  if (isPosTab && !force) {
-    return;
-  }
-
   openModal("modal-receipt");
 }
 
@@ -673,25 +666,11 @@ async function reprintTransactionById(trxId) {
   lastCompletedTransaction = transaction;
   preparePrintableReceipt(transaction);
 
-  // Jika printer Bluetooth Web terhubung langsung, cetak cepat via Bluetooth
-  if (typeof isBluetoothConnected === 'function' && isBluetoothConnected()) {
-    if (typeof showToast === 'function') showToast(`Mencetak ulang struk #${transaction.id} ke printer Bluetooth...`, "info");
-    if (typeof printReceiptUniversal === 'function') {
-      await printReceiptUniversal(transaction);
-    }
-    return;
+  if (typeof printReceiptUniversal === 'function') {
+    await printReceiptUniversal(transaction);
+  } else {
+    openReceiptModal(transaction, true);
   }
-
-  // Jika Bluetooth belum terhubung:
-  const isPosTab = !document.getElementById("tab-pos")?.classList.contains("hidden");
-  if (isPosTab) {
-    if (typeof showToast === 'function') showToast(`Printer Bluetooth belum terhubung untuk cetak ulang #${transaction.id}.`, "warning");
-    return;
-  }
-
-  // Jika di menu laporan / riwayat, buka modal pratinjau struk
-  openReceiptModal(transaction, true);
-  if (typeof showToast === 'function') showToast(`Pratinjau struk #${transaction.id} siap dicetak.`, "info");
 }
 
 function preparePrintableReceipt(trx = null) {

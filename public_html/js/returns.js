@@ -563,13 +563,18 @@ function openReturReceiptModal(returRecord) {
   openModal("modal-receipt-retur");
 }
 
-function printReturReceipt() {
+function printReturReceipt(returRecord = null) {
+  const r = returRecord || lastCompletedRetur;
+  if (!r) {
+    showToast("Data struk retur tidak ditemukan untuk dicetak!", "warning");
+    return;
+  }
   if (typeof printReturReceiptUniversal === "function") {
-    printReturReceiptUniversal(lastCompletedRetur);
+    printReturReceiptUniversal(r);
     return;
   }
   if (typeof preparePrintableReturReceipt === "function") {
-    preparePrintableReturReceipt(lastCompletedRetur);
+    preparePrintableReturReceipt(r);
   }
   window.print();
 }
