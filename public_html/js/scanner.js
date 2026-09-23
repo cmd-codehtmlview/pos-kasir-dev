@@ -186,7 +186,12 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
     updatePosScannerCartSummary();
   }
 
-  openModal("modal-pos-camera-scanner");
+  const modalEl = document.getElementById("modal-pos-camera-scanner");
+  if (modalEl) {
+    modalEl.classList.remove("hidden");
+    modalEl.style.display = "flex";
+    document.body.classList.add("modal-open");
+  }
 
   const loadingEl = document.getElementById("pos-camera-scanner-loading");
   const readerEl = document.getElementById("pos-camera-scanner-reader");
@@ -201,7 +206,7 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
   if (torchLabel) torchLabel.textContent = "Senter";
 
   // Berikan jeda kecil agar DOM modal selesai ter-render dengan dimensi sebenarnya
-  await new Promise(resolve => setTimeout(resolve, 120));
+  await new Promise(resolve => setTimeout(resolve, 150));
 
   // Prioritas 1: Gunakan library Html5Qrcode jika tersedia
   if (typeof Html5Qrcode !== "undefined") {
@@ -225,27 +230,12 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
         });
       }
 
-      // Susun konfigurasi kamera bertahap (cascade fallback)
-      // Opsi 1, 2, 3: Gunakan facingMode standar modern (paling kompatibel di Chrome/Safari mobile tanpa perlu izin awal ganda)
+      // Susun konfigurasi kamera langsung tanpa memicu getCameras() ganda
       const configsToTry = [
         { facingMode: "environment" },
         { facingMode: { ideal: "environment" } },
         { facingMode: "user" }
       ];
-
-      // Ambil daftar kamera jika diizinkan browser
-      try {
-        const cameras = await Html5Qrcode.getCameras();
-        if (cameras && cameras.length > 0) {
-          posScannerAvailableCameras = cameras;
-          const backCam = cameras.find(c => /back|rear|belakang|environment/i.test(c.label));
-          if (backCam) {
-            configsToTry.unshift(backCam.id);
-          }
-        }
-      } catch (camErr) {
-        // Abaikan jika browser membatasi enumerasi sebelum stream aktif
-      }
 
       const scanConfig = {
         fps: 20,
@@ -335,8 +325,22 @@ async function startPosNativeCameraFallback() {
   } catch (err) {
     console.error("Native camera fallback failed:", err);
     if (loadingEl) loadingEl.classList.add("hidden");
-    closePosCameraScanner();
-    showToast("Gagal mengakses kamera: " + (err.message || err), "error");
+    if (readerEl) {
+      readerEl.innerHTML = `
+        <div class="p-6 text-center text-slate-300 flex flex-col items-center justify-center gap-3">
+          <span class="text-4xl text-amber-400">📷</span>
+          <p class="text-xs font-bold text-white uppercase tracking-wider">Akses Kamera Terkendala</p>
+          <p class="text-[11px] text-slate-400 max-w-xs leading-relaxed">
+            ${err.message || 'Kamera sedang digunakan aplikasi lain atau izin belum aktif.'}
+          </p>
+          <button type="button" onclick="openPosCameraScanner()" class="mt-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer transition flex items-center gap-1.5">
+            <span>🔄</span>
+            <span>Coba Buka Kamera</span>
+          </button>
+        </div>
+      `;
+    }
+    showToast("Gagal mengakses kamera: " + (err.message || err), "warning");
   }
 }
 
