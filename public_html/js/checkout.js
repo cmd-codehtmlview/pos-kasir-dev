@@ -716,16 +716,14 @@ function preparePrintableReceipt(trx = null) {
     const src = document.getElementById("thermal-receipt-klerk-content");
     if (src && src.innerHTML.trim().length > 0) {
       target.innerHTML = src.innerHTML;
-      target.className = src.className || `thermal-receipt ${is80 ? 'width-80' : 'width-58'}`;
-      target.classList.remove("hidden");
+      target.className = (src.className || `thermal-receipt ${is80 ? 'width-80' : 'width-58'}`) + " hidden";
       return;
     }
   } else if (isReturOpen) {
     const src = document.getElementById("thermal-receipt-retur-content");
     if (src && src.innerHTML.trim().length > 0) {
       target.innerHTML = src.innerHTML;
-      target.className = src.className || `thermal-receipt ${is80 ? 'width-80' : 'width-58'}`;
-      target.classList.remove("hidden");
+      target.className = (src.className || `thermal-receipt ${is80 ? 'width-80' : 'width-58'}`) + " hidden";
       return;
     }
   }
@@ -734,8 +732,7 @@ function preparePrintableReceipt(trx = null) {
   const transaction = trx || lastCompletedTransaction;
   if (transaction) {
     target.innerHTML = renderReceiptHtml(transaction);
-    target.className = `thermal-receipt ${is80 ? 'width-80' : 'width-58'}`;
-    target.classList.remove("hidden");
+    target.className = `thermal-receipt ${is80 ? 'width-80' : 'width-58'} hidden`;
     return;
   }
 
@@ -745,8 +742,7 @@ function preparePrintableReceipt(trx = null) {
     const src = document.getElementById("thermal-receipt-content");
     if (src && src.innerHTML.trim().length > 0) {
       target.innerHTML = src.innerHTML;
-      target.className = src.className || `thermal-receipt ${is80 ? 'width-80' : 'width-58'}`;
-      target.classList.remove("hidden");
+      target.className = (src.className || `thermal-receipt ${is80 ? 'width-80' : 'width-58'}`) + " hidden";
       return;
     }
   }

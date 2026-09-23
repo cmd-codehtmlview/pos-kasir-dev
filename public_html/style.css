@@ -210,6 +210,24 @@ html, body {
 }
 
 /* =========================================================
+   CONTAINER PRINT KHUSUS: WAJIB TERSEMBUNYI TOTAL DI LAYAR
+   Mencegah bocornya desain struk/label di bawah menu kasir
+   ========================================================= */
+#printable-receipt-container {
+  display: none !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  left: -99999px !important;
+  top: -99999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  z-index: -9999 !important;
+}
+
+/* =========================================================
    PENGATURAN CETAK STRUK THERMAL & EXPORT PDF (58mm / 80mm)
    Memastikan hasil cetak fisik & simpan PDF presisi sama dengan pratinjau layar
    ========================================================= */
@@ -248,6 +266,14 @@ html, body {
     display: block !important;
     visibility: visible !important;
     position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: auto !important;
     margin: 0 auto !important;
     padding: 3mm 2mm !important;
     background: #ffffff !important;

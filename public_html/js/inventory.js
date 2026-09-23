@@ -1474,9 +1474,8 @@ function preparePrintableLabels() {
     fullHtml = itemsHtml.join('<div class="label-tear-line"><span>✂ POTONG DI SINI</span></div>');
   }
 
-  target.className = `print-label-mode print-format-${currentLabelFormat}`;
+  target.className = `print-label-mode print-format-${currentLabelFormat} hidden`;
   target.innerHTML = fullHtml;
-  target.classList.remove('hidden');
 }
 
 async function executePrintLabelsBluetooth() {

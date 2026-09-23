@@ -1521,8 +1521,7 @@ function preparePrintableReturReceipt(returRecord) {
   const src = document.getElementById("thermal-receipt-retur-content");
   if (src && src.innerHTML.trim().length > 0) {
     target.innerHTML = src.innerHTML;
-    target.className = src.className || "thermal-receipt width-58";
-    target.classList.remove("hidden");
+    target.className = (src.className || "thermal-receipt width-58") + " hidden";
     return;
   }
 
@@ -1531,8 +1530,7 @@ function preparePrintableReturReceipt(returRecord) {
     const newSrc = document.getElementById("thermal-receipt-retur-content");
     if (newSrc && newSrc.innerHTML.trim().length > 0) {
       target.innerHTML = newSrc.innerHTML;
-      target.className = newSrc.className || "thermal-receipt width-58";
-      target.classList.remove("hidden");
+      target.className = (newSrc.className || "thermal-receipt width-58") + " hidden";
     }
   }
 }
@@ -1592,8 +1590,7 @@ function preparePrintableKlerkReceipt(klerkRecord = null) {
   const src = document.getElementById("thermal-receipt-klerk-content");
   if (src && src.innerHTML.trim().length > 0) {
     target.innerHTML = src.innerHTML;
-    target.className = src.className || "thermal-receipt width-58";
-    target.classList.remove("hidden");
+    target.className = (src.className || "thermal-receipt width-58") + " hidden";
   }
 }
 
@@ -1692,8 +1689,7 @@ function preparePrintableTestReceipt() {
       <div style="height: 12mm;"></div>
     </div>
   `;
-  target.className = `thermal-receipt ${is80 ? 'width-80' : 'width-58'}`;
-  target.classList.remove("hidden");
+  target.className = `thermal-receipt ${is80 ? 'width-80' : 'width-58'} hidden`;
 }
 
 // Salin URL flag Web Bluetooth Google Chrome ke clipboard
@@ -2221,8 +2217,7 @@ function preparePrintableLpbReceipt(lpbDoc) {
   const storePhone = pos.settings.storePhone || "";
   const isWidth80 = pos.settings.paperWidth === "80mm";
 
-  target.className = `thermal-receipt ${isWidth80 ? 'width-80' : 'width-58'}`;
-  target.classList.remove("hidden");
+  target.className = `thermal-receipt ${isWidth80 ? 'width-80' : 'width-58'} hidden`;
 
   const itemsHtml = (lpbDoc.items || []).map((item, idx) => `
     <div style="margin-bottom: 4px;">
