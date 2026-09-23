@@ -2595,6 +2595,9 @@ function buildNativeLabelEscPos(product, is80 = false, mode = 'shelf') {
   const builder = new EscPosBuilder(lineWidth);
   builder.init();
 
+  // Atur line spacing kompak (24 dots ~ 3.0mm per baris) agar tinggi total pas ~3.8cm standar rel rak minimarket
+  builder.raw([0x1B, 0x33, 24]);
+
   const barBytes = [];
   for (let i = 0; i < barcodeValue.length; i++) {
     barBytes.push(barcodeValue.charCodeAt(i));
@@ -2602,7 +2605,7 @@ function buildNativeLabelEscPos(product, is80 = false, mode = 'shelf') {
 
   if (mode === 'shelf') {
     // =========================================================================
-    // MODE 1: LABEL RAK (ADA HARGANYA - SESUAI DESAIN GAMBAR 1)
+    // MODE 1: LABEL RAK (ADA HARGANYA - STANDAR MINIMARKET ~3.8 CM TINGGI)
     // =========================================================================
     // 1. Header Identitas Toko & PLU/Tgl
     builder.alignLeft().bold(true);
@@ -2631,69 +2634,62 @@ function buildNativeLabelEscPos(product, is80 = false, mode = 'shelf') {
     }
     builder.bold(false);
 
-    // 3. Hardware Native Barcode (Code 128 Tebal 2 Dot)
-    builder.raw([0x1D, 0x68, 54]); // GS h 54
+    // 3. Hardware Native Barcode (Tinggi kompak 38 dots ~ 4.75mm)
+    builder.raw([0x1D, 0x68, 38]); // GS h 38 (tinggi hemat proporsional mika rak)
     builder.raw([0x1D, 0x77, 2]);  // GS w 2
     builder.raw([0x1D, 0x48, 2]);  // GS H 2 (Cetak teks barcode di bawah)
-    builder.raw([0x1D, 0x66, 0]);  // GS f 0
+    builder.raw([0x1D, 0x66, 1]);  // GS f 1 (Font B kecil & rapi)
     builder.raw([0x1D, 0x6B, 73, barBytes.length + 2, 0x7B, 0x42, ...barBytes]);
     builder.newline();
 
     builder.lineDashed('-');
 
-    // 4. Harga Jual Jumbo (HARGA Rp ... / Unit)
+    // 4. Harga Jual Jumbo Kompak (Standar Alfamart: Rp 12.000 / Bks)
     builder.alignCenter().bold(true);
     builder.size(false, true); // Double height font
-    builder.text(`HARGA: Rp ${priceText}`).newline();
+    builder.text(`Rp ${priceText}`);
     builder.sizeNormal().bold(false);
-    builder.text(`/ ${unit}`).newline();
+    builder.text(` / ${unit}`).newline();
 
-    // Banner Grosir jika ada
+    // Banner Grosir jika ada (1 baris ringkas)
     const wholesalePrice = typeof product.wholesalePrice === 'number' ? product.wholesalePrice : (parseFloat(product.wholesalePrice) || 0);
     const wholesaleMinQty = parseInt(product.wholesaleMinQty, 10) || 0;
     if (wholesaleMinQty > 0 && wholesalePrice > 0 && wholesalePrice < price) {
-      builder.text(`GROSIR >=${wholesaleMinQty}: @Rp ${formatRupiahSimple(wholesalePrice)}`).newline();
+      builder.text(`*GROSIR >=${wholesaleMinQty}: @Rp ${formatRupiahSimple(wholesalePrice)}`).newline();
     }
 
     builder.lineDashed('=');
   } else {
     // =========================================================================
-    // MODE 2: STIKER KEMASAN SNACK (BEBAS HARGA / TANPA HARGA - SESUAI DESAIN GAMBAR 2)
+    // MODE 2: STIKER KEMASAN SNACK (BEBAS HARGA - 50x30mm)
     // =========================================================================
-    // 1. Nama Produk (Tengah & Tebal)
     builder.alignCenter().bold(true);
     const maxLineLen = is80 ? 44 : 30;
     if (prodName.length > maxLineLen) {
-      const words = prodName.split(' ');
-      let line1 = '', line2 = '';
-      for (const w of words) {
-        if ((line1 ? line1 + ' ' + w : w).length <= maxLineLen && !line2) {
-          line1 = (line1 ? line1 + ' ' + w : w);
-        } else {
-          line2 = (line2 ? line2 + ' ' + w : w);
-        }
-      }
-      builder.text(line1).newline();
-      if (line2) builder.text(line2.substring(0, maxLineLen)).newline();
+      builder.text(prodName.substring(0, maxLineLen)).newline();
     } else {
       builder.text(prodName).newline();
     }
     builder.bold(false);
 
     // 2. Info Netto / Toko
-    builder.text(`Isi / Netto: ${unit} • ${storeName}`).newline();
+    builder.text(`Netto: ${unit} • ${storeName}`).newline();
 
-    // 3. Hardware Native Barcode (Code 128 Tebal 2 Dot)
-    builder.raw([0x1D, 0x68, 56]); // GS h 56
+    // 3. Hardware Native Barcode (Code 128)
+    builder.raw([0x1D, 0x68, 36]); // GS h 36
     builder.raw([0x1D, 0x77, 2]);  // GS w 2
-    builder.raw([0x1D, 0x48, 2]);  // GS H 2 (Cetak teks angka barcode di bawah garis)
-    builder.raw([0x1D, 0x66, 0]);  // GS f 0
+    builder.raw([0x1D, 0x48, 2]);  // GS H 2
+    builder.raw([0x1D, 0x66, 1]);  // GS f 1
     builder.raw([0x1D, 0x6B, 73, barBytes.length + 2, 0x7B, 0x42, ...barBytes]);
     builder.newline();
 
-    // 4. Footer Kualitas & Tanggal (TIDAK ADA HARGA)
-    builder.text(`Renyah & Gurih  •  Tgl: ${todayStr}`).newline();
+    // 4. Footer Kualitas & Tanggal
+    builder.text(`Renyah & Gurih • Tgl: ${todayStr}`).newline();
+    builder.lineDashed('=');
   }
+
+  // Reset line spacing ke standar default printer thermal (1/6 inch ~ 30 dots)
+  builder.raw([0x1B, 0x32]);
 
   return builder.getBytes();
 }
@@ -2717,7 +2713,7 @@ async function printLabelsNativeFast(products, copies = 1, mode = 'shelf') {
 
   const is80 = pos.settings && pos.settings.paperWidth === '80mm';
   const totalCount = products.length * copies;
-  const labelTypeName = mode === 'shelf' ? 'Label Rak (Ada Harga)' : 'Stiker Snack (Bebas Harga)';
+  const labelTypeName = mode === 'shelf' ? 'Label Rak (3.8cm)' : 'Stiker Snack';
   showToast(`⚡ Mencetak kilat ${totalCount} ${labelTypeName}...`, "info");
 
   const builder = new EscPosBuilder(is80 ? 48 : 32);
@@ -2729,11 +2725,11 @@ async function printLabelsNativeFast(products, copies = 1, mode = 'shelf') {
 
     for (let c = 0; c < copies; c++) {
       builder.raw(labelBytes);
-      builder.raw([0x1B, 0x64, 0x02]); // Jeda 2 baris dot bersih
+      builder.raw([0x1B, 0x64, 0x01]); // 1 baris feed jeda antar label
     }
   }
 
-  builder.raw([0x1B, 0x64, 0x03]); // Feed 3 baris di akhir agar bisa disobek
+  builder.raw([0x1B, 0x64, 0x02]); // Feed 2 baris di akhir agar pas di garis cutter/sobek
 
   try {
     const allBytes = builder.getBytes();

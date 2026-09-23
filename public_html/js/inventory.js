@@ -1481,7 +1481,9 @@ async function executePrintLabelsBluetooth() {
   const copiesInp = document.getElementById('label-print-copies');
   const copies = parseInt(copiesInp ? copiesInp.value : 1, 10) || 1;
 
-  if (typeof printLabelsToBluetooth === 'function') {
+  if (typeof printLabelsNativeFast === 'function') {
+    await printLabelsNativeFast(selectedProducts, copies, currentLabelMode);
+  } else if (typeof printLabelsToBluetooth === 'function') {
     await printLabelsToBluetooth(selectedProducts, copies, currentLabelMode, currentLabelFormat);
   } else {
     alert('Modul driver printer Bluetooth belum siap. Silakan gunakan Dialog Print Sistem.');
