@@ -622,25 +622,46 @@ function downloadDatabaseBackup() {
 
   try {
     const jsonStr = JSON.stringify(backup, null, 2);
+    const today = new Date().toISOString().split("T")[0];
+    const fileName = `Backup_SnackPOS_Retail_${today}.json`;
     const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
     const url = URL.createObjectURL(blob);
+    
     const link = document.createElement("a");
-    const today = new Date().toISOString().split("T")[0];
     link.href = url;
-    link.download = `Backup_SnackPOS_Retail_${today}.json`;
+    link.download = fileName;
+    link.setAttribute("download", fileName);
+    link.style.display = "none";
     document.body.appendChild(link);
     link.click();
+    
     setTimeout(() => {
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }, 500);
+      try {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } catch(e){}
+    }, 1500);
 
     if (typeof showToast === "function") {
       showToast("💾 Cadangan database (.json) berhasil diunduh!", "success");
     }
   } catch (err) {
-    console.error("Gagal mendownload backup:", err);
-    alert("Gagal mengunduh file cadangan: " + err.message);
+    console.error("Gagal mendownload backup blob, mencoba fallback data URI:", err);
+    try {
+      const jsonStr = JSON.stringify(backup, null, 2);
+      const today = new Date().toISOString().split("T")[0];
+      const fileName = `Backup_SnackPOS_Retail_${today}.json`;
+      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(jsonStr);
+      const link = document.createElement("a");
+      link.href = dataUri;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => document.body.removeChild(link), 500);
+      if (typeof showToast === "function") showToast("💾 File cadangan berhasil dibuat!", "success");
+    } catch(fallbackErr) {
+      alert("Gagal mengunduh file cadangan: " + (err.message || err));
+    }
   }
 }
 

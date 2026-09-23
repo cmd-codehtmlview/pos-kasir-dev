@@ -225,40 +225,36 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
         });
       }
 
-      // Ambil daftar kamera jika diizinkan
+      // Susun konfigurasi kamera bertahap (cascade fallback)
+      // Opsi 1, 2, 3: Gunakan facingMode standar modern (paling kompatibel di Chrome/Safari mobile tanpa perlu izin awal ganda)
+      const configsToTry = [
+        { facingMode: "environment" },
+        { facingMode: { ideal: "environment" } },
+        { facingMode: "user" }
+      ];
+
+      // Ambil daftar kamera jika diizinkan browser
       try {
         const cameras = await Html5Qrcode.getCameras();
-        posScannerAvailableCameras = cameras || [];
-      } catch (camErr) {
-        console.warn("Gagal enumerasi kamera:", camErr);
-        posScannerAvailableCameras = [];
-      }
-
-      // Susun konfigurasi kamera bertahap (cascade fallback)
-      const configsToTry = [];
-      if (posScannerAvailableCameras.length > 0) {
-        const backCamIndex = posScannerAvailableCameras.findIndex(c => 
-          /back|rear|belakang|environment/i.test(c.label)
-        );
-        if (backCamIndex >= 0) {
-          posScannerCurrentCameraIndex = backCamIndex;
-          configsToTry.push(posScannerAvailableCameras[backCamIndex].id);
+        if (cameras && cameras.length > 0) {
+          posScannerAvailableCameras = cameras;
+          const backCam = cameras.find(c => /back|rear|belakang|environment/i.test(c.label));
+          if (backCam) {
+            configsToTry.unshift(backCam.id);
+          }
         }
-      }
-      configsToTry.push({ facingMode: "environment" });
-      configsToTry.push({ facingMode: "user" });
-      if (posScannerAvailableCameras.length > 0) {
-        configsToTry.push(posScannerAvailableCameras[0].id);
+      } catch (camErr) {
+        // Abaikan jika browser membatasi enumerasi sebelum stream aktif
       }
 
       const scanConfig = {
         fps: 20,
         qrbox: (viewfinderWidth, viewfinderHeight) => {
-          const width = Math.min(Math.round(viewfinderWidth * 0.9), 360);
-          const height = Math.min(Math.round(viewfinderHeight * 0.65), 220);
-          return { width: Math.max(width, 200), height: Math.max(height, 120) };
-        },
-        aspectRatio: 1.333333
+          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+          const w = Math.min(Math.max(Math.floor(minEdge * 0.8), 160), Math.max(viewfinderWidth - 10, 50));
+          const h = Math.min(Math.max(Math.floor(minEdge * 0.5), 100), Math.max(viewfinderHeight - 10, 50));
+          return { width: Math.max(w, 50), height: Math.max(h, 50) };
+        }
       };
 
       let started = false;
@@ -321,17 +317,19 @@ async function startPosNativeCameraFallback() {
 
     if (readerEl) {
       readerEl.innerHTML = `
-        <video id="pos-native-video" autoplay playsinline class="w-full h-full object-cover"></video>
+        <video id="pos-native-video" autoplay playsinline muted class="w-full h-full min-h-[280px] object-cover"></video>
       `;
       const video = document.getElementById("pos-native-video");
       if (video) {
         video.srcObject = posNativeCameraStream;
-        video.onloadedmetadata = () => {
-          video.play();
+        const onReady = () => {
+          video.play().catch(e => console.warn("Video play notice:", e));
           if (loadingEl) loadingEl.classList.add("hidden");
           posScannerIsScanning = true;
           startPosNativeDetectionLoop(video);
         };
+        video.onloadedmetadata = onReady;
+        setTimeout(onReady, 600); // Fallback timeout jika metadata event tertunda
       }
     }
   } catch (err) {

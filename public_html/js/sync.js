@@ -9,6 +9,9 @@
 let supabaseClient = null;
 let isSyncing = false;
 let autoSyncTimer = null;
+let syncCountdownSeconds = 30;
+let currentCloudStatusState = "offline";
+let lastCloudSyncDetail = "";
 
 // Fungsi pembersih URL Supabase (Mencegah error PGRST125: Invalid path specified in request URL)
 function cleanSupabaseUrl(rawUrl) {
@@ -59,6 +62,9 @@ function initSupabase() {
 }
 
 function updateCloudStatus(status, label = "") {
+  currentCloudStatusState = status;
+  if (label) lastCloudSyncDetail = label;
+
   const badge = document.getElementById("cloud-status-indicator") || document.getElementById("status-indicator");
   const dot = document.getElementById("cloud-status-dot") || document.getElementById("status-dot");
   const labelEl = document.getElementById("cloud-status-label") || document.getElementById("status-label");
@@ -69,24 +75,24 @@ function updateCloudStatus(status, label = "") {
     if (status === "online") {
       if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0 shadow-[0_0_6px_rgba(52,211,153,0.8)]";
       if (labelEl) {
-        labelEl.textContent = label ? `Sync ${label.replace('Sync ', '')}` : "Cloud Online";
-        labelEl.className = "tracking-tight text-[10px] sm:text-[11px] text-emerald-300 font-bold";
+        labelEl.textContent = `${syncCountdownSeconds}s`;
+        labelEl.className = "tracking-tight text-[10px] sm:text-[11px] text-emerald-300 font-bold font-mono min-w-[22px] text-center";
       }
-      badge.title = `Cloud Supabase Terhubung • Auto 30s • ${label || 'Siap'} • Klik untuk Sinkron Manual [F9]`;
+      badge.title = `Cloud Supabase Terhubung • Auto-Sync tiap 30s (Next: ${syncCountdownSeconds}s) • ${lastCloudSyncDetail || 'Siap'} • Klik untuk Sinkron Manual [F9]`;
     } else if (status === "syncing") {
       if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
       if (labelEl) {
-        labelEl.textContent = "Syncing...";
-        labelEl.className = "tracking-tight text-[10px] sm:text-[11px] text-amber-300 font-bold";
+        labelEl.textContent = "Sync...";
+        labelEl.className = "tracking-tight text-[10px] sm:text-[11px] text-amber-300 font-bold min-w-[22px] text-center";
       }
       badge.title = "Sedang menyinkronkan data kasir ke cloud Supabase...";
     } else {
       if (dot) dot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0 shadow-[0_0_6px_rgba(244,63,94,0.8)]";
       if (labelEl) {
         labelEl.textContent = "Offline";
-        labelEl.className = "tracking-tight text-[10px] sm:text-[11px] text-rose-300 font-bold";
+        labelEl.className = "tracking-tight text-[10px] sm:text-[11px] text-rose-300 font-bold min-w-[22px] text-center";
       }
-      badge.title = "Status: Offline (Lokal) • Klik untuk mencoba hubungkan ke cloud [F9]";
+      badge.title = `Status: Offline (${label || 'Lokal'}) • Klik untuk mencoba hubungkan ke cloud [F9]`;
     }
   }
 
@@ -101,10 +107,10 @@ function updateCloudStatus(status, label = "") {
   if (mobileDot) {
     if (status === "online") {
       mobileDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0";
-      if (mobileLabel) mobileLabel.textContent = label ? `Sync ${label.replace('Sync ', '')}` : "Cloud Online";
+      if (mobileLabel) mobileLabel.textContent = `${syncCountdownSeconds}s`;
     } else if (status === "syncing") {
       mobileDot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0";
-      if (mobileLabel) mobileLabel.textContent = "Syncing...";
+      if (mobileLabel) mobileLabel.textContent = "Sync...";
     } else {
       mobileDot.className = "w-2 h-2 rounded-full bg-rose-500 flex-shrink-0";
       if (mobileLabel) mobileLabel.textContent = "Offline";
@@ -493,27 +499,65 @@ async function syncToSupabase(silent = false) {
     }
   } finally {
     isSyncing = false;
+    syncCountdownSeconds = 30;
+    if (currentCloudStatusState === "online") {
+      updateCloudStatus("online");
+    }
   }
 }
 
-// Mulai Timer Auto-Sync 30 Detik (Sesuai SOP Real-Time Retail Kasir)
+// Mulai Timer Auto-Sync 30 Detik (Hitungan Mundur Per Detik 30s)
 function startAutoSyncTimer() {
   if (autoSyncTimer) clearInterval(autoSyncTimer);
+  syncCountdownSeconds = 30;
+
   autoSyncTimer = setInterval(() => {
+    // Jika sedang dalam proses sinkronisasi, tahan countdown dan tampilkan Sync...
+    if (isSyncing) {
+      updateCloudStatus("syncing");
+      return;
+    }
+
     const isDev = (typeof isDevEnvironment === 'function' && isDevEnvironment()) || 
                   (typeof window !== 'undefined' && (
                     window.location.hostname === 'localhost' || 
                     window.location.hostname === '127.0.0.1' || 
                     window.location.hostname.includes('trycloudflare.com') ||
+                    window.location.pathname.includes('/dev') ||
                     window.location.port === '8085' ||
                     window.location.port === '8081'
                   ));
     const lic = typeof getStoredLicense === 'function' ? getStoredLicense() : null;
     const isCloudActive = isDev || !lic || (lic && (lic.cloudStatus === 'ACTIVE' || lic.planType === 'PAKET_2' || lic.isLicensed));
-    if (isCloudActive && navigator.onLine) {
-      syncToSupabase(true); // silent auto-sync di background tiap 30 detik
+
+    if (!isCloudActive || !navigator.onLine) {
+      if (currentCloudStatusState !== "offline") {
+        updateCloudStatus("offline", "Koneksi Offline");
+      }
+      return;
     }
-  }, 30000); // 30 detik
+
+    syncCountdownSeconds--;
+
+    if (syncCountdownSeconds <= 0) {
+      syncCountdownSeconds = 30;
+      updateCloudStatus("syncing");
+      syncToSupabase(true).finally(() => {
+        syncCountdownSeconds = 30;
+        updateCloudStatus("online");
+      });
+    } else {
+      // Perbarui label detik secara ringan
+      if (currentCloudStatusState === "online") {
+        const labelEl = document.getElementById("cloud-status-label") || document.getElementById("status-label");
+        if (labelEl) labelEl.textContent = `${syncCountdownSeconds}s`;
+        const mobileLabel = document.getElementById("mobile-cloud-label");
+        if (mobileLabel) mobileLabel.textContent = `${syncCountdownSeconds}s`;
+        const badge = document.getElementById("cloud-status-indicator") || document.getElementById("status-indicator");
+        if (badge) badge.title = `Cloud Supabase Terhubung • Auto-Sync tiap 30s (Next: ${syncCountdownSeconds}s) • ${lastCloudSyncDetail || 'Siap'} • Klik untuk Sinkron Manual [F9]`;
+      }
+    }
+  }, 1000);
 }
 
 async function testSupabaseConnection() {

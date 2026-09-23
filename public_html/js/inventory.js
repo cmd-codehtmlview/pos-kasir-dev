@@ -800,23 +800,21 @@ async function openBarcodeCameraScanner(targetInputId = 'product-form-barcode') 
         });
       }
 
-      let availableCameras = [];
-      try {
-        availableCameras = await Html5Qrcode.getCameras() || [];
-      } catch (camErr) {
-        console.warn("Enumerasi kamera inventory fallback:", camErr);
-      }
+      // Susun konfigurasi kamera bertahap (cascade fallback)
+      const configsToTry = [
+        { facingMode: "environment" },
+        { facingMode: { ideal: "environment" } },
+        { facingMode: "user" }
+      ];
 
-      // Susun konfigurasi kamera bertahap
-      const configsToTry = [];
-      if (availableCameras.length > 0) {
-        const backCam = availableCameras.find(c => /back|rear|belakang|environment/i.test(c.label));
-        if (backCam) configsToTry.push(backCam.id);
-      }
-      configsToTry.push({ facingMode: "environment" });
-      configsToTry.push({ facingMode: "user" });
-      if (availableCameras.length > 0) {
-        configsToTry.push(availableCameras[0].id);
+      try {
+        const cameras = await Html5Qrcode.getCameras();
+        if (cameras && cameras.length > 0) {
+          const backCam = cameras.find(c => /back|rear|belakang|environment/i.test(c.label));
+          if (backCam) configsToTry.unshift(backCam.id);
+        }
+      } catch (camErr) {
+        // Abaikan jika browser belum mengizinkan enumerasi
       }
 
       let started = false;
@@ -828,11 +826,11 @@ async function openBarcodeCameraScanner(targetInputId = 'product-form-barcode') 
             {
               fps: 20,
               qrbox: (w, h) => {
-                const bw = Math.min(Math.round(w * 0.9), 350);
-                const bh = Math.min(Math.round(h * 0.65), 200);
-                return { width: Math.max(bw, 200), height: Math.max(bh, 120) };
-              },
-              aspectRatio: 1.333333
+                const minEdge = Math.min(w, h);
+                const bw = Math.min(Math.max(Math.floor(minEdge * 0.8), 160), Math.max(w - 10, 50));
+                const bh = Math.min(Math.max(Math.floor(minEdge * 0.5), 100), Math.max(h - 10, 50));
+                return { width: Math.max(bw, 50), height: Math.max(bh, 50) };
+              }
             },
             (decodedText) => {
               onInventoryBarcodeScanned(decodedText);
@@ -878,7 +876,10 @@ async function startInventoryNativeCameraFallback() {
       throw new Error("Perangkat atau browser tidak mendukung akses kamera langsung.");
     }
 
-    if (video) video.classList.remove('hidden');
+    if (video) {
+      video.muted = true;
+      video.classList.remove('hidden');
+    }
 
     barcodeScannerStream = await navigator.mediaDevices.getUserMedia({
       video: {
@@ -891,12 +892,14 @@ async function startInventoryNativeCameraFallback() {
 
     if (video) {
       video.srcObject = barcodeScannerStream;
-      video.onloadedmetadata = () => {
-        video.play();
+      const onReady = () => {
+        video.play().catch(e => console.warn("Video play notice:", e));
         if (loading) loading.classList.add('hidden');
         if (statusEl) statusEl.textContent = 'Arahkan barcode ke kamera...';
         startBarcodeScannerDetection(video);
       };
+      video.onloadedmetadata = onReady;
+      setTimeout(onReady, 600);
     }
   } catch (err) {
     console.warn("Kamera barcode gagal diakses:", err);

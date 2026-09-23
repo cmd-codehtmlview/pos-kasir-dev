@@ -206,10 +206,10 @@
           id="cloud-status-indicator" 
           onclick="syncToSupabase(false)" 
           class="flex items-center gap-1.5 text-white/90 hover:text-white active:scale-95 transition cursor-pointer font-bold px-2 py-0.5 rounded-full hover:bg-white/10" 
-          title="Cloud Supabase Terhubung • Klik untuk Sinkron Manual [F9]"
+          title="Cloud Supabase Terhubung • Auto-Sync tiap 30s • Klik untuk Sinkron Manual [F9]"
         >
           <span id="cloud-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
-          <span id="cloud-status-label" class="tracking-tight text-[10px] sm:text-[11px]">Cloud Online</span>
+          <span id="cloud-status-label" class="tracking-tight text-[10px] sm:text-[11px] font-mono min-w-[22px] text-center">30s</span>
         </button>
 
         <!-- Pemisah Halus Transparan -->
@@ -2109,31 +2109,39 @@
               </div>
             </button>
             
-            <div id="content-sec-backup" class="hidden p-4 sm:p-5 bg-slate-50/30 border-t border-slate-100 space-y-4">
-              <!-- Panduan Ringkas Sub-Menu (Hanya Muncul Saat Dibuka) -->
-              <div class="p-3.5 bg-slate-100 border-slate-200 rounded-xl text-xs flex items-start gap-2.5">
-                <span class="text-base shrink-0">ℹ️</span>
+            <div id="content-sec-backup" class="hidden p-4 sm:p-5 bg-slate-50/50 border-t border-slate-100 space-y-4">
+              <!-- Panduan Ringkas Sub-Menu -->
+              <div class="p-3.5 bg-white border border-slate-200 rounded-2xl text-xs flex items-start gap-2.5 shadow-2xs">
+                <span class="text-base shrink-0">💾</span>
                 <div>
-                  <p class="font-bold text-slate-800">Cadangan & Pemulihan Data Lokal (Offline JSON)</p>
-                  <p class="text-[11px] text-slate-600 mt-0.5 leading-relaxed">Unduh seluruh master data produk, mutasi barang, dan transaksi kasir ke file JSON komputer untuk cadangan berkala atau pulihkan data saat dibutuhkan.</p>
+                  <p class="font-bold text-slate-800">Cadangan & Pemulihan Data Toko (JSON)</p>
+                  <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Unduh seluruh master data produk, riwayat mutasi, dan transaksi kasir ke file cadangan JSON untuk backup berkala atau pindah perangkat.</p>
                 </div>
               </div>
 
-              <div class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h4 class="font-bold text-xs text-slate-800">Cadangan Data Lokal Komputer (File JSON)</h4>
-              <p class="text-[11px] text-slate-500 mt-0.5">Unduh seluruh produk, riwayat mutasi, dan transaksi ke file JSON untuk backup berkala.</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <button onclick="downloadDatabaseBackup()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs cursor-pointer">
-                💾 Backup JSON
-              </button>
-              <label class="px-4 py-2 bg-slate-100 border border-slate-300 text-slate-700 rounded-xl text-xs font-bold cursor-pointer hover:bg-slate-200">
-                📂 Pulihkan File
-                <input type="file" accept=".json" onchange="restoreDatabaseBackup(event)" class="hidden">
-              </label>
-            </div>
-          </div>
+              <!-- 2 Pilihan Utama Padat & Elegan -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button 
+                  type="button" 
+                  onclick="downloadDatabaseBackup()" 
+                  class="w-full py-3 px-4 bg-slate-900 hover:bg-black active:scale-95 text-white font-extrabold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer"
+                >
+                  <span class="text-base">💾</span>
+                  <span>Cadangkan Data (Backup JSON)</span>
+                </button>
+                <label 
+                  class="w-full py-3 px-4 bg-white hover:bg-slate-50 active:scale-95 text-slate-800 border-2 border-slate-300 hover:border-slate-400 font-extrabold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-xs transition cursor-pointer text-center"
+                >
+                  <span class="text-base">📂</span>
+                  <span>Pulihkan Data (Restore File)</span>
+                  <input type="file" accept=".json" onchange="restoreDatabaseBackup(event)" class="hidden">
+                </label>
+              </div>
+
+              <div class="pt-1 flex items-center justify-between text-[11px] text-slate-400">
+                <span>Format cadangan: Standar JSON SnackPOS Retail</span>
+                <button type="button" onclick="openSisModal('sis-modal-backup')" class="text-indigo-600 hover:underline font-bold cursor-pointer">Buka Dialog Backup Lengkap ›</button>
+              </div>
             </div>
           </div>
         </div>
@@ -7767,7 +7775,7 @@
   <!-- ============================================================ -->
   <!-- MODAL: PEMINDAI BARCODE KAMERA KASIR UTAMA (POS MULTI-SCAN) -->
   <!-- ============================================================ -->
-  <div id="modal-pos-camera-scanner" class="modal-backdrop fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[75] hidden no-print">
+  <div id="modal-pos-camera-scanner" class="modal-backdrop fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[90] hidden no-print">
     <div class="bg-slate-900 text-white w-full max-w-lg rounded-3xl shadow-2xl border-2 border-emerald-500 overflow-hidden flex flex-col max-h-[96vh]">
       
       <!-- Header Modal -->
@@ -7796,10 +7804,10 @@
       </div>
 
       <!-- Viewfinder Area -->
-      <div class="relative bg-black flex items-center justify-center min-h-[260px] sm:min-h-[320px] overflow-hidden">
+      <div class="relative bg-black flex items-center justify-center min-h-[280px] sm:min-h-[340px] overflow-hidden">
         
         <!-- Video element / Html5Qrcode reader container -->
-        <div id="pos-camera-scanner-reader" class="w-full h-full max-h-[380px]"></div>
+        <div id="pos-camera-scanner-reader" class="w-full min-h-[280px] sm:min-h-[340px] flex items-center justify-center overflow-hidden"></div>
 
         <!-- Laser Guide Overlay -->
         <div id="pos-scanner-laser-box" class="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -7901,7 +7909,7 @@
   <!-- ============================================================ -->
   <!-- MODAL: PEMINDAI BARCODE KAMERA LIVE (PRODUK & PLU) -->
   <!-- ============================================================ -->
-  <div id="modal-barcode-camera-scanner" class="modal-backdrop fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 z-50 hidden no-print">
+  <div id="modal-barcode-camera-scanner" class="modal-backdrop fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 z-[90] hidden no-print">
     <div class="bg-slate-900 text-white w-full max-w-md rounded-3xl shadow-2xl border-2 border-emerald-500 overflow-hidden flex flex-col">
       <!-- Header Modal -->
       <div class="p-4 bg-slate-800/90 border-b border-slate-700 flex items-center justify-between">
@@ -7916,9 +7924,9 @@
       </div>
 
       <!-- Viewfinder Area -->
-      <div class="relative bg-black flex items-center justify-center min-h-[260px] sm:min-h-[300px] overflow-hidden">
-        <div id="barcode-scanner-reader" class="w-full h-full max-h-[360px]"></div>
-        <video id="barcode-scanner-video" autoplay playsinline class="w-full h-auto max-h-[360px] object-cover hidden"></video>
+      <div class="relative bg-black flex items-center justify-center min-h-[280px] sm:min-h-[340px] overflow-hidden">
+        <div id="barcode-scanner-reader" class="w-full min-h-[280px] sm:min-h-[340px] flex items-center justify-center overflow-hidden"></div>
+        <video id="barcode-scanner-video" autoplay playsinline muted class="w-full h-auto min-h-[280px] max-h-[360px] object-cover hidden"></video>
         <!-- Laser scanning guide -->
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div class="w-64 h-36 border-2 border-dashed border-emerald-400 rounded-2xl relative flex items-center justify-center bg-emerald-500/10">
@@ -9028,11 +9036,11 @@
   <script src="js/db.js?v=120"></script>
   <script src="js/store.js?v=99"></script>
   <script src="js/license.js?v=120"></script>
-  <script src="js/sync.js?v=103"></script>
+  <script src="js/sync.js?v=104"></script>
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=105"></script>
+  <script src="js/scanner.js?v=106"></script>
   <script src="js/cart.js?v=105"></script>
   <script src="js/printer.js?v=124"></script>
   <script src="js/checkout.js?v=108"></script>
@@ -9040,12 +9048,12 @@
   <script src="js/returns.js?v=100"></script>
   <script src="js/stock-opname.js?v=100"></script>
   <script src="js/klerk.js?v=100"></script>
-  <script src="js/inventory.js?v=109"></script>
+  <script src="js/inventory.js?v=110"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/import-products.js?v=100"></script>
   <script src="js/repack.js?v=100"></script>
   <script src="js/reports.js?v=103"></script>
-  <script src="js/settings.js?v=123"></script>
+  <script src="js/settings.js?v=124"></script>
   <script src="js/employees.js?v=121"></script>
   
   <!-- Main Application Entry Point -->
@@ -10691,7 +10699,7 @@
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=115')
+        navigator.serviceWorker.register('./sw.js?v=116')
           .then((registration) => {
             registration.update();
             console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
