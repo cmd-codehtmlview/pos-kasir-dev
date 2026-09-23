@@ -1,4 +1,4 @@
-const CACHE_NAME = 'snackpos-cache-v117';
+const CACHE_NAME = 'snackpos-cache-v118';
 const STATIC_ASSETS = [
   './',
   './index.html',

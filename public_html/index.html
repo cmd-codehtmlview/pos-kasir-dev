@@ -4145,13 +4145,8 @@
         </div>
       </div>
 
-      <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-report')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Tutup</button>
-        <button onclick="printSisShiftReportReceipt()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5">
-          <span>🖨️</span>
-          <span>Cetak Rekap Laporan</span>
-        </button>
         <div class="flex items-center gap-2">
           <button type="button" onclick="exportTransactionsToExcel()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5" title="Ekspor laporan ke file Excel (.xlsx)">
             <span>📥</span>
@@ -10718,7 +10713,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=117')
+          navigator.serviceWorker.register('./sw.js?v=118')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
