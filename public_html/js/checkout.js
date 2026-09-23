@@ -457,14 +457,12 @@ function processPayment() {
   if (typeof syncSingleTransactionToCloud === "function") {
     syncSingleTransactionToCloud(transaction);
   }
-  if (navigator.onLine && typeof syncToSupabase === "function") {
-    syncToSupabase(true);
-  }
+  // JANGAN tampilkan modal preview struk di menu kasir!
+  // Sesuai standar operasional minimarket, kasir langsung siap transaksi berikutnya
+  preparePrintableReceipt(transaction);
+  showToast("Transaksi Kasir Berhasil Diproses! ✅", "success");
 
-  openReceiptModal(transaction);
-  showToast("Transaksi Kasir Berhasil Diproses!", "success");
-
-  // Auto-Print Struk ke Printer VSC Bluetooth / RawBT / Kiosk
+  // Auto-Print Struk ke Printer Bluetooth / RawBT / Kiosk
   if (pos.settings.autoPrintReceipt !== false && typeof printReceiptUniversal === "function") {
     setTimeout(() => {
       printReceiptUniversal(transaction, true);
@@ -630,7 +628,7 @@ function renderReceiptHtml(transaction) {
 }
 
 // Render Struk Thermal Kasir
-function openReceiptModal(trx = null) {
+function openReceiptModal(trx = null, force = false) {
   const transaction = trx || lastCompletedTransaction;
   if (!transaction) return;
   lastCompletedTransaction = transaction;
@@ -645,6 +643,12 @@ function openReceiptModal(trx = null) {
   // Langsung siapkan juga container cetak printable-receipt-container agar langsung siap tanpa delay
   preparePrintableReceipt(transaction);
 
+  // Jangan tampilkan preview modal apapun jika kasir sedang di menu kasir (tab-pos)
+  const isPosTab = !document.getElementById("tab-pos")?.classList.contains("hidden");
+  if (isPosTab && !force) {
+    return;
+  }
+
   openModal("modal-receipt");
 }
 
@@ -655,7 +659,7 @@ function openReceiptModalById(trxId) {
     if (typeof showToast === 'function') showToast("Data transaksi tidak ditemukan!", "warning");
     return;
   }
-  openReceiptModal(transaction);
+  openReceiptModal(transaction, true);
 }
 
 async function reprintTransactionById(trxId) {
@@ -678,8 +682,15 @@ async function reprintTransactionById(trxId) {
     return;
   }
 
-  // Jika Bluetooth belum terhubung, buka modal pratinjau struk agar kasir bisa lihat dan cetak via sistem/Bluetooth
-  openReceiptModal(transaction);
+  // Jika Bluetooth belum terhubung:
+  const isPosTab = !document.getElementById("tab-pos")?.classList.contains("hidden");
+  if (isPosTab) {
+    if (typeof showToast === 'function') showToast(`Printer Bluetooth belum terhubung untuk cetak ulang #${transaction.id}.`, "warning");
+    return;
+  }
+
+  // Jika di menu laporan / riwayat, buka modal pratinjau struk
+  openReceiptModal(transaction, true);
   if (typeof showToast === 'function') showToast(`Pratinjau struk #${transaction.id} siap dicetak.`, "info");
 }
 
