@@ -1,7 +1,7 @@
 {
-  "name": "SnackPOS Kasir [DEV TEST]",
-  "short_name": "SnackPOS TEST",
-  "description": "Aplikasi Kasir Retail Toko Snack [DEV TESTING ENVIRONMENT]",
+  "name": "SnackPOS DEV - Kasir Retail",
+  "short_name": "SnackPOS DEV",
+  "description": "Aplikasi Kasir Retail Toko Snack [DEV STAGING ENVIRONMENT]",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

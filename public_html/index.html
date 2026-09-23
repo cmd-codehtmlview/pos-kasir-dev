@@ -68,45 +68,65 @@
 </head>
 <body class="bg-slate-100 text-slate-900 antialiased min-h-screen flex flex-col selection:bg-yellow-200">
 
-  <!-- Dynamic Dev Environment Banner (Hanya muncul jika diakses via dev/localhost/port 8080) -->
+  <!-- Dynamic Dev Environment Detection & Aesthetic Subtle Indicator -->
   <script>
     (function() {
       var h = window.location.hostname;
       var path = window.location.pathname;
-      var isDev = h.startsWith('dev.') || h.includes('-dev.') || h.includes('dev-') || h.includes('preview') || h === 'localhost' || h === '127.0.0.1' || p === '8080' || p === '8081' || path.includes('/dev');
+      var p = window.location.port;
+      var isDev = h.startsWith('dev.') || h.includes('-dev.') || h.includes('dev-') || h.includes('preview') || h === 'localhost' || h === '127.0.0.1' || p === '8080' || p === '8081' || p === '8085' || path.includes('/dev') || h.includes('trycloudflare.com');
+      
+      window.IS_DEV_ENVIRONMENT = isDev;
+      
       if (isDev) {
-        document.title = "SnackPOS [DEV TEST] - Kasir Minimarket Retail";
+        document.title = "[DEV] SnackPOS - Kasir Minimarket Retail";
         var manifestLink = document.getElementById('app-manifest') || document.querySelector('link[rel="manifest"]');
         if (manifestLink) {
           manifestLink.setAttribute('href', 'manifest-dev.json');
         }
-        var injectBanner = function() {
-          if (document.getElementById('dev-environment-banner')) return;
-          var b = document.createElement('div');
-          b.id = 'dev-environment-banner';
-          b.className = 'bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 text-slate-950 px-3 py-1.5 text-xs font-black shadow-md flex items-center justify-between border-b-2 border-amber-700 z-20 relative no-print select-none';
-          b.innerHTML = '<div class="flex items-center gap-1.5 mx-auto text-center">' +
-            '<span class="text-sm animate-pulse">⚠️</span>' +
-            '<span class="tracking-wider uppercase">LINGKUNGAN PENGEMBANGAN [DEV TEST] — AREA UJI COBA</span>' +
-            '<span class="px-2 py-0.5 bg-slate-950 text-amber-300 text-[10px] rounded-full font-mono font-black ml-2 shadow-xs">MODE: DEV TEST</span>' +
-            '</div>' +
-            '<a href="https://pos-kasir-coj.pages.dev" target="_blank" class="hidden sm:flex items-center gap-1 px-2.5 py-1 bg-slate-950 hover:bg-slate-800 text-white rounded-lg text-[10px] font-bold transition shadow-xs">' +
-            '<span>🟢 Buka Versi Stabil</span>' +
-            '<span>↗</span>' +
-            '</a>';
-          if (document.body) {
-            document.body.prepend(b);
-          } else {
-            window.addEventListener('DOMContentLoaded', function() { document.body.prepend(b); });
+        
+        var applyDevIndicators = function() {
+          var badge = document.getElementById('header-env-badge');
+          if (badge) {
+            badge.classList.remove('hidden');
+            badge.classList.add('inline-flex');
           }
         };
+
         if (document.readyState === 'loading') {
-          window.addEventListener('DOMContentLoaded', injectBanner);
+          window.addEventListener('DOMContentLoaded', applyDevIndicators);
         } else {
-          injectBanner();
+          applyDevIndicators();
         }
       }
     })();
+
+    // Fungsi universal satu-klik untuk refresh & reset cache PWA
+    function forceAppCacheReset() {
+      if (confirm("🔄 Muat ulang aplikasi dan perbarui cache browser lokal sekarang?")) {
+        if (typeof showToast === "function") showToast("Membersihkan cache & memuat ulang...", "info");
+        if ('caches' in window) {
+          caches.keys().then(function(keys) {
+            return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+          }).then(function() {
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(regs) {
+                for (var i = 0; i < regs.length; i++) {
+                  regs[i].unregister();
+                }
+                window.location.reload(true);
+              });
+            } else {
+              window.location.reload(true);
+            }
+          }).catch(function() {
+            window.location.reload(true);
+          });
+        } else {
+          window.location.reload(true);
+        }
+      }
+    }
   </script>
 
   <!-- ================= HEADER KASIR RETAIL MINIMARKET ================= -->
@@ -126,6 +146,7 @@
             <h1 id="top-header-store-name" class="font-black text-xs sm:text-sm tracking-tight leading-tight truncate uppercase">
               TOKO SNACK BERKAH
             </h1>
+            <span id="header-env-badge" onclick="forceAppCacheReset()" class="hidden items-center px-1.5 py-0.2 bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-black text-[9px] uppercase tracking-wider rounded border border-amber-500/60 shadow-2xs transition cursor-pointer select-none" title="Mode Dev Uji Coba • Klik untuk Muat Ulang & Reset Cache">DEV</span>
             <button 
               type="button" 
               id="btn-header-store-login" 
@@ -4578,7 +4599,11 @@
       </div>
 
       <!-- Footer Minimalis -->
-      <div class="p-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <button type="button" onclick="forceAppCacheReset()" class="text-[11px] text-slate-500 hover:text-slate-800 font-bold flex items-center gap-1 cursor-pointer transition active:scale-95" title="Bersihkan cache browser dan muat ulang kode terbaru">
+          <span>🔄</span>
+          <span>Reset Cache</span>
+        </button>
         <button onclick="closeSisModal('sis-modal-backup')" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs cursor-pointer transition">Tutup</button>
       </div>
     </div>
