@@ -166,7 +166,7 @@ function triggerLogisticsCameraScan(context) {
     'products': 'Scan Master Produk',
     'product-form': 'Scan Barcode Form Produk',
     'lpb': 'Scan Barcode LPB (Faktur Masuk)',
-    'label': 'Scan Barcode Cetak Label Rak',
+    'label': 'Scan Barcode Cetak Label Harga',
     'so': 'Scan Barcode Stock Opname',
     'waste': 'Scan Barcode BAP Barang Rusak',
     'repack-origin': 'Scan Barcode Produk Asal (Bal/Dus)',
@@ -340,7 +340,7 @@ function renderSisProductsModal(filterText = "") {
             <span class="px-2 py-0.5 rounded-full ${autoSwitch ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'} text-[9px] font-extrabold">
               Auto: ${autoSwitch ? 'ON' : 'OFF'}
             </span>
-            <button type="button" onclick="openSinglePrintModal('${p.id}')" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold rounded-lg text-[10px] transition cursor-pointer flex items-center gap-0.5" title="Cetak Label Rak & Barcode Produk Ini">
+            <button type="button" onclick="openSinglePrintModal('${p.id}')" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold rounded-lg text-[10px] transition cursor-pointer flex items-center gap-0.5" title="Cetak Label Harga & Barcode Produk Ini">
               <span>🏷️</span>
               <span>Label</span>
             </button>

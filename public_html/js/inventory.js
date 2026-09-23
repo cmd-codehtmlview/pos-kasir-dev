@@ -1227,6 +1227,7 @@ function switchLabelMode(mode) {
 function updateLabelModeButtons() {
   const btnShelf = document.getElementById('btn-mode-shelf');
   const btnSticker = document.getElementById('btn-mode-sticker');
+  const btnPrintText = document.getElementById('btn-label-raster-text');
 
   if (currentLabelMode === 'shelf') {
     if (btnShelf) {
@@ -1235,12 +1236,18 @@ function updateLabelModeButtons() {
     if (btnSticker) {
       btnSticker.className = "px-3 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer border-2 bg-white text-slate-700 border-slate-200 hover:border-slate-300";
     }
+    if (btnPrintText) {
+      btnPrintText.textContent = "Cetak Label Harga";
+    }
   } else {
     if (btnShelf) {
       btnShelf.className = "px-3 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer border-2 bg-white text-slate-700 border-slate-200 hover:border-slate-300";
     }
     if (btnSticker) {
       btnSticker.className = "px-3 py-2 rounded-xl text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer border-2 bg-amber-500 text-slate-950 border-amber-500 shadow-sm";
+    }
+    if (btnPrintText) {
+      btnPrintText.textContent = "Cetak Stiker Barcode";
     }
   }
 }

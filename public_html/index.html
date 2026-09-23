@@ -565,13 +565,13 @@
         <div class="flex items-center gap-2">
           <button onclick="openBatchPrintModal('shelf')" class="px-3 py-1.5 bg-alfa-red hover:bg-red-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer">
             <span>🏷️</span>
-            <span class="hidden sm:inline">Cetak Label Rak Minimarket</span>
-            <span class="sm:hidden">Label Rak</span>
+            <span class="hidden sm:inline">Cetak Label Harga</span>
+            <span class="sm:hidden">Label Harga</span>
           </button>
           <button onclick="openBatchPrintModal('sticker')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-xl text-xs font-black flex items-center gap-1.5 shadow-sm transition-all cursor-pointer">
             <span>📦</span>
-            <span class="hidden sm:inline">Cetak Stiker Kemasan</span>
-            <span class="sm:hidden">Stiker</span>
+            <span class="hidden sm:inline">Cetak Stiker Barcode</span>
+            <span class="sm:hidden">Stiker Barcode</span>
           </button>
           <button onclick="clearInventorySelection()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl text-xs font-bold transition-all cursor-pointer" title="Batalkan Pilihan">
             ✕ Batal
@@ -2266,7 +2266,7 @@
           <button type="button" onclick="if(typeof toggleSisDrawer==='function')toggleSisDrawer(); openBatchPrintModal('shelf');" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
             <div class="flex items-center gap-3 min-w-0">
               <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">🏷️</span>
-              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Cetak Label Rak &amp; Barcode (Dual-Mode)</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Cetak Harga dan Barcode</span>
             </div>
             <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
@@ -5442,7 +5442,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CETAK LABEL RAK KOMPAK & STIKER KEMASAN SNACK -->
+  <!-- MODAL: CETAK LABEL HARGA & STIKER BARCODE -->
   <div id="modal-print-label" class="modal-backdrop fixed inset-0 bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 z-50 hidden no-print">
     <div class="bg-white w-full max-w-4xl rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[94vh] sm:h-auto sm:max-h-[92vh]">
       <!-- Header -->
@@ -5451,10 +5451,10 @@
           <span class="text-xl flex-shrink-0">🏷️</span>
           <div class="min-w-0">
             <h3 class="font-black text-xs sm:text-sm tracking-tight text-white flex items-center gap-1.5 truncate">
-              <span>Cetak Label Rak & Barcode</span>
+              <span>Cetak Harga dan Barcode</span>
               <span class="bg-amber-400 text-slate-950 text-[9px] sm:text-[10px] font-black px-1.5 py-0.2 rounded-full uppercase flex-shrink-0">Dual-Mode</span>
             </h3>
-            <p class="text-[10px] sm:text-[11px] text-slate-300 truncate">Standar Rak Minimarket (Tinggi 3,8 cm) & Stiker Kemasan Snack</p>
+            <p class="text-[10px] sm:text-[11px] text-slate-300 truncate">Standar Label Harga Minimarket (~3.8 cm) & Stiker Barcode Kemasan</p>
           </div>
         </div>
         <button onclick="closeModal('modal-print-label')" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center font-bold text-sm cursor-pointer transition-colors flex-shrink-0 ml-2">✕</button>
@@ -5467,15 +5467,15 @@
           <button id="btn-mode-shelf" onclick="switchLabelMode('shelf')" class="px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer border-2 bg-alfa-red text-white border-alfa-red shadow-sm">
             <span class="text-base sm:text-lg">🛒</span>
             <div class="text-left leading-tight min-w-0 truncate">
-              <div class="text-[11px] sm:text-xs truncate">Mode 1: Label Rak</div>
-              <div class="text-[9px] sm:text-[10px] font-normal opacity-90 hidden sm:block">Label Rak (Harga & Barcode)</div>
+              <div class="text-[11px] sm:text-xs truncate">Mode 1: Label Harga</div>
+              <div class="text-[9px] sm:text-[10px] font-normal opacity-90 hidden sm:block">Label Harga (Harga & Barcode)</div>
             </div>
           </button>
           <button id="btn-mode-sticker" onclick="switchLabelMode('sticker')" class="px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer border-2 bg-white text-slate-700 border-slate-200 hover:border-slate-300">
             <span class="text-base sm:text-lg">📦</span>
             <div class="text-left leading-tight min-w-0 truncate">
-              <div class="text-[11px] sm:text-xs truncate">Mode 2: Stiker Snack</div>
-              <div class="text-[9px] sm:text-[10px] font-normal text-slate-500 hidden sm:block">Kemasan (Bebas Harga)</div>
+              <div class="text-[11px] sm:text-xs truncate">Mode 2: Stiker Barcode</div>
+              <div class="text-[9px] sm:text-[10px] font-normal text-slate-500 hidden sm:block">Stiker Barcode (Tanpa Harga)</div>
             </div>
           </button>
         </div>
@@ -5582,13 +5582,9 @@
           <button onclick="closeModal('modal-print-label')" class="hidden sm:inline-block px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold cursor-pointer">
             Batal
           </button>
-          <button id="btn-print-labels-native" onclick="executePrintLabelsNativeFast()" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all" title="Cetak super cepat 0.3 detik format teks & barcode hardware standar rel rak minimarket ~3.8cm">
-            <span>⚡</span>
-            <span>Cetak Kilat (3.8cm)</span>
-          </button>
-          <button id="btn-print-labels-bluetooth" onclick="executePrintLabelsBluetooth()" class="flex-1 sm:flex-initial px-3 sm:px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all" title="Cetak label Bluetooth standar minimarket Alfamart ~3.8cm (Teks & Barcode Cepat)">
+          <button id="btn-print-labels-bluetooth" onclick="executePrintLabelsBluetooth()" class="flex-1 sm:flex-initial px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all active:scale-95" title="Cetak label harga / barcode langsung ke printer Bluetooth (Standar Minimarket ~3.8cm)">
             <span>🏷️</span>
-            <span id="btn-label-raster-text">Cetak Label Rak</span>
+            <span id="btn-label-raster-text">Cetak Label Harga</span>
           </button>
           <button onclick="executePrintLabelsSystem()" class="px-3 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-xs flex items-center justify-center gap-1 cursor-pointer transition-all" title="Buka dialog cetak sistem Android/PC atau simpan PDF">
             <span>📄</span>
@@ -8924,13 +8920,13 @@
   <script src="js/html5-qrcode.min.js"></script>
   <script src="js/scanner.js?v=127"></script>
   <script src="js/cart.js?v=106"></script>
-  <script src="js/printer.js?v=127"></script>
+  <script src="js/printer.js?v=128"></script>
   <script src="js/checkout.js?v=109"></script>
   <script src="js/member.js?v=108"></script>
   <script src="js/returns.js?v=100"></script>
   <script src="js/stock-opname.js?v=100"></script>
   <script src="js/klerk.js?v=100"></script>
-  <script src="js/inventory.js?v=120"></script>
+  <script src="js/inventory.js?v=121"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/import-products.js?v=100"></script>
   <script src="js/repack.js?v=100"></script>
@@ -8940,7 +8936,7 @@
   
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=118"></script>
-  <script src="js/sis-logistics.js?v=102"></script>
+  <script src="js/sis-logistics.js?v=103"></script>
   <script src="js/sis-cashier-ops.js?v=100"></script>
   <script src="js/sis-store-crm.js?v=100"></script>
   <script src="js/sis-analytics.js?v=100"></script>

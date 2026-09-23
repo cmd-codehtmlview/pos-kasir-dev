@@ -2605,7 +2605,7 @@ function buildNativeLabelEscPos(product, is80 = false, mode = 'shelf') {
 
   if (mode === 'shelf') {
     // =========================================================================
-    // MODE 1: LABEL RAK (ADA HARGANYA - STANDAR MINIMARKET ~3.8 CM TINGGI)
+    // MODE 1: LABEL HARGA (STANDAR MINIMARKET ~3.8 CM TINGGI - BEBAS TUMPANG TINDIH)
     // =========================================================================
     // 1. Header Identitas Toko & PLU/Tgl
     builder.alignLeft().bold(true);
@@ -2634,34 +2634,37 @@ function buildNativeLabelEscPos(product, is80 = false, mode = 'shelf') {
     }
     builder.bold(false);
 
-    // 3. Hardware Native Barcode (Tinggi kompak 38 dots ~ 4.75mm)
-    builder.raw([0x1D, 0x68, 38]); // GS h 38 (tinggi hemat proporsional mika rak)
-    builder.raw([0x1D, 0x77, 2]);  // GS w 2
-    builder.raw([0x1D, 0x48, 2]);  // GS H 2 (Cetak teks barcode di bawah)
-    builder.raw([0x1D, 0x66, 1]);  // GS f 1 (Font B kecil & rapi)
+    // 3. Hardware Native Barcode (Tinggi 46 dots ~ 5.75mm - Sangat Mudah & Cepat Discan)
+    builder.alignCenter();
+    builder.raw([0x1D, 0x68, 46]); // GS h 46 (Tinggi optimal laser/camera scanner)
+    builder.raw([0x1D, 0x77, 2]);  // GS w 2  (Modul 2 dot sangat kontras)
+    builder.raw([0x1D, 0x48, 2]);  // GS H 2  (Cetak teks barcode di bawah)
+    builder.raw([0x1D, 0x66, 1]);  // GS f 1  (Font B rapi & presisi)
     builder.raw([0x1D, 0x6B, 73, barBytes.length + 2, 0x7B, 0x42, ...barBytes]);
     builder.newline();
 
     builder.lineDashed('-');
 
-    // 4. Harga Jual Jumbo Kompak (Standar Alfamart: Rp 12.000 / Bks)
+    // 4. Harga Jual Bebas Tumpang Tindih (Double Height + Pitch Khusus 44 dot)
+    builder.raw([0x1B, 0x33, 44]); // Atur pitch 44 dots agar font tinggi tidak tumpang tindih
     builder.alignCenter().bold(true);
     builder.size(false, true); // Double height font
-    builder.text(`Rp ${priceText}`);
+    builder.text(`Rp ${priceText}`).newline(); // PENTING: newline() saat masih double-height
     builder.sizeNormal().bold(false);
-    builder.text(` / ${unit}`).newline();
+    builder.raw([0x1B, 0x33, 24]); // Kembalikan ke pitch 24 dot kompak
+    builder.text(`/ ${unit}`).newline();
 
     // Banner Grosir jika ada (1 baris ringkas)
     const wholesalePrice = typeof product.wholesalePrice === 'number' ? product.wholesalePrice : (parseFloat(product.wholesalePrice) || 0);
     const wholesaleMinQty = parseInt(product.wholesaleMinQty, 10) || 0;
     if (wholesaleMinQty > 0 && wholesalePrice > 0 && wholesalePrice < price) {
-      builder.text(`*GROSIR >=${wholesaleMinQty}: @Rp ${formatRupiahSimple(wholesalePrice)}`).newline();
+      builder.bold(true).text(`*GROSIR >=${wholesaleMinQty}: @Rp ${formatRupiahSimple(wholesalePrice)}`).newline().bold(false);
     }
 
     builder.lineDashed('=');
   } else {
     // =========================================================================
-    // MODE 2: STIKER KEMASAN SNACK (BEBAS HARGA - 50x30mm)
+    // MODE 2: STIKER BARCODE (BEBAS HARGA - 50x30mm)
     // =========================================================================
     builder.alignCenter().bold(true);
     const maxLineLen = is80 ? 44 : 30;
@@ -2675,8 +2678,9 @@ function buildNativeLabelEscPos(product, is80 = false, mode = 'shelf') {
     // 2. Info Netto / Toko
     builder.text(`Netto: ${unit} • ${storeName}`).newline();
 
-    // 3. Hardware Native Barcode (Code 128)
-    builder.raw([0x1D, 0x68, 36]); // GS h 36
+    // 3. Hardware Native Barcode (Code 128 - Prioritas Jelas & Tajam)
+    builder.alignCenter();
+    builder.raw([0x1D, 0x68, 44]); // GS h 44 (~5.5mm sangat mudah discan)
     builder.raw([0x1D, 0x77, 2]);  // GS w 2
     builder.raw([0x1D, 0x48, 2]);  // GS H 2
     builder.raw([0x1D, 0x66, 1]);  // GS f 1
@@ -2702,7 +2706,7 @@ async function printLabelsNativeFast(products, copies = 1, mode = 'shelf') {
 
   const isConnected = await ensureBluetoothConnected();
   if (!isConnected) {
-    const ok = confirm("Printer Bluetooth belum terhubung.\n\nApakah Anda ingin mencari dan menghubungkan printer VSC sekarang?");
+    const ok = confirm("Printer Bluetooth belum terhubung.\n\nApakah Anda ingin mencari dan menghubungkan printer Bluetooth sekarang?");
     if (ok) {
       const connected = await connectBluetoothPrinter();
       if (!connected) return;
@@ -2713,8 +2717,8 @@ async function printLabelsNativeFast(products, copies = 1, mode = 'shelf') {
 
   const is80 = pos.settings && pos.settings.paperWidth === '80mm';
   const totalCount = products.length * copies;
-  const labelTypeName = mode === 'shelf' ? 'Label Rak (3.8cm)' : 'Stiker Snack';
-  showToast(`⚡ Mencetak kilat ${totalCount} ${labelTypeName}...`, "info");
+  const labelTypeName = mode === 'shelf' ? 'Label Harga' : 'Stiker Barcode';
+  showToast(`⚡ Mencetak ${totalCount} ${labelTypeName}...`, "info");
 
   const builder = new EscPosBuilder(is80 ? 48 : 32);
   builder.init();
@@ -2733,11 +2737,11 @@ async function printLabelsNativeFast(products, copies = 1, mode = 'shelf') {
 
   try {
     const allBytes = builder.getBytes();
-    await sendBytesToBluetooth(allBytes, { id: 'fast_label_' + Date.now(), title: 'Cetak Kilat ' + totalCount + ' ' + labelTypeName, type: 'label' });
-    showToast(`⚡ Berhasil mencetak ${totalCount} ${labelTypeName}! ✨`, "success");
+    await sendBytesToBluetooth(allBytes, { id: 'fast_label_' + Date.now(), title: 'Cetak ' + totalCount + ' ' + labelTypeName, type: 'label' });
+    showToast(`✅ Berhasil mencetak ${totalCount} ${labelTypeName}! ✨`, "success");
     if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
   } catch (err) {
-    console.error("Gagal mencetak label kilat:", err);
+    console.error("Gagal mencetak label:", err);
     alert("Gagal mencetak label: " + err.message);
   }
 }
