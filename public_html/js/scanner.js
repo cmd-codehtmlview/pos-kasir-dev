@@ -605,3 +605,23 @@ async function finishPosScanningAndPay() {
     openPaymentModal();
   }
 }
+
+// Simulasi Scan Cepat untuk Pengujian (seperti di Mockup!)
+function simulateBarcodeScanDemo() {
+  const currentPos = window.pos || pos;
+  const products = (currentPos && currentPos.products) ? currentPos.products : [];
+  if (products.length === 0) {
+    showToast("Katalog produk toko masih kosong!", "warning");
+    return;
+  }
+  const randomProduct = products[Math.floor(Math.random() * products.length)];
+  const code = randomProduct.barcode || randomProduct.id;
+  onPosBarcodeDetected(code);
+  showToast(`🎲 [Demo Scan] Membaca: [${code}] ${randomProduct.name}`, "success");
+}
+
+if (typeof window !== "undefined") {
+  window.openPosCameraScanner = openPosCameraScanner;
+  window.closePosCameraScanner = closePosCameraScanner;
+  window.simulateBarcodeScanDemo = simulateBarcodeScanDemo;
+}

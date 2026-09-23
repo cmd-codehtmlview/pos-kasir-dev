@@ -7887,19 +7887,30 @@
         <button 
           type="button" 
           onclick="closePosCameraScanner()" 
-          class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5"
+          class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5"
         >
           <span>✕</span>
-          <span>Tutup / Selesai</span>
+          <span>Tutup</span>
+        </button>
+
+        <!-- Tombol Demo Simulasi Scan Cepat (seperti di Mockup) -->
+        <button 
+          type="button" 
+          onclick="simulateBarcodeScanDemo()" 
+          class="px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs"
+          title="Simulasi scan produk toko secara instan (seperti di versi mockup)"
+        >
+          <span>🎲</span>
+          <span>Test Scan Demo</span>
         </button>
 
         <button 
           type="button" 
           onclick="finishPosScanningAndPay()" 
-          class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white text-xs font-black rounded-xl shadow-lg shadow-emerald-950/50 transition-all cursor-pointer flex items-center gap-1.5"
+          class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white text-xs font-black rounded-xl shadow-lg shadow-emerald-950/50 transition-all cursor-pointer flex items-center gap-1.5"
         >
           <span>⚡</span>
-          <span>Lanjut Bayar [F12] &rarr;</span>
+          <span>Bayar [F12] &rarr;</span>
         </button>
       </div>
 
@@ -9040,7 +9051,7 @@
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=117"></script>
+  <script src="js/scanner.js?v=118"></script>
   <script src="js/cart.js?v=105"></script>
   <script src="js/printer.js?v=124"></script>
   <script src="js/checkout.js?v=108"></script>
