@@ -287,29 +287,17 @@
                   </svg>
                 </button>
                 
-                <!-- Tombol Test Scan Demo Cepat (Langsung di Layar Kasir!) -->
-                <button 
-                  type="button" 
-                  onclick="simulateBarcodeScanDemo()" 
-                  class="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black text-xs rounded-xl flex items-center gap-1 shadow-sm transition border border-amber-600 cursor-pointer shrink-0" 
-                  title="Simulasi scan produk langsung ke keranjang (Tanpa Kamera)"
-                >
-                  <span>🎲</span>
-                  <span class="font-extrabold text-[11px]">Test Scan</span>
-                </button>
-
-                <!-- Tombol Scan Barcode Kamera HP / Webcam -->
+                <!-- Simbol Minimalis: Scan Barcode Kamera (Flat Minimalis Sederhana) -->
                 <button 
                   type="button" 
                   onclick="openPosCameraScanner()" 
-                  class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95 flex items-center gap-1 transition rounded-xl shadow-sm border border-emerald-700 cursor-pointer shrink-0" 
+                  class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
                   title="Scan Barcode Kamera HP / Webcam"
                 >
-                  <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span class="text-[11px] font-bold hidden sm:inline">Kamera</span>
                 </button>
               </div>
             </div>
@@ -7905,17 +7893,6 @@
           <span>Tutup</span>
         </button>
 
-        <!-- Tombol Demo Simulasi Scan Cepat (seperti di Mockup) -->
-        <button 
-          type="button" 
-          onclick="simulateBarcodeScanDemo()" 
-          class="px-3 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-xs"
-          title="Simulasi scan produk toko secara instan (seperti di versi mockup)"
-        >
-          <span>🎲</span>
-          <span>Test Scan Demo</span>
-        </button>
-
         <button 
           type="button" 
           onclick="finishPosScanningAndPay()" 
@@ -9063,7 +9040,7 @@
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=119"></script>
+  <script src="js/scanner.js?v=120"></script>
   <script src="js/cart.js?v=105"></script>
   <script src="js/printer.js?v=124"></script>
   <script src="js/checkout.js?v=108"></script>
