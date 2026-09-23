@@ -998,8 +998,6 @@ function buildReceiptEscPos(trx) {
   builder.init()
     .alignCenter()
     .bold(true)
-    .text("*** UJI COBA INTERNAL [DEV] ***")
-    .newline()
     .size(false, true) // Double height agar nama toko jelas
     .text(storeName)
     .newline()
@@ -1014,7 +1012,6 @@ function buildReceiptEscPos(trx) {
     .alignLeft()
     .lineLeftRight(`No. ${transaction.id || 'TRX-001'}`, `${transaction.date || ''}`)
     .lineLeftRight(`Kasir: ${cashierName}`, `${transaction.time || ''}`)
-    .lineLeftRight(`Toko: ${storeCode}`, `POS: ${posNumber}`)
     .lineDashed('-');
 
   // 2. DAFTAR ITEM BELANJA
@@ -1054,12 +1051,12 @@ function buildReceiptEscPos(trx) {
   }
 
   builder.bold(true)
-    .lineLeftRight("TOTAL BAYAR", `Rp ${formatRupiahSimple(grandTotal)}`)
+    .lineLeftRight("TOTAL BELANJA", `Rp ${formatRupiahSimple(grandTotal)}`)
     .bold(false);
 
   // Detail Metode Pembayaran
   const methodLabel = (transaction.paymentMethod || "Tunai").toUpperCase();
-  builder.lineLeftRight(`Metode (${methodLabel})`, formatRupiahSimple(cashTendered));
+  builder.lineLeftRight(`Bayar (${methodLabel})`, formatRupiahSimple(cashTendered));
 
   if (changeAmount > 0) {
     builder.lineLeftRight("Kembalian", formatRupiahSimple(changeAmount));

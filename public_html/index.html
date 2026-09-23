@@ -349,14 +349,13 @@
           <!-- Tabel Daftar Belanja Kasir (Tinggi Adaptif di Layar HP & Desktop) -->
           <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden flex flex-col pos-cart-table-container">
             
-            <!-- Header Tabel (Kolom Tier Harga A/B/C di samping Qty) -->
+            <!-- Header Tabel Kasir -->
             <div class="bg-slate-800 text-white text-xs font-bold px-3 py-2.5 grid grid-cols-12 gap-1.5 sm:gap-2 uppercase tracking-wider">
               <span class="col-span-1 text-center hidden sm:inline">No</span>
-              <span class="col-span-5 sm:col-span-4">Nama Barang &amp; PLU</span>
+              <span class="col-span-5 sm:col-span-5">Nama Barang &amp; PLU</span>
               <span class="col-span-3 sm:col-span-2 text-center">Qty</span>
-              <span class="col-span-1 text-center">Tier</span>
               <span class="col-span-2 text-right hidden sm:inline">Harga</span>
-              <span class="col-span-3 sm:col-span-2 text-right">Total</span>
+              <span class="col-span-4 sm:col-span-2 text-right">Total</span>
             </div>
 
             <!-- Isi Item Belanja (Scrollable) -->
@@ -2264,7 +2263,7 @@
             </div>
             <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
-          <button type="button" onclick="openSisModal('sis-modal-label')" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+          <button type="button" onclick="if(typeof toggleSisDrawer==='function')toggleSisDrawer(); openBatchPrintModal('shelf');" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
             <div class="flex items-center gap-3 min-w-0">
               <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shrink-0 shadow-2xs">🏷️</span>
               <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Cetak Label Rak &amp; Barcode (Dual-Mode)</span>
@@ -3335,174 +3334,7 @@
     </div>
   </div>
 
-  <!-- ================= 7. MODAL CETAK LABEL RAK & BARCODE (DUAL-MODE) ================= -->
-  <div id="sis-modal-label" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-[60] hidden flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-emerald-200/80 overflow-hidden flex flex-col max-h-[92vh]">
-      <div class="px-5 py-4 bg-emerald-50/80 border-b border-emerald-200/80 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 border border-emerald-200/80 flex items-center justify-center text-base shrink-0 shadow-2xs">
-            🏷️
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h3 class="font-extrabold text-sm text-slate-900 tracking-tight">Cetak Label Rak &amp; Barcode</h3>
-              <span class="px-1.5 py-0.2 rounded-md bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase">Dual-Mode</span>
-            </div>
-            <p class="text-[11px] text-emerald-700 font-medium">Standar Rak Gondola (Tinggi 3.8 cm) &amp; Stiker Kemasan Snack</p>
-          </div>
-        </div>
-        <button onclick="closeSisModal('sis-modal-label')" class="w-8 h-8 rounded-xl bg-emerald-100/70 hover:bg-emerald-200 text-emerald-700 border border-emerald-200 font-bold flex items-center justify-center text-xs transition cursor-pointer active:scale-95">✕</button>
-      </div>
 
-      <!-- Mode Selector: Label Rak Minimarket vs Stiker Produk Snack -->
-      <div class="p-2 bg-emerald-50/40 border-b border-emerald-100 flex gap-1 text-xs">
-        <button id="label-mode-btn-shelf" onclick="switchLabelPrintMode('shelf')" class="flex-1 py-1.5 rounded-xl font-bold bg-white text-emerald-950 border border-emerald-200 shadow-2xs">
-          🛒 Mode 1: Label Rak Gondola (3.8 cm)
-        </button>
-        <button id="label-mode-btn-sticker" onclick="switchLabelPrintMode('sticker')" class="flex-1 py-1.5 rounded-xl font-bold text-slate-600 hover:text-emerald-950">
-          🏷️ Mode 2: Stiker Kemasan Snack (50x30)
-        </button>
-      </div>
-
-      <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
-        <!-- Preview Container Mode 1: Shelf Label (Standar Rak Gondola Minimarket) -->
-        <div id="label-preview-shelf" class="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Preview Label Rak Gondola Minimarket:</span>
-            <span class="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">Tinggi 3.8 cm x Lebar 6.0 cm</span>
-          </div>
-          
-          <!-- Mockup Label Rak Gondola Standar -->
-          <div class="p-3 bg-white border-2 border-dashed border-emerald-400 rounded-xl max-w-xs mx-auto text-left shadow-2xs space-y-1">
-            <div class="flex items-start justify-between border-b border-slate-200 pb-1">
-              <div>
-                <span class="font-black text-slate-900 block text-xs truncate max-w-[170px]">KERIPIK TEMPE RENYAH 150G</span>
-                <span class="text-[9px] font-mono text-slate-400 block">8992761111001 • RAK A-01</span>
-              </div>
-              <span class="px-1 py-0.5 bg-slate-100 text-slate-600 rounded text-[8px] font-mono font-bold">SNACK</span>
-            </div>
-            <div class="flex items-end justify-between pt-0.5">
-              <div>
-                <span class="text-[8px] font-bold text-slate-400 uppercase block">Harga Eceran</span>
-                <div class="font-bebas text-2xl text-slate-950 tracking-wider leading-none">Rp 12.000</div>
-              </div>
-              <div class="text-right">
-                <span class="text-[8px] text-slate-400 font-mono block">CETAK: 22/09/2026</span>
-                <span class="text-[9px] font-mono font-bold text-emerald-700">Grosir: Rp 10.500</span>
-              </div>
-            </div>
-          </div>
-          <p class="text-center text-[10px] text-slate-500">Cocok untuk mika selipan rak gondola minimarket (tinggi presisi 3.8 cm).</p>
-        </div>
-
-        <!-- Preview Container Mode 2: Sticker Kemasan Snack (50x30 mm / 40x30 mm) -->
-        <div id="label-preview-sticker" class="hidden p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Preview Stiker Kemasan Snack Plastik / Pouch:</span>
-            <span class="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">Ukuran 50 x 30 mm</span>
-          </div>
-
-          <!-- Mockup Stiker Kemasan -->
-          <div class="p-2.5 bg-white border-2 border-dashed border-emerald-400 rounded-xl w-60 mx-auto text-center shadow-2xs space-y-1">
-            <span class="font-black text-[11px] text-slate-900 block truncate">KERIPIK TEMPE RENYAH</span>
-            <div class="text-[8px] text-slate-500">Diproduksi Oleh: Snack Barokah Mandiri</div>
-            <!-- Barcode SVG mock -->
-            <div class="font-mono text-base font-black tracking-widest text-slate-800 py-0.5 leading-none">||||| | |||| ||| |||</div>
-            <div class="text-[9px] font-mono text-slate-600 font-bold">8992761111001</div>
-            <div class="flex justify-between items-center text-[8px] text-slate-500 pt-0.5 border-t border-slate-100">
-              <span>Exp: 22/12/2026</span>
-              <span class="font-black text-slate-900 text-[10px]">Rp 12.000</span>
-            </div>
-          </div>
-          <p class="text-center text-[10px] text-slate-500">Format stiker barcode label untuk ditempel langsung di kemasan pouch / plastik snack.</p>
-        </div>
-
-        <!-- Search & Scan Barcode Label Rak -->
-        <div class="relative w-full">
-          <div class="bg-white p-2 rounded-xl border border-slate-300 focus-within:border-emerald-600 shadow-2xs flex items-center gap-2 transition">
-            <span class="text-slate-400 pl-1 text-xs flex-shrink-0">🔍</span>
-            <input 
-              type="text" 
-              id="label-product-search" 
-              placeholder="Scan barcode / ketik live nama produk untuk dicetak..." 
-              class="w-full text-xs font-bold text-slate-800 placeholder:font-normal placeholder-slate-400 focus:outline-none bg-transparent"
-              oninput="handleLogisticsSearch(this.value, 'label')"
-              autocomplete="off"
-            />
-            <div class="flex items-center gap-1.5 flex-shrink-0">
-              <!-- Tombol List Produk -->
-              <button 
-                type="button" 
-                onclick="toggleLogisticsCatalog('label')" 
-                class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
-                title="Tampilkan List Produk Toko"
-              >
-                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
-              </button>
-              <!-- Tombol Camera Scanner Flat Minimalis -->
-              <button 
-                type="button" 
-                onclick="triggerLogisticsCameraScan('label')" 
-                class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 active:scale-95 flex items-center justify-center transition border border-slate-200 cursor-pointer" 
-                title="Scan Barcode Kamera Label"
-              >
-                <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          <!-- Dropdown Hasil Live Ketik / List Produk Label -->
-          <div id="label-search-dropdown" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-300 rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto divide-y divide-slate-100 text-xs">
-          </div>
-        </div>
-
-        <!-- Daftar Pilihan Produk -->
-        <div class="space-y-1.5">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px] block">Pilih Produk yang Akan Dicetak:</span>
-            <button onclick="showMockupToast('Semua produk dipilih', 'info');" class="text-[10px] font-bold text-emerald-700 hover:underline">Pilih Semua</button>
-          </div>
-          
-          <label class="p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between cursor-pointer hover:bg-emerald-50/30 transition">
-            <div class="flex items-center gap-2.5">
-              <input type="checkbox" checked class="w-4 h-4 text-emerald-600 rounded" />
-              <div>
-                <span class="font-bold text-slate-900 block text-xs">Keripik Tempe Renyah 150g</span>
-                <span class="text-[10px] text-slate-400 font-mono">8992761111001 • Rak A-01</span>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="font-mono font-bold text-slate-900 text-xs">Rp 12.000</span>
-              <input type="number" value="2" min="1" class="w-12 px-1.5 py-1 border border-slate-300 rounded-lg text-center font-bold text-xs">
-            </div>
-          </label>
-
-          <label class="p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between cursor-pointer hover:bg-emerald-50/30 transition">
-            <div class="flex items-center gap-2.5">
-              <input type="checkbox" checked class="w-4 h-4 text-emerald-600 rounded" />
-              <div>
-                <span class="font-bold text-slate-900 block text-xs">Basreng Pedas Daun Jeruk 200g</span>
-                <span class="text-[10px] text-slate-400 font-mono">8992761111002 • Rak A-02</span>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="font-mono font-bold text-slate-900 text-xs">Rp 15.000</span>
-              <input type="number" value="1" min="1" class="w-12 px-1.5 py-1 border border-slate-300 rounded-lg text-center font-bold text-xs">
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
-        <button onclick="closeSisModal('sis-modal-label')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
-        <button onclick="executeSisLabelPrint()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition flex items-center gap-1.5">
-          <span>⚡</span><span>Cetak Kilat (0.5s)</span>
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- ================= 8. MODAL STOCK OPNAME FISIK (SO) [F6] ================= -->
   <div id="sis-modal-so" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-[60] hidden flex items-center justify-center p-3 sm:p-4">
@@ -5732,6 +5564,12 @@
       </div>
       <div id="find-product-list" class="p-3 space-y-2 overflow-y-auto flex-1 max-h-[380px]">
         <!-- Diisi otomatis -->
+      </div>
+      <div class="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <span class="text-[11px] text-slate-500 font-medium">Klik produk untuk menambah ke keranjang</span>
+        <button onclick="closeModal('modal-find-product')" class="px-4 py-2 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl active:scale-95 transition cursor-pointer">
+          Selesai Memilih &rarr;
+        </button>
       </div>
     </div>
   </div>
@@ -9036,8 +8874,8 @@
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
   <script src="js/scanner.js?v=121"></script>
-  <script src="js/cart.js?v=105"></script>
-  <script src="js/printer.js?v=124"></script>
+  <script src="js/cart.js?v=106"></script>
+  <script src="js/printer.js?v=125"></script>
   <script src="js/checkout.js?v=108"></script>
   <script src="js/member.js?v=108"></script>
   <script src="js/returns.js?v=100"></script>
@@ -9864,6 +9702,13 @@
       if (modal) {
         modal.classList.remove('hidden');
 
+        // Jika membuka cetak label, arahkan ke modul label real
+        if (modalId === 'sis-modal-label') {
+          modal.classList.add('hidden');
+          openBatchPrintModal('shelf');
+          return;
+        }
+
         // Jika membuka klerk, reset form ke mode input fisik
         if (modalId === 'sis-modal-klerk') {
           resetKlerkForm();
@@ -9983,7 +9828,7 @@
         openSisModal('sis-modal-lpb');
       } else if (e.key === 'F8') {
         e.preventDefault();
-        openSisModal('sis-modal-label');
+        openBatchPrintModal('shelf');
       } else if (e.key === 'F11') {
         e.preventDefault();
         openSisModal('sis-modal-klerk');
@@ -10478,7 +10323,7 @@
       const headerHtml = `
         <div class="p-2.5 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between border-b border-slate-100 flex-wrap gap-2">
           <div class="flex items-center gap-2">
-            <span>Katalog (${items.length} Item)</span>
+            <span>Pilih Manual (${items.length} Item)</span>
             <div class="inline-flex bg-slate-200/80 p-0.5 rounded-lg text-[10px] font-black">
               <button 
                 type="button" 
@@ -10496,7 +10341,7 @@
               </button>
             </div>
           </div>
-          <button onclick="hidePosLiveSearch()" class="text-slate-400 hover:text-slate-600 font-black cursor-pointer">✕ Tutup</button>
+          <button onclick="hidePosLiveSearch()" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[10px] font-black cursor-pointer transition">✕ Selesai</button>
         </div>
       `;
 
@@ -10506,8 +10351,8 @@
           <div class="p-2.5 grid grid-cols-2 sm:grid-cols-3 gap-2 overflow-y-auto max-h-[380px] bg-slate-50/50">
             ${items.map(p => `
               <div 
-                onclick="addToCart('${p.id}'); hidePosLiveSearch();" 
-                class="bg-white border border-slate-200 hover:border-alfa-red rounded-xl p-2 flex flex-col justify-between hover:shadow-xs transition cursor-pointer group select-none"
+                onclick="addToCart('${p.id}'); showToast('⚡ +1 ${(p.name || '').replace(/'/g, "\\'")}', 'success');" 
+                class="bg-white border border-slate-200 hover:border-emerald-500 active:scale-95 rounded-xl p-2 flex flex-col justify-between hover:shadow-xs transition cursor-pointer group select-none"
               >
                 <div class="flex items-center justify-between gap-1 mb-1.5">
                   <span class="text-xl">${p.emoji || '🍪'}</span>
@@ -10516,15 +10361,16 @@
                   </span>
                 </div>
                 <div class="space-y-0.5 mb-1.5">
-                  <h5 class="font-extrabold text-xs text-slate-900 line-clamp-2 leading-tight group-hover:text-alfa-red">${p.name}</h5>
+                  <h5 class="font-extrabold text-xs text-slate-900 line-clamp-2 leading-tight group-hover:text-emerald-700">${p.name}</h5>
                   <p class="text-[9px] text-slate-400 font-mono truncate">${p.barcode || p.id}</p>
                 </div>
                 <div class="flex items-center justify-between pt-1 border-t border-slate-100 mt-auto">
-                  <span class="font-mono font-black text-xs text-alfa-red">${formatRupiah(p.price)}</span>
+                  <span class="font-mono font-black text-xs text-slate-900">${formatRupiah(p.price)}</span>
                   <button 
                     type="button" 
-                    onclick="event.stopPropagation(); addToCart('${p.id}'); hidePosLiveSearch();" 
-                    class="w-6 h-6 rounded-md bg-alfa-red hover:bg-red-700 active:scale-95 text-white font-black text-xs flex items-center justify-center shadow-2xs cursor-pointer"
+                    onclick="event.stopPropagation(); addToCart('${p.id}'); showToast('⚡ +1 ${(p.name || '').replace(/'/g, "\\'")}', 'success');" 
+                    class="w-6 h-6 rounded-md bg-emerald-600 hover:bg-emerald-700 active:scale-90 text-white font-black text-xs flex items-center justify-center shadow-2xs cursor-pointer"
+                    title="Tambah 1 ke Keranjang"
                   >+</button>
                 </div>
               </div>
@@ -10535,7 +10381,7 @@
         contentHtml = `
           <div class="divide-y divide-slate-100 overflow-y-auto max-h-[380px]">
             ${items.map(p => `
-              <div onclick="addToCart('${p.id}'); hidePosLiveSearch();" class="p-2.5 hover:bg-yellow-50/80 transition-colors flex items-center justify-between gap-2.5 cursor-pointer group">
+              <div onclick="addToCart('${p.id}'); showToast('⚡ +1 ${(p.name || '').replace(/'/g, "\\'")}', 'success');" class="p-2.5 hover:bg-emerald-50/50 active:bg-emerald-100/50 transition-colors flex items-center justify-between gap-2.5 cursor-pointer group">
                 <div class="flex items-center gap-2.5 min-w-0 flex-1">
                   <img src="${getProductImageSrc(p)}" alt="${p.name}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-slate-200" loading="lazy" onerror="this.onerror=null; this.src=getProductThumbnailSvg('${(p.category || '').replace(/'/g, "\\'")}', '${(p.name || '').replace(/'/g, "\\'")}');">
                   <div class="min-w-0 flex-1">
@@ -10543,8 +10389,8 @@
                       <span class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">${p.name}</span>
                       <button 
                         type="button" 
-                        onclick="event.stopPropagation(); addToCart('${p.id}'); hidePosLiveSearch();" 
-                        class="px-2 py-0.5 bg-alfa-red hover:bg-red-700 active:scale-95 text-white rounded-md text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
+                        onclick="event.stopPropagation(); addToCart('${p.id}'); showToast('⚡ +1 ${(p.name || '').replace(/'/g, "\\'")}', 'success');" 
+                        class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-md text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
                         title="Tambah ke Keranjang Kasir"
                       >
                         <span>+</span>
@@ -10558,7 +10404,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="text-right flex-shrink-0 font-mono font-black text-xs sm:text-sm text-alfa-red">
+                <div class="text-right flex-shrink-0 font-mono font-black text-xs sm:text-sm text-slate-900">
                   ${formatRupiah(p.price)}
                 </div>
               </div>
@@ -10580,33 +10426,33 @@
       }
     });
 
-    // Pencarian Modal F1 (Dengan Tombol + Tambah di Samping Nama Produk)
+    // Pencarian Modal F1 (Dengan Kemampuan Pilih Produk Satu per Satu Tanpa Langsung Tutup)
     function renderQuickFindProducts() {
       const q = document.getElementById("find-product-query").value.toLowerCase().trim();
       const container = document.getElementById("find-product-list");
       const filtered = pos.products.filter(p => !q || p.name.toLowerCase().includes(q) || p.barcode.includes(q));
       
       container.innerHTML = filtered.slice(0, 30).map(p => `
-        <div onclick="addToCart('${p.id}'); closeModal('modal-find-product');" class="p-2.5 bg-white hover:bg-yellow-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3 cursor-pointer transition-colors">
+        <div onclick="addToCart('${p.id}'); showToast('⚡ +1 ${(p.name || '').replace(/'/g, "\\'")}', 'success');" class="p-2.5 bg-white hover:bg-emerald-50/50 border border-slate-200 rounded-xl flex items-center justify-between gap-3 cursor-pointer transition-colors active:scale-[0.99]">
           <div class="flex items-center gap-2.5 min-w-0 flex-1">
             <img src="${getProductImageSrc(p)}" alt="${p.name}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-slate-200" loading="lazy" onerror="this.onerror=null; this.src=getProductThumbnailSvg('${(p.category || '').replace(/'/g, "\\'")}', '${(p.name || '').replace(/'/g, "\\'")}');">
             <div class="min-w-0 flex-1">
-              <!-- Baris Nama Produk & Tombol + Tambah Berdampingan -->
               <div class="flex items-center gap-2 flex-wrap">
                 <span class="font-bold text-slate-800 text-xs truncate">${p.name}</span>
                 <button 
                   type="button" 
-                  onclick="event.stopPropagation(); addToCart('${p.id}'); closeModal('modal-find-product');" 
-                  class="px-2 py-0.5 bg-alfa-red hover:bg-red-700 active:scale-95 text-white rounded-md text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
+                  onclick="event.stopPropagation(); addToCart('${p.id}'); showToast('⚡ +1 ${(p.name || '').replace(/'/g, "\\'")}', 'success');" 
+                  class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-md text-[10px] font-black transition flex items-center gap-0.5 shadow-2xs cursor-pointer flex-shrink-0"
+                  title="Tambah 1 ke Keranjang"
                 >
                   <span>+</span>
                   <span>Tambah</span>
                 </button>
               </div>
-              <div class="text-[10px] text-slate-400 font-mono">PLU: ${p.barcode} • Stok: ${p.stock}</div>
+              <div class="text-[10px] text-slate-400 font-mono">PLU: ${p.barcode || p.id} • Stok: ${p.stock}</div>
             </div>
           </div>
-          <span class="font-mono font-black text-alfa-red text-xs">${formatRupiah(p.price)}</span>
+          <span class="font-mono font-black text-slate-900 text-xs">${formatRupiah(p.price)}</span>
         </div>
       `).join("");
     }
@@ -10713,7 +10559,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=118')
+          navigator.serviceWorker.register('./sw.js?v=119')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
