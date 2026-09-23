@@ -135,63 +135,25 @@ const POS_SCANNER_COOLDOWN_MS = 1400;
 // Fallback native stream jika Html5Qrcode tidak tersedia
 let posNativeCameraStream = null;
 let posNativeAnimationId = null;
-let activeScannerCustomCallback = null;
 
-async function openPosCameraScanner(customCallback = null, customTitle = null) {
-  // Simpan callback kustom jika dipanggil dari modul luar (misal: SIS Logistik Gudang)
-  activeScannerCustomCallback = typeof customCallback === "function" ? customCallback : null;
-
-  // Cek dukungan akses kamera browser
-  const hasMediaDevices = Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === "function");
-  if (!hasMediaDevices && location.protocol === "http:") {
-    // Hanya alihkan ke HTTPS jika di host server default tanpa port kustom
-    if (location.hostname === "2.27.165.72" && (!location.port || location.port === "80")) {
-      const targetUrl = "https://2.27.165.72.sslip.io" + location.pathname + location.search + location.hash;
-      showToast("Akses kamera membutuhkan koneksi aman (HTTPS). Mengalihkan...", "info", 3000);
-      setTimeout(() => {
-        location.href = targetUrl;
-      }, 800);
-      return;
-    } else {
-      showToast("Akses kamera membutuhkan HTTPS atau localhost pada browser Anda.", "warning", 4000);
-    }
+async function openPosCameraScanner() {
+  // Verifikasi HTTPS untuk izin kamera modern
+  if (location.protocol === "http:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+    const targetUrl = "https://" + (location.hostname === "2.27.165.72" ? "2.27.165.72.sslip.io" : location.hostname) + location.pathname + location.search + location.hash;
+    showToast("Akses kamera membutuhkan koneksi aman (HTTPS). Mengalihkan...", "info", 3000);
+    setTimeout(() => {
+      location.href = targetUrl;
+    }, 800);
+    return;
   }
 
-  // Hanya alihkan tab jika bukan pemanggilan kustom dari modal (misal: bukan dari SIS)
-  if (!activeScannerCustomCallback && typeof switchTab === "function") {
+  // Pastikan berada di tab Kasir POS
+  if (typeof switchTab === "function") {
     switchTab("tab-pos");
   }
 
-  // Sesuaikan judul header scanner kamera jika ada
-  const titleEl = document.querySelector("#modal-pos-camera-scanner h3");
-  if (titleEl) {
-    titleEl.textContent = customTitle || "Scan Barcode Kasir";
-  }
-
-  // Tampilan badge mode dan bar keranjang
-  const cartBar = document.getElementById("pos-scanner-cart-bar");
-  const modeBadge = document.getElementById("pos-camera-mode-badge");
-  if (activeScannerCustomCallback) {
-    if (cartBar) cartBar.classList.add("hidden");
-    if (modeBadge) {
-      modeBadge.textContent = "Mode Logistik";
-      modeBadge.className = "px-2 py-0.5 text-[9px] font-black uppercase rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
-    }
-  } else {
-    if (cartBar) cartBar.classList.remove("hidden");
-    if (modeBadge) {
-      modeBadge.textContent = posScannerMultiScanMode ? "Multi-Scan ON" : "1x Scan Mode";
-      modeBadge.className = "px-2 py-0.5 text-[9px] font-black uppercase rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 animate-pulse";
-    }
-    updatePosScannerCartSummary();
-  }
-
-  const modalEl = document.getElementById("modal-pos-camera-scanner");
-  if (modalEl) {
-    modalEl.classList.remove("hidden");
-    modalEl.style.display = "flex";
-    document.body.classList.add("modal-open");
-  }
+  openModal("modal-pos-camera-scanner");
+  updatePosScannerCartSummary();
 
   const loadingEl = document.getElementById("pos-camera-scanner-loading");
   const readerEl = document.getElementById("pos-camera-scanner-reader");
@@ -204,9 +166,6 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
   posScannerTorchActive = false;
   const torchLabel = document.getElementById("label-pos-scanner-torch");
   if (torchLabel) torchLabel.textContent = "Senter";
-
-  // Berikan jeda kecil agar DOM modal selesai ter-render dengan dimensi sebenarnya
-  await new Promise(resolve => setTimeout(resolve, 150));
 
   // Prioritas 1: Gunakan library Html5Qrcode jika tersedia
   if (typeof Html5Qrcode !== "undefined") {
@@ -230,49 +189,51 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
         });
       }
 
-      // Susun konfigurasi kamera langsung tanpa memicu getCameras() ganda
-      const configsToTry = [
-        { facingMode: "environment" },
-        { facingMode: { ideal: "environment" } },
-        { facingMode: "user" }
-      ];
+      // Ambil daftar kamera
+      try {
+        const cameras = await Html5Qrcode.getCameras();
+        posScannerAvailableCameras = cameras || [];
+      } catch (camErr) {
+        console.warn("Gagal enumerasi kamera:", camErr);
+        posScannerAvailableCameras = [];
+      }
+
+      // Konfigurasi kamera belakang (environment)
+      let cameraConfig = { facingMode: "environment" };
+      if (posScannerAvailableCameras.length > 0) {
+        // Cari kamera belakang secara eksplisit
+        const backCamIndex = posScannerAvailableCameras.findIndex(c => 
+          /back|rear|belakang|environment/i.test(c.label)
+        );
+        if (backCamIndex >= 0) {
+          posScannerCurrentCameraIndex = backCamIndex;
+          cameraConfig = posScannerAvailableCameras[backCamIndex].id;
+        } else {
+          posScannerCurrentCameraIndex = 0;
+          cameraConfig = posScannerAvailableCameras[0].id;
+        }
+      }
 
       const scanConfig = {
         fps: 20,
         qrbox: (viewfinderWidth, viewfinderHeight) => {
-          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-          const w = Math.min(Math.max(Math.floor(minEdge * 0.8), 160), Math.max(viewfinderWidth - 10, 50));
-          const h = Math.min(Math.max(Math.floor(minEdge * 0.5), 100), Math.max(viewfinderHeight - 10, 50));
-          return { width: Math.max(w, 50), height: Math.max(h, 50) };
-        }
+          const width = Math.min(Math.round(viewfinderWidth * 0.9), 360);
+          const height = Math.min(Math.round(viewfinderHeight * 0.65), 220);
+          return { width: Math.max(width, 220), height: Math.max(height, 140) };
+        },
+        aspectRatio: 1.333333
       };
 
-      let started = false;
-      let lastErr = null;
-      for (const cfg of configsToTry) {
-        try {
-          await posHtml5QrCode.start(
-            cfg,
-            scanConfig,
-            onPosBarcodeDetected,
-            () => {} // abaikan frame error wajar saat mencari barcode
-          );
-          started = true;
-          break;
-        } catch (startErr) {
-          lastErr = startErr;
-          console.warn("Gagal membuka kamera dengan opsi:", cfg, startErr);
-          try { await posHtml5QrCode.stop(); } catch(e){}
-        }
-      }
+      await posHtml5QrCode.start(
+        cameraConfig,
+        scanConfig,
+        onPosBarcodeDetected,
+        () => {} // abaikan frame error wajar saat mencari barcode
+      );
 
-      if (started) {
-        posScannerIsScanning = true;
-        if (loadingEl) loadingEl.classList.add("hidden");
-        return;
-      } else {
-        throw lastErr || new Error("Gagal mengaktifkan kamera dengan semua opsi.");
-      }
+      posScannerIsScanning = true;
+      if (loadingEl) loadingEl.classList.add("hidden");
+      return;
     } catch (err) {
       console.warn("Html5Qrcode start error, mencoba native fallback:", err);
       if (posHtml5QrCode) {
@@ -307,40 +268,24 @@ async function startPosNativeCameraFallback() {
 
     if (readerEl) {
       readerEl.innerHTML = `
-        <video id="pos-native-video" autoplay playsinline muted class="w-full h-full min-h-[280px] object-cover"></video>
+        <video id="pos-native-video" autoplay playsinline class="w-full h-full object-cover"></video>
       `;
       const video = document.getElementById("pos-native-video");
       if (video) {
         video.srcObject = posNativeCameraStream;
-        const onReady = () => {
-          video.play().catch(e => console.warn("Video play notice:", e));
+        video.onloadedmetadata = () => {
+          video.play();
           if (loadingEl) loadingEl.classList.add("hidden");
           posScannerIsScanning = true;
           startPosNativeDetectionLoop(video);
         };
-        video.onloadedmetadata = onReady;
-        setTimeout(onReady, 600); // Fallback timeout jika metadata event tertunda
       }
     }
   } catch (err) {
     console.error("Native camera fallback failed:", err);
     if (loadingEl) loadingEl.classList.add("hidden");
-    if (readerEl) {
-      readerEl.innerHTML = `
-        <div class="p-6 text-center text-slate-300 flex flex-col items-center justify-center gap-3">
-          <span class="text-4xl text-amber-400">📷</span>
-          <p class="text-xs font-bold text-white uppercase tracking-wider">Akses Kamera Terkendala</p>
-          <p class="text-[11px] text-slate-400 max-w-xs leading-relaxed">
-            ${err.message || 'Kamera sedang digunakan aplikasi lain atau izin belum aktif.'}
-          </p>
-          <button type="button" onclick="openPosCameraScanner()" class="mt-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer transition flex items-center gap-1.5">
-            <span>🔄</span>
-            <span>Coba Buka Kamera</span>
-          </button>
-        </div>
-      `;
-    }
-    showToast("Gagal mengakses kamera: " + (err.message || err), "warning");
+    closePosCameraScanner();
+    showToast("Gagal mengakses kamera: " + (err.message || err), "error");
   }
 }
 
@@ -393,18 +338,6 @@ function onPosBarcodeDetected(decodedText) {
   flashPosReticleSuccess();
   if (typeof sfx !== "undefined" && sfx.beep) {
     sfx.beep();
-  }
-
-  // Jika ini adalah custom callback dari SIS Logistik Gudang (LPB, SO, Repack, Master Produk, Label, Waste)
-  if (typeof activeScannerCustomCallback === "function") {
-    const cb = activeScannerCustomCallback;
-    closePosCameraScanner();
-    try {
-      cb(code);
-    } catch (err) {
-      console.error("[SIS Camera] Callback error:", err);
-    }
-    return;
   }
 
   // Proses masukkan produk ke keranjang kasir
@@ -501,20 +434,11 @@ async function closePosCameraScanner() {
 
   closeModal("modal-pos-camera-scanner");
 
-  const hadCustomCallback = Boolean(activeScannerCustomCallback);
-  activeScannerCustomCallback = null;
-
-  // Pulihkan tampilan bilah ringkasan kasir
-  const cartBar = document.getElementById("pos-scanner-cart-bar");
-  if (cartBar) cartBar.classList.remove("hidden");
-
-  // Kembalikan fokus ke kotak pencarian barcode kasir hanya jika bukan dari modal kustom
-  if (!hadCustomCallback) {
-    setTimeout(() => {
-      const searchInput = document.getElementById("pos-barcode-search");
-      if (searchInput) searchInput.focus();
-    }, 100);
-  }
+  // Kembalikan fokus ke kotak pencarian barcode kasir
+  setTimeout(() => {
+    const searchInput = document.getElementById("pos-barcode-search");
+    if (searchInput) searchInput.focus();
+  }, 100);
 }
 
 // Tombol Switch Kamera (Kamera Depan vs Kamera Belakang)
