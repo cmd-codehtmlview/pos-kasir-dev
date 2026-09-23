@@ -59,7 +59,7 @@
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .font-bebas { font-family: 'Bebas Neue', sans-serif; }
   </style>
-  <link rel="stylesheet" href="style.css?v=123">
+  <link rel="stylesheet" href="style.css?v=125">
 
   <!-- PWA Manifest & App Icons -->
   <link rel="manifest" id="app-manifest" href="manifest.json">
@@ -9040,7 +9040,7 @@
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=106"></script>
+  <script src="js/scanner.js?v=117"></script>
   <script src="js/cart.js?v=105"></script>
   <script src="js/printer.js?v=124"></script>
   <script src="js/checkout.js?v=108"></script>
@@ -9048,16 +9048,16 @@
   <script src="js/returns.js?v=100"></script>
   <script src="js/stock-opname.js?v=100"></script>
   <script src="js/klerk.js?v=100"></script>
-  <script src="js/inventory.js?v=110"></script>
+  <script src="js/inventory.js?v=117"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/import-products.js?v=100"></script>
   <script src="js/repack.js?v=100"></script>
   <script src="js/reports.js?v=103"></script>
-  <script src="js/settings.js?v=124"></script>
+  <script src="js/settings.js?v=117"></script>
   <script src="js/employees.js?v=121"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=122"></script>
+  <script src="js/app.js?v=117"></script>
   <script src="js/sis-logistics.js?v=100"></script>
   <script src="js/sis-cashier-ops.js?v=100"></script>
   <script src="js/sis-store-crm.js?v=100"></script>
@@ -10698,19 +10698,41 @@
 
     // Registrasi Service Worker untuk Offline Caching & PWA Compliance
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=116')
-          .then((registration) => {
-            registration.update();
-            console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
-            if (typeof setupSilentAutoUpdate === 'function') {
-              setupSilentAutoUpdate();
+      if (location.pathname.includes('/dev')) {
+        // Lingkungan Dev/Staging: Otomatis unregister service worker & bersihkan cache lama agar selalu live
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.getRegistrations().then((regs) => {
+            for (let reg of regs) {
+              if (reg.scope.includes('/dev') || reg.scope.includes('sslip.io')) {
+                reg.unregister();
+              }
             }
-          })
-          .catch((error) => {
-            console.warn('PWA Service Worker gagal didaftarkan:', error);
           });
-      });
+          if ('caches' in window) {
+            caches.keys().then((keys) => {
+              for (let k of keys) {
+                if (k.includes('v116') || k.includes('dev')) {
+                  caches.delete(k);
+                }
+              }
+            });
+          }
+        });
+      } else {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js?v=117')
+            .then((registration) => {
+              registration.update();
+              console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
+              if (typeof setupSilentAutoUpdate === 'function') {
+                setupSilentAutoUpdate();
+              }
+            })
+            .catch((error) => {
+              console.warn('PWA Service Worker gagal didaftarkan:', error);
+            });
+        });
+      }
     }
   </script>
 </body>

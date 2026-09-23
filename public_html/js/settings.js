@@ -631,19 +631,25 @@ function downloadDatabaseBackup() {
     link.href = url;
     link.download = fileName;
     link.setAttribute("download", fileName);
-    link.style.display = "none";
+    link.rel = "noopener";
+    link.target = "_self";
+    // CRITICAL: JANGAN gunakan display:none karena Chrome Android memblokir klik tersembunyi
+    link.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0.01;pointer-events:none;";
     document.body.appendChild(link);
     link.click();
     
     setTimeout(() => {
       try {
-        document.body.removeChild(link);
+        if (link.parentNode) link.parentNode.removeChild(link);
         URL.revokeObjectURL(url);
       } catch(e){}
-    }, 1500);
+    }, 2000);
 
     if (typeof showToast === "function") {
       showToast("💾 Cadangan database (.json) berhasil diunduh!", "success");
+    }
+    if (window.sfx && typeof window.sfx.beep === "function") {
+      window.sfx.beep();
     }
   } catch (err) {
     console.error("Gagal mendownload backup blob, mencoba fallback data URI:", err);
@@ -655,10 +661,15 @@ function downloadDatabaseBackup() {
       const link = document.createElement("a");
       link.href = dataUri;
       link.download = fileName;
+      link.setAttribute("download", fileName);
+      link.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0.01;pointer-events:none;";
       document.body.appendChild(link);
       link.click();
-      setTimeout(() => document.body.removeChild(link), 500);
+      setTimeout(() => {
+        if (link.parentNode) link.parentNode.removeChild(link);
+      }, 1000);
       if (typeof showToast === "function") showToast("💾 File cadangan berhasil dibuat!", "success");
+      if (window.sfx && typeof window.sfx.beep === "function") window.sfx.beep();
     } catch(fallbackErr) {
       alert("Gagal mengunduh file cadangan: " + (err.message || err));
     }

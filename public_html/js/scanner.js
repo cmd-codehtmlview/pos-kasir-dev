@@ -130,9 +130,11 @@ let posScannerMultiScanMode = true;
 let posScannerLastCode = "";
 let posScannerLastTime = 0;
 let posScannerFeedbackTimeout = null;
+let posScannerSelectedDeviceId = null;
+let posScannerDetector = null;
 const POS_SCANNER_COOLDOWN_MS = 1400;
 
-// Fallback native stream jika Html5Qrcode tidak tersedia
+// Native camera stream & loop
 let posNativeCameraStream = null;
 let posNativeAnimationId = null;
 let activeScannerCustomCallback = null;
@@ -144,7 +146,6 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
   // Cek dukungan akses kamera browser
   const hasMediaDevices = Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === "function");
   if (!hasMediaDevices && location.protocol === "http:") {
-    // Hanya alihkan ke HTTPS jika di host server default tanpa port kustom
     if (location.hostname === "2.27.165.72" && (!location.port || location.port === "80")) {
       const targetUrl = "https://2.27.165.72.sslip.io" + location.pathname + location.search + location.hash;
       showToast("Akses kamera membutuhkan koneksi aman (HTTPS). Mengalihkan...", "info", 3000);
@@ -189,186 +190,182 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
   openModal("modal-pos-camera-scanner");
 
   const loadingEl = document.getElementById("pos-camera-scanner-loading");
-  const readerEl = document.getElementById("pos-camera-scanner-reader");
   const feedbackEl = document.getElementById("pos-scan-feedback");
   
   if (loadingEl) loadingEl.classList.remove("hidden");
   if (feedbackEl) feedbackEl.classList.add("hidden");
 
-  // Reset flag
+  // Reset senter
   posScannerTorchActive = false;
   const torchLabel = document.getElementById("label-pos-scanner-torch");
   if (torchLabel) torchLabel.textContent = "Senter";
 
-  // Berikan jeda kecil agar DOM modal selesai ter-render dengan dimensi sebenarnya
-  await new Promise(resolve => setTimeout(resolve, 120));
-
-  // Prioritas 1: Gunakan library Html5Qrcode jika tersedia
-  if (typeof Html5Qrcode !== "undefined") {
-    try {
-      if (!posHtml5QrCode) {
-        const formats = (typeof Html5QrcodeSupportedFormats !== "undefined") ? [
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.CODE_93,
-          Html5QrcodeSupportedFormats.ITF,
-          Html5QrcodeSupportedFormats.QR_CODE
-        ] : undefined;
-
-        posHtml5QrCode = new Html5Qrcode("pos-camera-scanner-reader", {
-          formatsToSupport: formats,
-          verbose: false
-        });
-      }
-
-      // Susun konfigurasi kamera bertahap (cascade fallback)
-      // Opsi 1, 2, 3: Gunakan facingMode standar modern (paling kompatibel di Chrome/Safari mobile tanpa perlu izin awal ganda)
-      const configsToTry = [
-        { facingMode: "environment" },
-        { facingMode: { ideal: "environment" } },
-        { facingMode: "user" }
-      ];
-
-      // Ambil daftar kamera jika diizinkan browser
-      try {
-        const cameras = await Html5Qrcode.getCameras();
-        if (cameras && cameras.length > 0) {
-          posScannerAvailableCameras = cameras;
-          const backCam = cameras.find(c => /back|rear|belakang|environment/i.test(c.label));
-          if (backCam) {
-            configsToTry.unshift(backCam.id);
-          }
-        }
-      } catch (camErr) {
-        // Abaikan jika browser membatasi enumerasi sebelum stream aktif
-      }
-
-      const scanConfig = {
-        fps: 20,
-        qrbox: (viewfinderWidth, viewfinderHeight) => {
-          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-          const w = Math.min(Math.max(Math.floor(minEdge * 0.8), 160), Math.max(viewfinderWidth - 10, 50));
-          const h = Math.min(Math.max(Math.floor(minEdge * 0.5), 100), Math.max(viewfinderHeight - 10, 50));
-          return { width: Math.max(w, 50), height: Math.max(h, 50) };
-        }
-      };
-
-      let started = false;
-      let lastErr = null;
-      for (const cfg of configsToTry) {
-        try {
-          await posHtml5QrCode.start(
-            cfg,
-            scanConfig,
-            onPosBarcodeDetected,
-            () => {} // abaikan frame error wajar saat mencari barcode
-          );
-          started = true;
-          break;
-        } catch (startErr) {
-          lastErr = startErr;
-          console.warn("Gagal membuka kamera dengan opsi:", cfg, startErr);
-          try { await posHtml5QrCode.stop(); } catch(e){}
-        }
-      }
-
-      if (started) {
-        posScannerIsScanning = true;
-        if (loadingEl) loadingEl.classList.add("hidden");
-        return;
-      } else {
-        throw lastErr || new Error("Gagal mengaktifkan kamera dengan semua opsi.");
-      }
-    } catch (err) {
-      console.warn("Html5Qrcode start error, mencoba native fallback:", err);
-      if (posHtml5QrCode) {
-        try { await posHtml5QrCode.clear(); } catch(e){}
-        posHtml5QrCode = null;
-      }
-    }
-  }
-
-  // Prioritas 2: Fallback Native BarcodeDetector + getUserMedia
-  startPosNativeCameraFallback();
+  // Mulai stream kamera langsung
+  await startPosCameraStream();
 }
 
-// Fallback native kamera (menggunakan Web BarcodeDetector jika Html5Qrcode gagal/tidak termuat)
-async function startPosNativeCameraFallback() {
+async function startPosCameraStream(targetDeviceId = null) {
   const loadingEl = document.getElementById("pos-camera-scanner-loading");
   const readerEl = document.getElementById("pos-camera-scanner-reader");
+  if (!readerEl) return;
+
+  if (loadingEl) loadingEl.classList.remove("hidden");
+
+  // Hentikan stream dan animasi sebelumnya jika ada
+  stopActiveCameraTracks();
+
+  if (targetDeviceId) {
+    posScannerSelectedDeviceId = targetDeviceId;
+  }
+
+  // Bersihkan dan sematkan video element baru
+  readerEl.innerHTML = `
+    <video id="pos-live-camera-video" autoplay playsinline muted class="w-full h-full object-cover min-h-[280px] sm:min-h-[340px]"></video>
+  `;
+  const videoEl = document.getElementById("pos-live-camera-video");
 
   try {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      throw new Error("Perangkat atau browser ini tidak mendukung akses kamera langsung.");
+      throw new Error("Browser atau perangkat ini belum mendukung MediaDevices getUserMedia.");
     }
 
-    posNativeCameraStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: "environment" },
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      },
-      audio: false
-    });
+    let stream = null;
+    const preferredConstraints = {
+      audio: false,
+      video: posScannerSelectedDeviceId 
+        ? { deviceId: { exact: posScannerSelectedDeviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+        : { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }
+    };
 
-    if (readerEl) {
-      readerEl.innerHTML = `
-        <video id="pos-native-video" autoplay playsinline muted class="w-full h-full min-h-[280px] object-cover"></video>
-      `;
-      const video = document.getElementById("pos-native-video");
-      if (video) {
-        video.srcObject = posNativeCameraStream;
-        const onReady = () => {
-          video.play().catch(e => console.warn("Video play notice:", e));
-          if (loadingEl) loadingEl.classList.add("hidden");
-          posScannerIsScanning = true;
-          startPosNativeDetectionLoop(video);
-        };
-        video.onloadedmetadata = onReady;
-        setTimeout(onReady, 600); // Fallback timeout jika metadata event tertunda
+    try {
+      stream = await navigator.mediaDevices.getUserMedia(preferredConstraints);
+    } catch (idealErr) {
+      console.warn("Gagal dengan preferred camera constraints, mencoba fallback dasar:", idealErr);
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: "environment" }
+        });
+      } catch (envErr) {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
       }
     }
+
+    posNativeCameraStream = stream;
+    videoEl.srcObject = stream;
+
+    // Ambil daftar kamera untuk fungsi ganti kamera di background
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      posScannerAvailableCameras = devices.filter(d => d.kind === "videoinput");
+    } catch(e){}
+
+    const onStreamReady = () => {
+      videoEl.play().catch(e => console.warn("Video play notice:", e));
+      if (loadingEl) loadingEl.classList.add("hidden");
+      posScannerIsScanning = true;
+      startPosDetectionLoop(videoEl);
+    };
+
+    videoEl.onloadedmetadata = onStreamReady;
+    setTimeout(onStreamReady, 450);
+
   } catch (err) {
-    console.error("Native camera fallback failed:", err);
+    console.error("Camera access error:", err);
     if (loadingEl) loadingEl.classList.add("hidden");
-    closePosCameraScanner();
-    showToast("Gagal mengakses kamera: " + (err.message || err), "error");
+    
+    // Tampilkan pesan error jelas dengan tombol coba lagi (JANGAN TUTUP MODAL!)
+    const isPermissionError = err.name === "NotAllowedError" || err.name === "PermissionDeniedError";
+    readerEl.innerHTML = `
+      <div class="p-6 text-center text-slate-300 flex flex-col items-center justify-center gap-3">
+        <span class="text-4xl text-amber-400">📷</span>
+        <p class="text-xs font-bold text-white uppercase tracking-wider">Akses Kamera Belum Aktif</p>
+        <p class="text-[11px] text-slate-400 max-w-xs leading-relaxed">
+          ${isPermissionError 
+            ? 'Izin kamera belum diizinkan oleh browser. Silakan tap ikon gembok / pengaturan situs di Chrome dan pilih "Izinkan Kamera".' 
+            : (err.message || 'Kamera sedang digunakan aplikasi lain atau tidak terdeteksi.')}
+        </p>
+        <button type="button" onclick="startPosCameraStream()" class="mt-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer transition flex items-center gap-1.5">
+          <span>🔄</span>
+          <span>Izinkan & Coba Lagi</span>
+        </button>
+      </div>
+    `;
+    showToast(isPermissionError ? "⚠️ Izin kamera ditolak. Silakan izinkan di browser." : "Gagal membuka kamera: " + (err.message || err.name), "warning", 5000);
   }
 }
 
-function startPosNativeDetectionLoop(video) {
-  if (!("BarcodeDetector" in window)) {
-    showToast("Kamera aktif, namun browser Anda membutuhkan dukungan barcode detector.", "warning");
-    return;
+function stopActiveCameraTracks() {
+  if (posNativeAnimationId) {
+    cancelAnimationFrame(posNativeAnimationId);
+    posNativeAnimationId = null;
   }
+  if (posNativeCameraStream) {
+    try {
+      posNativeCameraStream.getTracks().forEach(t => t.stop());
+    } catch(e){}
+    posNativeCameraStream = null;
+  }
+}
 
-  const detector = new window.BarcodeDetector({
-    formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128", "code_39", "qr_code"]
-  });
+async function startPosDetectionLoop(videoEl) {
+  if (!posScannerIsScanning) return;
 
-  async function loop() {
-    if (!posScannerIsScanning || !posNativeCameraStream) return;
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      try {
-        const barcodes = await detector.detect(video);
-        if (barcodes && barcodes.length > 0) {
-          const raw = barcodes[0].rawValue;
-          if (raw) {
-            onPosBarcodeDetected(raw);
-          }
-        }
-      } catch (e) {
-        // frame decode error
+  // 1. Native Web BarcodeDetector (Standar Chrome Android sejak v84, hardware-accelerated & 100% kompatibel)
+  if ("BarcodeDetector" in window) {
+    try {
+      if (!posScannerDetector) {
+        const supported = await window.BarcodeDetector.getSupportedFormats().catch(() => []);
+        const desired = ["ean_13", "ean_8", "upc_a", "upc_e", "code_128", "code_39", "code_93", "itf", "qr_code"];
+        const formats = (supported && supported.length > 0) ? desired.filter(f => supported.includes(f)) : desired;
+        posScannerDetector = new window.BarcodeDetector({ formats: formats.length > 0 ? formats : ["qr_code", "ean_13", "code_128"] });
       }
+
+      async function nativeDetectLoop() {
+        if (!posScannerIsScanning || !posNativeCameraStream) return;
+        if (videoEl.readyState >= 2 && !videoEl.paused) {
+          try {
+            const barcodes = await posScannerDetector.detect(videoEl);
+            if (barcodes && barcodes.length > 0) {
+              const raw = barcodes[0].rawValue;
+              if (raw) {
+                onPosBarcodeDetected(raw);
+              }
+            }
+          } catch(e){}
+        }
+        posNativeAnimationId = requestAnimationFrame(nativeDetectLoop);
+      }
+
+      posNativeAnimationId = requestAnimationFrame(nativeDetectLoop);
+      return;
+    } catch(detErr) {
+      console.warn("Native BarcodeDetector init notice:", detErr);
     }
-    posNativeAnimationId = requestAnimationFrame(loop);
   }
 
-  posNativeAnimationId = requestAnimationFrame(loop);
+  // 2. Fallback Html5Qrcode jika BarcodeDetector tidak didukung oleh browser
+  if (typeof Html5Qrcode !== "undefined") {
+    try {
+      stopActiveCameraTracks();
+      const readerEl = document.getElementById("pos-camera-scanner-reader");
+      if (readerEl) readerEl.innerHTML = "";
+
+      if (!posHtml5QrCode) {
+        posHtml5QrCode = new Html5Qrcode("pos-camera-scanner-reader", { verbose: false });
+      }
+      await posHtml5QrCode.start(
+        posScannerSelectedDeviceId || { facingMode: "environment" },
+        { fps: 15 },
+        onPosBarcodeDetected,
+        () => {}
+      );
+      posScannerIsScanning = true;
+      return;
+    } catch(h5Err) {
+      console.warn("Html5Qrcode fallback error:", h5Err);
+    }
+  }
 }
 
 // Handler saat Barcode berhasil terbaca oleh Kamera Kasir
@@ -523,25 +520,20 @@ async function switchPosScannerCamera() {
   try {
     posScannerCurrentCameraIndex = (posScannerCurrentCameraIndex + 1) % posScannerAvailableCameras.length;
     const nextCam = posScannerAvailableCameras[posScannerCurrentCameraIndex];
+    posScannerSelectedDeviceId = nextCam.deviceId || nextCam.id;
 
     if (posHtml5QrCode && posHtml5QrCode.isScanning) {
       await posHtml5QrCode.stop();
       await posHtml5QrCode.start(
-        nextCam.id,
-        {
-          fps: 15,
-          qrbox: (viewfinderWidth, viewfinderHeight) => {
-            const width = Math.min(viewfinderWidth * 0.85, 300);
-            const height = Math.min(viewfinderHeight * 0.55, 180);
-            return { width: Math.round(width), height: Math.round(height) };
-          },
-          aspectRatio: 1.333333
-        },
+        posScannerSelectedDeviceId,
+        { fps: 15 },
         onPosBarcodeDetected,
         () => {}
       );
-      showToast(`Beralih ke: ${nextCam.label || 'Kamera ' + (posScannerCurrentCameraIndex + 1)}`, "info");
+    } else {
+      await startPosCameraStream(posScannerSelectedDeviceId);
     }
+    showToast(`Beralih ke: ${nextCam.label || 'Kamera ' + (posScannerCurrentCameraIndex + 1)}`, "info");
   } catch (err) {
     console.warn("Gagal switch kamera:", err);
     showToast("Gagal beralih kamera: " + (err.message || err), "warning");
@@ -550,11 +542,28 @@ async function switchPosScannerCamera() {
 
 // Tombol Nyalakan / Matikan Senter HP (Torch)
 async function togglePosScannerTorch() {
-  if (!posHtml5QrCode || !posHtml5QrCode.isScanning) return;
-
   try {
+    let track = null;
+    if (posNativeCameraStream) {
+      track = posNativeCameraStream.getVideoTracks()[0];
+    } else if (posHtml5QrCode && posHtml5QrCode.isScanning) {
+      posScannerTorchActive = !posScannerTorchActive;
+      await posHtml5QrCode.applyVideoConstraints({
+        advanced: [{ torch: posScannerTorchActive }]
+      });
+      const label = document.getElementById("label-pos-scanner-torch");
+      if (label) label.textContent = posScannerTorchActive ? "Mati" : "Senter";
+      showToast(posScannerTorchActive ? "🔦 Senter kamera dinyalakan" : "Senter kamera dimatikan", "info");
+      return;
+    }
+
+    if (!track) {
+      showToast("Kamera belum aktif.", "info");
+      return;
+    }
+
     posScannerTorchActive = !posScannerTorchActive;
-    await posHtml5QrCode.applyVideoConstraints({
+    await track.applyConstraints({
       advanced: [{ torch: posScannerTorchActive }]
     });
 
@@ -565,6 +574,8 @@ async function togglePosScannerTorch() {
     console.warn("Torch constraint not supported:", err);
     showToast("Fitur lampu senter tidak didukung oleh kamera/browser ini.", "info");
     posScannerTorchActive = false;
+    const label = document.getElementById("label-pos-scanner-torch");
+    if (label) label.textContent = "Senter";
   }
 }
 

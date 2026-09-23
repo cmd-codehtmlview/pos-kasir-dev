@@ -1,4 +1,4 @@
-const CACHE_NAME = 'snackpos-cache-v116';
+const CACHE_NAME = 'snackpos-cache-v117';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -84,9 +84,9 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   const path = url.pathname.toLowerCase();
 
-  // JANGAN PERNAH intercept atau cache halaman order, owner monitoring, mockup, dan Supabase API
+  // JANGAN PERNAH intercept atau cache halaman order, owner monitoring, mockup, dev staging, dan Supabase API
   // Hal ini memastikan pengguna selalu mendapatkan data & tampilan live server terbaru
-  if (path.includes('order') || path.includes('owner') || path.includes('mockup') || path.includes('v-portal') || url.hostname.includes('supabase.co')) {
+  if (path.includes('order') || path.includes('owner') || path.includes('mockup') || path.includes('v-portal') || path.includes('/dev/') || url.pathname.startsWith('/dev') || url.hostname.includes('supabase.co')) {
     return;
   }
 

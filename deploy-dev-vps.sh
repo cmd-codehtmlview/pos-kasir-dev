@@ -33,3 +33,4 @@ echo "✅ JALUR DEV BERHASIL DI-DEPLOY & AKTIF!"
 echo "👉 Link Uji Coba DEV (HP/Laptop) : https://2.27.165.72.sslip.io/dev/"
 echo "👉 Link Kasir Toko (Produksi)    : https://2.27.165.72.sslip.io/"
 echo "=========================================================="
+

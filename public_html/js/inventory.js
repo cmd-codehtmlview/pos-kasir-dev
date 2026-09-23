@@ -778,91 +778,7 @@ async function openBarcodeCameraScanner(targetInputId = 'product-form-barcode') 
   // Berikan jeda kecil agar DOM modal selesai ter-render
   await new Promise(resolve => setTimeout(resolve, 120));
 
-  // Prioritas 1: Html5Qrcode (ZXing decoder lintas browser untuk EAN-13, UPC, Code 128, QR, dll.)
-  if (typeof Html5Qrcode !== "undefined") {
-    try {
-      if (!inventoryHtml5QrCode) {
-        const formats = (typeof Html5QrcodeSupportedFormats !== "undefined") ? [
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.CODE_93,
-          Html5QrcodeSupportedFormats.ITF,
-          Html5QrcodeSupportedFormats.QR_CODE
-        ] : undefined;
-
-        inventoryHtml5QrCode = new Html5Qrcode("barcode-scanner-reader", {
-          formatsToSupport: formats,
-          verbose: false
-        });
-      }
-
-      // Susun konfigurasi kamera bertahap (cascade fallback)
-      const configsToTry = [
-        { facingMode: "environment" },
-        { facingMode: { ideal: "environment" } },
-        { facingMode: "user" }
-      ];
-
-      try {
-        const cameras = await Html5Qrcode.getCameras();
-        if (cameras && cameras.length > 0) {
-          const backCam = cameras.find(c => /back|rear|belakang|environment/i.test(c.label));
-          if (backCam) configsToTry.unshift(backCam.id);
-        }
-      } catch (camErr) {
-        // Abaikan jika browser belum mengizinkan enumerasi
-      }
-
-      let started = false;
-      let lastErr = null;
-      for (const cfg of configsToTry) {
-        try {
-          await inventoryHtml5QrCode.start(
-            cfg,
-            {
-              fps: 20,
-              qrbox: (w, h) => {
-                const minEdge = Math.min(w, h);
-                const bw = Math.min(Math.max(Math.floor(minEdge * 0.8), 160), Math.max(w - 10, 50));
-                const bh = Math.min(Math.max(Math.floor(minEdge * 0.5), 100), Math.max(h - 10, 50));
-                return { width: Math.max(bw, 50), height: Math.max(bh, 50) };
-              }
-            },
-            (decodedText) => {
-              onInventoryBarcodeScanned(decodedText);
-            },
-            () => {}
-          );
-          started = true;
-          break;
-        } catch (startErr) {
-          lastErr = startErr;
-          console.warn("Gagal start inventory camera dengan config:", cfg, startErr);
-          try { await inventoryHtml5QrCode.stop(); } catch(e){}
-        }
-      }
-
-      if (started) {
-        if (loading) loading.classList.add('hidden');
-        if (statusEl) statusEl.textContent = 'Arahkan barcode ke kotak pemindai...';
-        return;
-      } else {
-        throw lastErr || new Error("Gagal mengaktifkan kamera inventory.");
-      }
-    } catch (err) {
-      console.warn("Html5Qrcode gagal di inventory, beralih ke native fallback:", err);
-      if (inventoryHtml5QrCode) {
-        try { await inventoryHtml5QrCode.clear(); } catch(e){}
-        inventoryHtml5QrCode = null;
-      }
-    }
-  }
-
-  // Prioritas 2: Fallback native BarcodeDetector + getUserMedia
+  // Prioritas 1: Langsung gunakan native getUserMedia + BarcodeDetector
   startInventoryNativeCameraFallback();
 }
 
@@ -870,6 +786,7 @@ async function startInventoryNativeCameraFallback() {
   const video = document.getElementById('barcode-scanner-video');
   const loading = document.getElementById('barcode-scanner-loading');
   const statusEl = document.getElementById('barcode-scanner-status');
+  const readerEl = document.getElementById('barcode-scanner-reader');
 
   try {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -881,30 +798,42 @@ async function startInventoryNativeCameraFallback() {
       video.classList.remove('hidden');
     }
 
-    barcodeScannerStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: "environment" },
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      },
-      audio: false
-    });
+    let stream = null;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+    } catch(idealErr) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+          audio: false
+        });
+      } catch(envErr) {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      }
+    }
+
+    barcodeScannerStream = stream;
 
     if (video) {
       video.srcObject = barcodeScannerStream;
       const onReady = () => {
         video.play().catch(e => console.warn("Video play notice:", e));
         if (loading) loading.classList.add('hidden');
-        if (statusEl) statusEl.textContent = 'Arahkan barcode ke kamera...';
+        if (statusEl) statusEl.textContent = 'Arahkan barcode ke kotak kamera...';
         startBarcodeScannerDetection(video);
       };
       video.onloadedmetadata = onReady;
-      setTimeout(onReady, 600);
+      setTimeout(onReady, 500);
     }
   } catch (err) {
     console.warn("Kamera barcode gagal diakses:", err);
     if (loading) loading.classList.add('hidden');
-    closeBarcodeCameraScanner();
+    if (statusEl) {
+      statusEl.innerHTML = `<span class="text-rose-400 font-bold">Akses Kamera Gagal:</span> ${err.message || err.name} <button type="button" onclick="startInventoryNativeCameraFallback()" class="ml-2 underline text-white font-bold">Coba Lagi</button>`;
+    }
     showToast("Gagal mengakses kamera: " + (err.message || err), "error");
   }
 }
