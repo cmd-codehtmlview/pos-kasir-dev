@@ -748,14 +748,19 @@ let barcodeScannerAnimationId = null;
 let barcodeScannerTargetInputId = 'product-form-barcode';
 
 async function openBarcodeCameraScanner(targetInputId = 'product-form-barcode') {
-  // Verifikasi HTTPS untuk izin kamera browser modern
-  if (location.protocol === "http:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
-    const targetUrl = "https://" + (location.hostname === "2.27.165.72" ? "2.27.165.72.sslip.io" : location.hostname) + location.pathname + location.search + location.hash;
-    showToast("Akses kamera membutuhkan koneksi aman (HTTPS). Mengalihkan...", "info", 3000);
-    setTimeout(() => {
-      location.href = targetUrl;
-    }, 800);
-    return;
+  // Cek dukungan akses kamera browser
+  const hasMediaDevices = Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === "function");
+  if (!hasMediaDevices && location.protocol === "http:") {
+    if (location.hostname === "2.27.165.72" && (!location.port || location.port === "80")) {
+      const targetUrl = "https://2.27.165.72.sslip.io" + location.pathname + location.search + location.hash;
+      showToast("Akses kamera membutuhkan koneksi aman (HTTPS). Mengalihkan...", "info", 3000);
+      setTimeout(() => {
+        location.href = targetUrl;
+      }, 800);
+      return;
+    } else {
+      showToast("Akses kamera membutuhkan HTTPS atau localhost pada browser Anda.", "warning", 4000);
+    }
   }
 
   barcodeScannerTargetInputId = targetInputId;
@@ -769,6 +774,9 @@ async function openBarcodeCameraScanner(targetInputId = 'product-form-barcode') 
   if (loading) loading.classList.remove('hidden');
   if (statusEl) statusEl.textContent = 'Menyiapkan kamera...';
   if (video) video.classList.add('hidden');
+
+  // Berikan jeda kecil agar DOM modal selesai ter-render
+  await new Promise(resolve => setTimeout(resolve, 120));
 
   // Prioritas 1: Html5Qrcode (ZXing decoder lintas browser untuk EAN-13, UPC, Code 128, QR, dll.)
   if (typeof Html5Qrcode !== "undefined") {
@@ -792,37 +800,61 @@ async function openBarcodeCameraScanner(targetInputId = 'product-form-barcode') 
         });
       }
 
-      let cameraConfig = { facingMode: "environment" };
+      let availableCameras = [];
       try {
-        const cameras = await Html5Qrcode.getCameras();
-        if (cameras && cameras.length > 0) {
-          const backCam = cameras.find(c => /back|rear|belakang|environment/i.test(c.label));
-          cameraConfig = backCam ? backCam.id : cameras[0].id;
-        }
+        availableCameras = await Html5Qrcode.getCameras() || [];
       } catch (camErr) {
         console.warn("Enumerasi kamera inventory fallback:", camErr);
       }
 
-      await inventoryHtml5QrCode.start(
-        cameraConfig,
-        {
-          fps: 20,
-          qrbox: (w, h) => {
-            const bw = Math.min(Math.round(w * 0.9), 350);
-            const bh = Math.min(Math.round(h * 0.65), 200);
-            return { width: Math.max(bw, 200), height: Math.max(bh, 120) };
-          },
-          aspectRatio: 1.333333
-        },
-        (decodedText) => {
-          onInventoryBarcodeScanned(decodedText);
-        },
-        () => {}
-      );
+      // Susun konfigurasi kamera bertahap
+      const configsToTry = [];
+      if (availableCameras.length > 0) {
+        const backCam = availableCameras.find(c => /back|rear|belakang|environment/i.test(c.label));
+        if (backCam) configsToTry.push(backCam.id);
+      }
+      configsToTry.push({ facingMode: "environment" });
+      configsToTry.push({ facingMode: "user" });
+      if (availableCameras.length > 0) {
+        configsToTry.push(availableCameras[0].id);
+      }
 
-      if (loading) loading.classList.add('hidden');
-      if (statusEl) statusEl.textContent = 'Arahkan barcode ke kotak pemindai...';
-      return;
+      let started = false;
+      let lastErr = null;
+      for (const cfg of configsToTry) {
+        try {
+          await inventoryHtml5QrCode.start(
+            cfg,
+            {
+              fps: 20,
+              qrbox: (w, h) => {
+                const bw = Math.min(Math.round(w * 0.9), 350);
+                const bh = Math.min(Math.round(h * 0.65), 200);
+                return { width: Math.max(bw, 200), height: Math.max(bh, 120) };
+              },
+              aspectRatio: 1.333333
+            },
+            (decodedText) => {
+              onInventoryBarcodeScanned(decodedText);
+            },
+            () => {}
+          );
+          started = true;
+          break;
+        } catch (startErr) {
+          lastErr = startErr;
+          console.warn("Gagal start inventory camera dengan config:", cfg, startErr);
+          try { await inventoryHtml5QrCode.stop(); } catch(e){}
+        }
+      }
+
+      if (started) {
+        if (loading) loading.classList.add('hidden');
+        if (statusEl) statusEl.textContent = 'Arahkan barcode ke kotak pemindai...';
+        return;
+      } else {
+        throw lastErr || new Error("Gagal mengaktifkan kamera inventory.");
+      }
     } catch (err) {
       console.warn("Html5Qrcode gagal di inventory, beralih ke native fallback:", err);
       if (inventoryHtml5QrCode) {

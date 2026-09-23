@@ -609,7 +609,7 @@ function downloadDatabaseBackup() {
   const backup = {
     backupDate: new Date().toISOString(),
     version: "2.0.0-retail",
-    settings: currentPos.settings,
+    settings: currentPos.settings || {},
     products: currentPos.products || [],
     transactions: currentPos.transactions || [],
     mutations: currentPos.mutations || [],
@@ -620,21 +620,32 @@ function downloadDatabaseBackup() {
     klerkHistory: currentPos.klerkHistory || []
   };
 
-  const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup, null, 2));
-  const link = document.createElement("a");
-  link.setAttribute("href", str);
-  link.setAttribute("download", `Backup_SnackPOS_Retail_${new Date().toISOString().split("T")[0]}.json`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  try {
+    const jsonStr = JSON.stringify(backup, null, 2);
+    const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const today = new Date().toISOString().split("T")[0];
+    link.href = url;
+    link.download = `Backup_SnackPOS_Retail_${today}.json`;
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 500);
 
-  if (typeof showToast === "function") {
-    showToast("💾 File backup database (.json) berhasil diunduh!", "success");
+    if (typeof showToast === "function") {
+      showToast("💾 Cadangan database (.json) berhasil diunduh!", "success");
+    }
+  } catch (err) {
+    console.error("Gagal mendownload backup:", err);
+    alert("Gagal mengunduh file cadangan: " + err.message);
   }
 }
 
 function restoreDatabaseBackup(event) {
-  const file = event.target.files[0];
+  const file = event.target.files && event.target.files[0];
   if (!file) return;
 
   const currentPos = window.pos || pos;
@@ -644,9 +655,15 @@ function restoreDatabaseBackup(event) {
   reader.onload = function(e) {
     try {
       const parsed = JSON.parse(e.target.result);
-      if (!parsed.products || !parsed.settings) throw new Error("Format file JSON tidak valid!");
+      if (!parsed.products || !parsed.settings) {
+        throw new Error("Format file JSON cadangan tidak valid!");
+      }
 
-      if (confirm(`Pulihkan data dari backup ${parsed.backupDate || 'ini'}?\n\n• Produk: ${(parsed.products || []).length} SKU\n• Transaksi: ${(parsed.transactions || []).length} struk\n\nPerhatian: Data saat ini akan digantikan oleh file cadangan.`)) {
+      const prodCount = (parsed.products || []).length;
+      const trxCount = (parsed.transactions || []).length;
+      const dateStr = parsed.backupDate ? parsed.backupDate.split("T")[0] : "Lokal";
+
+      if (confirm(`Pulihkan data dari backup (${dateStr})?\n\n• Produk: ${prodCount} SKU\n• Transaksi: ${trxCount} struk\n\nPerhatian: Data lokal saat ini akan digantikan oleh isi file cadangan ini.`)) {
         currentPos.products = parsed.products || [];
         currentPos.settings = { ...currentPos.settings, ...parsed.settings };
         currentPos.transactions = parsed.transactions || [];
@@ -674,14 +691,17 @@ function restoreDatabaseBackup(event) {
         if (typeof renderInventoryTable === "function") renderInventoryTable();
         if (typeof initSupabase === "function") initSupabase();
 
-        if (typeof showToast === "function") showToast("Database berhasil dipulihkan dari file backup!", "success");
+        if (typeof showToast === "function") showToast("✅ Database lokal berhasil dipulihkan!", "success");
         if (window.sfx && typeof window.sfx.success === "function") window.sfx.success();
 
-        // Refresh count badge jika modal backup terbuka
+        // Refresh ringkasan di modal backup jika masih terbuka
         if (typeof initSisBackupModal === "function") initSisBackupModal();
       }
     } catch (err) {
       alert("Gagal membaca file backup: " + err.message);
+    } finally {
+      // Reset input agar bisa pilih file yang sama kembali jika diperlukan
+      event.target.value = "";
     }
   };
   reader.readAsText(file);

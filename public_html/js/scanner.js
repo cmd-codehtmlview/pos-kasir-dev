@@ -141,15 +141,20 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
   // Simpan callback kustom jika dipanggil dari modul luar (misal: SIS Logistik Gudang)
   activeScannerCustomCallback = typeof customCallback === "function" ? customCallback : null;
 
-  // Verifikasi HTTPS untuk izin kamera modern (kecuali localhost / local IP)
-  const isLocalIp = location.hostname.startsWith("192.168.") || location.hostname.startsWith("10.") || location.hostname.startsWith("172.");
-  if (location.protocol === "http:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1" && !isLocalIp) {
-    const targetUrl = "https://" + (location.hostname === "2.27.165.72" ? "2.27.165.72.sslip.io" : location.hostname) + location.pathname + location.search + location.hash;
-    showToast("Akses kamera membutuhkan koneksi aman (HTTPS). Mengalihkan...", "info", 3000);
-    setTimeout(() => {
-      location.href = targetUrl;
-    }, 800);
-    return;
+  // Cek dukungan akses kamera browser
+  const hasMediaDevices = Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === "function");
+  if (!hasMediaDevices && location.protocol === "http:") {
+    // Hanya alihkan ke HTTPS jika di host server default tanpa port kustom
+    if (location.hostname === "2.27.165.72" && (!location.port || location.port === "80")) {
+      const targetUrl = "https://2.27.165.72.sslip.io" + location.pathname + location.search + location.hash;
+      showToast("Akses kamera membutuhkan koneksi aman (HTTPS). Mengalihkan...", "info", 3000);
+      setTimeout(() => {
+        location.href = targetUrl;
+      }, 800);
+      return;
+    } else {
+      showToast("Akses kamera membutuhkan HTTPS atau localhost pada browser Anda.", "warning", 4000);
+    }
   }
 
   // Hanya alihkan tab jika bukan pemanggilan kustom dari modal (misal: bukan dari SIS)
@@ -195,6 +200,9 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
   const torchLabel = document.getElementById("label-pos-scanner-torch");
   if (torchLabel) torchLabel.textContent = "Senter";
 
+  // Berikan jeda kecil agar DOM modal selesai ter-render dengan dimensi sebenarnya
+  await new Promise(resolve => setTimeout(resolve, 120));
+
   // Prioritas 1: Gunakan library Html5Qrcode jika tersedia
   if (typeof Html5Qrcode !== "undefined") {
     try {
@@ -217,7 +225,7 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
         });
       }
 
-      // Ambil daftar kamera
+      // Ambil daftar kamera jika diizinkan
       try {
         const cameras = await Html5Qrcode.getCameras();
         posScannerAvailableCameras = cameras || [];
@@ -226,20 +234,21 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
         posScannerAvailableCameras = [];
       }
 
-      // Konfigurasi kamera belakang (environment)
-      let cameraConfig = { facingMode: "environment" };
+      // Susun konfigurasi kamera bertahap (cascade fallback)
+      const configsToTry = [];
       if (posScannerAvailableCameras.length > 0) {
-        // Cari kamera belakang secara eksplisit
         const backCamIndex = posScannerAvailableCameras.findIndex(c => 
           /back|rear|belakang|environment/i.test(c.label)
         );
         if (backCamIndex >= 0) {
           posScannerCurrentCameraIndex = backCamIndex;
-          cameraConfig = posScannerAvailableCameras[backCamIndex].id;
-        } else {
-          posScannerCurrentCameraIndex = 0;
-          cameraConfig = posScannerAvailableCameras[0].id;
+          configsToTry.push(posScannerAvailableCameras[backCamIndex].id);
         }
+      }
+      configsToTry.push({ facingMode: "environment" });
+      configsToTry.push({ facingMode: "user" });
+      if (posScannerAvailableCameras.length > 0) {
+        configsToTry.push(posScannerAvailableCameras[0].id);
       }
 
       const scanConfig = {
@@ -247,21 +256,37 @@ async function openPosCameraScanner(customCallback = null, customTitle = null) {
         qrbox: (viewfinderWidth, viewfinderHeight) => {
           const width = Math.min(Math.round(viewfinderWidth * 0.9), 360);
           const height = Math.min(Math.round(viewfinderHeight * 0.65), 220);
-          return { width: Math.max(width, 220), height: Math.max(height, 140) };
+          return { width: Math.max(width, 200), height: Math.max(height, 120) };
         },
         aspectRatio: 1.333333
       };
 
-      await posHtml5QrCode.start(
-        cameraConfig,
-        scanConfig,
-        onPosBarcodeDetected,
-        () => {} // abaikan frame error wajar saat mencari barcode
-      );
+      let started = false;
+      let lastErr = null;
+      for (const cfg of configsToTry) {
+        try {
+          await posHtml5QrCode.start(
+            cfg,
+            scanConfig,
+            onPosBarcodeDetected,
+            () => {} // abaikan frame error wajar saat mencari barcode
+          );
+          started = true;
+          break;
+        } catch (startErr) {
+          lastErr = startErr;
+          console.warn("Gagal membuka kamera dengan opsi:", cfg, startErr);
+          try { await posHtml5QrCode.stop(); } catch(e){}
+        }
+      }
 
-      posScannerIsScanning = true;
-      if (loadingEl) loadingEl.classList.add("hidden");
-      return;
+      if (started) {
+        posScannerIsScanning = true;
+        if (loadingEl) loadingEl.classList.add("hidden");
+        return;
+      } else {
+        throw lastErr || new Error("Gagal mengaktifkan kamera dengan semua opsi.");
+      }
     } catch (err) {
       console.warn("Html5Qrcode start error, mencoba native fallback:", err);
       if (posHtml5QrCode) {

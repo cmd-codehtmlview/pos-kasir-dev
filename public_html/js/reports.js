@@ -499,7 +499,7 @@ function exportTransactionsCSV() {
   link.click();
   document.body.removeChild(link);
 
-  showToast(isAuth ? "File Laporan CSV berhasil diunduh!" : "Laporan CSV diunduh (Nominal rupiah disensor untuk kasir)", "success");
+  showToast(isAuth ? "File Laporan Excel/CSV berhasil diunduh!" : "Laporan Excel/CSV diunduh (Nominal rupiah disensor untuk kasir)", "success");
 }
 
 function exportTransactionsToExcel() {
