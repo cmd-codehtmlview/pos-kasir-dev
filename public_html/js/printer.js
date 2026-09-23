@@ -123,6 +123,7 @@ class BluetoothPrintSpooler {
               await bluetoothPrinterCharacteristic.writeValueWithResponse(chunk);
             }
             writeSuccess = true;
+            lastBleWriteTime = Date.now();
             break;
           } catch (e) {
             lastErr = e;
@@ -670,7 +671,42 @@ function scheduleSmartBluetoothReconnect() {
   }, reconnectBackoffMs);
 }
 
-// Watchdog background: menjaga koneksi tetap hidup secara pasif tanpa membanjiri printer dengan byte dummy
+// Timestamp pengiriman data BLE terakhir untuk meminimalkan transmisi heartbeat
+let lastBleWriteTime = Date.now();
+
+/**
+ * Keep-Alive Heartbeat (Anti-Putus):
+ * Mengirim 1 byte NUL (0x00) non-printing tiap 18-25 detik saat printer idle
+ * agar modul BLE onboard printer thermal (VSC, Panda, MPT, dsb.) tidak masuk ke mode sleep / memutus link
+ */
+async function sendBluetoothKeepAlive() {
+  if (!isBluetoothConnected() || !bluetoothPrinterCharacteristic) return;
+  if (isConnectingBluetooth || isUserExplicitlyDisconnected) return;
+
+  // Jika baru ada transaksi cetak dalam 14 detik terakhir, lewati ping
+  if (Date.now() - lastBleWriteTime < 14000) return;
+
+  try {
+    const nulByte = new Uint8Array([0x00]);
+    if (bluetoothPrinterCharacteristic.properties && bluetoothPrinterCharacteristic.properties.writeWithoutResponse) {
+      if (typeof bluetoothPrinterCharacteristic.writeValueWithoutResponse === 'function') {
+        await bluetoothPrinterCharacteristic.writeValueWithoutResponse(nulByte);
+      } else if (typeof bluetoothPrinterCharacteristic.writeValue === 'function') {
+        await bluetoothPrinterCharacteristic.writeValue(nulByte);
+      }
+    } else if (typeof bluetoothPrinterCharacteristic.writeValue === 'function') {
+      await bluetoothPrinterCharacteristic.writeValue(nulByte);
+    }
+    lastBleWriteTime = Date.now();
+  } catch (e) {
+    // Jika pengiriman ping gagal, cek apakah link hardware sudah terputus
+    if (bluetoothPrinterDevice && bluetoothPrinterDevice.gatt && !bluetoothPrinterDevice.gatt.connected) {
+      onBluetoothDisconnected();
+    }
+  }
+}
+
+// Watchdog background: menjaga koneksi tetap hidup aktif via heartbeat ringan tanpa membebani kasir
 function startBluetoothAutoReconnectWatchdog() {
   if (bluetoothAutoReconnectTimer) clearInterval(bluetoothAutoReconnectTimer);
 
@@ -682,19 +718,19 @@ function startBluetoothAutoReconnectWatchdog() {
 
     if (!isBluetoothConnected()) {
       if (bluetoothPrinterDevice || (pos?.settings?.lastPrinterName && typeof navigator !== 'undefined' && navigator.bluetooth?.getDevices)) {
-        console.log("[Bluetooth Watchdog] Mencoba auto-reconnect printer di latar belakang...");
         await ensureBluetoothConnected(true);
       }
     } else {
-      // MONITOR PASIF: Jika hardware GATT terputus di level OS, tangani segera
+      // MONITOR AKTIF: Cek status GATT OS dan kirim heartbeat
       if (bluetoothPrinterDevice && bluetoothPrinterDevice.gatt && !bluetoothPrinterDevice.gatt.connected) {
-        console.warn("[Bluetooth Watchdog] Terdeteksi GATT server terputus.");
         bluetoothPrinterCharacteristic = null;
         updatePrinterStatusBadge();
         scheduleSmartBluetoothReconnect();
+      } else {
+        await sendBluetoothKeepAlive();
       }
     }
-  }, 12000); // interval aman 12 detik
+  }, 18000); // Tiap 18 detik: aman, stabil, dan jauh di bawah ambang timeout 30s printer
 }
 
 // Event listener saat kasir kembali ke tab (setelah layar tablet mati / berpindah aplikasi)
