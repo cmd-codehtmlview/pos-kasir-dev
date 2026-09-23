@@ -203,8 +203,6 @@ function handleLogisticsScannedBarcode(scannedCode, context) {
     const barcodeInput = document.getElementById('sis-prod-barcode');
     if (barcodeInput) {
       barcodeInput.value = code;
-      const nameInput = document.getElementById('sis-prod-name');
-      if (nameInput) nameInput.focus();
     }
     const catalog = getLogisticsCatalog('products');
     const existing = catalog.find(p => p.barcode === code);
@@ -244,8 +242,6 @@ function handleLogisticsScannedBarcode(scannedCode, context) {
         resetSisProductForm();
         const barcodeInput = document.getElementById('sis-prod-barcode');
         if (barcodeInput) barcodeInput.value = code;
-        const nameInput = document.getElementById('sis-prod-name');
-        if (nameInput) nameInput.focus();
       }, 300);
       return;
     }
@@ -262,7 +258,6 @@ function handleLogisticsScannedBarcode(scannedCode, context) {
     const input = inputId ? document.getElementById(inputId) : null;
     if (input) {
       input.value = code;
-      input.focus();
       handleLogisticsSearch(code, context);
     }
     if (typeof showToast === 'function') {

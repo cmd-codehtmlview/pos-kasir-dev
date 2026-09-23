@@ -7615,12 +7615,12 @@
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h3 class="font-black text-sm sm:text-base uppercase tracking-wider text-emerald-300">Scan Barcode Kasir</h3>
+              <h3 id="pos-camera-scanner-title" class="font-black text-sm sm:text-base uppercase tracking-wider text-emerald-300">Scan Barcode Kasir</h3>
               <span id="pos-camera-mode-badge" class="px-2 py-0.5 text-[9px] font-black uppercase rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 animate-pulse">
                 Multi-Scan ON
               </span>
             </div>
-            <p class="text-[11px] text-slate-400">Arahkan kamera ke barcode kemasan produk snack / minuman.</p>
+            <p id="pos-camera-scanner-subtitle" class="text-[11px] text-slate-400">Arahkan kamera ke barcode kemasan produk snack / minuman.</p>
           </div>
         </div>
         <button type="button" onclick="closePosCameraScanner()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold flex items-center justify-center transition-all cursor-pointer">✕</button>
@@ -7723,6 +7723,7 @@
         </button>
 
         <button 
+          id="pos-scanner-pay-btn"
           type="button" 
           onclick="finishPosScanningAndPay()" 
           class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white text-xs font-black rounded-xl shadow-lg shadow-emerald-950/50 transition-all cursor-pointer flex items-center gap-1.5"
@@ -8866,7 +8867,7 @@
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=123"></script>
+  <script src="js/scanner.js?v=127"></script>
   <script src="js/cart.js?v=106"></script>
   <script src="js/printer.js?v=126"></script>
   <script src="js/checkout.js?v=109"></script>
@@ -8884,7 +8885,7 @@
   
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=118"></script>
-  <script src="js/sis-logistics.js?v=100"></script>
+  <script src="js/sis-logistics.js?v=101"></script>
   <script src="js/sis-cashier-ops.js?v=100"></script>
   <script src="js/sis-store-crm.js?v=100"></script>
   <script src="js/sis-analytics.js?v=100"></script>
@@ -10564,7 +10565,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=122')
+          navigator.serviceWorker.register('./sw.js?v=123')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

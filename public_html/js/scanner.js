@@ -134,11 +134,16 @@ let posScannerLastTime = 0;
 let posScannerFeedbackTimeout = null;
 const POS_SCANNER_COOLDOWN_MS = 1400;
 
+// Callback custom saat scanner dibuka dari menu SIS Logistik (LPB, SO, Repack, Master Produk, dll)
+let activeScannerCustomCallback = null;
+
 // Fallback native stream jika Html5Qrcode tidak tersedia
 let posNativeCameraStream = null;
 let posNativeAnimationId = null;
 
-async function openPosCameraScanner() {
+async function openPosCameraScanner(customCallback = null, customTitle = null) {
+  activeScannerCustomCallback = typeof customCallback === "function" ? customCallback : null;
+
   // Verifikasi HTTPS untuk izin kamera modern
   if (location.protocol === "http:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
     const targetUrl = "https://" + (location.hostname === "2.27.165.72" ? "2.27.165.72.sslip.io" : location.hostname) + location.pathname + location.search + location.hash;
@@ -149,13 +154,40 @@ async function openPosCameraScanner() {
     return;
   }
 
-  // Pastikan berada di tab Kasir POS
-  if (typeof switchTab === "function") {
+  // Jika bukan mode logistik/custom, pastikan berada di tab Kasir POS
+  if (!activeScannerCustomCallback && typeof switchTab === "function") {
     switchTab("tab-pos");
   }
 
+  // Atur teks header, badge mode, bilah keranjang, dan tombol bayar
+  const titleEl = document.getElementById("pos-camera-scanner-title");
+  const subtitleEl = document.getElementById("pos-camera-scanner-subtitle");
+  const modeBadge = document.getElementById("pos-camera-mode-badge");
+  const cartBar = document.getElementById("pos-scanner-cart-bar");
+  const payBtn = document.getElementById("pos-scanner-pay-btn");
+
+  if (activeScannerCustomCallback) {
+    if (titleEl) titleEl.textContent = customTitle || "Scan Barcode Logistik";
+    if (subtitleEl) subtitleEl.textContent = "Arahkan kamera ke barcode kemasan produk untuk proses logistik.";
+    if (modeBadge) {
+      modeBadge.textContent = "Mode Logistik";
+      modeBadge.className = "px-2 py-0.5 text-[9px] font-black uppercase rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30";
+    }
+    if (cartBar) cartBar.classList.add("hidden");
+    if (payBtn) payBtn.classList.add("hidden");
+  } else {
+    if (titleEl) titleEl.textContent = "Scan Barcode Kasir";
+    if (subtitleEl) subtitleEl.textContent = "Arahkan kamera ke barcode kemasan produk snack / minuman.";
+    if (modeBadge) {
+      modeBadge.textContent = posScannerMultiScanMode ? "Multi-Scan ON" : "1x Scan Mode";
+      modeBadge.className = "px-2 py-0.5 text-[9px] font-black uppercase rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 animate-pulse";
+    }
+    if (cartBar) cartBar.classList.remove("hidden");
+    if (payBtn) payBtn.classList.remove("hidden");
+    updatePosScannerCartSummary();
+  }
+
   openModal("modal-pos-camera-scanner");
-  updatePosScannerCartSummary();
 
   const loadingEl = document.getElementById("pos-camera-scanner-loading");
   const readerEl = document.getElementById("pos-camera-scanner-reader");
@@ -342,6 +374,19 @@ function onPosBarcodeDetected(decodedText) {
     sfx.beep();
   }
 
+  // Jika ini adalah custom callback dari SIS Logistik (LPB, SO, Repack, Master Produk, Label, Waste)
+  if (typeof activeScannerCustomCallback === "function") {
+    const cb = activeScannerCustomCallback;
+    activeScannerCustomCallback = null;
+    closePosCameraScanner();
+    try {
+      cb(code);
+    } catch (err) {
+      console.error("[SIS Camera] Callback error:", err);
+    }
+    return;
+  }
+
   // Proses masukkan produk ke keranjang kasir
   processScannedBarcode(code);
 
@@ -435,6 +480,18 @@ async function closePosCameraScanner() {
   if (readerEl) readerEl.innerHTML = "";
 
   closeModal("modal-pos-camera-scanner");
+
+  activeScannerCustomCallback = null;
+
+  // Pulihkan tampilan bilah ringkasan kasir, tombol bayar, dan judul ke mode kasir default
+  const cartBar = document.getElementById("pos-scanner-cart-bar");
+  if (cartBar) cartBar.classList.remove("hidden");
+  const payBtn = document.getElementById("pos-scanner-pay-btn");
+  if (payBtn) payBtn.classList.remove("hidden");
+  const titleEl = document.getElementById("pos-camera-scanner-title");
+  if (titleEl) titleEl.textContent = "Scan Barcode Kasir";
+  const subtitleEl = document.getElementById("pos-camera-scanner-subtitle");
+  if (subtitleEl) subtitleEl.textContent = "Arahkan kamera ke barcode kemasan produk snack / minuman.";
 
   // Pastikan keyboard virtual tetap tertutup
   if (document.activeElement && typeof document.activeElement.blur === 'function') {
