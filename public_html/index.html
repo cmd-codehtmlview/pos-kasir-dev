@@ -2385,7 +2385,7 @@
               <div class="w-10 flex items-center justify-center shrink-0">
                 <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shadow-2xs">🔐</span>
               </div>
-              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">PIN Otorisasi Kasir</span>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Ganti PIN Saya</span>
             </div>
             <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
@@ -3925,54 +3925,64 @@
     </div>
   </div>
 
-  <!-- ================= 12. MODAL SETTING PIN OTORISASI ================= -->
+  <!-- ================= 12. MODAL GANTI PIN SAYA (KASIR AKTIF) ================= -->
   <div id="sis-modal-pin" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-[60] hidden flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-amber-200/80 overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="px-5 py-4 bg-amber-50/80 border-b border-amber-200/80 flex items-center justify-between">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-5 py-4 bg-white border-b border-slate-200/90 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 border border-amber-200/80 flex items-center justify-center text-base shrink-0 shadow-2xs">
+          <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center text-base shrink-0 shadow-2xs">
             🔐
           </div>
           <div>
-            <h3 class="font-extrabold text-sm text-slate-900 tracking-tight">Setting PIN Otorisasi Kasir</h3>
-            <p class="text-[11px] text-slate-500 font-medium">Keamanan Approval Void, Retur, & Stock Opname</p>
+            <h3 class="font-extrabold text-sm text-slate-900 tracking-tight">Ganti PIN Saya</h3>
+            <p class="text-[11px] text-slate-500 font-medium">Ubah PIN pribadi kasir yang sedang aktif bertugas</p>
           </div>
         </div>
         <button onclick="closeSisModal('sis-modal-pin')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 font-bold flex items-center justify-center text-xs transition cursor-pointer border border-slate-200/60 active:scale-95">✕</button>
       </div>
 
       <div class="p-4 space-y-3.5 text-xs">
-        <div>
-          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">PIN Pejabat Toko (COS / Supervisor) *</label>
-          <input type="password" id="sis-pin-cos" value="1234" maxlength="8" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-black text-slate-900 text-center tracking-widest text-base focus:outline-none focus:border-amber-500" />
-        </div>
-        <div>
-          <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">PIN Asisten Toko (ACOS) *</label>
-          <input type="password" id="sis-pin-acos" value="5678" maxlength="8" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-black text-slate-900 text-center tracking-widest text-base focus:outline-none focus:border-amber-500" />
-        </div>
-
-        <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
-          <span class="font-bold text-slate-800 text-xs uppercase tracking-wider block">Matriks Tindakan Butuh PIN:</span>
-          <div class="space-y-1 text-[11px]">
-            <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200/80">
-              <span class="font-bold text-slate-800">Batal Item / Void</span>
-              <span class="text-emerald-700 font-bold text-[10px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">COS / ACOS</span>
-            </div>
-            <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200/80">
-              <span class="font-bold text-slate-800">Retur Transaksi</span>
-              <span class="text-emerald-700 font-bold text-[10px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">COS / ACOS</span>
-            </div>
-            <div class="flex items-center justify-between p-2 bg-white rounded-lg border border-slate-200/80">
-              <span class="font-bold text-slate-800">Stock Opname</span>
-              <span class="text-indigo-700 font-bold text-[10px] bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">Khusus COS</span>
+        <!-- Info Profil Kasir Aktif -->
+        <div id="sis-self-pin-user-card" class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 flex items-center justify-center text-sm shrink-0">👤</span>
+            <div class="min-w-0">
+              <span id="sis-self-pin-name" class="font-bold text-slate-900 text-xs block truncate">-</span>
+              <span id="sis-self-pin-nik" class="text-[10px] text-slate-500 font-mono block">NIK: -</span>
             </div>
           </div>
+          <span id="sis-self-pin-role" class="px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-800 font-black text-[10px] uppercase tracking-wider shrink-0">CREW</span>
+        </div>
+
+        <div id="sis-self-pin-form" class="space-y-3">
+          <div>
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">PIN Saat Ini (PIN Lama) *</label>
+            <input type="password" id="sis-self-pin-old" maxlength="8" placeholder="Masukkan PIN saat ini" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center tracking-widest text-sm focus:outline-none focus:border-slate-800" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">PIN Baru (4 - 8 Angka) *</label>
+            <input type="password" id="sis-self-pin-new" maxlength="8" placeholder="Masukkan PIN baru" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center tracking-widest text-sm focus:outline-none focus:border-slate-800" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Konfirmasi PIN Baru *</label>
+            <input type="password" id="sis-self-pin-confirm" maxlength="8" placeholder="Ketik ulang PIN baru" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-center tracking-widest text-sm focus:outline-none focus:border-slate-800" />
+          </div>
+
+          <div class="p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-[10px] text-slate-500 flex items-start gap-2">
+            <span class="text-xs">💡</span>
+            <span>PIN digunakan untuk login shift kasir dan otorisasi mandiri sesuai hak akses Anda. Jangan berikan PIN Anda kepada orang lain.</span>
+          </div>
+        </div>
+
+        <div id="sis-self-pin-no-user" class="hidden p-4 bg-amber-50 border border-amber-200 rounded-2xl text-center space-y-2">
+          <p class="text-amber-800 font-bold text-xs">Belum ada kasir yang login saat ini.</p>
+          <p class="text-slate-500 text-[11px]">Silakan lakukan login kasir terlebih dahulu untuk mengganti PIN pribadi Anda.</p>
         </div>
       </div>
 
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-pin')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
-        <button onclick="saveSisPin()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
+        <button id="sis-self-pin-submit-btn" onclick="saveSisSelfPin()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
           💾 Simpan PIN Baru
         </button>
       </div>
@@ -10710,7 +10720,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=133')
+          navigator.serviceWorker.register('./sw.js?v=134')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

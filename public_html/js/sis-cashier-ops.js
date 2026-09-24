@@ -539,64 +539,146 @@ function printSisCashDropSlip(dropRecord) {
 
 
 // =========================================================================
-// 3. SIS SETTING PIN OTORISASI SUPERVISOR (#sis-modal-pin)
+// 3. SIS GANTI PIN PRIBADI KASIR (SELF PIN) (#sis-modal-pin)
 // =========================================================================
 
 function initSisPinModal() {
-  const cosInput = document.getElementById('sis-pin-cos');
-  const acosInput = document.getElementById('sis-pin-acos');
+  const userCard = document.getElementById('sis-self-pin-user-card');
+  const formEl = document.getElementById('sis-self-pin-form');
+  const noUserEl = document.getElementById('sis-self-pin-no-user');
+  const submitBtn = document.getElementById('sis-self-pin-submit-btn');
 
-  const settings = (pos && pos.settings) ? pos.settings : {};
-  const cosPin = settings.supervisorPin || settings.cosPin || "1234";
-  const acosPin = settings.acosPin || "5678";
+  const nameEl = document.getElementById('sis-self-pin-name');
+  const nikEl = document.getElementById('sis-self-pin-nik');
+  const roleEl = document.getElementById('sis-self-pin-role');
 
-  if (cosInput) cosInput.value = cosPin;
-  if (acosInput) acosInput.value = acosPin;
+  const oldPinInput = document.getElementById('sis-self-pin-old');
+  const newPinInput = document.getElementById('sis-self-pin-new');
+  const confirmPinInput = document.getElementById('sis-self-pin-confirm');
+
+  if (oldPinInput) oldPinInput.value = '';
+  if (newPinInput) newPinInput.value = '';
+  if (confirmPinInput) confirmPinInput.value = '';
+
+  const activeUser = (window.pos && pos.currentUser) ? pos.currentUser : null;
+
+  if (!activeUser) {
+    if (userCard) userCard.classList.add('hidden');
+    if (formEl) formEl.classList.add('hidden');
+    if (noUserEl) noUserEl.classList.remove('hidden');
+    if (submitBtn) submitBtn.classList.add('hidden');
+    return;
+  }
+
+  if (userCard) userCard.classList.remove('hidden');
+  if (formEl) formEl.classList.remove('hidden');
+  if (noUserEl) noUserEl.classList.add('hidden');
+  if (submitBtn) submitBtn.classList.remove('hidden');
+
+  if (nameEl) nameEl.textContent = activeUser.name || 'Kasir';
+  if (nikEl) nikEl.textContent = `NIK: ${activeUser.nik || '-'}`;
+  if (roleEl) {
+    roleEl.textContent = activeUser.role || 'CREW';
+    if (activeUser.role === 'COS') {
+      roleEl.className = 'px-2 py-0.5 rounded-lg bg-red-100 text-red-800 font-black text-[10px] uppercase tracking-wider shrink-0';
+    } else if (activeUser.role === 'ACOS') {
+      roleEl.className = 'px-2 py-0.5 rounded-lg bg-blue-100 text-blue-800 font-black text-[10px] uppercase tracking-wider shrink-0';
+    } else {
+      roleEl.className = 'px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-800 font-black text-[10px] uppercase tracking-wider shrink-0';
+    }
+  }
+
+  setTimeout(() => {
+    if (oldPinInput) oldPinInput.focus();
+  }, 100);
 }
 
-function saveSisPin() {
-  const cosInput = document.getElementById('sis-pin-cos');
-  const acosInput = document.getElementById('sis-pin-acos');
-
-  const cosPin = (cosInput?.value || "").trim();
-  const acosPin = (acosInput?.value || "").trim();
-
-  if (!cosPin || cosPin.length < 4 || cosPin.length > 8 || !/^\d+$/.test(cosPin)) {
-    alert("PIN Pejabat Toko (COS) harus berupa 4 - 8 angka numerik!");
-    if (cosInput) cosInput.focus();
+function saveSisSelfPin() {
+  const activeUser = (window.pos && pos.currentUser) ? pos.currentUser : null;
+  if (!activeUser) {
+    alert("Belum ada kasir yang login saat ini!");
     return;
   }
 
-  if (!acosPin || acosPin.length < 4 || acosPin.length > 8 || !/^\d+$/.test(acosPin)) {
-    alert("PIN Asisten Toko (ACOS) harus berupa 4 - 8 angka numerik!");
-    if (acosInput) acosInput.focus();
+  const oldPinInput = document.getElementById('sis-self-pin-old');
+  const newPinInput = document.getElementById('sis-self-pin-new');
+  const confirmPinInput = document.getElementById('sis-self-pin-confirm');
+
+  const oldPin = (oldPinInput?.value || "").trim();
+  const newPin = (newPinInput?.value || "").trim();
+  const confirmPin = (confirmPinInput?.value || "").trim();
+
+  if (!oldPin) {
+    alert("Masukkan PIN lama Anda saat ini!");
+    if (oldPinInput) oldPinInput.focus();
     return;
   }
 
-  if (!pos || !pos.settings) {
-    alert("Pengaturan toko belum siap!");
+  // Verifikasi PIN lama harus sesuai dengan PIN aktif karyawan
+  if (String(activeUser.pin) !== String(oldPin)) {
+    alert("PIN lama yang Anda masukkan salah!");
+    if (oldPinInput) {
+      oldPinInput.value = '';
+      oldPinInput.focus();
+    }
     return;
   }
 
-  // Simpan ke pengaturan
-  pos.settings.supervisorPin = cosPin;
-  pos.settings.cosPin = cosPin;
-  pos.settings.acosPin = acosPin;
+  if (!newPin || newPin.length < 4 || newPin.length > 8 || !/^\d+$/.test(newPin)) {
+    alert("PIN Baru harus berupa 4 sampai 8 digit angka numerik!");
+    if (newPinInput) newPinInput.focus();
+    return;
+  }
 
-  // Sinkronkan ke data karyawan toko jika ada
+  if (newPin === oldPin) {
+    alert("PIN Baru tidak boleh sama dengan PIN Lama!");
+    if (newPinInput) newPinInput.focus();
+    return;
+  }
+
+  if (newPin !== confirmPin) {
+    alert("Konfirmasi PIN Baru tidak cocok! Mohon ketik ulang dengan benar.");
+    if (confirmPinInput) {
+      confirmPinInput.value = '';
+      confirmPinInput.focus();
+    }
+    return;
+  }
+
+  // Simpan PIN baru ke activeUser
+  activeUser.pin = newPin;
+  if (typeof pos.saveCurrentUser === 'function') {
+    pos.saveCurrentUser(activeUser);
+  }
+
+  // Sinkronkan ke daftar employees
   if (Array.isArray(pos.employees)) {
-    pos.employees.forEach(emp => {
-      if (emp.role === 'COS') emp.pin = cosPin;
-      if (emp.role === 'ACOS') emp.pin = acosPin;
-    });
-    try {
-      localStorage.setItem("snack_pos_employees", JSON.stringify(pos.employees));
-    } catch (e) {}
+    const emp = pos.employees.find(e => e.nik === activeUser.nik);
+    if (emp) {
+      emp.pin = newPin;
+    }
+    if (typeof pos.saveEmployees === 'function') {
+      pos.saveEmployees();
+    } else {
+      try {
+        localStorage.setItem("snack_pos_employees", JSON.stringify(pos.employees));
+      } catch (e) {}
+    }
   }
 
-  if (typeof pos.saveSettings === 'function') pos.saveSettings();
+  // Jika yang login adalah COS / ACOS, sinkronkan juga supervisorPin / acosPin
+  if (pos.settings) {
+    if (activeUser.role === 'COS') {
+      pos.settings.supervisorPin = newPin;
+      pos.settings.cosPin = newPin;
+      if (typeof pos.saveSettings === 'function') pos.saveSettings();
+    } else if (activeUser.role === 'ACOS') {
+      pos.settings.acosPin = newPin;
+      if (typeof pos.saveSettings === 'function') pos.saveSettings();
+    }
+  }
 
-  const toastMsg = `🔐 PIN Otorisasi Berhasil Diperbarui! COS: ${cosPin}, ACOS: ${acosPin}`;
+  const toastMsg = `🔐 PIN Anda berhasil diperbarui!`;
   if (typeof showMockupToast === 'function') {
     showMockupToast(toastMsg, 'success');
   } else if (typeof showToast === 'function') {
@@ -605,7 +687,6 @@ function saveSisPin() {
 
   closeSisModal('sis-modal-pin');
 }
-
 
 // Export to window
 if (typeof window !== 'undefined') {
@@ -627,5 +708,6 @@ if (typeof window !== 'undefined') {
   window.printSisCashDropSlip = printSisCashDropSlip;
 
   window.initSisPinModal = initSisPinModal;
-  window.saveSisPin = saveSisPin;
+  window.saveSisSelfPin = saveSisSelfPin;
+  window.saveSisPin = saveSisSelfPin; // Alias backward-compatibility
 }
