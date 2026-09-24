@@ -2424,17 +2424,14 @@
             </div>
             <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
-          <button type="button" onclick="exportTransactionsToExcel()" class="w-full px-4 py-3 hover:bg-emerald-50/80 active:bg-emerald-100/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+          <button type="button" onclick="exportTransactionsToExcel()" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
             <div class="flex items-center gap-3 min-w-0">
               <div class="w-10 flex items-center justify-center shrink-0">
-                <span class="w-8 h-8 rounded-lg bg-emerald-100 border border-emerald-200 text-emerald-800 flex items-center justify-center text-sm shadow-2xs">📥</span>
+                <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shadow-2xs">📥</span>
               </div>
-              <div class="truncate">
-                <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-emerald-700 transition truncate block">Ekspor Laporan Transaksi (Excel / XLS)</span>
-                <span class="text-[10px] text-slate-500 block truncate">Unduh file spreadsheet penjualan, item &amp; laba</span>
-              </div>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Ekspor Transaksi (Excel)</span>
             </div>
-            <span class="text-[11px] text-emerald-700 font-black group-hover:translate-x-0.5 transition shrink-0 bg-emerald-100 px-2 py-0.5 rounded-md">.XLSX</span>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
         </div>
       </div>
@@ -2480,17 +2477,14 @@
             </div>
             <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
-          <button type="button" onclick="openSisModal('sis-modal-backup')" class="w-full px-4 py-3 hover:bg-indigo-50/80 active:bg-indigo-100/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+          <button type="button" onclick="openSisModal('sis-modal-backup')" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
             <div class="flex items-center gap-3 min-w-0">
               <div class="w-10 flex items-center justify-center shrink-0">
-                <span class="w-8 h-8 rounded-lg bg-indigo-100 border border-indigo-200 text-indigo-800 flex items-center justify-center text-sm shadow-2xs">💾</span>
+                <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shadow-2xs">💾</span>
               </div>
-              <div class="truncate">
-                <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-indigo-700 transition truncate block">Cadangkan &amp; Pulihkan Data (Backup JSON)</span>
-                <span class="text-[10px] text-slate-500 block truncate">Backup offline JSON &amp; ekspor database lengkap</span>
-              </div>
+              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Backup &amp; Restore Data</span>
             </div>
-            <span class="text-[11px] text-indigo-700 font-black group-hover:translate-x-0.5 transition shrink-0 bg-indigo-100 px-2 py-0.5 rounded-md">.JSON</span>
+            <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
           <button type="button" onclick="openMockupAboutModal()" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
             <div class="flex items-center gap-3 min-w-0">
@@ -10716,7 +10710,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=132')
+          navigator.serviceWorker.register('./sw.js?v=133')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
