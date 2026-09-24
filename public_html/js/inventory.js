@@ -1479,6 +1479,12 @@ function preparePrintableLabels() {
 }
 
 async function executePrintLabelsBluetooth() {
+  const mode = pos?.settings?.printerDriverMode || 'bluetooth';
+  if (mode === 'system') {
+    executePrintLabelsSystem();
+    return;
+  }
+
   const selectedProducts = getSelectedProductsList();
   if (selectedProducts.length === 0) {
     alert('Harap pilih minimal 1 produk untuk dicetak!\n\nAnda dapat mencentang produk pada tabel katalog atau klik Pilih Semua.');

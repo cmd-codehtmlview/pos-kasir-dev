@@ -213,18 +213,20 @@ html, body {
    CONTAINER PRINT KHUSUS: WAJIB TERSEMBUNYI TOTAL DI LAYAR
    Mencegah bocornya desain struk/label di bawah menu kasir
    ========================================================= */
-#printable-receipt-container {
-  display: none !important;
-  visibility: hidden !important;
-  position: absolute !important;
-  left: -99999px !important;
-  top: -99999px !important;
-  width: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-  pointer-events: none !important;
-  opacity: 0 !important;
-  z-index: -9999 !important;
+@media screen {
+  #printable-receipt-container {
+    display: none !important;
+    visibility: hidden !important;
+    position: absolute !important;
+    left: -99999px !important;
+    top: -99999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    z-index: -9999 !important;
+  }
 }
 
 /* =========================================================

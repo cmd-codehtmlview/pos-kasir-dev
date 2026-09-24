@@ -1487,12 +1487,16 @@ async function printReceiptUniversal(transaction = null, isAuto = false) {
     }
   }
 
-  // Fallback: Dialog Cetak Sistem Browser (Kabel USB / PC) - jika mode adalah 'system'
-  if (!isAuto && mode === 'system') {
+  // Mode Cetak Dialog Sistem OS / Kabel USB
+  if (mode === 'system') {
+    if (isAuto && pos?.settings?.autoPrintReceipt === false) {
+      return;
+    }
     if (typeof preparePrintableReceipt === 'function') {
       preparePrintableReceipt(trx);
     }
     window.print();
+    return;
   }
 }
 
