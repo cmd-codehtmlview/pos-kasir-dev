@@ -471,15 +471,23 @@ function openReturReceiptModal(returRecord) {
   const is80 = pos.settings.paperWidth === "80mm";
   receiptContent.className = `thermal-receipt ${is80 ? 'width-80' : 'width-58'}`;
 
-  const itemsHtml = returRecord.items.map(item => `
+  const itemsHtml = (returRecord.items || []).map(item => {
+    const qty = item.returnQty || item.qty || 1;
+    const price = item.price || item.unitPrice || 0;
+    const subtotal = item.refundSubtotal || item.subtotal || (qty * price);
+    return `
     <div class="mb-1">
       <div class="font-bold text-left">${item.name}</div>
       <div class="flex justify-between text-slate-700">
-        <span>${item.returnQty} ${item.unit || 'pcs'} x ${formatAngka(item.price)}</span>
-        <span class="font-bold">${formatAngka(item.refundSubtotal)}</span>
+        <span>${qty} ${item.unit || 'pcs'} x ${formatAngka(price)}</span>
+        <span class="font-bold">${formatAngka(subtotal)}</span>
       </div>
     </div>
-  `).join("");
+  `;
+  }).join("");
+
+  const rDate = returRecord.date ? (returRecord.date.includes('T') ? new Date(returRecord.date).toLocaleDateString('id-ID') : returRecord.date) : '';
+  const rTime = returRecord.time || (returRecord.date && returRecord.date.includes('T') ? new Date(returRecord.date).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '');
 
   receiptContent.innerHTML = `
     <div class="text-center mb-2">
@@ -498,19 +506,19 @@ function openReturReceiptModal(returRecord) {
       </div>
       <div class="flex justify-between">
         <span>No. Struk Asal</span>
-        <span class="font-bold font-mono">${returRecord.originalTrxId}</span>
+        <span class="font-bold font-mono">${returRecord.originalTrxId || returRecord.originalInvoiceId || '-'}</span>
       </div>
       <div class="flex justify-between">
         <span>Waktu Retur</span>
-        <span>${returRecord.date} ${returRecord.time}</span>
+        <span>${rDate} ${rTime}</span>
       </div>
       <div class="flex justify-between">
         <span>Kasir / Shift</span>
-        <span>${returRecord.cashier} (${returRecord.shift})</span>
+        <span>${returRecord.cashier || 'Kasir'} (${returRecord.shift || '1'})</span>
       </div>
       <div class="flex justify-between">
         <span>Alasan Retur</span>
-        <span class="italic font-bold">${returRecord.reason}</span>
+        <span class="italic font-bold">${returRecord.reason || '-'}</span>
       </div>
       <div class="flex justify-between">
         <span>Status Stok Rak</span>

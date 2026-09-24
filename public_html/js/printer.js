@@ -1557,32 +1557,42 @@ function buildReturReceiptEscPos(returRecord) {
   if (storeAddress) builder.text(storeAddress).newline();
   if (storePhone) builder.text(storePhone).newline();
 
+  const d = returRecord.date ? new Date(returRecord.date) : new Date();
+  const dateStr = d.toLocaleDateString("id-ID");
+  const timeStr = returRecord.time || d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
   builder.lineDashed('=')
-    .bold(true)
-    .text("*** BUKTI RETUR PENJUALAN ***")
-    .newline()
-    .bold(false)
+    .bold(true);
+
+  if (is80) {
+    builder.text("*** BUKTI RETUR PENJUALAN ***").newline();
+  } else {
+    builder.text("*** BUKTI RETUR BARANG ***").newline();
+    builder.text("(NOTA RESTITUSI DANA)").newline();
+  }
+
+  builder.bold(false)
     .lineDashed('-')
     .alignLeft()
-    .lineLeftRight(`No. Retur : ${returRecord.id}`, `${returRecord.date || ''}`)
-    .lineLeftRight(`Struk Asal: ${returRecord.originalTrxId}`, `${returRecord.time || ''}`)
-    .lineLeftRight(`Kasir     : ${returRecord.cashier || 'Kasir'}`, `Shift: ${returRecord.shift || '1'}`)
-    .lineLeftRight(`Toko      : ${storeCode}`, `POS  : ${posNumber}`)
+    .lineLeftRight(`Tgl: ${dateStr}`, timeStr)
+    .text(`No.Retur  : ${returRecord.id}`).newline()
+    .text(`Struk Asal: ${returRecord.originalTrxId || returRecord.originalInvoiceId || '-'}`).newline()
+    .lineLeftRight(`Kasir     : ${(returRecord.cashier || 'Kasir').slice(0, 14)}`, `Shift: ${returRecord.shift || '1'}`)
     .lineDashed('-');
 
   // 2. KETERANGAN & ALASAN RETUR
-  builder.text(`Alasan: ${returRecord.reason || 'Kemasan Rusak / Salah Beli'}`).newline();
-  builder.text(`Stok  : ${returRecord.restocked ? 'Stok Bertambah (Restok)' : 'Tidak Direstok'}`).newline();
+  builder.text(`Alasan: ${(returRecord.reason || 'Kemasan Rusak').slice(0, lineWidth - 8)}`).newline();
   builder.lineDashed('-');
 
   // 3. DAFTAR BARANG YANG DIRETUR
   const items = returRecord.items || [];
-  items.forEach(item => {
-    builder.alignLeft().text(item.name).newline();
-    const qty = item.returnQty || 1;
-    const price = item.price || 0;
-    const subtotal = item.refundSubtotal || (qty * price);
-    const left = `  ${qty} ${item.unit || 'pcs'} x ${formatRupiahSimple(price)}`;
+  items.forEach((item, idx) => {
+    const itemName = String(item.name || 'Produk').slice(0, lineWidth);
+    builder.alignLeft().text(`${idx + 1}. ${itemName}`).newline();
+    const qty = item.returnQty || item.qty || 1;
+    const price = item.price || item.unitPrice || 0;
+    const subtotal = item.refundSubtotal || item.subtotal || (qty * price);
+    const left = `   +${qty} ${item.unit || 'pcs'} x ${formatRupiahSimple(price)}`;
     const right = formatRupiahSimple(subtotal);
     builder.lineLeftRight(left, right);
   });
@@ -1591,9 +1601,9 @@ function buildReturReceiptEscPos(returRecord) {
 
   // 4. TOTAL REFUND DANA
   builder.bold(true)
-    .lineLeftRight("TOTAL REFUND", formatRupiahSimple(returRecord.totalRefund || 0))
+    .lineLeftRight("TOTAL KEMBALI UANG", "Rp " + formatRupiahSimple(returRecord.totalRefund || 0))
     .bold(false);
-  builder.lineLeftRight("Metode Refund", "UANG TUNAI KASIR");
+  builder.lineLeftRight("Metode", "UANG TUNAI KASIR");
   builder.lineDashed('=');
 
   // 5. KOLOM TANDA TANGAN KASIR/PEJABAT & PELANGGAN
@@ -1607,19 +1617,14 @@ function buildReturReceiptEscPos(returRecord) {
     .newline()
     .newline()
     .text(is80
-      ? `( ${returRecord.cashier || 'Pejabat Toko'} )             ( .................... )`
-      : `( ${returRecord.cashier || 'Pejabat'} )     ( ............ )`
+      ? `( ${(returRecord.cashier || 'Pejabat Toko').slice(0, 16)} )             ( .................... )`
+      : `( ${(returRecord.cashier || 'Kasir').slice(0, 10)} )    ( ............ )`
     )
     .newline()
-    .newline();
-
-  // 6. FOOTER
-  builder.alignCenter()
+    .newline()
     .text("Barang retur telah diverifikasi.")
     .newline()
     .text("Stok toko & kas telah disesuaikan.")
-    .newline()
-    .text("Terima kasih.")
     .newline()
     .feed(feedLines)
     .cut();
@@ -1972,7 +1977,7 @@ async function printReturReceiptUniversal(returRecord = null) {
 
 function preparePrintableReturReceipt(returRecord) {
   const target = document.getElementById("printable-receipt-container");
-  if (!target) return;
+  if (!target || !returRecord) return;
 
   const src = document.getElementById("thermal-receipt-retur-content");
   if (src && src.innerHTML.trim().length > 0) {
@@ -1981,14 +1986,81 @@ function preparePrintableReturReceipt(returRecord) {
     return;
   }
 
-  if (typeof openReturReceiptModal === 'function' && returRecord) {
+  if (typeof openReturReceiptModal === 'function') {
     openReturReceiptModal(returRecord);
     const newSrc = document.getElementById("thermal-receipt-retur-content");
     if (newSrc && newSrc.innerHTML.trim().length > 0) {
       target.innerHTML = newSrc.innerHTML;
       target.className = (newSrc.className || "thermal-receipt width-58") + " hidden";
+      return;
     }
   }
+
+  // Direct HTML generation fallback
+  const storeName = (pos?.settings?.storeName || "TOKO SNACK BERKAH").toUpperCase();
+  const storeAddress = pos?.settings?.storeAddress || "";
+  const storePhone = pos?.settings?.storePhone || "";
+  const isWidth80 = pos?.settings?.paperWidth === "80mm";
+  target.className = `thermal-receipt ${isWidth80 ? 'width-80' : 'width-58'} hidden`;
+
+  const d = returRecord.date ? new Date(returRecord.date) : new Date();
+  const dateStr = d.toLocaleDateString("id-ID");
+  const timeStr = returRecord.time || d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
+  const itemsHtml = (returRecord.items || []).map((item, idx) => {
+    const qty = item.returnQty || item.qty || 1;
+    const price = item.price || item.unitPrice || 0;
+    const subtotal = item.refundSubtotal || item.subtotal || (qty * price);
+    return `
+      <div style="margin-bottom: 4px;">
+        <div style="font-weight: bold; font-size: 1em;">${idx + 1}. ${item.name || 'Produk'}</div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.9em;">
+          <span>+${qty} ${item.unit || 'pcs'} x Rp ${price.toLocaleString('id-ID')}</span>
+          <span style="font-weight: bold;">Rp ${subtotal.toLocaleString('id-ID')}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  target.innerHTML = `
+    <div style="text-align: center; margin-bottom: 6px;">
+      <div style="font-size: 1.15em; font-weight: 900; text-transform: uppercase;">${storeName}</div>
+      ${storeAddress ? `<div style="font-size: 0.85em; margin-top: 1px;">${storeAddress}</div>` : ''}
+      ${storePhone ? `<div style="font-size: 0.85em;">Telp: ${storePhone}</div>` : ''}
+      <div class="receipt-double-line"></div>
+      <div style="font-weight: 900; font-size: 1.05em; margin: 4px 0 2px 0;">BUKTI RETUR BARANG</div>
+      <div style="font-weight: bold; font-size: 0.85em;">(NOTA RESTITUSI DANA)</div>
+      <div class="receipt-dashed-line"></div>
+    </div>
+    <div style="font-size: 0.9em; margin-bottom: 6px; line-height: 1.45;">
+      <div style="display: flex; justify-content: space-between;"><span>No. Retur</span><strong style="font-family: monospace;">${returRecord.id}</strong></div>
+      <div style="display: flex; justify-content: space-between;"><span>Struk Asal</span><span>${returRecord.originalTrxId || returRecord.originalInvoiceId || '-'}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Waktu</span><span>${dateStr} ${timeStr}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Kasir / Shift</span><span>${returRecord.cashier || 'Kasir'} (Shift ${returRecord.shift || '1'})</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Alasan</span><span style="font-style: italic;">${returRecord.reason || 'Kemasan Rusak'}</span></div>
+    </div>
+    <div class="receipt-dashed-line"></div>
+    <div style="margin: 6px 0;">
+      ${itemsHtml}
+    </div>
+    <div class="receipt-dashed-line"></div>
+    <div style="font-size: 1.1em; font-weight: 900; display: flex; justify-content: space-between; margin: 8px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 6px 0;">
+      <span>TOTAL KEMBALI UANG</span>
+      <span>Rp ${(returRecord.totalRefund || 0).toLocaleString('id-ID')}</span>
+    </div>
+    <div class="receipt-double-line"></div>
+    <div style="margin-top: 14px; text-align: center; font-size: 0.85em;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 35px;">
+        <span style="width: 45%;">Kasir / Pejabat,</span>
+        <span style="width: 45%;">Pelanggan Penerima,</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="width: 45%; border-top: 1px solid #000; padding-top: 2px;">(${returRecord.cashier || 'Kasir'})</span>
+        <span style="width: 45%; border-top: 1px solid #000; padding-top: 2px;">(...........................)</span>
+      </div>
+      <div style="margin-top: 10px; font-size: 0.8em; color: #555;">Barang telah diverifikasi & dana dikembalikan</div>
+    </div>
+  `;
 }
 
 async function printKlerkReceiptUniversal(klerkRecord = null) {
@@ -2675,26 +2747,43 @@ function buildLpbReceiptEscPos(lpbDoc) {
   if (storePhone) builder.text(storePhone).newline();
 
   builder.lineDashed('=')
-    .bold(true)
-    .text("*** LEMBAR LPB (PENERIMAAN BARANG) ***")
-    .newline()
-    .bold(false)
+    .bold(true);
+
+  if (is80) {
+    builder.text("*** BUKTI PENERIMAAN BARANG (LPB) ***").newline();
+  } else {
+    builder.text("*** BUKTI LPB MASUK ***").newline();
+    builder.text("(PENERIMAAN BARANG)").newline();
+  }
+
+  builder.bold(false)
     .lineDashed('-')
-    .alignLeft()
-    .lineLeftRight(`No. LPB  : ${lpbDoc.id}`, `${lpbDoc.date || ''}`)
-    .lineLeftRight(`Supplier : ${(lpbDoc.supplierName || '-').slice(0, 18)}`, `${lpbDoc.time || ''}`)
-    .lineLeftRight(`No.Faktur: ${(lpbDoc.invoiceNo || '-').slice(0, 18)}`, `Toko: ${storeCode}`)
-    .lineLeftRight(`Bayar    : ${lpbDoc.paymentType || 'KREDIT'}`, `Petugas: ${(lpbDoc.operator || 'Admin').slice(0, 10)}`);
+    .alignLeft();
+
+  if (is80) {
+    builder.lineLeftRight(`No. LPB  : ${lpbDoc.id}`, `Tgl: ${lpbDoc.date || ''} ${lpbDoc.time || ''}`)
+      .lineLeftRight(`Supplier : ${(lpbDoc.supplierName || '-').slice(0, 24)}`, `Toko: ${storeCode}`)
+      .lineLeftRight(`No.Faktur: ${(lpbDoc.invoiceNo || '-').slice(0, 24)}`, `Petugas: ${(lpbDoc.operator || 'Admin').slice(0, 14)}`)
+      .lineLeftRight(`Bayar    : ${lpbDoc.paymentType || 'KREDIT'}`, `Jatuh Tempo: ${lpbDoc.dueDate || '-'}`);
+  } else {
+    builder.lineLeftRight(`Tgl: ${lpbDoc.date || ''}`, lpbDoc.time || '')
+      .text(`No.LPB   : ${lpbDoc.id}`).newline()
+      .text(`Supplier : ${(lpbDoc.supplierName || '-').slice(0, lineWidth - 11)}`).newline()
+      .text(`No.Faktur: ${(lpbDoc.invoiceNo || '-').slice(0, lineWidth - 11)}`).newline()
+      .lineLeftRight(`Bayar    : ${lpbDoc.paymentType || 'KREDIT'}`, `Toko: ${storeCode}`)
+      .lineLeftRight(`Petugas  : ${(lpbDoc.operator || 'Admin').slice(0, 12)}`, `Shift: ${lpbDoc.shift || '1'}`);
+  }
 
   if (lpbDoc.note) {
-    builder.text(`Catatan  : ${lpbDoc.note}`).newline();
+    builder.text(`Catatan  : ${lpbDoc.note.slice(0, lineWidth - 11)}`).newline();
   }
   builder.lineDashed('-');
 
   // 2. DAFTAR ITEM BARANG
   const items = lpbDoc.items || [];
   items.forEach((item, idx) => {
-    builder.alignLeft().text(`${idx + 1}. ${item.productName || item.name || 'Barang'}`).newline();
+    const itemName = String(item.productName || item.name || 'Barang').slice(0, lineWidth);
+    builder.alignLeft().text(`${idx + 1}. ${itemName}`).newline();
     const qtyStr = `   ${item.qty || 1} ${item.unit || 'pcs'} x Rp ${formatRp(item.costPrice || 0)}`;
     const subStr = `Rp ${formatRp(item.subtotal || 0)}`;
     builder.lineLeftRight(qtyStr, subStr);
@@ -2707,7 +2796,7 @@ function buildLpbReceiptEscPos(lpbDoc) {
   const totalQty = lpbDoc.totalQty || items.reduce((sum, it) => sum + (Number(it.qty) || 0), 0);
   const totalNilai = lpbDoc.totalValue || items.reduce((sum, it) => sum + (Number(it.subtotal) || 0), 0);
 
-  builder.lineLeftRight(`Total SKU : ${totalSku}`, `Total Qty : ${totalQty}`);
+  builder.lineLeftRight(`Total SKU: ${totalSku}`, `Total Qty: ${totalQty}`);
   builder.bold(true)
     .lineLeftRight("TOTAL NILAI FAKTUR", `Rp ${formatRp(totalNilai)}`)
     .bold(false)
@@ -2716,14 +2805,20 @@ function buildLpbReceiptEscPos(lpbDoc) {
   // 4. TANDA TANGAN
   builder.alignCenter()
     .newline()
-    .text("Diterima Oleh,            Pengirim/Supplier,")
+    .text(is80
+      ? "Diterima Oleh,                      Pengirim / Supplier,"
+      : "Diterima Oleh,   Pengirim / Sup,"
+    )
     .newline()
     .newline()
     .newline()
-    .text(`( ${lpbDoc.operator || 'Petugas'} )           ( _______________ )`)
+    .text(is80
+      ? `( ${(lpbDoc.operator || 'Petugas').padEnd(16).slice(0, 16)} )             ( .................... )`
+      : `( ${(lpbDoc.operator || 'Petugas').padEnd(10).slice(0, 10)} )    ( ......... )`
+    )
     .newline()
     .newline()
-    .text("Barang diterima dalam kondisi baik & sesuai faktur.")
+    .text(is80 ? "Barang diterima dalam kondisi baik & sesuai faktur." : "Barang dicek & sesuai faktur.")
     .newline()
     .feed(feedLines)
     .cut();
@@ -2940,17 +3035,33 @@ function buildCashDropEscPos(dropRecord) {
   const timeStr = d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
 
   builder.lineDashed('=')
-    .bold(true)
-    .text("*** BUKTI SETORAN KAS (CASH DROP) ***")
-    .newline()
-    .bold(false)
+    .bold(true);
+
+  if (is80) {
+    builder.text("*** BUKTI SETORAN KAS (CASH DROP) ***").newline();
+  } else {
+    builder.text("*** BUKTI SETORAN KAS ***").newline();
+    builder.text("(CASH DROP KE BRANKAS)").newline();
+  }
+
+  builder.bold(false)
     .lineDashed('-')
-    .alignLeft()
-    .lineLeftRight(`No. Bukti : ${dropRecord.id}`, `${dateStr} ${timeStr}`)
-    .lineLeftRight(`Kasir     : ${(dropRecord.cashier || 'Kasir').slice(0, 16)}`, `Shift: ${pos?.settings?.shiftName || 'Shift 1'}`)
-    .lineLeftRight(`Penerima  : ${(dropRecord.supervisor || 'Pejabat Toko').slice(0, 16)}`, '')
-    .lineLeftRight(`Catatan   : ${(dropRecord.notes || '-').slice(0, lineWidth - 12)}`, '')
-    .lineDashed('-');
+    .alignLeft();
+
+  if (is80) {
+    builder.lineLeftRight(`No. Bukti : ${dropRecord.id}`, `${dateStr} ${timeStr}`)
+      .lineLeftRight(`Kasir     : ${(dropRecord.cashier || 'Kasir').slice(0, 18)}`, `Shift: ${pos?.settings?.shiftName || 'Shift 1'}`)
+      .lineLeftRight(`Penerima  : ${(dropRecord.supervisor || 'Pejabat Toko').slice(0, 18)}`, '')
+      .text(`Catatan   : ${(dropRecord.notes || '-')}`).newline();
+  } else {
+    builder.lineLeftRight(`Tgl: ${dateStr}`, timeStr)
+      .text(`No.Bukti : ${dropRecord.id}`).newline()
+      .lineLeftRight(`Kasir    : ${(dropRecord.cashier || 'Kasir').slice(0, 12)}`, `Shift: ${pos?.settings?.shiftName || '1'}`)
+      .text(`Penerima : ${(dropRecord.supervisor || 'Pejabat Toko').slice(0, lineWidth - 11)}`).newline()
+      .text(`Catatan  : ${(dropRecord.notes || '-').slice(0, lineWidth - 11)}`).newline();
+  }
+
+  builder.lineDashed('-');
 
   builder.bold(true)
     .size(false, true)
@@ -2962,19 +3073,81 @@ function buildCashDropEscPos(dropRecord) {
   // TANDA TANGAN SERAH TERIMA
   builder.alignCenter()
     .newline()
-    .text("Diserahkan Oleh,           Diterima Oleh,")
+    .text(is80
+      ? "Diserahkan Kasir,                   Diterima Pejabat Toko,"
+      : "Diserahkan Kasir,   Diterima Sup"
+    )
     .newline()
     .newline()
     .newline()
-    .text(`( ${(dropRecord.cashier || 'Kasir').slice(0, 12)} )          ( ${(dropRecord.supervisor || 'Pejabat').slice(0, 12)} )`)
+    .text(is80
+      ? `( ${(dropRecord.cashier || 'Kasir').padEnd(16).slice(0, 16)} )             ( ${(dropRecord.supervisor || 'Pejabat').padEnd(16).slice(0, 16)} )`
+      : `( ${(dropRecord.cashier || 'Kasir').padEnd(10).slice(0, 10)} )    ( ......... )`
+    )
     .newline()
     .newline()
-    .text("Uang kas telah dihitung fisik & masuk brankas.")
+    .text(is80 ? "Uang kas telah dihitung fisik & masuk brankas." : "Uang kas fisik masuk brankas.")
     .newline()
     .feed(feedLines)
     .cut();
 
-  return builder.build();
+  return builder.getBytes();
+}
+
+function preparePrintableCashDropReceipt(dropRecord) {
+  const target = document.getElementById("printable-receipt-container");
+  if (!target || !dropRecord) return;
+
+  const storeName = (pos?.settings?.storeName || "TOKO SNACK BERKAH").toUpperCase();
+  const storeAddress = pos?.settings?.storeAddress || "";
+  const storePhone = pos?.settings?.storePhone || "";
+  const isWidth80 = pos?.settings?.paperWidth === "80mm";
+
+  target.className = `thermal-receipt ${isWidth80 ? 'width-80' : 'width-58'} hidden`;
+
+  const d = dropRecord.timestamp ? new Date(dropRecord.timestamp) : new Date();
+  const dateStr = d.toLocaleDateString('id-ID');
+  const timeStr = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+  target.innerHTML = `
+    <div style="text-align: center; margin-bottom: 6px;">
+      <div style="font-size: 1.15em; font-weight: 900; text-transform: uppercase;">${storeName}</div>
+      ${storeAddress ? `<div style="font-size: 0.85em; margin-top: 1px;">${storeAddress}</div>` : ''}
+      ${storePhone ? `<div style="font-size: 0.85em;">Telp: ${storePhone}</div>` : ''}
+      <div class="receipt-double-line"></div>
+      <div style="font-weight: 900; font-size: 1.05em; margin: 4px 0 2px 0;">BUKTI SETORAN KAS</div>
+      <div style="font-weight: bold; font-size: 0.85em;">(CASH DROP KE BRANKAS)</div>
+      <div class="receipt-dashed-line"></div>
+    </div>
+
+    <div style="font-size: 0.9em; margin-bottom: 6px; line-height: 1.45;">
+      <div style="display: flex; justify-content: space-between;"><span>No. Bukti</span><strong style="font-family: monospace;">${dropRecord.id}</strong></div>
+      <div style="display: flex; justify-content: space-between;"><span>Waktu</span><span>${dateStr} ${timeStr}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Kasir</span><span>${dropRecord.cashier || 'Kasir'}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Penerima</span><span>${dropRecord.supervisor || 'Pejabat Toko'}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Shift</span><span>${pos?.settings?.shiftName || '1'}</span></div>
+      ${dropRecord.notes ? `<div style="margin-top: 2px;"><span>Catatan:</span> ${dropRecord.notes}</div>` : ''}
+    </div>
+
+    <div class="receipt-dashed-line"></div>
+    <div style="font-size: 1.1em; font-weight: 900; display: flex; justify-content: space-between; margin: 8px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 6px 0;">
+      <span>NOMINAL DROP</span>
+      <span>Rp ${(dropRecord.amount || 0).toLocaleString('id-ID')}</span>
+    </div>
+    <div class="receipt-double-line"></div>
+
+    <div style="margin-top: 14px; text-align: center; font-size: 0.85em;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 35px;">
+        <span style="width: 45%;">Diserahkan Kasir,</span>
+        <span style="width: 45%;">Diterima Pejabat,</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="width: 45%; border-top: 1px solid #000; padding-top: 2px;">(${dropRecord.cashier || 'Kasir'})</span>
+        <span style="width: 45%; border-top: 1px solid #000; padding-top: 2px;">(${dropRecord.supervisor || 'Pejabat Toko'})</span>
+      </div>
+      <div style="margin-top: 10px; font-size: 0.8em; color: #555;">Uang kas fisik telah disetor & diverifikasi</div>
+    </div>
+  `;
 }
 
 async function printCashDropReceiptUniversal(dropRecord) {
@@ -3025,50 +3198,8 @@ async function printCashDropReceiptUniversal(dropRecord) {
   }
 
   // Fallback ke browser print
-  const store = pos?.settings || {};
-  const storeName = store.storeName || "TOKO SNACK BERKAH";
-  const d = dropRecord.timestamp ? new Date(dropRecord.timestamp) : new Date();
-  const dateStr = d.toLocaleString('id-ID');
-
-  const printWindow = window.open('', '_blank', 'width=350,height=500');
-  if (printWindow) {
-    printWindow.document.write(`
-      <html>
-      <head>
-        <title>Slip Cash Drop - ${dropRecord.id}</title>
-        <style>
-          body { font-family: monospace; font-size: 12px; margin: 10px; line-height: 1.4; color: #000; }
-          .center { text-align: center; }
-          .bold { font-weight: bold; }
-          .border-b { border-bottom: 1px dashed #000; margin: 6px 0; }
-          .row { display: flex; justify-content: space-between; }
-          .sig { display: flex; justify-content: space-between; margin-top: 25px; text-align: center; }
-        </style>
-      </head>
-      <body>
-        <div class="center bold" style="font-size:14px;">${storeName.toUpperCase()}</div>
-        <div class="center bold">BUKTI SETORAN KAS (CASH DROP)</div>
-        <div class="border-b"></div>
-        <div class="row"><span>No. Bukti:</span><span>${dropRecord.id}</span></div>
-        <div class="row"><span>Waktu:</span><span>${dateStr}</span></div>
-        <div class="row"><span>Kasir:</span><span>${dropRecord.cashier || 'Kasir'}</span></div>
-        <div class="row"><span>Penerima:</span><span>${dropRecord.supervisor || 'Supervisor'}</span></div>
-        <div class="row"><span>Catatan:</span><span>${dropRecord.notes || '-'}</span></div>
-        <div class="border-b"></div>
-        <div class="row bold" style="font-size:14px;"><span>NOMINAL:</span><span>Rp ${(dropRecord.amount || 0).toLocaleString('id-ID')}</span></div>
-        <div class="border-b"></div>
-        <div class="sig">
-          <div>Diserahkan,<br><br><br>(${dropRecord.cashier || 'Kasir'})</div>
-          <div>Diterima,<br><br><br>(${dropRecord.supervisor || 'Supervisor'})</div>
-        </div>
-      </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    setTimeout(() => printWindow.close(), 1000);
-  }
+  preparePrintableCashDropReceipt(dropRecord);
+  window.print();
 }
 
 

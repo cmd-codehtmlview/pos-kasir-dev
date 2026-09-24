@@ -274,8 +274,11 @@ function processSisRetur() {
         name: origItem.name,
         unit: origItem.unit || 'PCS',
         qty: itemConfig.qty,
+        returnQty: itemConfig.qty,
         unitPrice: itemConfig.unitPrice,
-        subtotal: subtotal
+        price: itemConfig.unitPrice,
+        subtotal: subtotal,
+        refundSubtotal: subtotal
       });
 
       // Kembalikan stok fisik produk ke database
@@ -305,11 +308,15 @@ function processSisRetur() {
   const returRecord = {
     id: returId,
     originalInvoiceId: trx.id || trx.invoiceNumber,
+    originalTrxId: trx.id || trx.invoiceNumber,
     date: new Date().toISOString(),
+    time: new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
+    shift: pos.currentShift || (pos.settings && pos.settings.shiftName) || '1',
     items: returnedItemsList,
     totalRefund: totalRefund,
     reason: reason,
     cashier: pos.currentUser ? pos.currentUser.name : 'Kasir Toko',
+    restocked: true,
     timestamp: Date.now()
   };
   pos.returns.unshift(returRecord);
@@ -336,41 +343,10 @@ function processSisRetur() {
 }
 
 function printSisReturReceipt(retRecord) {
-  const store = (pos && pos.settings) ? pos.settings : {};
-  const storeName = store.storeName || "SNACKPOS STORE";
-  const storeAddress = store.storeAddress || "Jl. Raya Retail No. 88";
-  const dateStr = new Date().toLocaleString('id-ID');
-
-  let receiptText = "";
-  receiptText += "================================\n";
-  receiptText += `${storeName.toUpperCase().padStart(16 + Math.floor(storeName.length / 2))}\n`;
-  receiptText += `${storeAddress.padStart(16 + Math.floor(storeAddress.length / 2))}\n`;
-  receiptText += "================================\n";
-  receiptText += `NOTA RETUR BARANG & RESTITUSI\n`;
-  receiptText += `No. Retur : ${retRecord.id}\n`;
-  receiptText += `Ref Struk : #${retRecord.originalInvoiceId}\n`;
-  receiptText += `Waktu     : ${dateStr}\n`;
-  receiptText += `Kasir     : ${retRecord.cashier}\n`;
-  receiptText += `Alasan    : ${retRecord.reason}\n`;
-  receiptText += "--------------------------------\n";
-  
-  (retRecord.items || []).forEach(it => {
-    receiptText += `${it.name}\n`;
-    receiptText += `  +${it.qty} ${it.unit} x Rp ${it.unitPrice.toLocaleString('id-ID')} = Rp ${it.subtotal.toLocaleString('id-ID')}\n`;
-  });
-
-  receiptText += "--------------------------------\n";
-  receiptText += `TOTAL KEMBALI UANG : Rp ${retRecord.totalRefund.toLocaleString('id-ID')}\n`;
-  receiptText += "================================\n";
-  receiptText += "\n";
-  receiptText += " Ttd Konsumen     Ttd Pejabat Toko\n\n\n";
-  receiptText += " (          )      (            )\n";
-  receiptText += "================================\n\n\n";
-
-  if (typeof printRawTextEscPos === 'function') {
-    printRawTextEscPos(receiptText);
+  if (typeof printReturReceiptUniversal === 'function') {
+    printReturReceiptUniversal(retRecord);
   } else {
-    console.log("Nota Retur Plain Text:\n", receiptText);
+    window.print();
   }
 }
 
