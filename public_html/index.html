@@ -158,7 +158,7 @@
               <span>▾</span>
             </button>
           </div>
-          <p class="text-[10px] text-red-100/90 flex items-center gap-1 font-medium leading-tight truncate mt-0.5">
+          <p onclick="confirmOrLockCashier()" class="text-[10px] text-red-100/90 flex items-center gap-1 font-medium leading-tight truncate mt-0.5 cursor-pointer hover:underline" title="Klik untuk Kunci Layar / Logout Kasir">
             <span id="header-user-info">👤 1003 • Dani</span>
             <span class="opacity-40">•</span>
             <span id="header-shift-info">Shift 1</span>
@@ -166,15 +166,16 @@
         </div>
       </div>
 
-      <!-- Kanan: Tombol Kunci Layar & Tombol SIS (Tanpa Tombol Printer & Sync yang Dobel) -->
+      <!-- Kanan: Tombol Kunci Layar (Mobile & Desktop) & Tombol SIS -->
       <div class="flex items-center gap-1.5 flex-shrink-0">
         
-        <!-- Kunci Layar Kasir (Lock) -->
+        <!-- Kunci Layar Kasir / Logout (Tampil di Semua Layar HP & Desktop) -->
         <button 
           type="button" 
-          onclick="lockCashierScreen()" 
-          class="hidden sm:flex h-8 w-8 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white/90 hover:text-white transition active:scale-95 items-center justify-center cursor-pointer shadow-xs text-xs" 
-          title="Kunci Kasir / Ganti User (Lock Screen)"
+          id="btn-header-lock-cashier"
+          onclick="confirmOrLockCashier()" 
+          class="flex h-8 w-8 rounded-xl bg-white/15 hover:bg-white/25 active:bg-white/30 border border-white/20 text-white transition active:scale-95 items-center justify-center cursor-pointer shadow-xs text-xs" 
+          title="Kunci Kasir / Logout Kasir (Lock Screen)"
         >
           🔒
         </button>
@@ -1123,15 +1124,26 @@
               <label class="block text-xs font-bold text-slate-700 mb-1">No. Terminal POS</label>
               <input type="text" id="setting-pos-number" class="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl font-mono focus:ring-2 focus:ring-alfa-red focus:outline-none">
             </div>
-            <div class="md:col-span-2 p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-              <div class="flex items-center gap-2.5">
-                <span class="text-2xl">👤</span>
-                <div>
-                  <span class="block text-[11px] font-bold text-slate-700">Kasir Bertugas & Shift Kerja</span>
-                  <span id="setting-active-user-preview" class="text-xs font-black text-slate-900 font-mono">1003 • Dani (Shift 1)</span>
+            <div class="md:col-span-2 p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-2xl shrink-0">👤</span>
+                <div class="min-w-0">
+                  <span class="block text-[11px] font-bold text-slate-700">Kasir Bertugas &amp; Shift Kerja</span>
+                  <span id="setting-active-user-preview" class="text-xs font-black text-slate-900 font-mono truncate block">1003 • Dani (Shift 1)</span>
                 </div>
               </div>
-              <span class="text-[10px] font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded-lg flex-shrink-0">Otomatis Singkron Login</span>
+              <div class="flex items-center gap-2 shrink-0">
+                <button 
+                  type="button" 
+                  onclick="confirmOrLockCashier()" 
+                  class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer active:scale-95"
+                  title="Logout / Kunci Layar Kasir"
+                >
+                  <span>🔒</span>
+                  <span>Logout</span>
+                </button>
+                <span class="hidden sm:inline-block text-[10px] font-bold px-2 py-1 bg-emerald-100 text-emerald-800 rounded-lg">Singkron Login</span>
+              </div>
             </div>
             <div class="md:col-span-2">
               <label class="block text-xs font-bold text-slate-700 mb-1">Alamat Toko</label>
@@ -2253,6 +2265,18 @@
             </div>
             <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
+          <button type="button" onclick="confirmOrLockCashier()" class="w-full px-4 py-3 hover:bg-rose-50/80 active:bg-rose-100/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 flex items-center justify-center shrink-0">
+                <span class="w-8 h-8 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 flex items-center justify-center text-sm shadow-2xs font-bold">🔒</span>
+              </div>
+              <div>
+                <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-rose-700 transition truncate block">Logout / Ganti Kasir</span>
+                <span class="text-[10px] text-slate-400">Kunci layar terminal &amp; ganti user kasir</span>
+              </div>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-rose-500 font-bold transition">›</span>
+          </button>
         </div>
       </div>
 
@@ -2394,6 +2418,18 @@
             </div>
             <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
+          <button type="button" onclick="confirmOrLockCashier()" class="w-full px-4 py-3 hover:bg-rose-50/80 active:bg-rose-100/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 flex items-center justify-center shrink-0">
+                <span class="w-8 h-8 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 flex items-center justify-center text-sm shadow-2xs font-bold">🚪</span>
+              </div>
+              <div>
+                <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-rose-700 transition truncate block">Logout Kasir</span>
+                <span class="text-[10px] text-slate-400">Keluar dari sesi shift kasir aktif saat ini</span>
+              </div>
+            </div>
+            <span class="text-xs text-slate-300 group-hover:text-rose-500 font-bold transition">›</span>
+          </button>
         </div>
       </div>
 
@@ -2507,10 +2543,15 @@
 
     <!-- Drawer Footer (Clean Minimalist Action Bar Tanpa Tombol Tutup Dobel) -->
     <div class="p-3.5 bg-white border-t border-slate-200 flex items-center justify-between gap-2 flex-shrink-0" style="padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));">
-      <div class="flex items-center gap-2 min-w-0 text-xs text-slate-500 font-medium">
-        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="truncate">SnackPOS Cloud Active</span>
-      </div>
+      <button 
+        type="button" 
+        onclick="confirmOrLockCashier()" 
+        class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+        title="Kunci Layar & Logout Kasir"
+      >
+        <span>🔒</span>
+        <span>Logout Kasir</span>
+      </button>
       <a href="owner.html" target="_blank" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-2xs">
         <span>📊</span>
         <span>Portal Owner ↗</span>
@@ -8602,6 +8643,9 @@
 
       <!-- Login Form -->
       <form id="form-employee-login" onsubmit="handleEmployeeLogin(event)" class="p-4 sm:p-5 space-y-3 sm:space-y-4 overflow-y-auto flex-1 custom-scrollbar">
+        <!-- Banner Info Shift Kasir Aktif Belum di-Clerk -->
+        <div id="login-active-shift-notice" class="hidden"></div>
+
         <div>
           <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1">
             NIK Karyawan (Nomor Induk Karyawan) *
@@ -9099,7 +9143,7 @@
   <!-- Core Data & Storage -->
   <script src="products-data.js?v=99"></script>
   <script src="js/db.js?v=120"></script>
-  <script src="js/store.js?v=100"></script>
+  <script src="js/store.js?v=101"></script>
   <script src="js/license.js?v=120"></script>
   <script src="js/sync.js?v=104"></script>
   
@@ -9112,14 +9156,14 @@
   <script src="js/member.js?v=108"></script>
   <script src="js/returns.js?v=101"></script>
   <script src="js/stock-opname.js?v=100"></script>
-  <script src="js/klerk.js?v=100"></script>
+  <script src="js/klerk.js?v=101"></script>
   <script src="js/inventory.js?v=125"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/import-products.js?v=100"></script>
   <script src="js/repack.js?v=100"></script>
   <script src="js/reports.js?v=103"></script>
   <script src="js/settings.js?v=118"></script>
-  <script src="js/employees.js?v=122"></script>
+  <script src="js/employees.js?v=123"></script>
   
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=118"></script>

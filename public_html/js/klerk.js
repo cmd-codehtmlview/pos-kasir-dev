@@ -66,9 +66,19 @@ function getLatestKlerkTodayForCashier(cashierUser) {
  */
 function getUnklerkedTransactionsForCashier(cashierUser) {
   const todayStr = new Date().toISOString().split("T")[0];
-  const nik = cashierUser ? cashierUser.nik : (pos.currentUser ? pos.currentUser.nik : null);
-  const name = cashierUser ? cashierUser.name : (pos.currentUser ? pos.currentUser.name : null);
-  const lastKlerk = getLatestKlerkTodayForCashier(cashierUser);
+  let nik = cashierUser ? cashierUser.nik : (pos.currentUser ? pos.currentUser.nik : null);
+  let name = cashierUser ? cashierUser.name : (pos.currentUser ? pos.currentUser.name : null);
+
+  if (nik && !name && Array.isArray(pos.employees)) {
+    const f = pos.employees.find(e => e.nik === nik);
+    if (f) name = f.name;
+  }
+  if (!nik && name && Array.isArray(pos.employees)) {
+    const f = pos.employees.find(e => e.name === name);
+    if (f) nik = f.nik;
+  }
+
+  const lastKlerk = getLatestKlerkTodayForCashier(cashierUser || { nik, name });
 
   let lastKlerkTime = 0;
   if (lastKlerk) {
@@ -91,10 +101,12 @@ function getUnklerkedTransactionsForCashier(cashierUser) {
     }
 
     // 4. Filter NIK kasir jika ada, atau nama kasir
-    if (nik && t.cashierNik) {
-      return t.cashierNik === nik;
+    if (nik) {
+      if (t.cashierNik) return t.cashierNik === nik;
+      if (name && t.cashier) return t.cashier === name;
+      return false;
     }
-    if (name && t.cashier) {
+    if (name) {
       return t.cashier === name;
     }
     return true;
@@ -106,9 +118,19 @@ function getUnklerkedTransactionsForCashier(cashierUser) {
  */
 function getUnklerkedReturnsForCashier(cashierUser) {
   const todayStr = new Date().toISOString().split("T")[0];
-  const nik = cashierUser ? cashierUser.nik : (pos.currentUser ? pos.currentUser.nik : null);
-  const name = cashierUser ? cashierUser.name : (pos.currentUser ? pos.currentUser.name : null);
-  const lastKlerk = getLatestKlerkTodayForCashier(cashierUser);
+  let nik = cashierUser ? cashierUser.nik : (pos.currentUser ? pos.currentUser.nik : null);
+  let name = cashierUser ? cashierUser.name : (pos.currentUser ? pos.currentUser.name : null);
+
+  if (nik && !name && Array.isArray(pos.employees)) {
+    const f = pos.employees.find(e => e.nik === nik);
+    if (f) name = f.name;
+  }
+  if (!nik && name && Array.isArray(pos.employees)) {
+    const f = pos.employees.find(e => e.name === name);
+    if (f) nik = f.nik;
+  }
+
+  const lastKlerk = getLatestKlerkTodayForCashier(cashierUser || { nik, name });
 
   let lastKlerkTime = 0;
   if (lastKlerk) {
@@ -126,8 +148,14 @@ function getUnklerkedReturnsForCashier(cashierUser) {
       }
     }
 
-    if (nik && r.cashierNik) return r.cashierNik === nik;
-    if (name && r.cashier) return r.cashier === name;
+    if (nik) {
+      if (r.cashierNik) return r.cashierNik === nik;
+      if (name && r.cashier) return r.cashier === name;
+      return false;
+    }
+    if (name) {
+      return r.cashier === name;
+    }
     return true;
   });
 }
@@ -571,9 +599,8 @@ function executeSaveAndPrintKlerk(logoutAfter = false, isBlindClose = false) {
   showToast(isBlindClose ? `Setoran Blind Klerk ${klerkRecord.id} berhasil disimpan!` : `Klerk closing shift ${klerkRecord.id} berhasil disimpan!`, "success");
   renderKlerkHistoryTable();
 
-  if (logoutAfter) {
-    localStorage.removeItem("snack_pos_active_shift_cashier");
-  }
+  // Sesi transaksi kasir telah selesai di-closing/klerk, lepaskan gembok shift
+  localStorage.removeItem("snack_pos_active_shift_cashier");
 }
 
 function onCloseKlerkReceiptModal() {

@@ -756,6 +756,9 @@ function openModal(modalId) {
   if (el) {
     el.classList.remove("hidden");
     document.body.classList.add("modal-open");
+    if (modalId === "modal-employee-login" && typeof prepareEmployeeLoginModal === "function") {
+      prepareEmployeeLoginModal();
+    }
   }
 }
 

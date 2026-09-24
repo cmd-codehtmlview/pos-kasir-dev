@@ -8,6 +8,102 @@
 // ==========================================
 let pendingSupervisorCallback = null;
 
+/**
+ * Mencari sesi shift kasir aktif yang saat ini memiliki transaksi belum di-Clerk
+ */
+function findActiveUnklerkedShift() {
+  const todayStr = new Date().toISOString().split("T")[0];
+  const savedNik = localStorage.getItem("snack_pos_active_shift_cashier");
+
+  // Ambil transaksi & retur hari ini yang belum diklerk (klerkId null/empty)
+  const unklerkedTrx = (pos.transactions || []).filter(t => t.date === todayStr && !t.klerkId);
+  const unklerkedRet = (pos.returns || []).filter(r => r.date === todayStr && !r.klerkId);
+
+  // Jika tidak ada transaksi sama sekali yang menggantung hari ini, shift bersih (bebas login NIK lain)
+  if (unklerkedTrx.length === 0 && unklerkedRet.length === 0) {
+    return null;
+  }
+
+  let activeNik = savedNik;
+  let activeName = null;
+
+  // Telusuri dari transaksi belum diklerk terbaru
+  for (let i = unklerkedTrx.length - 1; i >= 0; i--) {
+    const t = unklerkedTrx[i];
+    if (t.cashierNik) {
+      activeNik = t.cashierNik;
+      activeName = t.cashier;
+      break;
+    } else if (t.cashier && !activeName) {
+      activeName = t.cashier;
+    }
+  }
+
+  if (!activeNik && unklerkedRet.length > 0) {
+    for (let i = unklerkedRet.length - 1; i >= 0; i--) {
+      const r = unklerkedRet[i];
+      if (r.cashierNik) {
+        activeNik = r.cashierNik;
+        activeName = r.cashier;
+        break;
+      } else if (r.cashier && !activeName) {
+        activeName = r.cashier;
+      }
+    }
+  }
+
+  if (!activeNik && activeName && Array.isArray(pos.employees)) {
+    const foundEmp = pos.employees.find(e => e.name === activeName);
+    if (foundEmp) activeNik = foundEmp.nik;
+  }
+
+  if (activeNik && !activeName && Array.isArray(pos.employees)) {
+    const foundEmp = pos.employees.find(e => e.nik === activeNik);
+    if (foundEmp) activeName = foundEmp.name;
+  }
+
+  if (!activeNik) {
+    activeNik = pos.settings?.cashierNik || (pos.employees && pos.employees[0] ? pos.employees[0].nik : null);
+    activeName = pos.settings?.cashierName || (pos.employees && pos.employees[0] ? pos.employees[0].name : "Kasir Sebelumnya");
+  }
+
+  return {
+    nik: activeNik,
+    name: activeName || activeNik || "Kasir Sebelumnya",
+    trxCount: unklerkedTrx.length,
+    returnCount: unklerkedRet.length,
+    totalCount: unklerkedTrx.length + unklerkedRet.length
+  };
+}
+window.findActiveUnklerkedShift = findActiveUnklerkedShift;
+
+/**
+ * Konfirmasi dan lakukan Kunci Layar / Logout Kasir (Aman untuk Mobile & Desktop)
+ */
+function confirmOrLockCashier() {
+  const current = pos.currentUser;
+  const name = current ? current.name : (pos.settings?.cashierName || "Kasir");
+  const nik = current ? current.nik : (pos.settings?.cashierNik || "-");
+
+  const activeShift = typeof findActiveUnklerkedShift === "function" ? findActiveUnklerkedShift() : null;
+  let confirmMsg = `Apakah Anda yakin ingin mengunci layar & logout dari sesi kasir ${name} (${nik})?`;
+
+  if (activeShift && (activeShift.nik === nik || !nik)) {
+    confirmMsg += `\n\n📌 Catatan Penting:\nAnda memiliki ${activeShift.totalCount} transaksi aktif yang belum di-Clerk.\nAnda harus login kembali dengan NIK ${activeShift.nik} jika ingin melanjutkan transaksi atau melakukan Closing Kasir [F8]. NIK lain tidak dapat login sebelum Klerk selesai.`;
+  }
+
+  if (confirm(confirmMsg)) {
+    if (typeof toggleSisDrawer === "function") {
+      const drawer = document.getElementById("sis-drawer");
+      if (drawer && !drawer.classList.contains("translate-x-full")) {
+        toggleSisDrawer();
+      }
+    }
+    lockCashierScreen();
+  }
+}
+window.confirmOrLockCashier = confirmOrLockCashier;
+
 function renderEmployeeHeader() {
   const badgeEl = document.getElementById("header-user-badge");
   const infoEl = document.getElementById("header-user-info");
@@ -88,58 +184,36 @@ function handleEmployeeLogin(event) {
 
   // ========================================================
   // SINGLE CASHIER SHIFT LOCK (GEMBOK KASIR STANDAR RETAIL)
-  // Satu kasir yang sedang aktif tidak boleh login/diganti dengan NIK lain
-  // sebelum NIK pertama menyelesaikan Klerk [F8] (Closing Shift)
+  // Aturan Logika: Jika kasir login sudah ada transaksi yang belum di-Clerk,
+  // TIDAK BOLEH login dengan NIK lain sebelum kasir tersebut melakukan Clerk!
   // ========================================================
-  const activeShiftCashier = localStorage.getItem("snack_pos_active_shift_cashier");
-  if (activeShiftCashier && activeShiftCashier !== emp.nik) {
-    // Periksa apakah kasir sebelumnya benar-benar sudah melakukan transaksi (ada uang di laci)
-    const unklerkedTrx = typeof getUnklerkedTransactionsForCashier === "function"
-      ? getUnklerkedTransactionsForCashier({ nik: activeShiftCashier })
-      : [];
-    const unklerkedReturns = typeof getUnklerkedReturnsForCashier === "function"
-      ? getUnklerkedReturnsForCashier({ nik: activeShiftCashier })
-      : [];
+  const activeUnklerkedShift = findActiveUnklerkedShift();
+  if (activeUnklerkedShift && activeUnklerkedShift.nik && activeUnklerkedShift.nik !== emp.nik) {
+    const unklerkedNik = activeUnklerkedShift.nik;
+    const unklerkedName = activeUnklerkedShift.name;
+    const totalActs = activeUnklerkedShift.totalCount || (activeUnklerkedShift.trxCount + activeUnklerkedShift.returnCount);
 
-    if (unklerkedTrx.length === 0 && unklerkedReturns.length === 0) {
-      // Kasir sebelumnya BELUM pernah bertransaksi sama sekali!
-      // Bebas langsung berganti ke NIK kasir baru tanpa perlu transaksi & tanpa perlu Klerk
-      localStorage.setItem("snack_pos_active_shift_cashier", emp.nik);
-    } else {
-      // Kasir sebelumnya SUDAH MELAKUKAN TRANSAKSI!
-      // Wajib Klerk terlebih dahulu untuk pertanggungjawaban uang fisik di laci,
-      // kecuali di-override oleh Pejabat Toko (COS / ACOS)
-      if (emp.role === "COS" || emp.role === "ACOS") {
-        const activeEmp = (pos.employees || []).find(e => e.nik === activeShiftCashier);
-        const activeName = activeEmp ? activeEmp.name : activeShiftCashier;
-        const confirmOverride = confirm(
-          `⚠️ PERINGATAN: SHIFT MASIH AKTIF UNTUK KASIR LAIN!\n\n` +
-          `Terminal kasir ini sedang aktif dan memiliki transaksi atas nama:\n` +
-          `• NIK: ${activeShiftCashier}\n` +
-          `• Nama: ${activeName}\n\n` +
-          `Sebagai Pejabat Toko ${emp.role} (${emp.name}), apakah Anda ingin melakukan OVERRIDE DARURAT untuk mengambil alih kasir ini?`
-        );
-        if (!confirmOverride) {
-          return;
-        }
-        localStorage.setItem("snack_pos_active_shift_cashier", emp.nik);
-        if (typeof showToast === "function") {
-          showToast(`⚡ Override Shift oleh ${emp.role} (${emp.name})`, "info");
-        }
-      } else {
-        const activeEmp = (pos.employees || []).find(e => e.nik === activeShiftCashier);
-        const activeName = activeEmp ? activeEmp.name : activeShiftCashier;
-        if (errEl) {
-          errEl.textContent = `Shift kasir masih aktif dan memiliki transaksi untuk ${activeName} (NIK: ${activeShiftCashier})! Kasir tersebut wajib Klerk [F8] terlebih dahulu sebelum berganti NIK. Hubungi COS/ACOS jika perlu alih tugas darurat.`;
-          errEl.classList.remove("hidden");
-        }
-        sfx.warning();
-        return;
-      }
+    if (errEl) {
+      errEl.innerHTML = `
+        <div class="text-left space-y-1.5 p-3 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs">
+          <p class="font-black flex items-center gap-1.5 text-xs text-rose-900">
+            <span>⛔</span> <span>SHIFT KASIR MASIH AKTIF &amp; BELUM CLERK!</span>
+          </p>
+          <p class="text-[11px] leading-relaxed">
+            Terminal kasir ini memiliki <strong>${totalActs} transaksi aktif</strong> atas nama kasir <strong>${unklerkedName} (NIK: ${unklerkedNik})</strong> yang belum di-Closing/Clerk.
+          </p>
+          <p class="text-[11px] text-rose-950 font-bold bg-white/90 p-2 rounded-lg border border-rose-200 leading-normal">
+            ⚠️ NIK lain (<strong>${emp.nik} - ${emp.name}</strong>) tidak boleh login sebelum kasir <strong>${unklerkedName}</strong> menyelesaikan Closing/Clerk [F8] untuk serah terima laci kas.
+          </p>
+        </div>
+      `;
+      errEl.classList.remove("hidden");
     }
-  } else {
-    localStorage.setItem("snack_pos_active_shift_cashier", emp.nik);
+    sfx.warning();
+    return;
   }
+
+  localStorage.setItem("snack_pos_active_shift_cashier", emp.nik);
 
   const hour = new Date().getHours();
   const defaultShift = (hour >= 6 && hour < 14) ? "Shift 1 (Pagi)" : (hour >= 14 && hour < 22) ? "Shift 2 (Siang)" : "Shift 3 (Malam)";
@@ -296,6 +370,57 @@ function handleFirstTimeSetup(event) {
   }
 }
 
+/**
+ * Menyiapkan form modal login kasir (memeriksa gembok shift dan menampilkan status shift berjalan)
+ */
+function prepareEmployeeLoginModal() {
+  const nikInput = document.getElementById("login-employee-nik");
+  const pinInput = document.getElementById("login-employee-pin");
+  const errEl = document.getElementById("login-error-msg");
+  if (nikInput) nikInput.value = "";
+  if (pinInput) pinInput.value = "";
+  if (errEl) {
+    errEl.innerHTML = "";
+    errEl.classList.add("hidden");
+  }
+
+  // Periksa apakah ada shift kasir aktif yang belum di-clerk
+  const activeShift = typeof findActiveUnklerkedShift === "function" ? findActiveUnklerkedShift() : null;
+  const lockNoticeEl = document.getElementById("login-active-shift-notice");
+  if (lockNoticeEl) {
+    if (activeShift && activeShift.nik) {
+      lockNoticeEl.innerHTML = `
+        <div class="p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 text-xs shadow-2xs">
+          <p class="font-black flex items-center gap-1.5 text-amber-900">
+            <span>🔒</span> <span>SESI KASIR SEDANG BERJALAN</span>
+          </p>
+          <p class="text-[11px] text-amber-900 mt-1 leading-relaxed">
+            Kasir aktif: <strong>${activeShift.name} (NIK: ${activeShift.nik})</strong> memiliki <strong>${activeShift.totalCount} transaksi aktif</strong> yang belum di-Clerk.
+          </p>
+          <p class="text-[10px] text-amber-800 font-bold mt-1.5 bg-amber-100/70 p-1.5 rounded-lg border border-amber-200">
+            * Hanya NIK ${activeShift.nik} yang dapat login untuk melanjutkan atau melakukan Tutup Kasir / Clerk [F8].
+          </p>
+        </div>
+      `;
+      lockNoticeEl.classList.remove("hidden");
+      if (nikInput) nikInput.value = activeShift.nik;
+      setTimeout(() => pinInput?.focus(), 150);
+    } else {
+      lockNoticeEl.classList.add("hidden");
+      lockNoticeEl.innerHTML = "";
+      setTimeout(() => nikInput?.focus(), 150);
+    }
+  } else {
+    if (activeShift && activeShift.nik && nikInput) {
+      nikInput.value = activeShift.nik;
+      setTimeout(() => pinInput?.focus(), 150);
+    } else {
+      setTimeout(() => nikInput?.focus(), 150);
+    }
+  }
+}
+window.prepareEmployeeLoginModal = prepareEmployeeLoginModal;
+
 function lockCashierScreen() {
   financialsTempUnlocked = false;
   pos.saveCurrentUser(null);
@@ -313,13 +438,6 @@ function lockCashierScreen() {
   }
 
   openModal("modal-employee-login");
-  const nikInput = document.getElementById("login-employee-nik");
-  const pinInput = document.getElementById("login-employee-pin");
-  const errEl = document.getElementById("login-error-msg");
-  if (nikInput) nikInput.value = "";
-  if (pinInput) pinInput.value = "";
-  if (errEl) errEl.classList.add("hidden");
-  setTimeout(() => nikInput?.focus(), 150);
   showToast("Layar kasir dikunci. Silakan login kembali.", "info");
 }
 
