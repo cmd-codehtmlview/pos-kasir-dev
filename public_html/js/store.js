@@ -41,6 +41,15 @@ class POSStore {
       try { localStorage.setItem("snack_pos_stock_zero_v4", "true"); } catch (e) {}
     }
 
+    // Standar Industri Ritel: Default Minimal Order / Auto Switch Tier adalah OFF (Harga Satuan)
+    if (Array.isArray(this.products)) {
+      this.products.forEach(p => {
+        if (p.autoSwitchTier === undefined) {
+          p.autoSwitchTier = false;
+        }
+      });
+    }
+
     // 2. Pengaturan Toko
     const storedSettings = localStorage.getItem("snack_pos_settings");
     const defaultSettings = (typeof INITIAL_SETTINGS !== 'undefined' && INITIAL_SETTINGS) ? INITIAL_SETTINGS : {};
@@ -52,6 +61,14 @@ class POSStore {
       } catch (e) {
         this.settings = { ...defaultSettings };
       }
+    }
+    // Aturan Default Baru Poin Member: Belanja Rp 200 = 1 Poin
+    if (!this.settings.memberPointSpendStep || this.settings.memberPointSpendStep === 10000) {
+      this.settings.memberPointSpendStep = 200;
+    }
+    if (!this.settings.pointsPerSpend || this.settings.pointsPerSpend === 10000) {
+      this.settings.pointsPerSpend = 200;
+      this.settings.pointsEarned = 1;
     }
     // Jamin Store ID bukan STR-001 (dummy default lama)
     if (!this.settings.storeId || this.settings.storeId === "STR-001") {

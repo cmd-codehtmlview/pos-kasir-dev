@@ -397,8 +397,8 @@ function processPayment() {
       const pointsAfterRedeem = Math.max(0, currentPts - checkoutPointsRedeemed);
 
       // 2. Hitung poin baru dari sisa belanja bersih yang dibayar uang (bukan dari poin)
-      const step = Number(pos.settings.memberPointSpendStep);
-      const earnedPoints = (step > 0 && payable > 0) ? Math.floor(payable / step) : 0;
+      const step = Number(pos.settings.memberPointSpendStep) || 200;
+      const earnedPoints = (step > 0 && payable >= step) ? Math.floor(payable / step) : 0;
 
       member.points = pointsAfterRedeem + earnedPoints;
       member.totalSpend = (Number(member.totalSpend) || 0) + payable;

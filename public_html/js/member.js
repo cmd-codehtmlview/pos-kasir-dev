@@ -323,7 +323,7 @@ function handleRegisterMember(event) {
     name,
     phone,
     address,
-    points: 50, // Bonus sambutan 50 poin
+    points: 0, // Poin awal 0, hanya diperoleh saat transaksi belanja kasir
     totalSpend: 0,
     registeredAt: new Date().toISOString().split("T")[0],
     createdAt: new Date().toISOString()

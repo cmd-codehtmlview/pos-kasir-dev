@@ -38,25 +38,41 @@ function togglePosViewMode(mode) {
 function recalculateItemWholesale(item, product) {
   if (!product || !item) return;
 
-  // Aturan Standar Toko Ritel: Default Auto Grosir / Min. Belanja adalah OFF (Mati)
-  // Hanya aktif jika produk secara sengaja memiliki hasWholesale = true dan memenuhi Qty Minimum
-  const minQty = product.wholesaleMinQty || (product.hasMultiUnit ? 12 : 0);
-  const wholesalePrice = product.wholesalePrice || (product.hasMultiUnit && product.lusinPrice ? Math.round(product.lusinPrice / 12) : 0);
-  const isWholesaleActive = Boolean(product.hasWholesale && minQty > 1 && wholesalePrice > 0 && wholesalePrice < product.price);
+  // Jika kasir sudah manual memilih Tier (A/B/C), hormati pilihan kasir
+  if (item.manualTier) return;
 
-  if (isWholesaleActive && item.qty >= minQty) {
-    item.price = wholesalePrice;
-    item.isWholesale = true;
-    item.wholesaleMinQty = minQty;
-    item.wholesaleSaved = Math.max(0, (product.price - wholesalePrice) * item.qty);
-  } else {
-    item.price = product.price;
-    item.isWholesale = false;
-    item.wholesaleMinQty = minQty;
-    item.wholesaleSaved = 0;
+  const priceA = product.priceA || product.price || item.basePrice || 0;
+  const priceB = product.priceB || (product.hasWholesale && product.wholesalePrice ? product.wholesalePrice : Math.round(priceA * 0.9));
+  const priceC = product.priceC || Math.round(priceA * 0.8);
+  const minB = product.minQtyB || (product.hasWholesale ? product.wholesaleMinQty : 0) || 0;
+  const minC = product.minQtyC || 0;
+
+  // Aturan Standar Toko Ritel: Default Auto Switch / Minimal Order adalah OFF (Mati)
+  // Hanya aktif jika produk secara sengaja diset autoSwitchTier === true
+  const autoSwitch = product.autoSwitchTier === true;
+
+  if (autoSwitch) {
+    if (minC > 1 && item.qty >= minC && priceC > 0) {
+      item.tier = 'C';
+      item.price = priceC;
+      item.isWholesale = true;
+      item.wholesaleSaved = Math.max(0, (priceA - priceC) * item.qty);
+      return;
+    } else if (minB > 1 && item.qty >= minB && priceB > 0) {
+      item.tier = 'B';
+      item.price = priceB;
+      item.isWholesale = true;
+      item.wholesaleSaved = Math.max(0, (priceA - priceB) * item.qty);
+      return;
+    }
   }
-}
 
+  // Default: Harga Satuan (Tier A), minimal order OFF
+  item.tier = 'A';
+  item.price = priceA;
+  item.isWholesale = false;
+  item.wholesaleSaved = 0;
+}
 
 function addToCart(productId, quantity = 1) {
   const product = pos.products.find(p => p.id === productId);
@@ -82,29 +98,31 @@ function addToCart(productId, quantity = 1) {
     const wasWholesale = existingItem.isWholesale;
     recalculateItemWholesale(existingItem, product);
     if (existingItem.isWholesale && !wasWholesale) {
-      showToast(`⚡ Harga Grosir Otomatis Aktif: @${formatRupiah(existingItem.price)} (${existingItem.name})`, "success");
+      showToast(`⚡ Harga Grosir Otomatis: @${formatRupiah(existingItem.price)} (${existingItem.name})`, "success");
     }
   } else {
     const initialQty = Math.min(quantity, product.stock);
+    const priceA = product.priceA || product.price;
     const newItem = {
       id: product.id,
       barcode: product.barcode,
       name: product.name,
       category: product.category,
-      basePrice: product.price,
-      price: product.price,
+      basePrice: priceA,
+      price: priceA,
       costPrice: product.costPrice,
       qty: initialQty,
       unit: product.unit || 'Pcs',
       emoji: product.emoji || '🍪',
       image: product.image,
+      tier: 'A',
       isWholesale: false,
       wholesaleSaved: 0
     };
     recalculateItemWholesale(newItem, product);
     pos.cart.push(newItem);
     if (newItem.isWholesale) {
-      showToast(`⚡ Harga Grosir Otomatis Aktif: @${formatRupiah(newItem.price)} (${newItem.name})`, "success");
+      showToast(`⚡ Harga Grosir Otomatis: @${formatRupiah(newItem.price)} (${newItem.name})`, "success");
     }
   }
 
@@ -317,36 +335,97 @@ function renderPosCart() {
   tableBody.innerHTML = pos.cart.map((item, idx) => {
     const itemTotal = item.price * item.qty;
     const isSelected = idx === selectedCartIndex;
-    const wholesaleBadge = item.isWholesale ? `<span class="ml-1 px-1.5 py-0.2 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded font-black text-[9px]">Grosir</span>` : '';
+    const itemTier = item.tier || 'A';
+    const wholesaleBadge = item.isWholesale ? `<span class="ml-1 px-1.5 py-0.2 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded font-black text-[9px]">${itemTier === 'C' ? 'Pabrik' : 'Grosir'}</span>` : '';
 
     return `
       <div 
         id="cart-row-${idx}"
         onclick="selectedCartIndex = ${idx}; renderPosCart();"
-        class="p-2.5 sm:p-3 grid grid-cols-12 gap-1.5 sm:gap-2 items-center hover:bg-slate-50 text-xs transition cursor-pointer ${isSelected ? 'bg-amber-50/40 border-l-4 border-amber-500' : ''}"
+        class="p-2 sm:p-2.5 grid grid-cols-12 gap-1 sm:gap-2 items-center hover:bg-slate-50 text-xs transition cursor-pointer ${isSelected ? 'bg-amber-50/40 border-l-4 border-amber-500' : ''}"
         data-product-id="${item.id}"
       >
         <span class="col-span-1 text-center font-bold text-slate-400 hidden sm:inline">${idx + 1}</span>
-        <div class="col-span-5 sm:col-span-5 min-w-0">
+        <div class="col-span-4 sm:col-span-4 min-w-0">
           <div class="flex items-center gap-1">
             <h4 class="font-extrabold text-slate-900 text-xs sm:text-sm truncate">${item.name}</h4>
             ${wholesaleBadge}
           </div>
           <p class="text-[10px] text-slate-400 font-mono truncate item-unit-label">@${formatAngka(item.price)} • ${item.barcode || item.plu || '-'}</p>
         </div>
-        <div class="col-span-3 sm:col-span-2 flex items-center justify-center gap-1" onclick="event.stopPropagation();">
+        <div class="col-span-3 sm:col-span-2 flex items-center justify-center gap-0.5 sm:gap-1" onclick="event.stopPropagation();">
           <button type="button" onclick="updateCartQtyByIndex(${idx}, ${item.qty - 1})" class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">-</button>
-          <span class="font-black text-xs sm:text-sm w-4 sm:w-5 text-center item-qty">${item.qty}</span>
+          <input 
+            type="number" 
+            min="1" 
+            value="${item.qty}" 
+            onchange="onCartQtyInputChange(${idx}, this.value)" 
+            onkeydown="if(event.key==='Enter'){this.blur();}"
+            onfocus="this.select()"
+            class="font-black text-xs sm:text-sm w-7 sm:w-11 text-center py-0.5 px-0.5 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
+            title="Ketik angka kuantiti langsung tanpa tombol -+"
+          />
           <button type="button" onclick="updateCartQtyByIndex(${idx}, ${item.qty + 1})" class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-xs cursor-pointer">+</button>
         </div>
+        <div class="col-span-2 sm:col-span-1 flex items-center justify-center" onclick="event.stopPropagation();">
+          <select 
+            onchange="onCartTierChange(${idx}, this.value)" 
+            class="tier-selector item-tier-select px-1 py-0.5 bg-slate-100 hover:bg-slate-200 font-black text-[11px] rounded-lg border border-slate-300 text-slate-800 cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500" 
+            title="Pilih Tier Harga (A: Satuan, B: Grosir, C: Pabrik)"
+          >
+            <option value="A" ${itemTier === 'A' ? 'selected' : ''}>A</option>
+            <option value="B" ${itemTier === 'B' ? 'selected' : ''}>B</option>
+            <option value="C" ${itemTier === 'C' ? 'selected' : ''}>C</option>
+          </select>
+        </div>
         <span class="col-span-2 text-right font-mono font-semibold text-slate-600 hidden sm:inline item-unit-price">${formatAngka(item.price)}</span>
-        <div class="col-span-4 sm:col-span-2 text-right font-mono font-extrabold text-slate-900 text-xs sm:text-sm flex items-center justify-end gap-1">
+        <div class="col-span-3 sm:col-span-2 text-right font-mono font-extrabold text-slate-900 text-xs sm:text-sm flex items-center justify-end gap-1">
           <span class="truncate item-total-price">${formatAngka(itemTotal)}</span>
           <button type="button" onclick="event.stopPropagation(); removeCartItem(${idx})" class="text-rose-500 hover:text-rose-700 text-xs font-bold ml-1 cursor-pointer" title="Hapus item">✕</button>
         </div>
       </div>
     `;
   }).join("");
+}
+
+function onCartQtyInputChange(index, val) {
+  const parsed = parseInt(val, 10);
+  if (isNaN(parsed) || parsed <= 0) {
+    updateCartQtyByIndex(index, 0);
+  } else {
+    updateCartQtyByIndex(index, parsed);
+  }
+}
+
+function onCartTierChange(index, newTier) {
+  if (!pos || !pos.cart || !pos.cart[index]) return;
+  const item = pos.cart[index];
+  const product = pos.products.find(p => p.id === item.id);
+  if (!product) return;
+
+  item.tier = newTier;
+  item.manualTier = true; // Manual override oleh kasir
+
+  const priceA = product.priceA || product.price || item.basePrice || 0;
+  const priceB = product.priceB || (product.hasWholesale && product.wholesalePrice ? product.wholesalePrice : Math.round(priceA * 0.9));
+  const priceC = product.priceC || Math.round(priceA * 0.8);
+
+  if (newTier === 'B') {
+    item.price = priceB;
+    item.isWholesale = true;
+  } else if (newTier === 'C') {
+    item.price = priceC;
+    item.isWholesale = true;
+  } else {
+    item.price = priceA;
+    item.isWholesale = false;
+  }
+
+  const tierName = newTier === 'A' ? 'Satuan' : (newTier === 'B' ? 'Grosir' : 'Pabrik');
+  if (typeof showToast === 'function') {
+    showToast(`Tier ${newTier} (${tierName}) dipilih: @${formatRupiah(item.price)}`, "info");
+  }
+  renderPosCart();
 }
 
 function removeCartItem(idx) {

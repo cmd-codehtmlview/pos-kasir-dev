@@ -277,6 +277,8 @@ function openSisMemberForm(memberId = null) {
   const phoneInput = document.getElementById('sis-member-input-phone');
   const pointsInput = document.getElementById('sis-member-input-points');
 
+  const displayPoints = document.getElementById('sis-member-display-points');
+
   if (memberId) {
     const member = (pos.members || []).find(m => m.id === memberId);
     if (member) {
@@ -284,12 +286,14 @@ function openSisMemberForm(memberId = null) {
       if (nameInput) nameInput.value = member.name || '';
       if (phoneInput) phoneInput.value = member.phone || '';
       if (pointsInput) pointsInput.value = member.points || 0;
+      if (displayPoints) displayPoints.textContent = `${member.points || 0} Poin`;
     }
   } else {
     if (titleEl) titleEl.textContent = '➕ Pendaftaran Member Baru';
     if (nameInput) nameInput.value = '';
     if (phoneInput) phoneInput.value = '';
     if (pointsInput) pointsInput.value = '0';
+    if (displayPoints) displayPoints.textContent = '0 Poin';
   }
 
   if (formBox) formBox.classList.remove('hidden');
@@ -311,11 +315,9 @@ function saveSisMember() {
 
   const nameInput = document.getElementById('sis-member-input-name');
   const phoneInput = document.getElementById('sis-member-input-phone');
-  const pointsInput = document.getElementById('sis-member-input-points');
 
   const name = nameInput ? nameInput.value.trim() : '';
   const phone = phoneInput ? phoneInput.value.trim() : '';
-  const points = pointsInput ? (parseInt(pointsInput.value, 10) || 0) : 0;
 
   if (!name || !phone) {
     if (typeof showMockupToast === 'function') {
@@ -325,12 +327,12 @@ function saveSisMember() {
   }
 
   if (sisEditingMemberId) {
-    // Edit existing member
+    // Edit existing member: POIN TIDAK BISA DIUBAH MANUAL (Hanya dari transaksi belanja)
     const existing = pos.members.find(m => m.id === sisEditingMemberId);
     if (existing) {
       existing.name = name;
       existing.phone = phone;
-      existing.points = points;
+      // existing.points tetap utuh
       existing.updatedAt = new Date().toISOString();
       if (typeof syncSingleMemberToCloud === 'function') {
         syncSingleMemberToCloud(existing);
@@ -353,7 +355,7 @@ function saveSisMember() {
       id: newId,
       name: name,
       phone: phone,
-      points: points,
+      points: 0, // Poin awal selalu 0, hanya bertambah saat transaksi belanja kasir
       totalSpend: 0,
       createdAt: new Date().toISOString()
     };
@@ -362,7 +364,7 @@ function saveSisMember() {
       syncSingleMemberToCloud(newMember);
     }
     if (typeof showMockupToast === 'function') {
-      showMockupToast(`🎉 Member baru "${name}" berhasil didaftarkan!`, 'success');
+      showMockupToast(`🎉 Member baru "${name}" berhasil didaftarkan! Poin awal: 0`, 'success');
     }
   }
 
@@ -415,9 +417,9 @@ function initSisPointsRulesModal() {
   const redeemValInput = document.getElementById('sis-points-redeem-val');
   const minRedeemInput = document.getElementById('sis-points-min-redeem');
 
-  if (spendInput) spendInput.value = s.pointsPerSpend || 10000;
-  if (earnInput) earnInput.value = s.pointsEarned || 10;
-  if (redeemValInput) redeemValInput.value = s.pointValue || 1;
+  if (spendInput) spendInput.value = s.memberPointSpendStep || s.pointsPerSpend || 200;
+  if (earnInput) earnInput.value = s.pointsEarned || 1;
+  if (redeemValInput) redeemValInput.value = s.memberPointRedeemValue || s.pointValue || 1;
   if (minRedeemInput) minRedeemInput.value = s.minRedeemPoints || 100;
 }
 
@@ -429,20 +431,23 @@ function saveSisPointsRules() {
   const redeemValInput = document.getElementById('sis-points-redeem-val');
   const minRedeemInput = document.getElementById('sis-points-min-redeem');
 
-  const spend = spendInput ? Math.max(1000, parseInt(spendInput.value, 10) || 10000) : 10000;
-  const earn = earnInput ? Math.max(1, parseInt(earnInput.value, 10) || 10) : 10;
+  const spend = spendInput ? Math.max(1, parseInt(spendInput.value, 10) || 200) : 200;
+  const earn = earnInput ? Math.max(1, parseInt(earnInput.value, 10) || 1) : 1;
   const redeemVal = redeemValInput ? Math.max(1, parseInt(redeemValInput.value, 10) || 1) : 1;
   const minRedeem = minRedeemInput ? Math.max(10, parseInt(minRedeemInput.value, 10) || 100) : 100;
 
+  const pointStep = Math.max(1, Math.round(spend / earn));
   pos.settings.pointsPerSpend = spend;
   pos.settings.pointsEarned = earn;
+  pos.settings.memberPointSpendStep = pointStep;
   pos.settings.pointValue = redeemVal;
+  pos.settings.memberPointRedeemValue = redeemVal;
   pos.settings.minRedeemPoints = minRedeem;
 
   pos.saveSettings();
 
   if (typeof showMockupToast === 'function') {
-    showMockupToast('🎁 Aturan Poin Reward Berhasil Disimpan!', 'success');
+    showMockupToast(`🎁 Aturan Poin Disimpan: Belanja kelipatan Rp ${pointStep.toLocaleString('id-ID')} = 1 Poin`, 'success');
   }
   if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
   closeSisModal('sis-modal-member-rules');

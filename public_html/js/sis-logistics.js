@@ -325,7 +325,7 @@ function renderSisProductsModal(filterText = "") {
     const priceC = p.priceC || Math.round(priceA * 0.8);
     const minB = p.minQtyB || (p.wholesaleMinQty || 10);
     const minC = p.minQtyC || 50;
-    const autoSwitch = p.autoSwitchTier !== false;
+    const autoSwitch = p.autoSwitchTier === true;
 
     return `
       <div class="p-3 bg-white border border-slate-200/90 rounded-2xl hover:border-emerald-300 transition space-y-2 shadow-2xs">
@@ -387,11 +387,11 @@ function resetSisProductForm() {
   setVal('sis-prod-unit', 'Bks');
   setVal('sis-prod-price-a', '');
   setVal('sis-prod-price-b', '');
-  setVal('sis-prod-min-b', '10');
+  setVal('sis-prod-min-b', '');
   setVal('sis-prod-price-c', '');
-  setVal('sis-prod-min-c', '50');
+  setVal('sis-prod-min-c', '');
   const toggle = document.getElementById('sis-prod-auto-switch');
-  if (toggle) toggle.checked = true;
+  if (toggle) toggle.checked = false;
 
   // SOP: Tambah SKU baru stok fisik wajib 0 & terkunci
   const stockEl = document.getElementById('sis-prod-stock');
@@ -403,7 +403,7 @@ function resetSisProductForm() {
   if (directPrintBtn) directPrintBtn.classList.add('hidden');
 
   const heading = document.getElementById('sis-prod-form-heading');
-  if (heading) heading.textContent = 'Tambah Produk & Multi-Harga Baru';
+  if (heading) heading.textContent = 'Tambah Produk Baru (Default Harga Satuan)';
 }
 
 function editSisProduct(productId) {
@@ -435,10 +435,10 @@ function editSisProduct(productId) {
   if (directPrintBtn) directPrintBtn.classList.remove('hidden');
   
   const priceA = p.price || 0;
-  const priceB = p.priceB || (p.hasWholesale && p.wholesalePrice ? p.wholesalePrice : Math.round(priceA * 0.9));
-  const priceC = p.priceC || Math.round(priceA * 0.8);
-  const minB = p.minQtyB || (p.wholesaleMinQty || 10);
-  const minC = p.minQtyC || 50;
+  const priceB = p.priceB || (p.hasWholesale && p.wholesalePrice ? p.wholesalePrice : '');
+  const priceC = p.priceC || '';
+  const minB = p.minQtyB || (p.wholesaleMinQty || '');
+  const minC = p.minQtyC || '';
 
   setVal('sis-prod-price-a', priceA);
   setVal('sis-prod-price-b', priceB);
@@ -447,7 +447,7 @@ function editSisProduct(productId) {
   setVal('sis-prod-min-c', minC);
 
   const toggle = document.getElementById('sis-prod-auto-switch');
-  if (toggle) toggle.checked = p.autoSwitchTier !== false;
+  if (toggle) toggle.checked = p.autoSwitchTier === true;
 
   const heading = document.getElementById('sis-prod-form-heading');
   if (heading) heading.textContent = `Edit Produk: ${p.name}`;
@@ -464,10 +464,12 @@ function saveSisProduct(andPrint = false) {
   const costPrice = parseFloat(getVal('sis-prod-cost')) || 0;
   const unit = getVal('sis-prod-unit') || 'Bks';
   const priceA = parseFloat(getVal('sis-prod-price-a')) || 0;
-  const priceB = parseFloat(getVal('sis-prod-price-b')) || Math.round(priceA * 0.9);
-  const minB = parseInt(getVal('sis-prod-min-b'), 10) || 10;
-  const priceC = parseFloat(getVal('sis-prod-price-c')) || Math.round(priceA * 0.8);
-  const minC = parseInt(getVal('sis-prod-min-c'), 10) || 50;
+  const rawPriceB = parseFloat(getVal('sis-prod-price-b'));
+  const priceB = !isNaN(rawPriceB) && rawPriceB > 0 ? rawPriceB : 0;
+  const minB = parseInt(getVal('sis-prod-min-b'), 10) || 0;
+  const rawPriceC = parseFloat(getVal('sis-prod-price-c'));
+  const priceC = !isNaN(rawPriceC) && rawPriceC > 0 ? rawPriceC : 0;
+  const minC = parseInt(getVal('sis-prod-min-c'), 10) || 0;
   const autoSwitch = !!document.getElementById('sis-prod-auto-switch')?.checked;
 
   if (!barcode) {
@@ -514,7 +516,7 @@ function saveSisProduct(andPrint = false) {
       prod.priceC = priceC;
       prod.minQtyC = minC;
       prod.autoSwitchTier = autoSwitch;
-      prod.hasWholesale = true;
+      prod.hasWholesale = autoSwitch && priceB > 0;
       prod.wholesalePrice = priceB;
       prod.wholesaleMinQty = minB;
     }
@@ -538,7 +540,7 @@ function saveSisProduct(andPrint = false) {
       priceC: priceC,
       minQtyC: minC,
       autoSwitchTier: autoSwitch,
-      hasWholesale: true,
+      hasWholesale: autoSwitch && priceB > 0,
       wholesalePrice: priceB,
       wholesaleMinQty: minB,
       emoji: '🍘'

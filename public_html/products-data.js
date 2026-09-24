@@ -28,9 +28,13 @@ const INITIAL_SETTINGS = {
   enableSound: true,
   taxPercent: 0,
   scannerAutoEnter: true, // Otomatis langsung tambahkan produk ke keranjang saat scan barcode
-  // Pengaturan Poin Member Minimarket
+  // Pengaturan Poin Member Minimarket (Default: Rp 200 = 1 Poin)
   memberPointSpendStep: 200, // Dapatkan 1 poin setiap kelipatan belanja Rp 200 (0 = nonaktif)
+  pointsPerSpend: 200,
+  pointsEarned: 1,
   memberPointRedeemValue: 1, // Nilai tukar 1 poin = Rp 1 saat pembayaran
+  pointValue: 1,
+  minRedeemPoints: 100,
   // Konfigurasi Cloud Supabase (Dev Project)
   supabaseUrl: "https://2.27.165.72.sslip.io",
   supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg5ODUwNDE4LCJleHAiOjE5NDc1MzA0MTh9.99BRNnUQwei95p1zAqtFBBD5CnUJSedfUeh2MJy97Gg",
