@@ -622,6 +622,8 @@ let sisLpbDraft = [];
 window.selectedLpbProduct = null;
 
 function initSisLpbModal() {
+  switchSisLpbTab('form');
+
   const invInput = document.getElementById('lpb-invoice-no');
   if (invInput && (!invInput.value || invInput.value === 'FAK-2026-8812')) {
     const d = new Date();
@@ -640,6 +642,7 @@ function initSisLpbModal() {
   if (costInput) costInput.value = '';
 
   renderSisLpbDraftTable();
+  renderSisLpbHistory();
 }
 
 function renderSisLpbDraftTable() {
@@ -759,6 +762,148 @@ function removeSisLpbItem(index) {
   }
 }
 
+function switchSisLpbTab(tab = 'form') {
+  const btnForm = document.getElementById('lpb-tab-btn-form');
+  const btnHistory = document.getElementById('lpb-tab-btn-history');
+  const contentForm = document.getElementById('lpb-tab-content-form');
+  const contentHistory = document.getElementById('lpb-tab-content-history');
+  const footerEl = document.getElementById('lpb-modal-footer');
+
+  if (tab === 'form') {
+    if (btnForm) btnForm.className = "flex-1 py-1.5 rounded-xl font-bold bg-white text-slate-900 border border-slate-200 shadow-2xs transition";
+    if (btnHistory) btnHistory.className = "flex-1 py-1.5 rounded-xl font-bold text-slate-500 hover:text-slate-900 transition";
+    if (contentForm) contentForm.classList.remove('hidden');
+    if (contentHistory) contentHistory.classList.add('hidden');
+    if (footerEl) footerEl.classList.remove('hidden');
+  } else {
+    if (btnForm) btnForm.className = "flex-1 py-1.5 rounded-xl font-bold text-slate-500 hover:text-slate-900 transition";
+    if (btnHistory) btnHistory.className = "flex-1 py-1.5 rounded-xl font-bold bg-white text-slate-900 border border-slate-200 shadow-2xs transition";
+    if (contentForm) contentForm.classList.add('hidden');
+    if (contentHistory) contentHistory.classList.remove('hidden');
+    if (footerEl) footerEl.classList.add('hidden');
+    renderSisLpbHistory();
+  }
+}
+
+function renderSisLpbHistory() {
+  const container = document.getElementById('lpb-history-container');
+  if (!container) return;
+
+  const records = (pos && Array.isArray(pos.lpbRecords)) ? pos.lpbRecords : [];
+
+  if (records.length === 0) {
+    container.innerHTML = `
+      <div class="p-8 text-center text-slate-400 bg-white border border-dashed border-slate-200 rounded-2xl">
+        <span class="text-2xl block mb-1">📦</span>
+        <span class="font-bold text-xs block text-slate-600">Belum ada riwayat penerimaan barang (LPB)</span>
+        <span class="text-[11px] text-slate-400 block mt-0.5">Semua faktur masuk dari supplier yang Anda simpan akan muncul di sini.</span>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = records.map((rec, idx) => {
+    const d = rec.date ? new Date(rec.date) : (rec.timestamp ? new Date(rec.timestamp) : new Date());
+    const dateStr = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    const timeStr = rec.time || d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    const totalVal = Number(rec.totalValue || rec.totalAmount || 0).toLocaleString('id-ID');
+    const skuCount = rec.totalItems || (rec.items ? rec.items.length : 0);
+    const totalQty = rec.totalQty || (rec.items ? rec.items.reduce((s, it) => s + (Number(it.qty) || 0), 0) : 0);
+    const supplier = rec.supplierName || rec.supplier || "Distributor";
+    const invoice = rec.invoiceNo || rec.id;
+    const detailId = `sis-lpb-detail-${idx}`;
+
+    const itemsRows = (rec.items || []).map(it => `
+      <div class="py-1 border-b border-slate-100 flex justify-between items-center text-[10px]">
+        <div class="min-w-0 pr-2">
+          <span class="font-bold text-slate-800 block truncate">${it.productName || it.name || 'Produk'}</span>
+          <span class="text-slate-400 font-mono">${it.barcode || ''}</span>
+        </div>
+        <div class="text-right shrink-0 font-mono">
+          <span class="font-bold text-slate-700">${it.qty} ${it.unit || 'pcs'} x Rp ${(it.costPrice || it.cost || 0).toLocaleString('id-ID')}</span>
+          <span class="block text-emerald-700 font-bold">Rp ${(it.subtotal || (it.qty * (it.costPrice || it.cost || 0))).toLocaleString('id-ID')}</span>
+        </div>
+      </div>
+    `).join('');
+
+    return `
+      <div class="p-3.5 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-2.5 hover:border-slate-300 transition">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 font-mono text-[10px] font-bold border border-emerald-200">
+              ${invoice}
+            </span>
+            <span class="text-[10px] text-slate-500 font-medium">${dateStr} • ${timeStr}</span>
+          </div>
+          <span class="font-black text-slate-900 font-mono text-sm">
+            Rp ${totalVal}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-600 pt-1 border-t border-slate-100">
+          <div><span class="text-slate-400">Supplier:</span> <b class="text-slate-800">${supplier}</b></div>
+          <div><span class="text-slate-400">Total Masuk:</span> <b class="text-emerald-700">${skuCount} SKU (${totalQty} Total Item)</b></div>
+        </div>
+
+        <!-- Tombol Aksi Detail & Cetak -->
+        <div class="pt-1 flex items-center justify-between gap-2 border-t border-slate-100">
+          <button 
+            type="button" 
+            onclick="toggleSisLpbDetail('${detailId}')" 
+            class="text-[11px] font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer transition"
+          >
+            <span>👁️</span><span id="${detailId}-lbl">Lihat Rincian Item</span>
+          </button>
+
+          <button 
+            type="button" 
+            onclick="printSisLpbReceiptById('${rec.id}')" 
+            class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl font-bold text-xs flex items-center gap-1.5 transition cursor-pointer active:scale-95 border border-emerald-200"
+          >
+            <span>🖨️</span>
+            <span>Cetak Struk LPB</span>
+          </button>
+        </div>
+
+        <!-- Accordion Detail Items -->
+        <div id="${detailId}" class="hidden mt-2 pt-2 border-t border-dashed border-slate-200 space-y-1 bg-slate-50/60 p-2.5 rounded-xl">
+          <div class="text-[10px] font-bold uppercase text-slate-400 mb-1">Rincian Barang Diterima:</div>
+          ${itemsRows || '<div class="text-slate-400 text-[10px]">Tidak ada data item</div>'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleSisLpbDetail(id) {
+  const el = document.getElementById(id);
+  const lbl = document.getElementById(`${id}-lbl`);
+  if (!el) return;
+  const isHidden = el.classList.contains('hidden');
+  if (isHidden) {
+    el.classList.remove('hidden');
+    if (lbl) lbl.textContent = "Tutup Rincian Item";
+  } else {
+    el.classList.add('hidden');
+    if (lbl) lbl.textContent = "Lihat Rincian Item";
+  }
+}
+
+function printSisLpbReceiptById(lpbId) {
+  const records = (pos && Array.isArray(pos.lpbRecords)) ? pos.lpbRecords : [];
+  const rec = records.find(r => r.id === lpbId || r.invoiceNo === lpbId);
+  if (!rec) {
+    alert("Dokumen LPB tidak ditemukan!");
+    return;
+  }
+
+  if (typeof printLpbReceiptUniversal === 'function') {
+    printLpbReceiptUniversal(rec);
+  } else {
+    window.print();
+  }
+}
+
 function saveSisLpb() {
   if (sisLpbDraft.length === 0) {
     alert("Faktur penerimaan masih kosong! Tambahkan minimal 1 produk barang masuk.");
@@ -802,17 +947,41 @@ function saveSisLpb() {
     }
   });
 
-  // Catat riwayat dokumen LPB
-  if (!Array.isArray(pos.lpbRecords)) pos.lpbRecords = [];
-  pos.lpbRecords.unshift({
+  const now = new Date();
+  const dateStr = now.toISOString().split("T")[0];
+  const timeStr = now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+  const operator = (pos.currentUser ? pos.currentUser.name : "Admin Toko");
+
+  // Catat riwayat dokumen LPB dengan struktur standar
+  const lpbDoc = {
     id: invoiceNo,
+    invoiceNo: invoiceNo,
+    supplierName: supplier,
     supplier: supplier,
-    date: new Date().toISOString(),
-    items: JSON.parse(JSON.stringify(sisLpbDraft)),
-    totalAmount: totalAmount,
+    date: dateStr,
+    time: timeStr,
+    timestamp: Date.now(),
+    operator: operator,
+    paymentType: "TUNAI/KREDIT",
+    items: sisLpbDraft.map(item => ({
+      productId: item.id,
+      productName: item.name,
+      name: item.name,
+      barcode: item.barcode,
+      unit: item.unit || 'pcs',
+      qty: item.qty,
+      costPrice: item.cost,
+      cost: item.cost,
+      subtotal: item.qty * item.cost
+    })),
+    totalItems: sisLpbDraft.length,
     totalQty: totalAddedStock,
-    timestamp: Date.now()
-  });
+    totalValue: totalAmount,
+    totalAmount: totalAmount
+  };
+
+  if (!Array.isArray(pos.lpbRecords)) pos.lpbRecords = [];
+  pos.lpbRecords.unshift(lpbDoc);
 
   if (typeof pos.saveProducts === 'function') pos.saveProducts();
   if (typeof pos.saveMutations === 'function') pos.saveMutations();
@@ -821,7 +990,12 @@ function saveSisLpb() {
   if (typeof renderInventoryTable === 'function') renderInventoryTable();
   if (typeof renderPosCart === 'function') renderPosCart();
 
-  const toastMsg = `📥 Faktur LPB #${invoiceNo} Disimpan! Stok +${totalAddedStock} item bertambah.`;
+  // Cetak Dokumen Penerimaan LPB ke Printer
+  if (typeof printLpbReceiptUniversal === 'function') {
+    printLpbReceiptUniversal(lpbDoc);
+  }
+
+  const toastMsg = `📥 Faktur LPB #${invoiceNo} Disimpan & Dicetak! Stok +${totalAddedStock} item bertambah.`;
   if (typeof showMockupToast === 'function') {
     showMockupToast(toastMsg, 'success');
   } else if (typeof showToast === 'function') {
@@ -829,8 +1003,13 @@ function saveSisLpb() {
   }
 
   sisLpbDraft = [];
-  closeSisModal('sis-modal-lpb');
+  renderSisLpbDraftTable();
+
+  // Tampilkan tab riwayat langsung agar kasir melihat bukti faktur
+  renderSisLpbHistory();
+  switchSisLpbTab('history');
 }
+
 
 
 // =========================================================================

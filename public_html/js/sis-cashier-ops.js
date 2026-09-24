@@ -380,6 +380,8 @@ function printSisReturReceipt(retRecord) {
 // =========================================================================
 
 function initSisCashDropModal() {
+  switchSisCashDropTab('form');
+
   const today = new Date().toISOString().slice(0, 10);
   const trxs = (pos && Array.isArray(pos.transactions)) ? pos.transactions : [];
 
@@ -425,6 +427,8 @@ function initSisCashDropModal() {
     const hhmm = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
     notesInput.value = `Tarik kas pengamanan laci jam ${hhmm}`;
   }
+
+  renderSisCashDropHistory();
 }
 
 function setSisCashDropPreset(amount) {
@@ -458,6 +462,117 @@ function setSisCashDropAllRemaining() {
   if (amountInput) {
     amountInput.value = String(netCash);
   }
+}
+
+function switchSisCashDropTab(tab = 'form') {
+  const btnForm = document.getElementById('cashdrop-tab-btn-form');
+  const btnHistory = document.getElementById('cashdrop-tab-btn-history');
+  const contentForm = document.getElementById('cashdrop-tab-content-form');
+  const contentHistory = document.getElementById('cashdrop-tab-content-history');
+  const footerEl = document.getElementById('cashdrop-modal-footer');
+
+  if (tab === 'form') {
+    if (btnForm) {
+      btnForm.className = "flex-1 py-1.5 rounded-xl font-bold bg-white text-slate-900 border border-slate-200 shadow-2xs transition";
+    }
+    if (btnHistory) {
+      btnHistory.className = "flex-1 py-1.5 rounded-xl font-bold text-slate-500 hover:text-slate-900 transition";
+    }
+    if (contentForm) contentForm.classList.remove('hidden');
+    if (contentHistory) contentHistory.classList.add('hidden');
+    if (footerEl) footerEl.classList.remove('hidden');
+  } else {
+    if (btnForm) {
+      btnForm.className = "flex-1 py-1.5 rounded-xl font-bold text-slate-500 hover:text-slate-900 transition";
+    }
+    if (btnHistory) {
+      btnHistory.className = "flex-1 py-1.5 rounded-xl font-bold bg-white text-slate-900 border border-slate-200 shadow-2xs transition";
+    }
+    if (contentForm) contentForm.classList.add('hidden');
+    if (contentHistory) contentHistory.classList.remove('hidden');
+    if (footerEl) footerEl.classList.add('hidden');
+    renderSisCashDropHistory();
+  }
+}
+
+function renderSisCashDropHistory() {
+  const container = document.getElementById('cashdrop-history-container');
+  if (!container) return;
+
+  let drops = [];
+  try {
+    const raw = localStorage.getItem('snack_pos_cashdrops');
+    drops = raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    drops = [];
+  }
+
+  if (drops.length === 0) {
+    container.innerHTML = `
+      <div class="p-8 text-center text-slate-400 bg-white border border-dashed border-slate-200 rounded-2xl">
+        <span class="text-2xl block mb-1">📥</span>
+        <span class="font-bold text-xs block text-slate-600">Belum ada riwayat setoran kas</span>
+        <span class="text-[11px] text-slate-400 block mt-0.5">Semua bukti cash drop yang disetor ke brankas akan tercatat di sini.</span>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = drops.map(d => {
+    const dateObj = d.timestamp ? new Date(d.timestamp) : new Date();
+    const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    const timeStr = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    const nominal = Number(d.amount || 0).toLocaleString('id-ID');
+
+    return `
+      <div class="p-3 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-2 hover:border-slate-300 transition">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-md bg-slate-100 font-mono text-[10px] font-bold text-slate-700 border border-slate-200">
+              ${d.id}
+            </span>
+            <span class="text-[10px] text-slate-500 font-medium">${dateStr} • ${timeStr}</span>
+          </div>
+          <span class="font-black text-slate-900 font-mono text-sm">
+            Rp ${nominal}
+          </span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-600 pt-1 border-t border-slate-100">
+          <div><span class="text-slate-400">Kasir:</span> <b class="text-slate-800">${d.cashier || 'Kasir'}</b></div>
+          <div><span class="text-slate-400">Penerima:</span> <b class="text-slate-800">${d.supervisor || 'Pejabat Toko'}</b></div>
+          <div class="col-span-2 text-slate-500 truncate"><span class="text-slate-400">Catatan:</span> ${d.notes || '-'}</div>
+        </div>
+        <div class="pt-1 flex justify-end">
+          <button 
+            type="button" 
+            onclick="reprintCashDropById('${d.id}')" 
+            class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs flex items-center gap-1.5 transition cursor-pointer active:scale-95 border border-slate-200/80"
+          >
+            <span>🖨️</span>
+            <span>Cetak Ulang Slip</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function reprintCashDropById(dropId) {
+  let drops = [];
+  try {
+    const raw = localStorage.getItem('snack_pos_cashdrops');
+    drops = raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    drops = [];
+  }
+
+  const drop = drops.find(d => d.id === dropId);
+  if (!drop) {
+    alert("Data setoran kas tidak ditemukan!");
+    return;
+  }
+
+  printSisCashDropSlip(drop);
 }
 
 function saveSisCashDrop() {
@@ -504,38 +619,20 @@ function saveSisCashDrop() {
     showToast(toastMsg, 'success');
   }
 
-  closeSisModal('sis-modal-cashdrop');
+  // Refresh riwayat dan alihkan ke tab riwayat
+  renderSisCashDropHistory();
+  switchSisCashDropTab('history');
 }
 
 function printSisCashDropSlip(dropRecord) {
-  const store = (pos && pos.settings) ? pos.settings : {};
-  const storeName = store.storeName || "SNACKPOS STORE";
-  const dateStr = new Date().toLocaleString('id-ID');
-
-  let slipText = "";
-  slipText += "================================\n";
-  slipText += `${storeName.toUpperCase().padStart(16 + Math.floor(storeName.length / 2))}\n`;
-  slipText += "   BUKTI SETORAN KAS BRANKAS    \n";
-  slipText += "          (CASH DROP)           \n";
-  slipText += "================================\n";
-  slipText += `No. Bukti : ${dropRecord.id}\n`;
-  slipText += `Waktu     : ${dateStr}\n`;
-  slipText += `Kasir     : ${dropRecord.cashier}\n`;
-  slipText += `Penerima  : ${dropRecord.supervisor}\n`;
-  slipText += `Catatan   : ${dropRecord.notes}\n`;
-  slipText += "--------------------------------\n";
-  slipText += `NOMINAL : Rp ${dropRecord.amount.toLocaleString('id-ID')}\n`;
-  slipText += "================================\n\n";
-  slipText += "  Yang Menyetor     Penerima Kas\n\n\n";
-  slipText += ` (${dropRecord.cashier.slice(0, 10)})     (${dropRecord.supervisor.slice(0, 10)})\n`;
-  slipText += "================================\n\n\n";
-
-  if (typeof printRawTextEscPos === 'function') {
-    printRawTextEscPos(slipText);
+  if (typeof printCashDropReceiptUniversal === 'function') {
+    printCashDropReceiptUniversal(dropRecord);
   } else {
-    console.log("Slip Cash Drop:\n", slipText);
+    console.log("Slip Cash Drop:", dropRecord);
+    window.print();
   }
 }
+
 
 
 // =========================================================================

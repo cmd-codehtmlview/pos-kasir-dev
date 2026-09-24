@@ -2902,6 +2902,176 @@ async function generateLpbReceiptBytes(lpbDoc) {
   return await printLpbReceiptUniversal(lpbDoc);
 }
 
+// ==========================================
+// CETAK SLIP SETORAN KAS (CASH DROP BRANKAS)
+// ==========================================
+function buildCashDropEscPos(dropRecord) {
+  if (!dropRecord) return new Uint8Array();
+
+  const is80 = (pos?.settings?.paperWidth) === "80mm";
+  const lineWidth = is80 ? 48 : 32;
+  const builder = new EscPosBuilder(lineWidth);
+
+  const storeName = (pos?.settings?.storeName || "TOKO SNACK BERKAH").toUpperCase();
+  const storeAddress = pos?.settings?.storeAddress || "";
+  const storePhone = pos?.settings?.storePhone ? `Telp: ${pos.settings.storePhone}` : "";
+  const feedLines = parseInt(pos?.settings?.printerFeedLines, 10) || 3;
+
+  function formatRp(num) {
+    if (num === null || num === undefined || isNaN(num)) return "0";
+    return new Intl.NumberFormat("id-ID").format(Math.round(num));
+  }
+
+  // 1. HEADER TOKO
+  builder.init()
+    .alignCenter()
+    .bold(true)
+    .size(false, true)
+    .text(storeName)
+    .newline()
+    .sizeNormal()
+    .bold(false);
+
+  if (storeAddress) builder.text(storeAddress).newline();
+  if (storePhone) builder.text(storePhone).newline();
+
+  const d = dropRecord.timestamp ? new Date(dropRecord.timestamp) : new Date();
+  const dateStr = d.toLocaleDateString("id-ID");
+  const timeStr = d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
+  builder.lineDashed('=')
+    .bold(true)
+    .text("*** BUKTI SETORAN KAS (CASH DROP) ***")
+    .newline()
+    .bold(false)
+    .lineDashed('-')
+    .alignLeft()
+    .lineLeftRight(`No. Bukti : ${dropRecord.id}`, `${dateStr} ${timeStr}`)
+    .lineLeftRight(`Kasir     : ${(dropRecord.cashier || 'Kasir').slice(0, 16)}`, `Shift: ${pos?.settings?.shiftName || 'Shift 1'}`)
+    .lineLeftRight(`Penerima  : ${(dropRecord.supervisor || 'Pejabat Toko').slice(0, 16)}`, '')
+    .lineLeftRight(`Catatan   : ${(dropRecord.notes || '-').slice(0, lineWidth - 12)}`, '')
+    .lineDashed('-');
+
+  builder.bold(true)
+    .size(false, true)
+    .lineLeftRight("NOMINAL DROP", `Rp ${formatRp(dropRecord.amount)}`)
+    .sizeNormal()
+    .bold(false)
+    .lineDashed('=');
+
+  // TANDA TANGAN SERAH TERIMA
+  builder.alignCenter()
+    .newline()
+    .text("Diserahkan Oleh,           Diterima Oleh,")
+    .newline()
+    .newline()
+    .newline()
+    .text(`( ${(dropRecord.cashier || 'Kasir').slice(0, 12)} )          ( ${(dropRecord.supervisor || 'Pejabat').slice(0, 12)} )`)
+    .newline()
+    .newline()
+    .text("Uang kas telah dihitung fisik & masuk brankas.")
+    .newline()
+    .feed(feedLines)
+    .cut();
+
+  return builder.build();
+}
+
+async function printCashDropReceiptUniversal(dropRecord) {
+  if (!dropRecord) {
+    showToast("Data slip setoran kas (cash drop) tidak ditemukan!", "warning");
+    return;
+  }
+
+  const mode = pos?.settings?.printerDriverMode || 'bluetooth';
+
+  if (mode === 'webusb') {
+    const isConnected = await checkOrPromptUsbConnection("slip setoran kas (cash drop)");
+    if (isConnected) {
+      try {
+        showToast("Mencetak slip cash drop via USB...", "info");
+        const bytes = buildCashDropEscPos(dropRecord);
+        await sendBytesToUsb(bytes, { id: dropRecord.id, title: 'Cash Drop #' + dropRecord.id, type: 'cashdrop' });
+        showToast("Slip cash drop berhasil dicetak via USB! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+        return;
+      } catch (err) {
+        console.warn("Gagal cetak cash drop via USB:", err);
+      }
+    }
+  } else if (mode === 'bluetooth') {
+    const isConnected = await checkOrPromptBluetoothConnection("slip setoran kas (cash drop)");
+    if (isConnected) {
+      try {
+        showToast("Mencetak slip cash drop via Bluetooth...", "info");
+        const bytes = buildCashDropEscPos(dropRecord);
+        await sendBytesToBluetooth(bytes, { id: dropRecord.id, title: 'Cash Drop #' + dropRecord.id, type: 'cashdrop' });
+        showToast("Slip cash drop berhasil dicetak! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+        return;
+      } catch (err) {
+        console.warn("Gagal cetak cash drop via Bluetooth:", err);
+      }
+    }
+  } else if (mode === 'rawbt') {
+    try {
+      const bytes = buildCashDropEscPos(dropRecord);
+      printViaRawBT(bytes);
+      if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+      return;
+    } catch (err) {
+      console.warn("Gagal kirim cash drop ke RawBT:", err);
+    }
+  }
+
+  // Fallback ke browser print
+  const store = pos?.settings || {};
+  const storeName = store.storeName || "TOKO SNACK BERKAH";
+  const d = dropRecord.timestamp ? new Date(dropRecord.timestamp) : new Date();
+  const dateStr = d.toLocaleString('id-ID');
+
+  const printWindow = window.open('', '_blank', 'width=350,height=500');
+  if (printWindow) {
+    printWindow.document.write(`
+      <html>
+      <head>
+        <title>Slip Cash Drop - ${dropRecord.id}</title>
+        <style>
+          body { font-family: monospace; font-size: 12px; margin: 10px; line-height: 1.4; color: #000; }
+          .center { text-align: center; }
+          .bold { font-weight: bold; }
+          .border-b { border-bottom: 1px dashed #000; margin: 6px 0; }
+          .row { display: flex; justify-content: space-between; }
+          .sig { display: flex; justify-content: space-between; margin-top: 25px; text-align: center; }
+        </style>
+      </head>
+      <body>
+        <div class="center bold" style="font-size:14px;">${storeName.toUpperCase()}</div>
+        <div class="center bold">BUKTI SETORAN KAS (CASH DROP)</div>
+        <div class="border-b"></div>
+        <div class="row"><span>No. Bukti:</span><span>${dropRecord.id}</span></div>
+        <div class="row"><span>Waktu:</span><span>${dateStr}</span></div>
+        <div class="row"><span>Kasir:</span><span>${dropRecord.cashier || 'Kasir'}</span></div>
+        <div class="row"><span>Penerima:</span><span>${dropRecord.supervisor || 'Supervisor'}</span></div>
+        <div class="row"><span>Catatan:</span><span>${dropRecord.notes || '-'}</span></div>
+        <div class="border-b"></div>
+        <div class="row bold" style="font-size:14px;"><span>NOMINAL:</span><span>Rp ${(dropRecord.amount || 0).toLocaleString('id-ID')}</span></div>
+        <div class="border-b"></div>
+        <div class="sig">
+          <div>Diserahkan,<br><br><br>(${dropRecord.cashier || 'Kasir'})</div>
+          <div>Diterima,<br><br><br>(${dropRecord.supervisor || 'Supervisor'})</div>
+        </div>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    setTimeout(() => printWindow.close(), 1000);
+  }
+}
+
+
 
 function updateBluetoothUI() {
   const badge = document.getElementById("bluetooth-status-indicator");

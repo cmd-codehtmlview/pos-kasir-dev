@@ -2689,25 +2689,35 @@
         <button onclick="closeSisModal('sis-modal-klerk')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 font-bold flex items-center justify-center text-xs transition cursor-pointer border border-slate-200/60 active:scale-95">✕</button>
       </div>
 
-      <!-- Klerk Body -->
-      <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
+      <!-- Tab Selector: Closing Sekarang vs Riwayat Closing Shift -->
+      <div class="p-2 bg-blue-50/50 border-b border-blue-100 flex gap-1 text-xs">
+        <button id="klerk-tab-btn-form" onclick="switchSisKlerkTab('form')" class="flex-1 py-1.5 rounded-xl font-bold bg-white text-slate-900 border border-slate-200 shadow-2xs transition">
+          📋 Closing Shift Sekarang
+        </button>
+        <button id="klerk-tab-btn-history" onclick="switchSisKlerkTab('history')" class="flex-1 py-1.5 rounded-xl font-bold text-slate-500 hover:text-slate-900 transition">
+          📜 Riwayat Closing (Klerk)
+        </button>
+      </div>
+
+      <!-- Tab 1: Form Closing Kasir -->
+      <div id="klerk-tab-content-form" class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
         <!-- Kasir & Shift Header Info -->
         <div class="grid grid-cols-2 gap-2 bg-slate-50 border border-slate-200/80 p-3 rounded-2xl">
           <div>
             <span class="text-[10px] text-slate-500 font-bold uppercase block">Kasir Aktif (NIK):</span>
-            <span class="font-black text-slate-900 text-xs">1003 • Siti Aminah</span>
+            <span id="sis-klerk-nik-name" class="font-black text-slate-900 text-xs">1001 • Kasir Toko</span>
           </div>
           <div>
             <span class="text-[10px] text-slate-500 font-bold uppercase block">Shift Kerja:</span>
-            <span class="font-black text-slate-900 text-xs font-mono">Shift 1 (Pagi - Sore)</span>
+            <span id="sis-klerk-shift-name" class="font-black text-slate-900 text-xs font-mono">Shift 1 (Pagi - Sore)</span>
           </div>
           <div>
             <span class="text-[10px] text-slate-500 font-bold uppercase block">Modal Awal Laci:</span>
-            <span class="font-bold text-slate-700 font-mono">Rp 200.000</span>
+            <span id="sis-klerk-initial-val" class="font-bold text-slate-700 font-mono">Rp 200.000</span>
           </div>
           <div>
             <span class="text-[10px] text-slate-500 font-bold uppercase block">No. Terminal:</span>
-            <span class="font-bold text-slate-700 font-mono">POS-01 (Kasir 1)</span>
+            <span id="sis-klerk-terminal-val" class="font-bold text-slate-700 font-mono">POS-01 (Kasir 1)</span>
           </div>
         </div>
 
@@ -2763,19 +2773,19 @@
             <div class="space-y-1.5 font-mono text-xs">
               <div class="flex justify-between text-slate-600">
                 <span>Modal Awal Laci:</span>
-                <span class="font-bold text-slate-800">Rp 200.000</span>
+                <span id="klerk-result-modal-awal" class="font-bold text-slate-800">Rp 200.000</span>
               </div>
               <div class="flex justify-between text-slate-600">
                 <span>Penjualan Tunai (Sistem):</span>
-                <span class="font-bold text-slate-800">Rp 1.850.000</span>
+                <span id="klerk-result-sales-val" class="font-bold text-slate-800">Rp 0</span>
               </div>
               <div class="flex justify-between text-slate-900 font-bold border-t border-dashed border-slate-200 pt-1">
                 <span>Target Kas Fisik:</span>
-                <span class="text-blue-700 font-black">Rp 2.050.000</span>
+                <span id="klerk-result-target-val" class="text-blue-700 font-black">Rp 200.000</span>
               </div>
               <div class="flex justify-between text-slate-900 font-bold">
                 <span>Fisik Kasir (Input):</span>
-                <span id="klerk-result-input-cash" class="text-slate-900 font-black">Rp 2.050.000</span>
+                <span id="klerk-result-input-cash" class="text-slate-900 font-black">Rp 0</span>
               </div>
               <div class="flex justify-between items-center border-t border-slate-300 pt-1.5 text-xs font-black">
                 <span>SELISIH KAS LACI:</span>
@@ -2796,16 +2806,16 @@
             </div>
             <div class="space-y-1 font-mono text-[11px] text-indigo-900">
               <div class="flex justify-between">
-                <span>QRIS Toko (8 Transaksi):</span>
-                <span class="font-bold">Rp 450.000</span>
+                <span>QRIS Toko:</span>
+                <span id="klerk-result-qris-val" class="font-bold">Rp 0</span>
               </div>
               <div class="flex justify-between">
-                <span>Debit EDC (3 Transaksi):</span>
-                <span class="font-bold">Rp 150.000</span>
+                <span>Debit / EDC:</span>
+                <span id="klerk-result-edc-val" class="font-bold">Rp 0</span>
               </div>
               <div class="flex justify-between border-t border-indigo-200 pt-1 font-bold text-indigo-950">
                 <span>Total Non-Tunai Bank:</span>
-                <span>Rp 600.000</span>
+                <span id="klerk-result-noncash-total">Rp 0</span>
               </div>
             </div>
             <p class="text-[10px] text-indigo-600 leading-snug">
@@ -2817,10 +2827,21 @@
           <div class="p-3 bg-slate-900 text-white rounded-2xl flex items-center justify-between font-mono">
             <div>
               <span class="text-[10px] text-slate-400 font-bold uppercase block">Total Omzet Kasir Shift Ini:</span>
-              <span class="text-[10px] text-slate-300">(Tunai Rp 1.850.000 + Non-Tunai Rp 600.000)</span>
+              <span class="text-[10px] text-slate-300">Akumulasi Tunai &amp; Non-Tunai</span>
             </div>
-            <span class="text-base font-black text-amber-400">Rp 2.450.000</span>
+            <span id="klerk-result-omzet-total" class="text-base font-black text-amber-400">Rp 0</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Riwayat Closing Shift -->
+      <div id="klerk-tab-content-history" class="hidden p-4 overflow-y-auto space-y-3 flex-1 text-xs">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">Daftar Closing Kasir (Settlement):</span>
+          <span class="text-[10px] text-slate-400 font-medium">Tersimpan di sistem &amp; database</span>
+        </div>
+        <div id="klerk-history-container" class="space-y-2.5">
+          <!-- Rendered dynamically via renderSisKlerkHistory() -->
         </div>
       </div>
 
@@ -2981,7 +3002,18 @@
         <button onclick="closeSisModal('sis-modal-cashdrop')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 font-bold flex items-center justify-center text-xs transition cursor-pointer border border-slate-200/60 active:scale-95">✕</button>
       </div>
 
-      <div class="p-4 space-y-3.5 text-xs">
+      <!-- Tab Selector: Tarik Kas Baru vs Riwayat Tarik Kas -->
+      <div class="p-2 bg-slate-100/70 border-b border-slate-200 flex gap-1 text-xs">
+        <button id="cashdrop-tab-btn-form" onclick="switchSisCashDropTab('form')" class="flex-1 py-1.5 rounded-xl font-bold bg-white text-slate-900 border border-slate-200 shadow-2xs transition">
+          📥 Tarik Kas Baru
+        </button>
+        <button id="cashdrop-tab-btn-history" onclick="switchSisCashDropTab('history')" class="flex-1 py-1.5 rounded-xl font-bold text-slate-500 hover:text-slate-900 transition">
+          📜 Riwayat Tarik Kas
+        </button>
+      </div>
+
+      <!-- Tab 1: Form Input Tarik Kas -->
+      <div id="cashdrop-tab-content-form" class="p-4 space-y-3.5 text-xs overflow-y-auto flex-1">
         <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-[11px] text-slate-700 leading-relaxed flex items-center justify-between">
           <div>
             <span class="block text-[10px] text-slate-400 font-bold uppercase">Kas Fisik di Laci Saat Ini:</span>
@@ -3013,7 +3045,18 @@
         </div>
       </div>
 
-      <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
+      <!-- Tab 2: Riwayat Tarik Kas -->
+      <div id="cashdrop-tab-content-history" class="hidden p-4 space-y-3 text-xs overflow-y-auto flex-1">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">Daftar Cash Drop ke Brankas:</span>
+          <span class="text-[10px] text-slate-400 font-medium">Shift &amp; Harian</span>
+        </div>
+        <div id="cashdrop-history-container" class="space-y-2.5">
+          <!-- Rendered dynamically via renderSisCashDropHistory() -->
+        </div>
+      </div>
+
+      <div id="cashdrop-modal-footer" class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-cashdrop')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
         <button onclick="saveSisCashDrop()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
           💾 Simpan &amp; Cetak Bukti Setor
@@ -3038,7 +3081,18 @@
         <button onclick="closeSisModal('sis-modal-lpb')" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-700 font-bold flex items-center justify-center text-xs transition cursor-pointer border border-slate-200/60 active:scale-95">✕</button>
       </div>
 
-      <div class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
+      <!-- Tab Selector: Input Baru vs Riwayat LPB -->
+      <div class="p-2 bg-emerald-50/50 border-b border-emerald-100 flex gap-1 text-xs">
+        <button id="lpb-tab-btn-form" onclick="switchSisLpbTab('form')" class="flex-1 py-1.5 rounded-xl font-bold bg-white text-slate-900 border border-slate-200 shadow-2xs transition">
+          📥 Input Penerimaan Baru
+        </button>
+        <button id="lpb-tab-btn-history" onclick="switchSisLpbTab('history')" class="flex-1 py-1.5 rounded-xl font-bold text-slate-500 hover:text-slate-900 transition">
+          📋 Riwayat LPB Masuk
+        </button>
+      </div>
+
+      <!-- Tab 1: Form Input Penerimaan LPB -->
+      <div id="lpb-tab-content-form" class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Nomor Faktur Supplier *</label>
@@ -3135,10 +3189,21 @@
         </div>
       </div>
 
-      <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
+      <!-- Tab 2: Riwayat LPB Masuk -->
+      <div id="lpb-tab-content-history" class="hidden p-4 overflow-y-auto space-y-3 flex-1 text-xs">
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">Daftar Faktur LPB Masuk:</span>
+          <span class="text-[10px] text-slate-400 font-medium">Stok telah terupdate ke sistem</span>
+        </div>
+        <div id="lpb-history-container" class="space-y-2.5">
+          <!-- Rendered dynamically via renderSisLpbHistory() -->
+        </div>
+      </div>
+
+      <div id="lpb-modal-footer" class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <button onclick="closeSisModal('sis-modal-lpb')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
         <button onclick="saveSisLpb()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs active:scale-95 transition">
-          💾 Simpan Faktur LPB
+          💾 Simpan &amp; Cetak Faktur LPB
         </button>
       </div>
     </div>
@@ -9529,17 +9594,109 @@
       }
     }
 
-    // ================= LOGIKA BLIND KLERK OPERASIONAL RITEL =================
-    const KLERK_SYSTEM_DATA = {
-      cashier: "1003 • Siti Aminah",
-      shift: "Shift 1 (Pagi)",
-      initialFloat: 200000,    // Modal awal laci kasir
-      systemCashSales: 1850000, // Penjualan tunai tercatat di sistem
-      systemNonCash: [          // Penjualan non-tunai (tidak masuk laci fisik)
-        { method: "QRIS Toko", trxCount: 8, amount: 450000 },
-        { method: "Debit EDC", trxCount: 3, amount: 150000 }
-      ]
-    };
+    // ================= LOGIKA KLERK (CLOSING SHIFT KASIR) REAL RETAIL =================
+    function switchSisKlerkTab(tab = 'form') {
+      const btnForm = document.getElementById('klerk-tab-btn-form');
+      const btnHistory = document.getElementById('klerk-tab-btn-history');
+      const contentForm = document.getElementById('klerk-tab-content-form');
+      const contentHistory = document.getElementById('klerk-tab-content-history');
+      const footerInput = document.getElementById('klerk-footer-input');
+      const footerResult = document.getElementById('klerk-footer-result');
+
+      if (tab === 'form') {
+        if (btnForm) btnForm.className = "flex-1 py-1.5 rounded-xl font-bold bg-white text-slate-900 border border-slate-200 shadow-2xs transition";
+        if (btnHistory) btnHistory.className = "flex-1 py-1.5 rounded-xl font-bold text-slate-500 hover:text-slate-900 transition";
+        if (contentForm) contentForm.classList.remove('hidden');
+        if (contentHistory) contentHistory.classList.add('hidden');
+        if (footerInput) footerInput.classList.remove('hidden');
+      } else {
+        if (btnForm) btnForm.className = "flex-1 py-1.5 rounded-xl font-bold text-slate-500 hover:text-slate-900 transition";
+        if (btnHistory) btnHistory.className = "flex-1 py-1.5 rounded-xl font-bold bg-white text-slate-900 border border-slate-200 shadow-2xs transition";
+        if (contentForm) contentForm.classList.add('hidden');
+        if (contentHistory) contentHistory.classList.remove('hidden');
+        if (footerInput) footerInput.classList.add('hidden');
+        if (footerResult) footerResult.classList.add('hidden');
+        renderSisKlerkHistory();
+      }
+    }
+
+    function initSisKlerkModal() {
+      switchSisKlerkTab('form');
+      resetKlerkForm();
+
+      const activeUser = (window.pos && pos.currentUser) ? pos.currentUser : {
+        nik: pos?.settings?.cashierNik || "1001",
+        name: pos?.settings?.cashierName || "Kasir Utama",
+        role: "CREW"
+      };
+      const shiftName = pos?.settings?.shiftName || "Shift 1";
+      const terminalId = pos?.settings?.terminalId || "POS-01";
+      const initialCash = Number(pos?.settings?.defaultInitialCash) || 200000;
+
+      // Ambil transaksi hari ini yang belum diklerk
+      const todayStr = new Date().toISOString().split("T")[0];
+      const todayTrxs = (pos && Array.isArray(pos.transactions)) ? pos.transactions.filter(t => {
+        if (!t) return false;
+        const d = t.date ? t.date.slice(0, 10) : (t.createdAt ? t.createdAt.slice(0, 10) : "");
+        return d === todayStr && !t.klerkId;
+      }) : [];
+
+      let cashSales = 0;
+      let qrisSales = 0;
+      let edcSales = 0;
+
+      todayTrxs.forEach(t => {
+        const method = (t.paymentMethod || 'CASH').toUpperCase();
+        const total = Number(t.grandTotal || t.total) || 0;
+        if (method === 'CASH') {
+          cashSales += total;
+        } else if (method === 'QRIS') {
+          qrisSales += total;
+        } else {
+          edcSales += total;
+        }
+      });
+
+      // Retur hari ini yang belum diklerk
+      const todayReturns = (pos && Array.isArray(pos.returns)) ? pos.returns.filter(r => {
+        if (!r) return false;
+        const d = r.date ? r.date.slice(0, 10) : (r.createdAt ? r.createdAt.slice(0, 10) : "");
+        return d === todayStr && !r.klerkId;
+      }) : [];
+
+      let cashRefunds = 0;
+      todayReturns.forEach(r => {
+        cashRefunds += Number(r.refundAmount || r.totalRefund || 0);
+      });
+
+      const expectedCash = initialCash + cashSales - cashRefunds;
+
+      window.sisActiveKlerkState = {
+        activeUser,
+        shiftName,
+        terminalId,
+        initialCash,
+        cashSales,
+        cashRefunds,
+        qrisSales,
+        edcSales,
+        expectedCash,
+        todayTrxs,
+        trxCount: todayTrxs.length
+      };
+
+      // Update UI Header
+      const nikEl = document.getElementById('sis-klerk-nik-name');
+      if (nikEl) nikEl.textContent = `${activeUser.nik || '1001'} • ${activeUser.name || 'Kasir'}`;
+      const shiftEl = document.getElementById('sis-klerk-shift-name');
+      if (shiftEl) shiftEl.textContent = `${shiftName}`;
+      const initialEl = document.getElementById('sis-klerk-initial-val');
+      if (initialEl) initialEl.textContent = `Rp ${initialCash.toLocaleString('id-ID')}`;
+      const termEl = document.getElementById('sis-klerk-terminal-val');
+      if (termEl) termEl.textContent = `${terminalId}`;
+
+      renderSisKlerkHistory();
+    }
 
     function handleKlerkInputFormat(el) {
       // Hanya izinkan angka murni
@@ -9573,6 +9730,7 @@
     }
 
     function submitBlindKlerk() {
+      const state = window.sisActiveKlerkState || {};
       const inputEl = document.getElementById('klerk-input-nominal');
       const rawVal = inputEl ? inputEl.value.replace(/[^0-9]/g, '') : '';
       
@@ -9583,10 +9741,17 @@
       }
 
       const inputCash = parseInt(rawVal, 10);
-      const targetCash = KLERK_SYSTEM_DATA.initialFloat + KLERK_SYSTEM_DATA.systemCashSales; // Rp 2.050.000
+      const targetCash = typeof state.expectedCash === 'number' ? state.expectedCash : (state.initialCash || 200000) + (state.cashSales || 0);
       const diff = inputCash - targetCash;
 
       // Update tampilan hasil rekonsiliasi kas laci
+      const modalAwalEl = document.getElementById('klerk-result-modal-awal');
+      if (modalAwalEl) modalAwalEl.textContent = 'Rp ' + (state.initialCash || 0).toLocaleString('id-ID');
+      const salesEl = document.getElementById('klerk-result-sales-val');
+      if (salesEl) salesEl.textContent = 'Rp ' + (state.cashSales || 0).toLocaleString('id-ID');
+      const targetEl = document.getElementById('klerk-result-target-val');
+      if (targetEl) targetEl.textContent = 'Rp ' + targetCash.toLocaleString('id-ID');
+
       const inputCashEl = document.getElementById('klerk-result-input-cash');
       const diffEl = document.getElementById('klerk-result-diff');
       const badgeEl = document.getElementById('klerk-result-badge');
@@ -9615,6 +9780,60 @@
         }
       }
 
+      // Non-tunai info
+      const qrisEl = document.getElementById('klerk-result-qris-val');
+      if (qrisEl) qrisEl.textContent = 'Rp ' + (state.qrisSales || 0).toLocaleString('id-ID');
+      const edcEl = document.getElementById('klerk-result-edc-val');
+      if (edcEl) edcEl.textContent = 'Rp ' + (state.edcSales || 0).toLocaleString('id-ID');
+      const nonCashTotalEl = document.getElementById('klerk-result-noncash-total');
+      const nonCashTotal = (state.qrisSales || 0) + (state.edcSales || 0);
+      if (nonCashTotalEl) nonCashTotalEl.textContent = 'Rp ' + nonCashTotal.toLocaleString('id-ID');
+      const totalOmzetEl = document.getElementById('klerk-result-omzet-total');
+      const totalOmzet = (state.cashSales || 0) + nonCashTotal;
+      if (totalOmzetEl) totalOmzetEl.textContent = 'Rp ' + totalOmzet.toLocaleString('id-ID');
+
+      // Buat record klerk resmi
+      const now = new Date();
+      const klerkId = 'KLR-' + now.toISOString().slice(0, 10).replace(/-/g, '') + '-' + Math.floor(100 + Math.random() * 900);
+      const notesVal = (document.getElementById('klerk-input-notes')?.value || '').trim();
+
+      const klerkDoc = {
+        id: klerkId,
+        date: now.toISOString().slice(0, 10),
+        time: now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+        cashierNik: state.activeUser?.nik || '1001',
+        cashierName: state.activeUser?.name || 'Kasir',
+        shift: state.shiftName || 'Shift 1',
+        terminal: state.terminalId || 'POS-01',
+        posNumber: state.terminalId || 'POS-01',
+        initialCash: state.initialCash || 0,
+        cashSales: state.cashSales || 0,
+        cashRefunds: state.cashRefunds || 0,
+        qrisSales: state.qrisSales || 0,
+        edcSales: state.edcSales || 0,
+        expectedCash: targetCash,
+        physicalCash: inputCash,
+        physicalTotal: inputCash,
+        variance: diff,
+        diff: diff,
+        status: diff === 0 ? "KLOP" : (diff > 0 ? "LEBIH" : "KURANG"),
+        notes: notesVal,
+        createdAt: now.toISOString()
+      };
+
+      if (!Array.isArray(pos.klerkHistory)) pos.klerkHistory = [];
+      pos.klerkHistory.unshift(klerkDoc);
+      if (typeof pos.saveKlerkHistory === 'function') pos.saveKlerkHistory();
+
+      // Tandai transaksi
+      if (Array.isArray(state.todayTrxs)) {
+        state.todayTrxs.forEach(t => { t.klerkId = klerkId; });
+        if (typeof pos.saveTransactions === 'function') pos.saveTransactions();
+      }
+
+      window.activeKlerkRecord = klerkDoc;
+      window.lastCompletedKlerk = klerkDoc;
+
       // Alihkan section dari input ke hasil
       const inputSection = document.getElementById('klerk-input-section');
       const resultSection = document.getElementById('klerk-result-section');
@@ -9626,25 +9845,103 @@
       if (footerInput) footerInput.classList.add('hidden');
       if (footerResult) footerResult.classList.remove('hidden');
 
-      showMockupToast('💾 Data fisik klerk terkunci & hasil rekonsiliasi keluar!', 'success');
+      showMockupToast('💾 Data closing klerk tersimpan & terkunci!', 'success');
+      renderSisKlerkHistory();
+    }
 
-      // Rekam data klerk aktif untuk pencetakan struk
-      const klerkRec = {
-        id: 'KLERK-' + Date.now(),
-        date: new Date().toISOString(),
-        cashier: KLERK_SYSTEM_DATA.cashier,
-        shift: KLERK_SYSTEM_DATA.shift,
-        initialFloat: KLERK_SYSTEM_DATA.initialFloat,
-        cashSales: KLERK_SYSTEM_DATA.systemCashSales,
-        nonCashSales: KLERK_SYSTEM_DATA.systemNonCash.reduce((acc, c) => acc + c.amount, 0),
-        totalExpected: targetCash,
-        actualCash: inputCash,
-        difference: diff,
-        notes: (document.getElementById('klerk-input-notes')?.value || '').trim()
-      };
-      if (typeof window !== 'undefined') {
-        window.activeKlerkRecord = klerkRec;
-        window.lastCompletedKlerk = klerkRec;
+    function printKlerkReceipt() {
+      const k = window.lastCompletedKlerk || window.activeKlerkRecord;
+      if (!k) {
+        showMockupToast('⚠️ Belum ada data closing klerk untuk dicetak!', 'warning');
+        return;
+      }
+      if (typeof printKlerkReceiptUniversal === 'function') {
+        printKlerkReceiptUniversal(k);
+      } else {
+        window.print();
+      }
+    }
+
+    function renderSisKlerkHistory() {
+      const container = document.getElementById('klerk-history-container');
+      if (!container) return;
+
+      const history = (pos && Array.isArray(pos.klerkHistory)) ? pos.klerkHistory : [];
+      if (history.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center text-slate-400 bg-white border border-dashed border-slate-200 rounded-2xl">
+            <span class="text-2xl block mb-1">📋</span>
+            <span class="font-bold text-xs block text-slate-600">Belum ada riwayat closing klerk</span>
+            <span class="text-[11px] text-slate-400 block mt-0.5">Semua data closing kasir per shift akan tercatat di sini.</span>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = history.map(k => {
+        const diff = Number(k.variance || k.diff) || 0;
+        let badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✅ KLOP</span>`;
+        let diffColor = "text-emerald-700";
+        let diffText = "Rp 0";
+        if (diff > 0) {
+          badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300">📈 LEBIH</span>`;
+          diffColor = "text-blue-700";
+          diffText = `+Rp ${diff.toLocaleString('id-ID')}`;
+        } else if (diff < 0) {
+          badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">📉 KURANG</span>`;
+          diffColor = "text-rose-700";
+          diffText = `-Rp ${Math.abs(diff).toLocaleString('id-ID')}`;
+        }
+
+        return `
+          <div class="p-3.5 bg-white border border-slate-200/90 rounded-2xl shadow-2xs space-y-2.5 hover:border-slate-300 transition">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 font-mono text-[10px] font-bold border border-blue-200">
+                  ${k.id}
+                </span>
+                <span class="text-[10px] text-slate-500 font-medium">${k.date || ''} • ${k.time || ''}</span>
+              </div>
+              ${badge}
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-[10px] text-slate-600 pt-1 border-t border-slate-100">
+              <div><span class="text-slate-400">Kasir:</span> <b class="text-slate-800">${k.cashierName || 'Kasir'}</b> <span class="font-mono text-slate-400">[${k.cashierNik || ''}]</span></div>
+              <div><span class="text-slate-400">Shift / POS:</span> <b class="text-slate-800">${k.shift || 'Shift 1'} (${k.terminal || 'POS-01'})</b></div>
+              <div><span class="text-slate-400">Target Kas:</span> <b class="text-slate-800 font-mono">Rp ${(k.expectedCash || 0).toLocaleString('id-ID')}</b></div>
+              <div><span class="text-slate-400">Kas Fisik:</span> <b class="text-slate-900 font-mono">Rp ${(k.physicalCash || k.physicalTotal || 0).toLocaleString('id-ID')}</b></div>
+              <div class="col-span-2 flex justify-between items-center pt-1 border-t border-dashed border-slate-200">
+                <span class="text-slate-400 font-bold uppercase text-[9px]">Selisih Kas Laci:</span>
+                <span class="font-mono font-black text-xs ${diffColor}">${diffText}</span>
+              </div>
+            </div>
+
+            <div class="pt-1 flex justify-end border-t border-slate-100">
+              <button 
+                type="button" 
+                onclick="reprintSisKlerkById('${k.id}')" 
+                class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs flex items-center gap-1.5 transition cursor-pointer active:scale-95 border border-slate-200/80"
+              >
+                <span>🖨️</span>
+                <span>Cetak Ulang Struk Klerk</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function reprintSisKlerkById(klerkId) {
+      const history = (pos && Array.isArray(pos.klerkHistory)) ? pos.klerkHistory : [];
+      const k = history.find(item => item.id === klerkId);
+      if (!k) {
+        showMockupToast('⚠️ Data closing klerk tidak ditemukan!', 'warning');
+        return;
+      }
+      if (typeof printKlerkReceiptUniversal === 'function') {
+        printKlerkReceiptUniversal(k);
+      } else {
+        window.print();
       }
     }
 
@@ -9901,9 +10198,10 @@
           return;
         }
 
-        // Jika membuka klerk, reset form ke mode input fisik
+        // Jika membuka klerk, inisialisasi rekonsiliasi kas riil & riwayat
         if (modalId === 'sis-modal-klerk') {
-          resetKlerkForm();
+          if (typeof initSisKlerkModal === 'function') initSisKlerkModal();
+          else resetKlerkForm();
         }
         // Jika membuka setting printer, refresh status real-time
         if (modalId === 'sis-modal-printer') {
