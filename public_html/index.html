@@ -3302,6 +3302,9 @@
       <!-- Tab 2: Form Setting Multi-Harga Baru -->
       <div id="prod-tab-content-form" class="hidden p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
         <input type="hidden" id="sis-prod-id" value="">
+        <input type="hidden" id="sis-prod-image-data" value="">
+        <input type="hidden" id="sis-prod-stock" value="0">
+        
         <div class="flex items-center justify-between pb-1 border-b border-slate-100">
           <span id="sis-prod-form-heading" class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Tambah / Edit Master Produk</span>
           <button type="button" onclick="resetSisProductForm()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-[10px] transition cursor-pointer">
@@ -3309,16 +3312,45 @@
           </button>
         </div>
 
+        <!-- Foto Produk dengan Auto-Kompresi WebP Canvas -->
+        <div class="p-2.5 bg-slate-50 border border-slate-200/90 rounded-2xl flex items-center gap-3">
+          <div class="relative w-16 h-16 rounded-xl border border-slate-300 bg-white overflow-hidden flex items-center justify-center shrink-0 shadow-2xs">
+            <img id="sis-prod-image-preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><rect width='160' height='160' rx='24' fill='%23F1F5F9' stroke='%2394A3B8' stroke-width='2' stroke-opacity='0.25'/><circle cx='80' cy='66' r='38' fill='%23ffffff' fill-opacity='0.92'/><text x='80' y='73' font-size='42' text-anchor='middle' dominant-baseline='central'>📦</text><rect x='18' y='118' width='124' height='24' rx='12' fill='%23ffffff' fill-opacity='0.95'/><text x='80' y='132' font-size='9.5' font-weight='900' font-family='sans-serif' fill='%23475569' text-anchor='middle' dominant-baseline='central'>FOTO</text></svg>" alt="Preview" class="w-full h-full object-cover">
+          </div>
+          <div class="flex-1 min-w-0 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">Foto Produk (Auto-Kompresi)</span>
+              <span id="sis-prod-image-badge" class="text-[9px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">Hemat Storage</span>
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <label class="px-2.5 py-1.5 bg-slate-900 hover:bg-black text-white rounded-lg text-[10px] font-bold cursor-pointer transition flex items-center gap-1 shadow-2xs">
+                <span>🖼️ Galeri</span>
+                <input type="file" id="sis-prod-file-input" accept="image/*" onchange="handleSisProductImageUpload(event)" class="hidden">
+              </label>
+              <button type="button" onclick="triggerSisProductCamera()" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[10px] font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer" title="Ambil foto produk via kamera HP/Webcam">
+                <span>📸 Kamera</span>
+              </button>
+              <input type="file" id="sis-prod-camera-input" accept="image/*" capture="environment" onchange="handleSisProductImageUpload(event)" class="hidden">
+              <button type="button" onclick="clearSisProductImage()" class="px-2 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[10px] font-bold transition cursor-pointer" title="Hapus foto produk">
+                Reset
+              </button>
+            </div>
+            <div id="sis-prod-image-info" class="text-[9px] text-slate-500 font-mono truncate">
+              Ukuran gambar dioptimalkan otomatis maks ~20 KB
+            </div>
+          </div>
+        </div>
+
         <div class="grid grid-cols-2 gap-2.5">
           <div>
-            <div class="flex items-center justify-between mb-1">
-              <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">Barcode / SKU *</label>
-              <div class="flex items-center gap-2">
-                <button type="button" onclick="triggerLogisticsCameraScan('product-form')" class="text-[9px] text-emerald-700 hover:underline font-bold flex items-center gap-0.5 cursor-pointer">📷 Scan</button>
-                <button type="button" onclick="document.getElementById('sis-prod-barcode').value = '899' + Math.floor(1000000000 + Math.random() * 9000000000);" class="text-[9px] text-slate-500 hover:underline font-bold cursor-pointer">Acak</button>
+            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Barcode / SKU *</label>
+            <div class="relative flex items-center">
+              <input type="text" id="sis-prod-barcode" placeholder="Scan / ketik barcode..." class="w-full pl-3 pr-16 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
+              <div class="absolute right-1.5 flex items-center gap-1">
+                <button type="button" onclick="triggerLogisticsCameraScan('product-form')" class="w-6 h-6 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs transition cursor-pointer" title="Scan Barcode Kamera">📷</button>
+                <button type="button" onclick="document.getElementById('sis-prod-barcode').value = '899' + Math.floor(1000000000 + Math.random() * 9000000000);" class="w-6 h-6 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs transition cursor-pointer" title="Acak Barcode Otomatis">🎲</button>
               </div>
             </div>
-            <input type="text" id="sis-prod-barcode" placeholder="Contoh: 899276..." class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
           </div>
           <div>
             <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Kategori Produk</label>
@@ -3340,16 +3372,10 @@
           <input type="text" id="sis-prod-name" placeholder="Nama snack lengkap dengan gramatur..." class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
         </div>
 
-        <div class="grid grid-cols-3 gap-2">
+        <div class="grid grid-cols-2 gap-2.5">
           <div>
             <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Harga Beli HPP *</label>
             <input type="number" id="sis-prod-cost" placeholder="0" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 text-xs focus:outline-none focus:border-emerald-600">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">
-              Stok Fisik <span class="text-[9px] text-amber-600 font-bold">(Masuk via LPB/Retur)</span>
-            </label>
-            <input type="number" id="sis-prod-stock" value="0" readonly class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono font-bold text-slate-500 bg-slate-100 text-xs focus:outline-none cursor-not-allowed" title="Stok awal produk baru adalah 0. Penambahan stok hanya dapat dilakukan melalui faktur LPB (Penerimaan Barang) atau Retur Penjualan.">
           </div>
           <div>
             <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Satuan</label>
@@ -9097,7 +9123,7 @@
   
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=118"></script>
-  <script src="js/sis-logistics.js?v=103"></script>
+  <script src="js/sis-logistics.js?v=104"></script>
   <script src="js/sis-cashier-ops.js?v=100"></script>
   <script src="js/sis-store-crm.js?v=100"></script>
   <script src="js/sis-analytics.js?v=100"></script>

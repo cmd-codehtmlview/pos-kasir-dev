@@ -271,6 +271,131 @@ function handleLogisticsScannedBarcode(scannedCode, context) {
 // 1. SIS MASTER PRODUK & MULTI-HARGA A/B/C (#sis-modal-products)
 // =========================================================================
 
+// Helper Kompresi & Upload Foto Master Produk
+async function handleSisProductImageUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const infoEl = document.getElementById("sis-prod-image-info");
+  const badgeEl = document.getElementById("sis-prod-image-badge");
+  if (infoEl) {
+    infoEl.innerHTML = `<span class="text-amber-700 font-bold">⏳ Mengompresi gambar otomatis...</span>`;
+  }
+
+  try {
+    let res;
+    if (typeof compressImageFile === 'function') {
+      res = await compressImageFile(file, 360, 0.75);
+    } else {
+      res = await compressSisProductImageFallback(file, 360, 0.75);
+    }
+
+    const preview = document.getElementById("sis-prod-image-preview");
+    const dataInput = document.getElementById("sis-prod-image-data");
+
+    if (preview) preview.src = res.dataUrl;
+    if (dataInput) dataInput.value = res.dataUrl;
+
+    if (infoEl) {
+      infoEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ Tersimpan: ${res.compKb} KB (Hemat ${res.savings}%)</span>`;
+    }
+    if (badgeEl) {
+      badgeEl.textContent = `${res.compKb} KB`;
+      badgeEl.className = "text-[9px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full";
+    }
+    if (typeof showToast === 'function') {
+      showToast(`📸 Foto berhasil dikompresi (${res.compKb} KB)`, 'success');
+    }
+  } catch (err) {
+    console.error("Gagal kompresi foto master produk:", err);
+    if (infoEl) {
+      infoEl.innerHTML = `<span class="text-rose-600 font-bold">❌ Gagal: ${err.message || 'Error proses gambar'}</span>`;
+    }
+    alert("Gagal memproses gambar: " + (err.message || "Pastikan file berupa foto"));
+  } finally {
+    event.target.value = "";
+  }
+}
+
+function triggerSisProductCamera() {
+  const cameraInput = document.getElementById("sis-prod-camera-input");
+  if (cameraInput) {
+    cameraInput.click();
+  }
+}
+
+function clearSisProductImage() {
+  const preview = document.getElementById("sis-prod-image-preview");
+  const dataInput = document.getElementById("sis-prod-image-data");
+  const infoEl = document.getElementById("sis-prod-image-info");
+  const badgeEl = document.getElementById("sis-prod-image-badge");
+
+  if (dataInput) dataInput.value = "";
+  if (preview) {
+    const category = document.getElementById("sis-prod-category")?.value || "";
+    const name = document.getElementById("sis-prod-name")?.value || "";
+    if (typeof getProductThumbnailSvg === 'function') {
+      preview.src = getProductThumbnailSvg(category, name);
+    } else {
+      preview.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><rect width='160' height='160' rx='24' fill='%23F1F5F9' stroke='%2394A3B8' stroke-width='2' stroke-opacity='0.25'/><circle cx='80' cy='66' r='38' fill='%23ffffff' fill-opacity='0.92'/><text x='80' y='73' font-size='42' text-anchor='middle' dominant-baseline='central'>📦</text><rect x='18' y='118' width='124' height='24' rx='12' fill='%23ffffff' fill-opacity='0.95'/><text x='80' y='132' font-size='9.5' font-weight='900' font-family='sans-serif' fill='%23475569' text-anchor='middle' dominant-baseline='central'>FOTO</text></svg>";
+    }
+  }
+  if (infoEl) {
+    infoEl.textContent = "Foto dikosongkan (menggunakan icon SVG)";
+  }
+  if (badgeEl) {
+    badgeEl.textContent = "Tanpa Foto";
+    badgeEl.className = "text-[9px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full";
+  }
+}
+
+function compressSisProductImageFallback(file, maxDimension = 360, quality = 0.75) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith('image/')) {
+      return reject(new Error('File bukan gambar'));
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxDimension) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          }
+        } else {
+          if (height > maxDimension) {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        let compressed = canvas.toDataURL('image/webp', quality);
+        if (!compressed.startsWith('data:image/webp')) {
+          compressed = canvas.toDataURL('image/jpeg', quality);
+        }
+        const origKb = (file.size / 1024).toFixed(1);
+        const compKb = ((compressed.length * 0.75) / 1024).toFixed(1);
+        const savings = Math.max(0, Math.round((1 - (compressed.length * 0.75) / file.size) * 100));
+
+        resolve({ dataUrl: compressed, origKb, compKb, savings, width, height });
+      };
+      img.onerror = () => reject(new Error('Gagal memuat gambar'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('Gagal membaca file'));
+    reader.readAsDataURL(file);
+  });
+}
+
 function switchProductModalTab(tab) {
   const btnList = document.getElementById('prod-tab-btn-list');
   const btnForm = document.getElementById('prod-tab-btn-form');
@@ -326,15 +451,19 @@ function renderSisProductsModal(filterText = "") {
     const minB = p.minQtyB || (p.wholesaleMinQty || 10);
     const minC = p.minQtyC || 50;
     const autoSwitch = p.autoSwitchTier === true;
+    const imgSrc = (typeof getProductImageSrc === 'function') ? getProductImageSrc(p) : (p.image || '');
 
     return `
       <div class="p-3 bg-white border border-slate-200/90 rounded-2xl hover:border-emerald-300 transition space-y-2 shadow-2xs">
-        <div class="flex items-start justify-between gap-2">
-          <div class="min-w-0">
-            <span class="font-black text-slate-900 block text-xs truncate">${p.name}</span>
-            <span class="text-[10px] text-slate-500 font-mono block">
-              ${p.barcode || '-'} • HPP: <strong>Rp ${(p.costPrice || 0).toLocaleString('id-ID')}</strong> • Stok: <strong class="text-emerald-700">${p.stock || 0} ${p.unit || 'Bks'}</strong>
-            </span>
+        <div class="flex items-start justify-between gap-2.5">
+          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+            <img src="${imgSrc}" alt="${(p.name || '').replace(/"/g, '&quot;')}" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0 bg-slate-50" onerror="this.onerror=null; if(typeof getProductThumbnailSvg === 'function') this.src=getProductThumbnailSvg('${(p.category || '').replace(/'/g, "\\'")}', '${(p.name || '').replace(/'/g, "\\'")}');">
+            <div class="min-w-0 flex-1">
+              <span class="font-black text-slate-900 block text-xs truncate">${p.name}</span>
+              <span class="text-[10px] text-slate-500 font-mono block">
+                ${p.barcode || '-'} • HPP: <strong>Rp ${(p.costPrice || 0).toLocaleString('id-ID')}</strong> • Stok: <strong class="text-emerald-700">${p.stock || 0} ${p.unit || 'Bks'}</strong>
+              </span>
+            </div>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
             <span class="px-2 py-0.5 rounded-full ${autoSwitch ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'} text-[9px] font-extrabold">
@@ -379,6 +508,7 @@ function resetSisProductForm() {
     if (el) el.value = val;
   };
   setVal('sis-prod-id', '');
+  setVal('sis-prod-image-data', '');
   setVal('sis-prod-barcode', '899' + Math.floor(1000000000 + Math.random() * 9000000000));
   setVal('sis-prod-category', 'Makanan Ringan & Biskuit');
   setVal('sis-prod-name', '');
@@ -392,6 +522,20 @@ function resetSisProductForm() {
   setVal('sis-prod-min-c', '');
   const toggle = document.getElementById('sis-prod-auto-switch');
   if (toggle) toggle.checked = false;
+
+  const preview = document.getElementById('sis-prod-image-preview');
+  if (preview) {
+    preview.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><rect width='160' height='160' rx='24' fill='%23F1F5F9' stroke='%2394A3B8' stroke-width='2' stroke-opacity='0.25'/><circle cx='80' cy='66' r='38' fill='%23ffffff' fill-opacity='0.92'/><text x='80' y='73' font-size='42' text-anchor='middle' dominant-baseline='central'>📦</text><rect x='18' y='118' width='124' height='24' rx='12' fill='%23ffffff' fill-opacity='0.95'/><text x='80' y='132' font-size='9.5' font-weight='900' font-family='sans-serif' fill='%23475569' text-anchor='middle' dominant-baseline='central'>FOTO</text></svg>";
+  }
+  const badgeEl = document.getElementById('sis-prod-image-badge');
+  if (badgeEl) {
+    badgeEl.textContent = "Hemat Storage";
+    badgeEl.className = "text-[9px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full";
+  }
+  const infoEl = document.getElementById('sis-prod-image-info');
+  if (infoEl) {
+    infoEl.textContent = "Ukuran gambar dioptimalkan otomatis maks ~20 KB";
+  }
 
   // SOP: Tambah SKU baru stok fisik wajib 0 & terkunci
   const stockEl = document.getElementById('sis-prod-stock');
@@ -417,12 +561,38 @@ function editSisProduct(productId) {
   };
 
   setVal('sis-prod-id', p.id);
+  setVal('sis-prod-image-data', p.image || '');
   setVal('sis-prod-barcode', p.barcode || '');
   setVal('sis-prod-category', p.category || 'Makanan Ringan & Biskuit');
   setVal('sis-prod-name', p.name || '');
   setVal('sis-prod-cost', p.costPrice || p.cost || 0);
   setVal('sis-prod-stock', p.stock || 0);
   setVal('sis-prod-unit', p.unit || 'Bks');
+
+  const preview = document.getElementById('sis-prod-image-preview');
+  if (preview) {
+    if (p.image && typeof p.image === 'string' && p.image.trim() !== '') {
+      preview.src = p.image;
+    } else if (typeof getProductImageSrc === 'function') {
+      preview.src = getProductImageSrc(p);
+    } else {
+      preview.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><rect width='160' height='160' rx='24' fill='%23F1F5F9' stroke='%2394A3B8' stroke-width='2' stroke-opacity='0.25'/><circle cx='80' cy='66' r='38' fill='%23ffffff' fill-opacity='0.92'/><text x='80' y='73' font-size='42' text-anchor='middle' dominant-baseline='central'>📦</text><rect x='18' y='118' width='124' height='24' rx='12' fill='%23ffffff' fill-opacity='0.95'/><text x='80' y='132' font-size='9.5' font-weight='900' font-family='sans-serif' fill='%23475569' text-anchor='middle' dominant-baseline='central'>FOTO</text></svg>";
+    }
+  }
+  const badgeEl = document.getElementById('sis-prod-image-badge');
+  if (badgeEl) {
+    if (p.image) {
+      badgeEl.textContent = "Ada Foto";
+      badgeEl.className = "text-[9px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full";
+    } else {
+      badgeEl.textContent = "Tanpa Foto";
+      badgeEl.className = "text-[9px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full";
+    }
+  }
+  const infoEl = document.getElementById('sis-prod-image-info');
+  if (infoEl) {
+    infoEl.textContent = p.image ? "Foto produk tersimpan" : "Belum ada foto produk (menggunakan ikon SVG)";
+  }
 
   // Stok produk hanya dapat diedit via LPB/SO/Retur
   const stockEl = document.getElementById('sis-prod-stock');
@@ -458,6 +628,7 @@ function editSisProduct(productId) {
 function saveSisProduct(andPrint = false) {
   const getVal = id => (document.getElementById(id)?.value || "").trim();
   const id = getVal('sis-prod-id');
+  const imageData = getVal('sis-prod-image-data');
   const barcode = getVal('sis-prod-barcode');
   const category = getVal('sis-prod-category') || 'Makanan Ringan & Biskuit';
   const name = getVal('sis-prod-name');
@@ -519,6 +690,7 @@ function saveSisProduct(andPrint = false) {
       prod.hasWholesale = autoSwitch && priceB > 0;
       prod.wholesalePrice = priceB;
       prod.wholesaleMinQty = minB;
+      prod.image = imageData || null;
     }
   } else {
     // Mode Tambah SKU Baru: STOK AWAL WAJIB 0 (Stok hanya masuk via LPB atau Retur)
@@ -543,7 +715,8 @@ function saveSisProduct(andPrint = false) {
       hasWholesale: autoSwitch && priceB > 0,
       wholesalePrice: priceB,
       wholesaleMinQty: minB,
-      emoji: '🍘'
+      emoji: '🍘',
+      image: imageData || null
     };
     pos.products.unshift(newProduct);
   }
