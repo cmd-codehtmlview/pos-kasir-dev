@@ -2,6 +2,22 @@
  * SnackPOS - Store Settings, Backup & Accordion UI
  */
 
+// Normalisasi nomor WhatsApp ke standar internasional tanpa tanda baca (628...)
+function formatWhatsAppNumber(phone) {
+  if (!phone) return "6281234567890";
+  let cleaned = String(phone).trim().replace(/[^0-9]/g, '');
+  if (cleaned.startsWith('0')) {
+    cleaned = '62' + cleaned.slice(1);
+  } else if (cleaned.startsWith('8')) {
+    cleaned = '62' + cleaned;
+  }
+  if (!cleaned.startsWith('62') && cleaned.length > 0) {
+    cleaned = '62' + cleaned;
+  }
+  return cleaned.length >= 9 ? cleaned : "6281234567890";
+}
+window.formatWhatsAppNumber = formatWhatsAppNumber;
+
 function isDevEnvironment() {
   if (typeof window === 'undefined') return false;
   const h = window.location.hostname;
@@ -148,7 +164,7 @@ function loadSettingsToForm() {
 
   // Load Kontak Bantuan Toko
   const helpdeskWaEl = document.getElementById("setting-helpdesk-wa");
-  if (helpdeskWaEl) helpdeskWaEl.value = pos.settings.helpdeskWa || "6281234567890";
+  if (helpdeskWaEl) helpdeskWaEl.value = formatWhatsAppNumber(pos.settings.helpdeskWa || "6281234567890");
   const helpdeskEmailEl = document.getElementById("setting-helpdesk-email");
   if (helpdeskEmailEl) helpdeskEmailEl.value = pos.settings.helpdeskEmail || "helpdesk@snackpos.local";
 
@@ -262,7 +278,12 @@ function saveStoreSettings() {
 
   // Simpan Kontak Helpdesk Toko
   const helpdeskWaInput = document.getElementById("setting-helpdesk-wa")?.value.trim();
-  if (helpdeskWaInput) pos.settings.helpdeskWa = helpdeskWaInput;
+  if (helpdeskWaInput) {
+    const formattedWa = formatWhatsAppNumber(helpdeskWaInput);
+    pos.settings.helpdeskWa = formattedWa;
+    const el = document.getElementById("setting-helpdesk-wa");
+    if (el) el.value = formattedWa;
+  }
   const helpdeskEmailInput = document.getElementById("setting-helpdesk-email")?.value.trim();
   if (helpdeskEmailInput) pos.settings.helpdeskEmail = helpdeskEmailInput;
 
@@ -389,12 +410,18 @@ const ALL_SETTING_SECTIONS = [
 function contactHelpdeskWhatsApp() {
   const currentCfg = (typeof getActiveAboutConfig === 'function') ? getActiveAboutConfig() : null;
   const configuredWa = document.getElementById("setting-helpdesk-wa")?.value || (pos && pos.settings && pos.settings.helpdeskWa) || (currentCfg ? currentCfg.helpdeskWa : "6281234567890");
-  const waNum = configuredWa.replace(/[^0-9]/g, '') || "6281234567890";
+  const waNum = formatWhatsAppNumber(configuredWa);
   const storeName = (pos && pos.settings && pos.settings.storeName) ? pos.settings.storeName : "Toko SnackPOS";
   const appVer = currentCfg ? currentCfg.appVersion : "v2.4.2";
   const text = encodeURIComponent(`Halo Tim Support SnackPOS, saya dari ${storeName} (Terminal POS: ${appVer}). Mohon bantuan teknis operasional kasir.`);
-  window.open(`https://wa.me/${waNum}?text=${text}`, '_blank');
+  const waUrl = `https://wa.me/${waNum}?text=${text}`;
+  
+  const win = window.open(waUrl, '_blank');
+  if (!win || win.closed || typeof win.closed === 'undefined') {
+    window.location.href = waUrl;
+  }
 }
+window.contactHelpdeskWhatsApp = contactHelpdeskWhatsApp;
 
 function toggleSettingSection(secId) {
   const targetContent = document.getElementById(`content-${secId}`);
@@ -956,9 +983,9 @@ function applyAboutConfigToUI(cfg) {
   const inputWa = document.getElementById("setting-helpdesk-wa");
   if (inputWa && (!inputWa.value || inputWa.value === DEFAULT_APP_ABOUT_CONFIG.helpdeskWa)) {
     if (pos && pos.settings && pos.settings.helpdeskWa) {
-      inputWa.value = pos.settings.helpdeskWa;
+      inputWa.value = formatWhatsAppNumber(pos.settings.helpdeskWa);
     } else if (c.helpdeskWa) {
-      inputWa.value = c.helpdeskWa;
+      inputWa.value = formatWhatsAppNumber(c.helpdeskWa);
     }
   }
   const inputEmail = document.getElementById("setting-helpdesk-email");

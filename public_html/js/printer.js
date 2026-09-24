@@ -3202,6 +3202,657 @@ async function printCashDropReceiptUniversal(dropRecord) {
   window.print();
 }
 
+// ==========================================
+// LAPORAN PENJUALAN SHIFT KASIR (UNIVERSAL PRINT)
+// ==========================================
+
+function getSalesShiftReportData(customData = null) {
+  if (customData && customData.totalTurnover !== undefined) {
+    return customData;
+  }
+
+  const s = (pos && pos.settings) || {};
+  const storeName = s.storeName || 'TOKO SNACK BERKAH';
+  const storeAddress = s.storeAddress || '';
+  const storePhone = s.storePhone || '';
+  const cashier = (pos?.currentUser && pos.currentUser.name) || s.cashierName || 'Kasir';
+  const shift = (pos?.currentUser && pos.currentUser.shift) || s.shiftName || 'Shift 1';
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  let trxList = [];
+  if (customData && Array.isArray(customData.transactions)) {
+    trxList = customData.transactions;
+  } else if (typeof getTodayTransactions === 'function') {
+    trxList = getTodayTransactions();
+  } else {
+    trxList = (pos?.transactions || []).filter(t => t && t.date === todayStr);
+  }
+
+  let totalTurnover = 0;
+  let cashAmount = 0;
+  let cashCount = 0;
+  let qrisAmount = 0;
+  let qrisCount = 0;
+  let transferAmount = 0;
+  let transferCount = 0;
+  const productCount = {};
+
+  trxList.forEach(t => {
+    const payable = Number(t.payableAmount !== undefined ? t.payableAmount : (t.grandTotal !== undefined ? t.grandTotal : t.total)) || 0;
+    totalTurnover += payable;
+
+    const method = String(t.paymentMethod || t.payment || 'cash').toLowerCase();
+    if (method === 'cash' || method === 'tunai') {
+      cashAmount += payable;
+      cashCount++;
+    } else if (method === 'transfer') {
+      transferAmount += payable;
+      transferCount++;
+    } else {
+      qrisAmount += payable;
+      qrisCount++;
+    }
+
+    (t.items || []).forEach(it => {
+      const pName = it.name || 'Produk';
+      const qty = Number(it.qty) || 1;
+      const subtotal = Number(it.subtotal) || ((Number(it.price) || 0) * qty);
+      if (!productCount[pName]) productCount[pName] = { qty: 0, total: 0 };
+      productCount[pName].qty += qty;
+      productCount[pName].total += subtotal;
+    });
+  });
+
+  const topProducts = Object.entries(productCount)
+    .sort((a, b) => b[1].qty - a[1].qty)
+    .slice(0, 5)
+    .map(([name, val]) => ({ name, qty: val.qty, total: val.total }));
+
+  return {
+    storeName,
+    storeAddress,
+    storePhone,
+    cashier,
+    shift,
+    period: (customData && customData.period) ? customData.period : 'HARI INI (SHIFT AKTIF)',
+    dateStr: new Date().toLocaleDateString('id-ID'),
+    timeStr: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+    trxCount: trxList.length,
+    totalTurnover,
+    cashAmount,
+    cashCount,
+    qrisAmount,
+    qrisCount,
+    transferAmount,
+    transferCount,
+    topProducts
+  };
+}
+
+function buildSalesReportEscPos(reportData = null) {
+  const is80 = pos?.settings?.paperWidth === "80mm";
+  const lineWidth = is80 ? 48 : 32;
+  const builder = new EscPosBuilder(lineWidth);
+
+  function formatRp(num) {
+    return Number(num || 0).toLocaleString("id-ID");
+  }
+
+  const d = getSalesShiftReportData(reportData);
+  const feedLines = parseInt(pos?.settings?.printerFeedLines, 10) || 3;
+
+  // 1. Header Toko
+  builder.init()
+    .alignCenter()
+    .bold(true)
+    .size(false, true)
+    .text(d.storeName.toUpperCase())
+    .newline()
+    .sizeNormal()
+    .bold(false);
+
+  if (d.storeAddress) builder.text(d.storeAddress).newline();
+  if (d.storePhone) builder.text(`Telp: ${d.storePhone}`).newline();
+
+  builder.lineDashed('=')
+    .bold(true);
+
+  if (is80) {
+    builder.text("*** LAPORAN PENJUALAN SHIFT KASIR ***").newline();
+  } else {
+    builder.text("*** LAPORAN PENJUALAN ***").newline();
+    builder.text("(SHIFT KASIR)").newline();
+  }
+
+  builder.bold(false)
+    .lineDashed('-')
+    .alignLeft();
+
+  if (is80) {
+    builder.lineLeftRight(`Periode : ${d.period || d.dateStr}`, `${d.timeStr} WIB`)
+      .lineLeftRight(`Kasir   : ${(d.cashier || 'Kasir').slice(0, 18)}`, `Shift: ${d.shift || '1'}`)
+      .lineLeftRight(`Struk   : ${d.trxCount} Transaksi Selesai`, '');
+  } else {
+    builder.lineLeftRight(`Tgl: ${d.dateStr}`, d.timeStr)
+      .lineLeftRight(`Kasir: ${(d.cashier || 'Kasir').slice(0, 12)}`, `Shift: ${d.shift || '1'}`)
+      .text(`Struk: ${d.trxCount} Transaksi Selesai`).newline();
+  }
+
+  builder.lineDashed('-');
+
+  // 2. Omzet Bersih
+  builder.bold(true)
+    .size(false, true)
+    .lineLeftRight("OMZET BERSIH", `Rp ${formatRp(d.totalTurnover)}`)
+    .sizeNormal()
+    .bold(false)
+    .lineDashed('-');
+
+  // 3. Rincian Metode Bayar
+  builder.bold(true).text("METODE PEMBAYARAN:").newline().bold(false);
+  builder.lineLeftRight(`  Tunai (${d.cashCount || 0} nota)`, `Rp ${formatRp(d.cashAmount)}`);
+  builder.lineLeftRight(`  QRIS (${d.qrisCount || 0} nota)`, `Rp ${formatRp(d.qrisAmount)}`);
+  if (d.transferAmount > 0) {
+    builder.lineLeftRight(`  Transfer (${d.transferCount || 0} nota)`, `Rp ${formatRp(d.transferAmount)}`);
+  }
+
+  // 4. Top Produk Terlaris
+  if (d.topProducts && d.topProducts.length > 0) {
+    builder.lineDashed('-');
+    builder.bold(true).text("TOP PRODUK TERLARIS:").newline().bold(false);
+    d.topProducts.slice(0, 5).forEach((p, idx) => {
+      const name = `${idx + 1}. ${p.name}`;
+      if (is80) {
+        builder.lineLeftRight(name.slice(0, 26), `${p.qty} pcs  Rp ${formatRp(p.total)}`);
+      } else {
+        builder.text(name.slice(0, lineWidth)).newline();
+        builder.lineLeftRight(`   ${p.qty} pcs`, `Rp ${formatRp(p.total)}`);
+      }
+    });
+  }
+
+  builder.lineDashed('=');
+
+  // 5. Signatures
+  builder.alignCenter()
+    .newline()
+    .text(is80
+      ? "Kasir Pelaksana,                    Pejabat Toko / COS,"
+      : "Kasir Pelaksana,    Pejabat Toko,"
+    )
+    .newline()
+    .newline()
+    .newline()
+    .text(is80
+      ? `( ${(d.cashier || 'Kasir').padEnd(16).slice(0, 16)} )             ( Pejabat Toko )`
+      : `( ${(d.cashier || 'Kasir').padEnd(10).slice(0, 10)} )    ( ......... )`
+    )
+    .newline()
+    .newline()
+    .text(is80 ? "Laporan dicetak otomatis oleh sistem SnackPOS." : "Dicetak otomatis oleh SnackPOS.")
+    .newline()
+    .feed(feedLines)
+    .cut();
+
+  return builder.getBytes();
+}
+
+function preparePrintableSalesReportReceipt(reportData = null) {
+  const target = document.getElementById("printable-receipt-container");
+  if (!target) return;
+
+  const d = getSalesShiftReportData(reportData);
+  const isWidth80 = pos?.settings?.paperWidth === "80mm";
+
+  target.className = `thermal-receipt ${isWidth80 ? 'width-80' : 'width-58'} hidden`;
+
+  function fmt(num) {
+    return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+  }
+
+  let topProdsHtml = '';
+  if (d.topProducts && d.topProducts.length > 0) {
+    topProdsHtml = `
+      <div class="receipt-dashed-line"></div>
+      <div style="font-weight: bold; font-size: 0.9em; margin: 4px 0 2px 0;">TOP PRODUK TERLARIS:</div>
+      ${d.topProducts.map((p, idx) => `
+        <div style="font-size: 0.85em; display: flex; justify-content: space-between; margin-bottom: 2px;">
+          <span>${idx + 1}. ${p.name} (${p.qty} pcs)</span>
+          <span style="font-family: monospace;">${fmt(p.total)}</span>
+        </div>
+      `).join('')}
+    `;
+  }
+
+  target.innerHTML = `
+    <div style="text-align: center; margin-bottom: 6px;">
+      <div style="font-size: 1.15em; font-weight: 900; text-transform: uppercase;">${d.storeName}</div>
+      ${d.storeAddress ? `<div style="font-size: 0.85em; margin-top: 1px;">${d.storeAddress}</div>` : ''}
+      ${d.storePhone ? `<div style="font-size: 0.85em;">Telp: ${d.storePhone}</div>` : ''}
+      <div class="receipt-double-line"></div>
+      <div style="font-weight: 900; font-size: 1.05em; margin: 4px 0 2px 0;">LAPORAN PENJUALAN SHIFT</div>
+      <div style="font-weight: bold; font-size: 0.85em;">(REKAP TRANSAKSI KASIR)</div>
+      <div class="receipt-dashed-line"></div>
+    </div>
+
+    <div style="font-size: 0.9em; margin-bottom: 6px; line-height: 1.45;">
+      <div style="display: flex; justify-content: space-between;"><span>Waktu</span><span>${d.dateStr} ${d.timeStr}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Periode</span><span>${d.period || 'Hari Ini'}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Kasir</span><span>${d.cashier}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Shift</span><span>${d.shift}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Struk Selesai</span><strong style="font-family: monospace;">${d.trxCount} Transaksi</strong></div>
+    </div>
+
+    <div class="receipt-dashed-line"></div>
+    <div style="font-size: 1.1em; font-weight: 900; display: flex; justify-content: space-between; margin: 6px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 6px 0;">
+      <span>OMZET BERSIH</span>
+      <span style="font-family: monospace;">${fmt(d.totalTurnover)}</span>
+    </div>
+    <div class="receipt-dashed-line"></div>
+
+    <div style="font-size: 0.9em; line-height: 1.45;">
+      <div style="font-weight: bold; margin-bottom: 2px;">RINCIAN PEMBAYARAN:</div>
+      <div style="display: flex; justify-content: space-between;"><span>💵 Tunai (${d.cashCount || 0} nota)</span><span style="font-family: monospace;">${fmt(d.cashAmount)}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>📱 QRIS (${d.qrisCount || 0} nota)</span><span style="font-family: monospace;">${fmt(d.qrisAmount)}</span></div>
+      ${d.transferAmount > 0 ? `<div style="display: flex; justify-content: space-between;"><span>💳 Transfer (${d.transferCount || 0} nota)</span><span style="font-family: monospace;">${fmt(d.transferAmount)}</span></div>` : ''}
+    </div>
+
+    ${topProdsHtml}
+
+    <div class="receipt-double-line"></div>
+
+    <div style="margin-top: 14px; text-align: center; font-size: 0.85em;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 35px;">
+        <span style="width: 45%;">Kasir Pelaksana,</span>
+        <span style="width: 45%;">Pejabat Toko / COS,</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="width: 45%; border-top: 1px solid #000; padding-top: 2px;">(${d.cashier})</span>
+        <span style="width: 45%; border-top: 1px solid #000; padding-top: 2px;">( Pejabat Toko )</span>
+      </div>
+      <div style="margin-top: 10px; font-size: 0.8em; color: #555;">Dicetak otomatis oleh sistem POS</div>
+    </div>
+  `;
+}
+
+async function printSalesReportUniversal(reportData = null) {
+  const d = getSalesShiftReportData(reportData);
+  const mode = pos?.settings?.printerDriverMode || 'bluetooth';
+
+  if (mode === 'webusb') {
+    const isConnected = await checkOrPromptUsbConnection("laporan penjualan shift kasir");
+    if (isConnected) {
+      try {
+        showToast("Mencetak laporan penjualan via USB...", "info");
+        const bytes = buildSalesReportEscPos(d);
+        await sendBytesToUsb(bytes, { id: 'sales_rep_' + Date.now(), title: 'Laporan Penjualan', type: 'report' });
+        showToast("Laporan penjualan berhasil dicetak via USB! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+        return;
+      } catch (err) {
+        console.warn("Gagal cetak laporan penjualan via USB:", err);
+      }
+    }
+  } else if (mode === 'bluetooth') {
+    const isConnected = await checkOrPromptBluetoothConnection("laporan penjualan shift kasir");
+    if (isConnected) {
+      try {
+        showToast("Mencetak laporan penjualan via Bluetooth...", "info");
+        const bytes = buildSalesReportEscPos(d);
+        await sendBytesToBluetooth(bytes, { id: 'sales_rep_' + Date.now(), title: 'Laporan Penjualan', type: 'report' });
+        showToast("Laporan penjualan berhasil dicetak di printer Thermal! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+        return;
+      } catch (err) {
+        console.warn("Gagal cetak laporan penjualan via Bluetooth:", err);
+      }
+    }
+  } else if (mode === 'rawbt') {
+    try {
+      const bytes = buildSalesReportEscPos(d);
+      printViaRawBT(bytes);
+      if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+      return;
+    } catch (err) {
+      console.warn("Gagal kirim laporan penjualan ke RawBT:", err);
+    }
+  }
+
+  // Fallback ke browser print
+  preparePrintableSalesReportReceipt(d);
+  window.print();
+}
+
+// ==========================================
+// REKAP KAS & TRANSAKSI HARIAN (UNIVERSAL PRINT)
+// ==========================================
+
+function getDailyRecapData(customData = null) {
+  if (customData && customData.totalTurnover !== undefined) {
+    return customData;
+  }
+
+  const s = (pos && pos.settings) || {};
+  const storeName = s.storeName || 'TOKO SNACK BERKAH';
+  const storeAddress = s.storeAddress || '';
+  const storePhone = s.storePhone || '';
+  const cashier = (pos?.currentUser && pos.currentUser.name) || s.cashierName || 'Kasir';
+  const shift = (pos?.currentUser && pos.currentUser.shift) || s.shiftName || 'Semua Shift';
+
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+
+  let todayTrx = [];
+  if (typeof getTodayTransactions === 'function') {
+    todayTrx = getTodayTransactions();
+  } else {
+    todayTrx = (pos?.transactions || []).filter(t => t && t.date === todayStr);
+  }
+
+  let totalTurnover = 0;
+  let cashSales = 0;
+  let qrisSales = 0;
+  let transferSales = 0;
+  let pointDiscount = 0;
+
+  todayTrx.forEach(t => {
+    const payable = Number(t.payableAmount !== undefined ? t.payableAmount : (t.grandTotal !== undefined ? t.grandTotal : t.total)) || 0;
+    totalTurnover += payable;
+
+    const method = String(t.paymentMethod || t.payment || 'cash').toLowerCase();
+    if (method === 'cash' || method === 'tunai') {
+      cashSales += payable;
+    } else if (method === 'transfer') {
+      transferSales += payable;
+    } else {
+      qrisSales += payable;
+    }
+
+    pointDiscount += Number(t.pointDiscount || 0);
+  });
+
+  let returnAmount = 0;
+  if (window.pos && Array.isArray(pos.returns)) {
+    const todayReturns = pos.returns.filter(r => (r.date && r.date.startsWith(todayStr)) || (r.createdAt && r.createdAt.startsWith(todayStr)));
+    returnAmount = todayReturns.reduce((acc, r) => acc + (Number(r.refundAmount || r.totalRefund) || 0), 0);
+  }
+
+  let cashDropAmount = 0;
+  try {
+    const stored = localStorage.getItem('snack_pos_cashdrops');
+    if (stored) {
+      const drops = JSON.parse(stored);
+      if (Array.isArray(drops)) {
+        const todayDrops = drops.filter(d => d.date && d.date.startsWith(todayStr));
+        cashDropAmount = todayDrops.reduce((acc, d) => acc + (Number(d.amount) || 0), 0);
+      }
+    }
+  } catch(e) {}
+
+  const initialCash = Number(pos?.settings?.initialCash) || 200000;
+  const drawerCash = Math.max(0, initialCash + cashSales - returnAmount - cashDropAmount);
+
+  return {
+    storeName,
+    storeAddress,
+    storePhone,
+    cashier,
+    shift,
+    dateStr: now.toLocaleDateString('id-ID'),
+    timeStr: now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+    trxCount: todayTrx.length,
+    totalTurnover,
+    cashSales,
+    qrisSales,
+    transferSales,
+    pointDiscount,
+    returnAmount,
+    cashDropAmount,
+    initialCash,
+    drawerCash
+  };
+}
+
+function buildDailyRecapEscPos(recapData = null) {
+  const is80 = pos?.settings?.paperWidth === "80mm";
+  const lineWidth = is80 ? 48 : 32;
+  const builder = new EscPosBuilder(lineWidth);
+
+  function formatRp(num) {
+    return Number(num || 0).toLocaleString("id-ID");
+  }
+
+  const d = getDailyRecapData(recapData);
+  const feedLines = parseInt(pos?.settings?.printerFeedLines, 10) || 3;
+
+  // 1. Header Toko
+  builder.init()
+    .alignCenter()
+    .bold(true)
+    .size(false, true)
+    .text(d.storeName.toUpperCase())
+    .newline()
+    .sizeNormal()
+    .bold(false);
+
+  if (d.storeAddress) builder.text(d.storeAddress).newline();
+  if (d.storePhone) builder.text(`Telp: ${d.storePhone}`).newline();
+
+  builder.lineDashed('=')
+    .bold(true);
+
+  if (is80) {
+    builder.text("*** REKAP KAS & TRANSAKSI HARIAN ***").newline();
+  } else {
+    builder.text("*** REKAP KAS HARIAN ***").newline();
+    builder.text("(PENUTUPAN KASIR)").newline();
+  }
+
+  builder.bold(false)
+    .lineDashed('-')
+    .alignLeft();
+
+  if (is80) {
+    builder.lineLeftRight(`Tanggal : ${d.dateStr}`, `${d.timeStr} WIB`)
+      .lineLeftRight(`Petugas : ${(d.cashier || 'Kasir').slice(0, 18)}`, `Shift: ${d.shift || '1'}`)
+      .lineLeftRight(`Struk   : ${d.trxCount} Transaksi Sukses`, '');
+  } else {
+    builder.lineLeftRight(`Tgl: ${d.dateStr}`, d.timeStr)
+      .lineLeftRight(`Kasir: ${(d.cashier || 'Kasir').slice(0, 12)}`, `Shift: ${d.shift || '1'}`)
+      .text(`Total: ${d.trxCount} Transaksi Sukses`).newline();
+  }
+
+  builder.lineDashed('-');
+
+  // 2. Omzet Bersih
+  builder.bold(true)
+    .size(false, true)
+    .lineLeftRight("OMZET BERSIH", `Rp ${formatRp(d.totalTurnover)}`)
+    .sizeNormal()
+    .bold(false)
+    .lineDashed('-');
+
+  // 3. Rincian Pembayaran Masuk
+  builder.bold(true).text("RINCIAN PEMBAYARAN MASUK:").newline().bold(false);
+  builder.lineLeftRight("  Tunai (Cash)", `Rp ${formatRp(d.cashSales)}`);
+  builder.lineLeftRight("  QRIS / E-Money", `Rp ${formatRp(d.qrisSales)}`);
+  if (d.transferSales > 0) {
+    builder.lineLeftRight("  Transfer Bank", `Rp ${formatRp(d.transferSales)}`);
+  }
+
+  builder.lineDashed('-');
+
+  // 4. Pengurangan & Setoran
+  builder.bold(true).text("PENGURANGAN & SETORAN:").newline().bold(false);
+  if (d.pointDiscount > 0) {
+    builder.lineLeftRight("  Potongan Poin", `-Rp ${formatRp(d.pointDiscount)}`);
+  }
+  builder.lineLeftRight("  Retur Belanja", `-Rp ${formatRp(d.returnAmount)}`);
+  builder.lineLeftRight("  Tarik Kas (Drop)", `-Rp ${formatRp(d.cashDropAmount)}`);
+
+  builder.lineDashed('=');
+
+  // 5. Uang Fisik Laci
+  builder.bold(true)
+    .text("UANG FISIK DALAM LACI KASIR:").newline()
+    .size(false, true)
+    .lineLeftRight("TOTAL FISIK", `Rp ${formatRp(d.drawerCash)}`)
+    .sizeNormal()
+    .bold(false);
+
+  builder.text(`(Termasuk modal kasir Rp ${formatRp(d.initialCash)})`).newline();
+  builder.lineDashed('=');
+
+  // 6. Signatures
+  builder.alignCenter()
+    .newline()
+    .text(is80
+      ? "Kepala Toko / COS                   Supervisor / Kasir"
+      : "Kepala Toko / COS   Kasir / Sup"
+    )
+    .newline()
+    .newline()
+    .newline()
+    .text(is80
+      ? `( Pejabat Toko )                   ( ${(d.cashier || 'Kasir').padEnd(16).slice(0, 16)} )`
+      : `( Pejabat Toko )   ( ${(d.cashier || 'Kasir').padEnd(10).slice(0, 10)} )`
+    )
+    .newline()
+    .newline()
+    .text(is80 ? "Laporan dicetak otomatis oleh sistem SnackPOS." : "Dicetak otomatis oleh SnackPOS.")
+    .newline()
+    .feed(feedLines)
+    .cut();
+
+  return builder.getBytes();
+}
+
+function preparePrintableDailyRecapReceipt(recapData = null) {
+  const target = document.getElementById("printable-receipt-container");
+  if (!target) return;
+
+  const d = getDailyRecapData(recapData);
+  const isWidth80 = pos?.settings?.paperWidth === "80mm";
+
+  target.className = `thermal-receipt ${isWidth80 ? 'width-80' : 'width-58'} hidden`;
+
+  function fmt(num) {
+    return 'Rp ' + Number(num || 0).toLocaleString('id-ID');
+  }
+
+  target.innerHTML = `
+    <div style="text-align: center; margin-bottom: 6px;">
+      <div style="font-size: 1.15em; font-weight: 900; text-transform: uppercase;">${d.storeName}</div>
+      ${d.storeAddress ? `<div style="font-size: 0.85em; margin-top: 1px;">${d.storeAddress}</div>` : ''}
+      ${d.storePhone ? `<div style="font-size: 0.85em;">Telp: ${d.storePhone}</div>` : ''}
+      <div class="receipt-double-line"></div>
+      <div style="font-weight: 900; font-size: 1.05em; margin: 4px 0 2px 0;">REKAP KAS & TRANSAKSI HARIAN</div>
+      <div style="font-weight: bold; font-size: 0.85em;">(RINGKASAN KEUANGAN KASIR)</div>
+      <div class="receipt-dashed-line"></div>
+    </div>
+
+    <div style="font-size: 0.9em; margin-bottom: 6px; line-height: 1.45;">
+      <div style="display: flex; justify-content: space-between;"><span>Tanggal</span><span>${d.dateStr} ${d.timeStr}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Petugas</span><span>${d.cashier}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Shift</span><span>${d.shift}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>Total Struk</span><strong style="font-family: monospace;">${d.trxCount} Transaksi</strong></div>
+    </div>
+
+    <div class="receipt-dashed-line"></div>
+    <div style="font-size: 1.1em; font-weight: 900; display: flex; justify-content: space-between; margin: 6px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 6px 0;">
+      <span>OMZET BERSIH</span>
+      <span style="font-family: monospace;">${fmt(d.totalTurnover)}</span>
+    </div>
+    <div class="receipt-dashed-line"></div>
+
+    <div style="font-size: 0.9em; line-height: 1.45;">
+      <div style="font-weight: bold; margin-bottom: 2px;">RINCIAN PEMBAYARAN MASUK:</div>
+      <div style="display: flex; justify-content: space-between;"><span>💵 Tunai (Cash)</span><span style="font-family: monospace;">${fmt(d.cashSales)}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>📱 QRIS / E-Money</span><span style="font-family: monospace;">${fmt(d.qrisSales)}</span></div>
+      ${d.transferSales > 0 ? `<div style="display: flex; justify-content: space-between;"><span>💳 Transfer Bank</span><span style="font-family: monospace;">${fmt(d.transferSales)}</span></div>` : ''}
+    </div>
+
+    <div class="receipt-dashed-line" style="margin-top: 6px;"></div>
+
+    <div style="font-size: 0.9em; line-height: 1.45;">
+      <div style="font-weight: bold; margin-bottom: 2px;">PENGURANGAN & SETORAN:</div>
+      ${d.pointDiscount > 0 ? `<div style="display: flex; justify-content: space-between;"><span>🎁 Potongan Poin</span><span style="font-family: monospace;">-${fmt(d.pointDiscount)}</span></div>` : ''}
+      <div style="display: flex; justify-content: space-between;"><span>↩️ Retur Belanja</span><span style="font-family: monospace;">-${fmt(d.returnAmount)}</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>📥 Tarik Kas (Cash Drop)</span><span style="font-family: monospace;">-${fmt(d.cashDropAmount)}</span></div>
+    </div>
+
+    <div class="receipt-double-line"></div>
+
+    <div style="font-size: 1.05em; font-weight: 900; display: flex; justify-content: space-between; margin: 6px 0; padding: 4px 0;">
+      <span>FISIK LACI KASIR</span>
+      <span style="font-family: monospace;">${fmt(d.drawerCash)}</span>
+    </div>
+    <div style="font-size: 0.8em; color: #555; text-align: center;">(Termasuk modal kasir ${fmt(d.initialCash)})</div>
+
+    <div class="receipt-double-line"></div>
+
+    <div style="margin-top: 14px; text-align: center; font-size: 0.85em;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 35px;">
+        <span style="width: 45%;">Kepala Toko / COS,</span>
+        <span style="width: 45%;">Supervisor / Kasir,</span>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <span style="width: 45%; border-top: 1px solid #000; padding-top: 2px;">( Pejabat Toko )</span>
+        <span style="width: 45%; border-top: 1px solid #000; padding-top: 2px;">(${d.cashier})</span>
+      </div>
+      <div style="margin-top: 10px; font-size: 0.8em; color: #555;">Dicetak otomatis oleh sistem POS</div>
+    </div>
+  `;
+}
+
+async function printDailyRecapUniversal(recapData = null) {
+  const d = getDailyRecapData(recapData);
+  const mode = pos?.settings?.printerDriverMode || 'bluetooth';
+
+  if (mode === 'webusb') {
+    const isConnected = await checkOrPromptUsbConnection("rekap kas & transaksi harian");
+    if (isConnected) {
+      try {
+        showToast("Mencetak rekap kas harian via USB...", "info");
+        const bytes = buildDailyRecapEscPos(d);
+        await sendBytesToUsb(bytes, { id: 'daily_recap_' + Date.now(), title: 'Rekap Kas Harian', type: 'recap' });
+        showToast("Rekap kas harian berhasil dicetak via USB! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+        return;
+      } catch (err) {
+        console.warn("Gagal cetak rekap kas via USB:", err);
+      }
+    }
+  } else if (mode === 'bluetooth') {
+    const isConnected = await checkOrPromptBluetoothConnection("rekap kas & transaksi harian");
+    if (isConnected) {
+      try {
+        showToast("Mencetak rekap kas harian via Bluetooth...", "info");
+        const bytes = buildDailyRecapEscPos(d);
+        await sendBytesToBluetooth(bytes, { id: 'daily_recap_' + Date.now(), title: 'Rekap Kas Harian', type: 'recap' });
+        showToast("Rekap kas harian berhasil dicetak di printer Thermal! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+        return;
+      } catch (err) {
+        console.warn("Gagal cetak rekap kas via Bluetooth:", err);
+      }
+    }
+  } else if (mode === 'rawbt') {
+    try {
+      const bytes = buildDailyRecapEscPos(d);
+      printViaRawBT(bytes);
+      if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+      return;
+    } catch (err) {
+      console.warn("Gagal kirim rekap kas ke RawBT:", err);
+    }
+  }
+
+  // Fallback ke browser print
+  preparePrintableDailyRecapReceipt(d);
+  window.print();
+}
+
 
 
 function updateBluetoothUI() {
@@ -3663,3 +4314,17 @@ window.checkOrPromptUsbConnection = checkOrPromptUsbConnection;
 window.sendBytesToUsb = sendBytesToUsb;
 window.handleUniversalConnectClick = handleUniversalConnectClick;
 window.handleUniversalDisconnectClick = handleUniversalDisconnectClick;
+
+// Sales Report & Daily Recap Exports
+window.getSalesShiftReportData = getSalesShiftReportData;
+window.getDailyRecapData = getDailyRecapData;
+window.buildSalesReportEscPos = buildSalesReportEscPos;
+window.buildDailyRecapEscPos = buildDailyRecapEscPos;
+window.preparePrintableSalesReportReceipt = preparePrintableSalesReportReceipt;
+window.preparePrintableDailyRecapReceipt = preparePrintableDailyRecapReceipt;
+window.printSalesReportUniversal = printSalesReportUniversal;
+window.printDailyRecapUniversal = printDailyRecapUniversal;
+window.printSalesReport = printSalesReportUniversal;
+window.printDailyRecapReceipt = printDailyRecapUniversal;
+window.printSisShiftReportReceipt = printSalesReportUniversal;
+window.printSisDailyRecapReceipt = printDailyRecapUniversal;

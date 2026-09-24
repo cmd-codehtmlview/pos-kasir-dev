@@ -1998,9 +1998,11 @@
 
       const appName = document.getElementById("vendor-app-name")?.value.trim() || DEFAULT_ABOUT_CONFIG.appName;
       const appVersion = document.getElementById("vendor-app-version")?.value.trim() || DEFAULT_ABOUT_CONFIG.appVersion;
-      const devName = document.getElementById("vendor-dev-name")?.value.trim() || DEFAULT_ABOUT_CONFIG.devName;
-      const helpdeskWa = (document.getElementById("vendor-helpdesk-wa")?.value || "").replace(/[^0-9]/g, '') || DEFAULT_ABOUT_CONFIG.helpdeskWa;
-      const helpdeskEmail = document.getElementById("vendor-helpdesk-email")?.value.trim() || DEFAULT_ABOUT_CONFIG.helpdeskEmail;
+      let helpdeskWaRaw = (document.getElementById("vendor-helpdesk-wa")?.value || "").replace(/[^0-9]/g, '');
+      if (helpdeskWaRaw.startsWith('0')) helpdeskWaRaw = '62' + helpdeskWaRaw.slice(1);
+      else if (helpdeskWaRaw.startsWith('8')) helpdeskWaRaw = '62' + helpdeskWaRaw;
+      if (!helpdeskWaRaw.startsWith('62') && helpdeskWaRaw.length > 0) helpdeskWaRaw = '62' + helpdeskWaRaw;
+      const helpdeskWa = helpdeskWaRaw || DEFAULT_ABOUT_CONFIG.helpdeskWa;
       const releaseNotes = document.getElementById("vendor-release-notes")?.value.trim() || DEFAULT_ABOUT_CONFIG.releaseNotes;
 
       const configObj = {

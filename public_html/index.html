@@ -610,9 +610,12 @@
             <span id="btn-toggle-financial-censor-text">Buka Sensor Angka</span>
           </button>
 
-          <button onclick="exportTransactionsCSV()" class="px-3 py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-xs cursor-pointer">
           <button onclick="exportTransactionsToExcel()" class="px-3 py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-xs cursor-pointer" title="Unduh data transaksi ke spreadsheet Excel (.xlsx)">
             <span>📥 Export Excel</span>
+          </button>
+
+          <button onclick="printCurrentTabSalesReport()" class="px-3 py-1.5 sm:py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-xs cursor-pointer active:scale-95 transition" title="Cetak ringkasan laporan penjualan ke printer thermal">
+            <span>🖨️ Cetak Laporan</span>
           </button>
 
           <!-- Tombol Dashboard Laporan Online (Diproteksi Otorisasi COS) -->
@@ -2598,7 +2601,7 @@
             <p class="text-[10px] text-emerald-900/90 leading-relaxed">
               Jika mengalami kendala teknis saat jam operasional toko, hubungi tim support resmi toko via WhatsApp.
             </p>
-            <a id="mockup-about-wa-link" href="https://wa.me/6281234567890?text=Halo%20Support%20SnackPOS,%20saya%20butuh%20bantuan%20operasional%20kasir" target="_blank" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition">
+            <a id="mockup-about-wa-link" href="javascript:void(0)" onclick="contactHelpdeskWhatsApp(); return false;" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-xs transition cursor-pointer">
               <span>💬</span>
               <span>Hubungi WhatsApp Helpdesk Toko</span>
             </a>
@@ -9542,7 +9545,9 @@
 
           const waLink = document.getElementById('mockup-about-wa-link');
           if (waLink && cfg.helpdeskWa) {
-            const cleanWa = cfg.helpdeskWa.replace(/[^0-9]/g, '');
+            const cleanWa = (typeof formatWhatsAppNumber === 'function')
+              ? formatWhatsAppNumber(cfg.helpdeskWa)
+              : cfg.helpdeskWa.replace(/[^0-9]/g, '').replace(/^0/, '62');
             waLink.href = `https://wa.me/${cleanWa}?text=Halo%20Support%20SnackPOS,%20saya%20butuh%20bantuan%20operasional%20kasir`;
           }
 
@@ -10132,19 +10137,29 @@
 
     // Cetak Laporan Shift dari SIS Modal 13
     function printShiftReportReceipt() {
-      showToast("Mempersiapkan cetak laporan shift kasir...", "info");
-      if (typeof printSalesReport === "function") {
+      if (typeof printSalesReportUniversal === "function") {
+        printSalesReportUniversal();
+      } else if (typeof printSalesReport === "function") {
         printSalesReport();
       } else {
         window.print();
       }
     }
+    window.printShiftReportReceipt = printShiftReportReceipt;
+    window.printSisShiftReportReceipt = printShiftReportReceipt;
 
     // Cetak Rekap Harian Kasir dari SIS Modal 19
     function printDailyRecapReceipt() {
-      showToast("Mencetak rekap kas & transaksi harian...", "info");
-      window.print();
+      if (typeof printDailyRecapUniversal === "function") {
+        printDailyRecapUniversal();
+      } else if (typeof printDailyRecapReceipt === "function") {
+        printDailyRecapReceipt();
+      } else {
+        window.print();
+      }
     }
+    window.printDailyRecapReceipt = printDailyRecapReceipt;
+    window.printSisDailyRecapReceipt = printDailyRecapReceipt;
 
     // Render Riwayat Struk dari SIS Modal 2
     function renderSisReceiptsList() {

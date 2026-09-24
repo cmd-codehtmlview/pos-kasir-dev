@@ -631,9 +631,42 @@ function exportProductsToExcel() {
   if (typeof showToast === "function") showToast("📥 Master produk (.csv) berhasil diunduh!", "success");
 }
 
+function printCurrentTabSalesReport() {
+  const transactions = getFilteredTransactions();
+  if (!transactions || transactions.length === 0) {
+    showToast("Tidak ada data transaksi pada periode filter ini untuk dicetak!", "warning");
+    return;
+  }
+
+  let periodLabel = "30 Hari Terakhir";
+  if (reportDateFilter === "today") periodLabel = "Hari Ini";
+  else if (reportDateFilter === "7days") periodLabel = "7 Hari Terakhir";
+  else if (reportDateFilter === "all") periodLabel = "Semua Riwayat Transaksi";
+
+  const s = (pos && pos.settings) || {};
+  const reportData = {
+    storeName: s.storeName || 'TOKO SNACK BERKAH',
+    storeAddress: s.storeAddress || '',
+    storePhone: s.storePhone || '',
+    cashier: (pos?.currentUser && pos.currentUser.name) || s.cashierName || 'Kasir',
+    shift: (pos?.currentUser && pos.currentUser.shift) || s.shiftName || 'Semua Shift',
+    period: periodLabel.toUpperCase(),
+    transactions: transactions
+  };
+
+  if (typeof printSalesReportUniversal === 'function') {
+    printSalesReportUniversal(reportData);
+  } else if (typeof printSalesReport === 'function') {
+    printSalesReport(reportData);
+  } else {
+    window.print();
+  }
+}
+
 if (typeof window !== "undefined") {
   window.exportTransactionsCSV = exportTransactionsCSV;
   window.exportTransactionsToExcel = exportTransactionsToExcel;
   window.exportProductsToExcel = exportProductsToExcel;
+  window.printCurrentTabSalesReport = printCurrentTabSalesReport;
 }
 

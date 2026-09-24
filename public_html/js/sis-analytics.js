@@ -103,69 +103,12 @@ function initSisReportModal() {
 }
 
 function printSisShiftReportReceipt() {
-  const todayTrx = getTodayTransactions();
-  const s = (pos && pos.settings) || {};
-  const storeName = s.storeName || 'SNACK TIME EXPRESS';
-  const cashier = (pos.currentUser && pos.currentUser.name) || s.cashierName || 'Kasir';
-  const shift = (pos.currentUser && pos.currentUser.shift) || s.shiftName || 'Shift 1';
-  const fmt = typeof formatRupiah === 'function' ? formatRupiah : (val) => 'Rp ' + Number(val || 0).toLocaleString('id-ID');
-
-  let totalTurnover = 0;
-  let cashAmount = 0;
-  let qrisAmount = 0;
-  const productCount = {};
-
-  todayTrx.forEach(t => {
-    const payable = Number(t.payableAmount !== undefined ? t.payableAmount : (t.grandTotal !== undefined ? t.grandTotal : t.total)) || 0;
-    totalTurnover += payable;
-
-    const method = String(t.paymentMethod || t.payment || 'cash').toLowerCase();
-    if (method === 'cash' || method === 'tunai') {
-      cashAmount += payable;
-    } else {
-      qrisAmount += payable;
-    }
-
-    (t.items || []).forEach(it => {
-      const pName = it.name || 'Produk';
-      const qty = Number(it.qty) || 1;
-      productCount[pName] = (productCount[pName] || 0) + qty;
-    });
-  });
-
-  const top3 = Object.entries(productCount).sort((a, b) => b[1] - a[1]).slice(0, 3);
-  let topStr = '';
-  top3.forEach(([name, qty], i) => {
-    topStr += `${i + 1}. ${name.slice(0, 20).padEnd(20)} ${String(qty).padStart(4)} PCS\n`;
-  });
-
-  const slip = 
-    `--------------------------------\n` +
-    `     LAPORAN PENJUALAN SHIFT    \n` +
-    `      ${storeName.toUpperCase()}\n` +
-    `--------------------------------\n` +
-    `KASIR  : ${cashier}\n` +
-    `SHIFT  : ${shift}\n` +
-    `WAKTU  : ${new Date().toLocaleString('id-ID')}\n` +
-    `STRUK  : ${todayTrx.length} Transaksi Selesai\n` +
-    `--------------------------------\n` +
-    `OMZET BERSIH : ${fmt(totalTurnover)}\n` +
-    `TUNAI DI LACI: ${fmt(cashAmount)}\n` +
-    `QRIS/TRANSFER: ${fmt(qrisAmount)}\n` +
-    `--------------------------------\n` +
-    (topStr ? `PRODUK PALING LARIS:\n${topStr}--------------------------------\n` : '') +
-    `Ttd Kasir,         Ttd Supervisor,\n\n\n\n` +
-    `(${cashier})          (Pejabat Toko)\n` +
-    `--------------------------------\n\n\n`;
-
-  if (typeof printRawTextEscPos === 'function' && window.isPrinterConnected) {
-    printRawTextEscPos(slip);
-    if (typeof showMockupToast === 'function') {
-      showMockupToast('🖨️ Laporan Shift berhasil dikirim ke printer thermal!', 'success');
-    }
+  if (typeof printSalesReportUniversal === 'function') {
+    printSalesReportUniversal();
+  } else if (typeof printSalesReport === 'function') {
+    printSalesReport();
   } else {
-    console.log(slip);
-    alert("🖨️ CETAK LAPORAN PENJUALAN SHIFT:\n\n" + slip);
+    window.print();
   }
 }
 
@@ -253,92 +196,11 @@ function initSisRecapModal() {
 }
 
 function printSisDailyRecapReceipt() {
-  const todayTrx = getTodayTransactions();
-  const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
-  const s = (pos && pos.settings) || {};
-  const storeName = s.storeName || 'SNACK TIME EXPRESS';
-  const fmt = typeof formatRupiah === 'function' ? formatRupiah : (val) => 'Rp ' + Number(val || 0).toLocaleString('id-ID');
-
-  let totalTurnover = 0;
-  let cashSales = 0;
-  let qrisSales = 0;
-  let transferSales = 0;
-  let pointDiscount = 0;
-
-  todayTrx.forEach(t => {
-    const payable = Number(t.payableAmount !== undefined ? t.payableAmount : (t.grandTotal !== undefined ? t.grandTotal : t.total)) || 0;
-    totalTurnover += payable;
-
-    const method = String(t.paymentMethod || t.payment || 'cash').toLowerCase();
-    if (method === 'cash' || method === 'tunai') {
-      cashSales += payable;
-    } else if (method === 'transfer') {
-      transferSales += payable;
-    } else {
-      qrisSales += payable;
-    }
-
-    pointDiscount += Number(t.pointDiscount || 0);
-  });
-
-  let returnAmount = 0;
-  if (window.pos && Array.isArray(pos.returns)) {
-    const todayReturns = pos.returns.filter(r => (r.date && r.date.startsWith(todayStr)) || (r.createdAt && r.createdAt.startsWith(todayStr)));
-    returnAmount = todayReturns.reduce((acc, r) => acc + (Number(r.refundAmount) || 0), 0);
-  }
-
-  let cashDropAmount = 0;
-  try {
-    const stored = localStorage.getItem('snack_pos_cashdrops');
-    if (stored) {
-      const drops = JSON.parse(stored);
-      if (Array.isArray(drops)) {
-        const todayDrops = drops.filter(d => d.date && d.date.startsWith(todayStr));
-        cashDropAmount = todayDrops.reduce((acc, d) => acc + (Number(d.amount) || 0), 0);
-      }
-    }
-  } catch(e) {}
-
-  const initialCash = Number(pos?.settings?.initialCash) || 200000;
-  const drawerCash = Math.max(0, initialCash + cashSales - returnAmount - cashDropAmount);
-
-  const slip = 
-    `================================\n` +
-    `  REKAP KAS & TRANSAKSI HARIAN  \n` +
-    `      ${storeName.toUpperCase()}\n` +
-    `================================\n` +
-    `TANGGAL: ${new Date().toLocaleDateString('id-ID')}\n` +
-    `WAKTU  : ${new Date().toLocaleTimeString('id-ID')} WIB\n` +
-    `TOTAL  : ${todayTrx.length} Struk Berhasil\n` +
-    `--------------------------------\n` +
-    `OMZET BERSIH    : ${fmt(totalTurnover)}\n` +
-    `--------------------------------\n` +
-    `RINCIAN PEMBAYARAN MASUK:\n` +
-    `  Tunai (Cash)  : ${fmt(cashSales)}\n` +
-    `  QRIS / E-Money: ${fmt(qrisSales)}\n` +
-    `  Transfer Bank : ${fmt(transferSales)}\n` +
-    `--------------------------------\n` +
-    `PENGURANGAN & SETORAN:\n` +
-    `  Potongan Poin : -${fmt(pointDiscount)}\n` +
-    `  Retur Belanja : -${fmt(returnAmount)}\n` +
-    `  Tarik Kas (Drop): -${fmt(cashDropAmount)}\n` +
-    `--------------------------------\n` +
-    `UANG FISIK DALAM LACI KASIR:\n` +
-    `  ${fmt(drawerCash)}\n` +
-    `  (Termasuk modal laci ${fmt(initialCash)})\n` +
-    `================================\n` +
-    `Mengetahui,\n\n\n\n` +
-    `Kepala Toko / COS      Supervisor\n` +
-    `================================\n\n\n`;
-
-  if (typeof printRawTextEscPos === 'function' && window.isPrinterConnected) {
-    printRawTextEscPos(slip);
-    if (typeof showMockupToast === 'function') {
-      showMockupToast('🖨️ Rekap Harian Kasir berhasil dikirim ke printer thermal!', 'success');
-    }
+  if (typeof printDailyRecapUniversal === 'function') {
+    printDailyRecapUniversal();
+  } else if (typeof printDailyRecapReceipt === 'function') {
+    printDailyRecapReceipt();
   } else {
-    console.log(slip);
-    alert("🖨️ CETAK REKAP KAS HARIAN:\n\n" + slip);
+    window.print();
   }
 }
