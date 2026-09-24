@@ -15,7 +15,7 @@ const INITIAL_CATEGORIES = [
 
 const INITIAL_SETTINGS = {
   storeName: "TOKO SNACK BERKAH",
-  storeTagline: "Pusat Aneka Snack, Keripik & Oleh-oleh",
+  storeTagline: "",
   storeId: "",
   storeCode: "POS-01",
   posNumber: "01",

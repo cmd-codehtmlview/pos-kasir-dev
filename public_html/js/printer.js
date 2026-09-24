@@ -1402,7 +1402,7 @@ function buildReceiptEscPos(trx) {
   const builder = new EscPosBuilder(lineWidth);
 
   const storeName = (pos.settings.storeName || "TOKO SNACK BERKAH").toUpperCase();
-  const storeTagline = pos.settings.storeTagline || "Pusat Aneka Camilan & Keripik";
+  const storeTagline = (pos.settings.storeTagline || "").trim();
   const storeAddress = pos.settings.storeAddress || "Jl. Raya Jajanan No. 88";
   const storePhone = pos.settings.storePhone ? `Telp: ${pos.settings.storePhone}` : "";
   const storeCode = pos.settings.storeCode || "T088";
@@ -1517,9 +1517,8 @@ function buildReceiptEscPos(trx) {
     builder.text(pos.settings.receiptFooter).newline();
   } else {
     builder.text("Terima Kasih Telah Berbelanja").newline()
-      .text("Camilan Enak, Hati Senang!").newline()
       .text("Barang yang sudah dibeli").newline()
-      .text("dapat ditukar dalam 1x24 jam").newline();
+      .text("tidak dapat ditukar/dikembalikan").newline();
   }
 
   // Dorong kertas dan potong

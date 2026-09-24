@@ -99,6 +99,8 @@ function loadSettingsToForm() {
   }
   const taglineEl = document.getElementById("setting-store-tagline");
   if (taglineEl) taglineEl.value = pos.settings.storeTagline || "";
+  const sisTaglineEl = document.getElementById("sis-profile-tagline");
+  if (sisTaglineEl) sisTaglineEl.value = pos.settings.storeTagline || "";
   const codeEl = document.getElementById("setting-store-code");
   if (codeEl) codeEl.value = pos.settings.storeCode || "T088";
   const posNumEl = document.getElementById("setting-pos-number");
@@ -228,6 +230,8 @@ function saveStoreSettings() {
   pos.settings.storeName = document.getElementById("setting-store-name")?.value.trim() || "TOKO SNACK BERKAH";
   pos.settings.storeId = getOrCreateStoreId();
   pos.settings.storeTagline = document.getElementById("setting-store-tagline")?.value.trim() || "";
+  const sisTaglineEl = document.getElementById("sis-profile-tagline");
+  if (sisTaglineEl) sisTaglineEl.value = pos.settings.storeTagline;
   pos.settings.storeCode = document.getElementById("setting-store-code")?.value.trim() || "T088";
   pos.settings.posNumber = document.getElementById("setting-pos-number")?.value.trim() || "01";
   pos.settings.storeAddress = document.getElementById("setting-store-address")?.value.trim() || "";

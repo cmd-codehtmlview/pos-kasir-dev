@@ -74,6 +74,12 @@ class POSStore {
     if (!this.settings.storeId || this.settings.storeId === "STR-001") {
       this.settings.storeId = typeof getOrCreateStoreId === 'function' ? getOrCreateStoreId() : "STR-" + Math.floor(1000 + Math.random() * 9000);
     }
+    // Standar Industri Ritel: Hilangkan template slogan toko default lama ("Pusat Aneka...")
+    if (this.settings.storeTagline === "Pusat Aneka Snack, Keripik & Oleh-oleh" || 
+        this.settings.storeTagline === "Pusat Aneka Camilan & Keripik" ||
+        this.settings.storeTagline === "Pusat Aneka Camilan") {
+      this.settings.storeTagline = "";
+    }
     this.saveSettings();
 
     // 3. Riwayat Transaksi (Dimulai bersih Rp 0 / 0 Struk untuk toko baru)

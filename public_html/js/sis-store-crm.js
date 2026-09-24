@@ -12,11 +12,13 @@ function initSisProfileModal() {
   const s = pos.settings;
 
   const nameInput = document.getElementById('sis-profile-store-name');
+  const taglineInput = document.getElementById('sis-profile-tagline');
   const addrInput = document.getElementById('sis-profile-address');
   const phoneInput = document.getElementById('sis-profile-phone');
   const footerInput = document.getElementById('sis-profile-footer');
 
   if (nameInput) nameInput.value = s.storeName || 'TOKO SNACK BERKAH';
+  if (taglineInput) taglineInput.value = s.storeTagline || '';
   if (addrInput) addrInput.value = s.storeAddress || '';
   if (phoneInput) phoneInput.value = s.storePhone || '';
   if (footerInput) footerInput.value = s.receiptFooter || 'Terima kasih atas kunjungan Anda.\nBarang yang dibeli tidak dapat ditukar kecuali ada perjanjian.';
@@ -26,6 +28,7 @@ function saveSisProfile() {
   if (!window.pos || !pos.settings) return;
 
   const nameInput = document.getElementById('sis-profile-store-name');
+  const taglineInput = document.getElementById('sis-profile-tagline');
   const addrInput = document.getElementById('sis-profile-address');
   const phoneInput = document.getElementById('sis-profile-phone');
   const footerInput = document.getElementById('sis-profile-footer');
@@ -40,6 +43,11 @@ function saveSisProfile() {
   }
 
   pos.settings.storeName = storeName;
+  if (taglineInput) {
+    pos.settings.storeTagline = taglineInput.value.trim();
+    const mainTagline = document.getElementById('setting-store-tagline');
+    if (mainTagline) mainTagline.value = pos.settings.storeTagline;
+  }
   if (addrInput) pos.settings.storeAddress = addrInput.value.trim();
   if (phoneInput) pos.settings.storePhone = phoneInput.value.trim();
   if (footerInput) pos.settings.receiptFooter = footerInput.value.trim();
@@ -49,6 +57,10 @@ function saveSisProfile() {
   // Update header or on-screen store names
   const headerStoreName = document.getElementById('header-store-name');
   if (headerStoreName) headerStoreName.textContent = storeName;
+
+  if (typeof syncStoreProfileToCloud === 'function') {
+    syncStoreProfileToCloud();
+  }
 
   if (typeof showMockupToast === 'function') {
     showMockupToast('🏪 Profil Toko & Struk Berhasil Disimpan!', 'success');
