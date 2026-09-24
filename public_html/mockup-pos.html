@@ -2492,6 +2492,18 @@
           </div>
         </div>
 
+        <!-- Opsi On/Off Cetak Otomatis (Hemat Kertas) -->
+        <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <span class="font-bold text-slate-800 text-xs block">Cetak Otomatis Struk</span>
+            <span class="text-[10px] text-slate-500 block leading-snug">Langsung cetak saat transaksi kasir selesai (matikan untuk hemat kertas)</span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer shrink-0">
+            <input type="checkbox" id="mock-printer-autoprint-toggle" checked onchange="showMockupToast(this.checked ? '🖨️ Cetak otomatis struk AKTIF' : '🌱 Cetak otomatis struk NONAKTIF (Hemat Kertas)', this.checked ? 'success' : 'info')" class="sr-only peer">
+            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+          </label>
+        </div>
+
         <!-- Tes Print -->
         <button onclick="showMockupToast('🖨️ Sample struk tes 58mm berhasil dikirim ke printer!', 'success');" class="w-full py-3 bg-slate-900 hover:bg-black text-white font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
           <span>🖨️</span>
@@ -3701,10 +3713,6 @@
 
       if (input) {
         input.value = "";
-        input.focus();
-      }
-      if (dropdown) {
-        dropdown.classList.add('hidden');
       }
     }
 

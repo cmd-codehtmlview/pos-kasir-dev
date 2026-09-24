@@ -4159,6 +4159,18 @@
           </div>
         </div>
 
+        <!-- Opsi On/Off Cetak Otomatis (Hemat Kertas) -->
+        <div class="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <span class="font-bold text-slate-800 text-xs block">Cetak Otomatis Struk</span>
+            <span class="text-[10px] text-slate-500 block leading-snug">Langsung cetak saat transaksi kasir selesai (matikan untuk hemat kertas)</span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer shrink-0">
+            <input type="checkbox" id="sis-printer-autoprint-toggle" onchange="toggleSisAutoPrintReceipt(this.checked)" class="sr-only peer">
+            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+          </label>
+        </div>
+
         <!-- Tes Print -->
         <button type="button" onclick="testPrintReceipt()" class="w-full py-3 bg-slate-900 hover:bg-black text-white font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
           <span>🖨️</span>
@@ -9654,6 +9666,11 @@
       const disconnectUsbBtn = document.getElementById("sis-printer-btn-disconnect-usb");
       const btn58 = document.getElementById("sis-paper-58-btn");
       const btn80 = document.getElementById("sis-paper-80-btn");
+      const autoPrintToggle = document.getElementById("sis-printer-autoprint-toggle");
+
+      if (autoPrintToggle) {
+        autoPrintToggle.checked = (typeof pos !== "undefined" && pos.settings && pos.settings.autoPrintReceipt !== false);
+      }
 
       const mode = (typeof pos !== "undefined" && pos.settings && pos.settings.printerDriverMode) || "bluetooth";
       const paper = (typeof pos !== "undefined" && pos.settings && pos.settings.paperWidth) || "58mm";
@@ -9783,6 +9800,22 @@
       if (typeof updateBluetoothUI === "function") updateBluetoothUI();
       if (typeof updateQuickBluetoothModalUI === "function") updateQuickBluetoothModalUI();
     }
+
+    function toggleSisAutoPrintReceipt(enabled) {
+      if (typeof pos !== "undefined" && pos.settings) {
+        pos.settings.autoPrintReceipt = !!enabled;
+        pos.saveSettings();
+        const autoPrintEl = document.getElementById("setting-auto-print-receipt");
+        if (autoPrintEl) autoPrintEl.checked = !!enabled;
+        const msg = enabled ? "🖨️ Cetak otomatis struk AKTIF" : "🌱 Cetak otomatis struk NONAKTIF (Hemat Kertas)";
+        if (typeof showMockupToast === "function") {
+          showMockupToast(msg, enabled ? "success" : "info");
+        } else if (typeof showToast === "function") {
+          showToast(msg, enabled ? "success" : "info");
+        }
+      }
+    }
+    window.toggleSisAutoPrintReceipt = toggleSisAutoPrintReceipt;
 
     // Eksekusi Cetak Label dari SIS Modal 7
     function executeSisLabelPrint() {
@@ -10278,10 +10311,6 @@
 
       if (input) {
         input.value = "";
-        input.focus();
-      }
-      if (dropdown) {
-        dropdown.classList.add('hidden');
       }
     }
 
@@ -10720,7 +10749,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=134')
+          navigator.serviceWorker.register('./sw.js?v=135')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
