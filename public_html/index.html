@@ -1295,6 +1295,14 @@
                 </div>
               </label>
 
+              <label class="p-3 border-2 border-slate-200 rounded-xl flex items-start gap-2.5 cursor-pointer hover:border-emerald-400 has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/50 transition-all">
+                <input type="radio" name="printer-driver-mode" id="printer-mode-webusb" value="webusb" onchange="changePrinterDriverMode('webusb')" class="mt-0.5 text-emerald-600 focus:ring-emerald-500" />
+                <div>
+                  <div class="font-bold text-xs text-slate-800">🔌 Direct WebUSB (Kabel USB PC / Laptop)</div>
+                  <p class="text-[10px] text-slate-500 mt-0.5">Cetak instan via kabel USB tanpa driver OS (Fujitsu FP-2000C, Epson, Xprinter di Linux Mint/Windows).</p>
+                </div>
+              </label>
+
               <label class="p-3 border-2 border-slate-200 rounded-xl flex items-start gap-2.5 cursor-pointer hover:border-amber-400 has-[:checked]:border-amber-600 has-[:checked]:bg-amber-50/50 transition-all">
                 <input type="radio" name="printer-driver-mode" id="printer-mode-rawbt" value="rawbt" onchange="changePrinterDriverMode('rawbt')" class="mt-0.5 text-amber-600 focus:ring-amber-500" />
                 <div>
@@ -1306,8 +1314,8 @@
               <label class="p-3 border-2 border-slate-200 rounded-xl flex items-start gap-2.5 cursor-pointer hover:border-slate-400 has-[:checked]:border-slate-800 has-[:checked]:bg-slate-50 transition-all">
                 <input type="radio" name="printer-driver-mode" id="printer-mode-system" value="system" onchange="changePrinterDriverMode('system')" class="mt-0.5 text-slate-800 focus:ring-slate-700" />
                 <div>
-                  <div class="font-bold text-xs text-slate-800">Dialog Sistem / Kabel USB</div>
-                  <p class="text-[10px] text-slate-500 mt-0.5">Dialog cetak sistem operasi browser standar untuk komputer kasir kabel USB.</p>
+                  <div class="font-bold text-xs text-slate-800">Dialog Sistem OS</div>
+                  <p class="text-[10px] text-slate-500 mt-0.5">Dialog cetak sistem operasi browser standar.</p>
                 </div>
               </label>
             </div>
@@ -1411,7 +1419,7 @@
               <button 
                 type="button" 
                 id="btn-connect-bluetooth" 
-                onclick="connectBluetoothPrinter()" 
+                onclick="handleUniversalConnectClick()" 
                 class="flex-1 sm:flex-initial px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer transition-all"
               >
                 <span>🔍</span>
@@ -1420,7 +1428,7 @@
               <button 
                 type="button" 
                 id="btn-disconnect-bluetooth" 
-                onclick="disconnectBluetoothPrinter()" 
+                onclick="handleUniversalDisconnectClick()" 
                 class="hidden flex-1 sm:flex-initial px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold rounded-xl text-xs items-center justify-center gap-1.5 cursor-pointer transition-all"
               >
                 <span>🔌</span>
@@ -4043,17 +4051,32 @@
         <!-- Pilihan Jalur / Driver Mode Printer -->
         <div>
           <label class="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Metode / Jalur Printer:</label>
-          <div class="grid grid-cols-3 gap-1.5">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
             <button type="button" id="sis-driver-btn-bluetooth" onclick="selectSisPrinterDriver('bluetooth')" class="py-2 px-1 text-center rounded-xl border-2 border-slate-900 bg-slate-50 font-bold text-slate-900 text-[10px] transition cursor-pointer">
               <span>📱</span><br>Bluetooth BLE
             </button>
-            <button type="button" id="sis-driver-btn-system" onclick="selectSisPrinterDriver('system')" class="py-2 px-1 text-center rounded-xl border border-slate-300 bg-white font-medium text-slate-600 text-[10px] hover:border-slate-400 transition cursor-pointer">
-              <span>📄</span><br>Sistem / USB / PDF
+            <button type="button" id="sis-driver-btn-webusb" onclick="selectSisPrinterDriver('webusb')" class="py-2 px-1 text-center rounded-xl border border-slate-300 bg-white font-medium text-slate-600 text-[10px] hover:border-slate-400 transition cursor-pointer">
+              <span>🔌</span><br>Direct WebUSB
             </button>
             <button type="button" id="sis-driver-btn-rawbt" onclick="selectSisPrinterDriver('rawbt')" class="py-2 px-1 text-center rounded-xl border border-slate-300 bg-white font-medium text-slate-600 text-[10px] hover:border-slate-400 transition cursor-pointer">
               <span>🚀</span><br>RawBT Android
             </button>
+            <button type="button" id="sis-driver-btn-system" onclick="selectSisPrinterDriver('system')" class="py-2 px-1 text-center rounded-xl border border-slate-300 bg-white font-medium text-slate-600 text-[10px] hover:border-slate-400 transition cursor-pointer">
+              <span>📄</span><br>Sistem OS
+            </button>
           </div>
+        </div>
+
+        <!-- Tombol Aksi WebUSB (Hanya tampil jika mode WebUSB aktif) -->
+        <div id="sis-printer-webusb-actions" class="hidden space-y-2">
+          <button type="button" onclick="connectUsbPrinter()" class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95">
+            <span>🔌</span>
+            <span>Pilih & Hubungkan Printer USB (WebUSB)</span>
+          </button>
+          <button type="button" id="sis-printer-btn-disconnect-usb" onclick="disconnectUsbPrinter(); updateSisPrinterModalUI();" class="hidden w-full py-2 px-3 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer">
+            <span>🔌</span>
+            <span>Putuskan Koneksi USB</span>
+          </button>
         </div>
 
         <!-- Tombol Aksi Bluetooth (Hanya tampil jika mode Bluetooth aktif) -->
@@ -4071,7 +4094,7 @@
         <!-- Info Mode Sistem (Tampil saat mode sistem/USB/PDF) -->
         <div id="sis-printer-system-info" class="hidden p-3 bg-blue-50 border border-blue-200 rounded-xl text-[11px] text-blue-900 space-y-1">
           <p class="font-bold flex items-center gap-1"><span>📄</span> Mode Dialog Cetak Sistem Browser Aktif</p>
-          <p class="text-blue-700 text-[10px]">Struk langsung dicetak via popup cetak browser. Cocok untuk printer kabel USB, printer Android Print Service, atau simpan file PDF tanpa perlu Bluetooth.</p>
+          <p class="text-blue-700 text-[10px]">Struk langsung dicetak via popup cetak browser. Cocok untuk printer kabel USB standar atau simpan file PDF tanpa perlu WebUSB/Bluetooth.</p>
         </div>
 
         <!-- Lebar Kertas -->
@@ -8872,20 +8895,20 @@
         <div class="space-y-2 pt-1">
           <button 
             id="btn-modal-bt-connect" 
-            onclick="connectBluetoothPrinter(); closeModal('modal-bluetooth-quick');" 
+            onclick="handleUniversalConnectClick(); closeModal('modal-bluetooth-quick');" 
             class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <span>🔍</span>
-            <span>Cari & Hubungkan Printer VSC (BLE)</span>
+            <span id="btn-modal-bt-connect-text">Cari & Hubungkan Printer VSC (BLE)</span>
           </button>
           <button 
             id="btn-modal-bt-switch-mode" 
-            type="button"
+            type="button" 
             onclick="togglePrinterDriverModeQuick();" 
             class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
           >
             <span>📄</span>
-            <span id="btn-modal-bt-switch-mode-text">Ganti ke Mode Dialog Sistem / USB / PDF</span>
+            <span id="btn-modal-bt-switch-mode-text">Ganti ke Mode Direct WebUSB (PC)</span>
           </button>
           <div class="grid grid-cols-2 gap-2">
             <button 
@@ -8896,7 +8919,7 @@
               <span>Tes Print</span>
             </button>
             <button 
-              onclick="disconnectBluetoothPrinter(); closeModal('modal-bluetooth-quick');" 
+              onclick="handleUniversalDisconnectClick(); closeModal('modal-bluetooth-quick');" 
               class="py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
             >
               <span>🔌</span>
@@ -8920,18 +8943,18 @@
   <script src="js/html5-qrcode.min.js"></script>
   <script src="js/scanner.js?v=127"></script>
   <script src="js/cart.js?v=106"></script>
-  <script src="js/printer.js?v=132"></script>
+  <script src="js/printer.js?v=133"></script>
   <script src="js/checkout.js?v=112"></script>
   <script src="js/member.js?v=108"></script>
   <script src="js/returns.js?v=101"></script>
   <script src="js/stock-opname.js?v=100"></script>
   <script src="js/klerk.js?v=100"></script>
-  <script src="js/inventory.js?v=123"></script>
+  <script src="js/inventory.js?v=124"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/import-products.js?v=100"></script>
   <script src="js/repack.js?v=100"></script>
   <script src="js/reports.js?v=103"></script>
-  <script src="js/settings.js?v=117"></script>
+  <script src="js/settings.js?v=118"></script>
   <script src="js/employees.js?v=122"></script>
   
   <!-- Main Application Entry Point -->
@@ -9574,11 +9597,14 @@
       const modeText = document.getElementById("sis-printer-mode-text");
       const paperText = document.getElementById("sis-printer-paper-text");
       const btnBt = document.getElementById("sis-driver-btn-bluetooth");
+      const btnWebusb = document.getElementById("sis-driver-btn-webusb");
       const btnSys = document.getElementById("sis-driver-btn-system");
       const btnRaw = document.getElementById("sis-driver-btn-rawbt");
       const btActions = document.getElementById("sis-printer-bluetooth-actions");
+      const webusbActions = document.getElementById("sis-printer-webusb-actions");
       const sysInfo = document.getElementById("sis-printer-system-info");
       const disconnectBtn = document.getElementById("sis-printer-btn-disconnect");
+      const disconnectUsbBtn = document.getElementById("sis-printer-btn-disconnect-usb");
       const btn58 = document.getElementById("sis-paper-58-btn");
       const btn80 = document.getElementById("sis-paper-80-btn");
 
@@ -9603,11 +9629,39 @@
       const inactiveBtnCls = "py-2 px-1 text-center rounded-xl border border-slate-300 bg-white font-medium text-slate-600 text-[10px] hover:border-slate-400 transition cursor-pointer";
 
       if (btnBt) btnBt.className = (mode === "bluetooth") ? activeBtnCls : inactiveBtnCls;
+      if (btnWebusb) btnWebusb.className = (mode === "webusb") ? activeBtnCls : inactiveBtnCls;
       if (btnSys) btnSys.className = (mode === "system") ? activeBtnCls : inactiveBtnCls;
       if (btnRaw) btnRaw.className = (mode === "rawbt") ? activeBtnCls : inactiveBtnCls;
 
-      if (mode === "system") {
-        if (modeText) modeText.textContent = "Dialog Sistem / USB / PDF";
+      if (mode === "webusb") {
+        if (modeText) modeText.textContent = "Direct WebUSB (PC/Laptop)";
+        if (btActions) btActions.classList.add("hidden");
+        if (webusbActions) webusbActions.classList.remove("hidden");
+        if (sysInfo) sysInfo.classList.add("hidden");
+
+        const connected = (typeof isUsbConnected === "function") && isUsbConnected();
+        const devName = (typeof usbPrinterDevice !== "undefined" && usbPrinterDevice && usbPrinterDevice.productName) ||
+                        (pos?.settings?.lastUsbPrinterName) || "Fujitsu FP-2000C / Printer USB";
+
+        if (devNameEl) devNameEl.textContent = connected ? devName : (pos?.settings?.lastUsbPrinterName ? (pos.settings.lastUsbPrinterName + " (Siaga)") : "Belum Terhubung");
+
+        if (connected) {
+          if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+          if (badge) {
+            badge.textContent = "TERHUBUNG (USB)";
+            badge.className = "px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[9px] rounded-full uppercase";
+          }
+          if (disconnectUsbBtn) disconnectUsbBtn.classList.remove("hidden");
+        } else {
+          if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-slate-400";
+          if (badge) {
+            badge.textContent = "TERPUTUS";
+            badge.className = "px-2 py-0.5 bg-slate-200 text-slate-700 border border-slate-300 font-bold text-[9px] rounded-full uppercase";
+          }
+          if (disconnectUsbBtn) disconnectUsbBtn.classList.add("hidden");
+        }
+      } else if (mode === "system") {
+        if (modeText) modeText.textContent = "Dialog Sistem OS";
         if (devNameEl) devNameEl.textContent = "Printer USB / Dialog OS / PDF";
         if (dot) dot.className = "w-2.5 h-2.5 rounded-full bg-blue-500";
         if (badge) {
@@ -9615,6 +9669,7 @@
           badge.className = "px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 font-bold text-[9px] rounded-full uppercase";
         }
         if (btActions) btActions.classList.add("hidden");
+        if (webusbActions) webusbActions.classList.add("hidden");
         if (sysInfo) sysInfo.classList.remove("hidden");
       } else if (mode === "rawbt") {
         if (modeText) modeText.textContent = "RawBT Android";
@@ -9625,11 +9680,13 @@
           badge.className = "px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 font-bold text-[9px] rounded-full uppercase";
         }
         if (btActions) btActions.classList.add("hidden");
+        if (webusbActions) webusbActions.classList.add("hidden");
         if (sysInfo) sysInfo.classList.add("hidden");
       } else {
         // Bluetooth
         if (modeText) modeText.textContent = "Web Bluetooth BLE";
         if (btActions) btActions.classList.remove("hidden");
+        if (webusbActions) webusbActions.classList.add("hidden");
         if (sysInfo) sysInfo.classList.add("hidden");
 
         const connected = (typeof isBluetoothConnected === "function") && isBluetoothConnected();
@@ -10616,7 +10673,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=130')
+          navigator.serviceWorker.register('./sw.js?v=131')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

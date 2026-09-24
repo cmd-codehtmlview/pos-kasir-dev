@@ -234,7 +234,20 @@ function updateQuickBluetoothModalUI() {
   const paper = (typeof pos !== "undefined" && pos.settings && pos.settings.paperWidth) || "58mm";
   if (modalPaperBadge) modalPaperBadge.textContent = paper;
 
-  if (mode === "system") {
+  if (mode === "webusb") {
+    const usbConnected = isUsbConnected();
+    const usbDevName = (usbPrinterDevice && usbPrinterDevice.productName) || (pos?.settings?.lastUsbPrinterName) || "Printer USB (FP-2000C)";
+    if (modalDeviceName) modalDeviceName.textContent = usbDevName;
+    if (modalStatusDot) modalStatusDot.className = usbConnected ? "w-3 h-3 rounded-full bg-emerald-500 shadow-sm" : "w-3 h-3 rounded-full bg-slate-400";
+    if (modalStatusText) modalStatusText.textContent = usbConnected ? "USB Terhubung & Siap" : "USB Terputus";
+    if (modalDetailText) modalDetailText.textContent = usbConnected ? "Kabel USB aktif • Format: " + paper : "Hubungkan kabel USB printer ke PC/Laptop";
+    if (switchModeBtnText) switchModeBtnText.textContent = "Beralih ke Bluetooth BLE";
+    if (connectBtn) {
+      connectBtn.classList.remove("hidden");
+      const connectBtnText = document.getElementById("btn-modal-bt-connect-text");
+      if (connectBtnText) connectBtnText.textContent = "Hubungkan Printer USB (WebUSB)";
+    }
+  } else if (mode === "system") {
     if (modalDeviceName) modalDeviceName.textContent = "Dialog Cetak Sistem / Kabel USB";
     if (modalStatusDot) modalStatusDot.className = "w-3 h-3 rounded-full bg-blue-500 shadow-sm";
     if (modalStatusText) modalStatusText.textContent = "Mode Sistem Aktif (Bebas BT)";
@@ -253,8 +266,12 @@ function updateQuickBluetoothModalUI() {
     const connected = isBluetoothConnected();
     const devName = (bluetoothPrinterDevice && bluetoothPrinterDevice.name) || (typeof pos !== "undefined" && pos.settings && pos.settings.lastPrinterName) || "Printer VSC";
     if (modalDeviceName) modalDeviceName.textContent = devName;
-    if (switchModeBtnText) switchModeBtnText.textContent = "Ganti ke Mode Dialog Sistem / USB";
-    if (connectBtn) connectBtn.classList.remove("hidden");
+    if (switchModeBtnText) switchModeBtnText.textContent = "Ganti ke Mode Direct WebUSB (PC)";
+    if (connectBtn) {
+      connectBtn.classList.remove("hidden");
+      const connectBtnText = document.getElementById("btn-modal-bt-connect-text");
+      if (connectBtnText) connectBtnText.textContent = "Cari & Hubungkan Printer VSC (BLE)";
+    }
 
     if (connected) {
       if (modalStatusDot) modalStatusDot.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-sm";
@@ -275,7 +292,10 @@ function updateQuickBluetoothModalUI() {
 
 function togglePrinterDriverModeQuick() {
   const current = (typeof pos !== 'undefined' && pos.settings && pos.settings.printerDriverMode) || 'bluetooth';
-  const newMode = (current === 'bluetooth') ? 'system' : 'bluetooth';
+  let newMode = 'bluetooth';
+  if (current === 'bluetooth') newMode = 'webusb';
+  else if (current === 'webusb') newMode = 'bluetooth';
+  else newMode = 'bluetooth';
   if (typeof changePrinterDriverMode === 'function') {
     changePrinterDriverMode(newMode);
   } else if (typeof pos !== 'undefined' && pos.settings) {
@@ -799,6 +819,56 @@ function updatePrinterStatusBadge() {
     btnTestPrint.innerHTML = `<span>⚡</span><span>Test Cetak ${mode === 'system' ? 'USB' : 'Kertas'} (${paperWidth})</span>`;
   }
 
+  // KONDISI 0: MODE DIRECT WEBUSB (KABEL USB PC / LAPTOP)
+  if (mode === 'webusb') {
+    const usbConnected = isUsbConnected();
+    const usbDevName = (usbPrinterDevice && usbPrinterDevice.productName) || (pos.settings && pos.settings.lastUsbPrinterName) || "Fujitsu FP-2000C / Printer USB";
+    const isUsbSupp = isUsbSupported();
+
+    if (banner) {
+      if (!isUsbSupp) {
+        banner.classList.remove("hidden");
+        banner.innerHTML = "⚠️ Browser Anda belum mendukung WebUSB. Gunakan Google Chrome atau Chromium di PC/Laptop.";
+      } else {
+        banner.classList.add("hidden");
+      }
+    }
+
+    if (deviceDescEl) {
+      deviceDescEl.textContent = `Hubungkan kabel USB printer ke laptop/PC. Cetak native ESC/POS instan tanpa perantara driver OS (Format: ${paperWidth}).`;
+    }
+
+    if (badge) {
+      if (isConnectingUsb) {
+        badge.textContent = "Sedang Menghubungkan USB...";
+        badge.className = "px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 animate-pulse";
+      } else if (usbConnected) {
+        badge.textContent = `🟢 USB Terhubung: ${usbDevName} (${paperWidth})`;
+        badge.className = "px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800";
+      } else if (usbPrinterDevice || (pos.settings && pos.settings.lastUsbPrinterName)) {
+        badge.textContent = `🟡 USB Siaga: ${usbDevName}`;
+        badge.className = "px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-300";
+      } else {
+        badge.textContent = "⚪ USB Belum Terhubung";
+        badge.className = "px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600";
+      }
+    }
+
+    if (deviceNameEl) {
+      deviceNameEl.innerHTML = `<span>${usbConnected ? usbDevName : (pos.settings.lastUsbPrinterName ? `${usbDevName} (Siaga)` : "Direct WebUSB ESC/POS")}</span> <span class="px-2 py-0.5 rounded text-[10px] font-bold font-mono ${paperWidth === '80mm' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}">${paperWidth}</span>`;
+    }
+
+    if (btnConnect) {
+      btnConnect.classList.toggle("hidden", usbConnected);
+      btnConnect.innerHTML = `<span>🔍</span><span>Hubungkan Printer USB</span>`;
+    }
+    if (btnDisconnect) {
+      btnDisconnect.classList.toggle("hidden", !usbConnected && !usbPrinterDevice);
+      btnDisconnect.innerHTML = `<span>🔌</span><span>Putus Koneksi USB</span>`;
+    }
+    return;
+  }
+
   // KONDISI 1: MODE DIALOG SISTEM / KABEL USB
   if (mode === 'system') {
     if (badge) {
@@ -859,9 +929,11 @@ function updatePrinterStatusBadge() {
   }
   if (btnConnect) {
     btnConnect.classList.toggle("hidden", connected);
+    btnConnect.innerHTML = `<span>🔍</span><span>Cari & Hubungkan Printer</span>`;
   }
   if (btnDisconnect) {
     btnDisconnect.classList.toggle("hidden", !connected && !bluetoothPrinterDevice);
+    btnDisconnect.innerHTML = `<span>🔌</span><span>Putus Koneksi</span>`;
   }
 }
 
@@ -893,6 +965,295 @@ async function sendBytesToBluetooth(bytes, meta = {}) {
     if (isLargeJob && (i % 500 < chunkSize)) {
       await new Promise(r => setTimeout(r, 60));
     }
+  }
+}
+
+// =========================================================
+// 1B. MANAJEMEN KONEKSI DIRECT WEBUSB API (KABEL USB PC / LAPTOP)
+// Mendukung printer Fujitsu FP-2000C, Epson TM-T88, Xprinter, dsb.
+// Mengirim perintah ESC/POS biner murni langsung via kabel USB
+// =========================================================
+
+let usbPrinterDevice = null;
+let usbPrinterInterfaceNumber = null;
+let usbPrinterEndpointOut = null;
+let isConnectingUsb = false;
+let isUserExplicitlyDisconnectedUsb = false;
+
+function isUsbSupported() {
+  return typeof navigator !== 'undefined' && 'usb' in navigator;
+}
+
+function isUsbConnected() {
+  return Boolean(
+    usbPrinterDevice &&
+    usbPrinterDevice.opened &&
+    usbPrinterEndpointOut !== null
+  );
+}
+
+async function initUsbDevice(device) {
+  if (!device) return false;
+  try {
+    if (!device.opened) {
+      await device.open();
+    }
+
+    if (device.configuration === null) {
+      await device.selectConfiguration(1);
+    }
+
+    let foundInterfaceNumber = null;
+    let foundEndpointOut = null;
+
+    const configuration = device.configuration;
+    if (configuration && configuration.interfaces) {
+      for (const iface of configuration.interfaces) {
+        for (const alt of iface.alternates) {
+          const outEndpoint = alt.endpoints.find(ep => ep.direction === 'out' && ep.type === 'bulk');
+          if (outEndpoint) {
+            foundInterfaceNumber = iface.interfaceNumber;
+            foundEndpointOut = outEndpoint.endpointNumber;
+            break;
+          }
+        }
+        if (foundInterfaceNumber !== null) break;
+      }
+
+      if (foundInterfaceNumber === null) {
+        for (const iface of configuration.interfaces) {
+          for (const alt of iface.alternates) {
+            const outEndpoint = alt.endpoints.find(ep => ep.direction === 'out');
+            if (outEndpoint) {
+              foundInterfaceNumber = iface.interfaceNumber;
+              foundEndpointOut = outEndpoint.endpointNumber;
+              break;
+            }
+          }
+          if (foundInterfaceNumber !== null) break;
+        }
+      }
+    }
+
+    if (foundInterfaceNumber === null || foundEndpointOut === null) {
+      foundInterfaceNumber = 0;
+      foundEndpointOut = 1;
+    }
+
+    await device.claimInterface(foundInterfaceNumber);
+
+    usbPrinterDevice = device;
+    usbPrinterInterfaceNumber = foundInterfaceNumber;
+    usbPrinterEndpointOut = foundEndpointOut;
+    isUserExplicitlyDisconnectedUsb = false;
+
+    if (navigator.usb && typeof navigator.usb.addEventListener === 'function') {
+      navigator.usb.removeEventListener('disconnect', onUsbDisconnected);
+      navigator.usb.addEventListener('disconnect', onUsbDisconnected);
+    }
+
+    return true;
+  } catch (err) {
+    console.error("[WebUSB] Inisialisasi printer USB gagal:", err);
+    throw err;
+  }
+}
+
+async function connectUsbPrinter() {
+  if (!isUsbSupported()) {
+    alert(
+      "Browser ini belum mendukung WebUSB API.\n\n" +
+      "💡 Saran Penggunaan:\n" +
+      "- Gunakan browser Google Chrome atau Chromium di PC/Laptop Linux Mint atau Windows."
+    );
+    return false;
+  }
+
+  if (isConnectingUsb) return false;
+  isConnectingUsb = true;
+  updatePrinterStatusBadge();
+
+  try {
+    showToast("Membuka jendela pemilihan printer USB...", "info");
+
+    const device = await navigator.usb.requestDevice({
+      filters: []
+    });
+
+    if (!device) {
+      isConnectingUsb = false;
+      updatePrinterStatusBadge();
+      return false;
+    }
+
+    showToast(`Menghubungkan ke ${device.productName || 'Printer USB'}...`, "info");
+    await initUsbDevice(device);
+
+    const devName = device.productName || "Fujitsu FP-2000C / Printer USB";
+    if (pos && pos.settings) {
+      pos.settings.lastUsbPrinterName = devName;
+      pos.settings.lastUsbVendorId = device.vendorId;
+      pos.settings.lastUsbProductId = device.productId;
+      pos.settings.printerDriverMode = 'webusb';
+      pos.saveSettings();
+    }
+
+    showToast(`🟢 Berhasil terhubung ke ${devName}!`, "success");
+    if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+
+    isConnectingUsb = false;
+    updatePrinterStatusBadge();
+    return true;
+  } catch (err) {
+    console.warn("Koneksi WebUSB dibatalkan / gagal:", err);
+    isConnectingUsb = false;
+    updatePrinterStatusBadge();
+    if (err.name !== 'NotFoundError') {
+      if (err.message && (err.message.includes('Access denied') || err.message.includes('SecurityError'))) {
+        alert(
+          "⚠️ IZIN PORT USB DITOLAK LINUX MINT!\n\n" +
+          "Sistem Linux Mint memerlukan izin akses port printer USB.\n" +
+          "Solusi: Buka Terminal Linux dan jalankan perintah:\n\n" +
+          "sudo usermod -a -G lp,dialout $USER\n\n" +
+          "Setelah itu tutup Google Chrome dan buka kembali."
+        );
+      } else {
+        showToast(`Gagal konek USB: ${err.message}`, "error");
+      }
+    }
+    return false;
+  }
+}
+
+async function ensureUsbConnected(silent = false) {
+  if (isUsbConnected()) return true;
+
+  if (isConnectingUsb) {
+    for (let i = 0; i < 15; i++) {
+      await new Promise(r => setTimeout(r, 200));
+      if (isUsbConnected()) return true;
+    }
+    return isUsbConnected();
+  }
+
+  if (isUsbSupported() && !isUserExplicitlyDisconnectedUsb) {
+    try {
+      const devices = await navigator.usb.getDevices();
+      if (devices && devices.length > 0) {
+        const targetVid = pos?.settings?.lastUsbVendorId;
+        const targetPid = pos?.settings?.lastUsbProductId;
+        const matched = (targetVid && targetPid && devices.find(d => d.vendorId === targetVid && d.productId === targetPid)) || devices[0];
+        if (matched) {
+          if (!silent) showToast(`Menyambungkan kembali ke ${matched.productName || 'Printer USB'}...`, "info");
+          isConnectingUsb = true;
+          updatePrinterStatusBadge();
+          await initUsbDevice(matched);
+          isConnectingUsb = false;
+          updatePrinterStatusBadge();
+          if (!silent) showToast(`🟢 Terhubung kembali ke ${matched.productName || 'Printer USB'}!`, "success");
+          return true;
+        }
+      }
+    } catch (e) {
+      console.warn("[WebUSB] getDevices auto-reconnect failed:", e);
+    } finally {
+      isConnectingUsb = false;
+      updatePrinterStatusBadge();
+    }
+  }
+
+  return false;
+}
+
+async function checkOrPromptUsbConnection(docType = "struk") {
+  const isConnected = isUsbConnected() || (await ensureUsbConnected(false));
+  if (isConnected) return true;
+
+  const ok = confirm(`⚠️ PRINTER BELUM TERHUBUNG!\n\nPrinter USB belum tersambung atau kabel terputus.\n\nApakah Anda ingin memilih dan menghubungkan printer USB sekarang untuk mencetak ${docType}?`);
+  if (ok) {
+    const connected = await connectUsbPrinter();
+    return !!connected;
+  }
+  return false;
+}
+
+function disconnectUsbPrinter() {
+  isUserExplicitlyDisconnectedUsb = true;
+  if (usbPrinterDevice) {
+    try {
+      if (usbPrinterInterfaceNumber !== null && usbPrinterDevice.opened) {
+        usbPrinterDevice.releaseInterface(usbPrinterInterfaceNumber).catch(() => {});
+      }
+      if (usbPrinterDevice.opened) {
+        usbPrinterDevice.close().catch(() => {});
+      }
+    } catch (e) {
+      console.warn("WebUSB disconnect warning:", e);
+    }
+  }
+  usbPrinterDevice = null;
+  usbPrinterInterfaceNumber = null;
+  usbPrinterEndpointOut = null;
+  isConnectingUsb = false;
+  updatePrinterStatusBadge();
+  showToast("Printer USB telah diputuskan.", "info");
+}
+
+function onUsbDisconnected(event) {
+  if (usbPrinterDevice && event.device === usbPrinterDevice) {
+    console.log("[WebUSB] Kabel printer USB dicabut/terputus.");
+    usbPrinterDevice = null;
+    usbPrinterInterfaceNumber = null;
+    usbPrinterEndpointOut = null;
+    isConnectingUsb = false;
+    updatePrinterStatusBadge();
+    showToast("⚠️ Kabel printer USB terputus.", "warning");
+  }
+}
+
+async function sendBytesToUsb(bytes, meta = {}) {
+  const connected = await ensureUsbConnected(true);
+  if (!connected || !usbPrinterDevice || !usbPrinterDevice.opened || usbPrinterEndpointOut === null) {
+    throw new Error("Printer USB belum terhubung.");
+  }
+
+  const rawBuffer = bytes instanceof Uint8Array ? bytes.buffer : (new Uint8Array(bytes)).buffer;
+  const chunkSize = 1024;
+  const totalLength = bytes.length;
+
+  if (totalLength <= chunkSize) {
+    const result = await usbPrinterDevice.transferOut(usbPrinterEndpointOut, rawBuffer);
+    if (result.status !== 'ok') {
+      throw new Error("Status transfer USB tidak OK: " + result.status);
+    }
+  } else {
+    for (let offset = 0; offset < totalLength; offset += chunkSize) {
+      const slice = bytes.slice(offset, offset + chunkSize);
+      const sliceBuffer = slice.buffer.slice(slice.byteOffset, slice.byteOffset + slice.byteLength);
+      const res = await usbPrinterDevice.transferOut(usbPrinterEndpointOut, sliceBuffer);
+      if (res.status !== 'ok') {
+        throw new Error("Status transfer USB terhenti: " + res.status);
+      }
+      await new Promise(r => setTimeout(r, 4));
+    }
+  }
+}
+
+function handleUniversalConnectClick() {
+  const mode = pos?.settings?.printerDriverMode || 'bluetooth';
+  if (mode === 'webusb') {
+    connectUsbPrinter();
+  } else {
+    connectBluetoothPrinter();
+  }
+}
+
+function handleUniversalDisconnectClick() {
+  const mode = pos?.settings?.printerDriverMode || 'bluetooth';
+  if (mode === 'webusb') {
+    disconnectUsbPrinter();
+  } else {
+    disconnectBluetoothPrinter();
   }
 }
 
@@ -1404,6 +1765,8 @@ function buildTestReceiptEscPos() {
   const today = new Date().toLocaleString("id-ID");
   const storeName = (pos.settings.storeName || "TOKO SNACK BERKAH").toUpperCase();
   const feedLines = parseInt(pos.settings.printerFeedLines, 10) || 3;
+  const mode = pos?.settings?.printerDriverMode || 'bluetooth';
+  const driverText = mode === 'webusb' ? 'Direct WebUSB (Kabel PC)' : (mode === 'rawbt' ? 'RawBT Service Android' : (mode === 'system' ? 'Dialog Sistem OS' : 'Web Bluetooth BLE'));
 
   builder.init()
     .alignCenter()
@@ -1415,7 +1778,7 @@ function buildTestReceiptEscPos() {
     .bold(false)
     .lineDashed('=')
     .bold(true)
-    .text("TES KONEKSI PRINTER VSC")
+    .text("TES KONEKSI PRINTER THERMAL")
     .newline()
     .text("BERHASIL TERHUBUNG! ✅")
     .newline()
@@ -1424,10 +1787,10 @@ function buildTestReceiptEscPos() {
     .alignLeft()
     .text(`Waktu : ${today}`).newline()
     .text(`Mode  : ESC/POS ${is80 ? 'Thermal 80mm' : 'Thermal 58mm'}`).newline()
-    .text(`Driver: Web Bluetooth / RawBT`).newline()
+    .text(`Driver: ${driverText}`).newline()
     .lineDashed('-')
     .alignCenter()
-    .text("Printer VSC Siap Mencetak Struk Kasir!")
+    .text("Printer Siap Mencetak Struk Kasir!")
     .newline()
     .feed(feedLines)
     .cut();
@@ -1447,7 +1810,34 @@ async function printReceiptUniversal(transaction = null, isAuto = false) {
   }
   const mode = pos?.settings?.printerDriverMode || 'bluetooth';
 
-  if (mode === 'bluetooth') {
+  if (mode === 'webusb') {
+    const isConnected = await checkOrPromptUsbConnection("struk transaksi");
+    if (isConnected) {
+      try {
+        showToast("Mencetak struk ke printer USB...", "info");
+        const bytes = buildReceiptEscPos(trx);
+        await sendBytesToUsb(bytes, { id: trx.id, title: 'Struk Transaksi #' + trx.id, type: 'receipt' });
+        showToast("Struk berhasil dicetak via USB! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+        return;
+      } catch (err) {
+        console.warn("Gagal mencetak via WebUSB:", err);
+        const retry = confirm(`Gagal mengirim ke printer USB: ${err.message}\n\nKoneksi printer terputus. Apakah ingin menghubungkan ulang printer USB?`);
+        if (retry) {
+          const reconnected = await connectUsbPrinter();
+          if (reconnected) {
+            const bytes = buildReceiptEscPos(trx);
+            await sendBytesToUsb(bytes, { id: trx.id, title: 'Struk Transaksi #' + trx.id, type: 'receipt' });
+            showToast("Struk berhasil dicetak via USB! 🖨️", "success");
+            if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+            return;
+          }
+        }
+      }
+    } else {
+      return;
+    }
+  } else if (mode === 'bluetooth') {
     const isConnected = await checkOrPromptBluetoothConnection("struk transaksi");
     if (isConnected) {
       try {
@@ -1509,7 +1899,34 @@ async function printReturReceiptUniversal(returRecord = null) {
 
   const mode = pos?.settings?.printerDriverMode || 'bluetooth';
 
-  if (mode === 'bluetooth') {
+  if (mode === 'webusb') {
+    const isConnected = await checkOrPromptUsbConnection("bukti retur");
+    if (isConnected) {
+      try {
+        showToast("Mencetak struk retur ke printer USB...", "info");
+        const bytes = buildReturReceiptEscPos(rtr);
+        await sendBytesToUsb(bytes, { id: rtr.id, title: 'Retur #' + rtr.id, type: 'retur' });
+        showToast("Struk retur berhasil dicetak via USB! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+        return;
+      } catch (err) {
+        console.warn("Gagal cetak retur via USB:", err);
+        const retry = confirm(`Gagal mengirim ke printer USB: ${err.message}\n\nKoneksi terputus. Apakah ingin menghubungkan ulang printer USB?`);
+        if (retry) {
+          const reconnected = await connectUsbPrinter();
+          if (reconnected) {
+            const bytes = buildReturReceiptEscPos(rtr);
+            await sendBytesToUsb(bytes, { id: rtr.id, title: 'Retur #' + rtr.id, type: 'retur' });
+            showToast("Struk retur berhasil dicetak via USB! 🖨️", "success");
+            if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+            return;
+          }
+        }
+      }
+    } else {
+      return;
+    }
+  } else if (mode === 'bluetooth') {
     const isConnected = await checkOrPromptBluetoothConnection("bukti retur");
     if (isConnected) {
       try {
@@ -1583,7 +2000,34 @@ async function printKlerkReceiptUniversal(klerkRecord = null) {
 
   const mode = pos?.settings?.printerDriverMode || 'bluetooth';
 
-  if (mode === 'bluetooth') {
+  if (mode === 'webusb') {
+    const isConnected = await checkOrPromptUsbConnection("laporan setoran kasir (klerk)");
+    if (isConnected) {
+      try {
+        showToast("Mencetak struk klerk ke printer USB...", "info");
+        const bytes = buildKlerkReceiptEscPos(k);
+        await sendBytesToUsb(bytes, { id: k.id, title: 'Klerk #' + k.id, type: 'klerk' });
+        showToast("Struk klerk berhasil dicetak via USB! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+        return;
+      } catch (err) {
+        console.warn("Gagal cetak klerk via USB:", err);
+        const retry = confirm(`Gagal mengirim ke printer USB: ${err.message}\n\nKoneksi terputus. Apakah ingin menghubungkan ulang printer USB?`);
+        if (retry) {
+          const reconnected = await connectUsbPrinter();
+          if (reconnected) {
+            const bytes = buildKlerkReceiptEscPos(k);
+            await sendBytesToUsb(bytes, { id: k.id, title: 'Klerk #' + k.id, type: 'klerk' });
+            showToast("Struk klerk berhasil dicetak via USB! 🖨️", "success");
+            if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+            return;
+          }
+        }
+      }
+    } else {
+      return;
+    }
+  } else if (mode === 'bluetooth') {
     const isConnected = await checkOrPromptBluetoothConnection("laporan setoran kasir (klerk)");
     if (isConnected) {
       try {
@@ -1654,13 +2098,40 @@ function initUniversalPrinterDriver() {
         ensureBluetoothConnected(true);
       }
     }, 1200);
+  } else if (mode === 'webusb') {
+    setTimeout(() => {
+      if (!isUsbConnected() && !isUserExplicitlyDisconnectedUsb) {
+        ensureUsbConnected(true);
+      }
+    }, 1200);
   }
 }
 
 async function testPrintReceipt() {
   const mode = (typeof pos !== 'undefined' && pos.settings && pos.settings.printerDriverMode) || 'bluetooth';
 
-  if (mode === 'bluetooth') {
+  if (mode === 'webusb') {
+    const isConnected = isUsbConnected() || (await ensureUsbConnected(false));
+    if (!isConnected) {
+      const ok = confirm("Printer USB belum terhubung.\n\nKlik OK untuk memilih dan menghubungkan printer USB sekarang,\natau klik CANCEL untuk batal.");
+      if (ok) {
+        const connected = await connectUsbPrinter();
+        if (!connected) return;
+      } else {
+        return;
+      }
+    }
+
+    try {
+      showToast("Mengirim teks tes ke printer USB (ESC/POS)...", "info");
+      const bytes = buildTestReceiptEscPos();
+      await sendBytesToUsb(bytes, { id: 'test_usb_' + Date.now(), title: 'Struk Uji Coba USB', type: 'test' });
+      showToast("Tes cetak berhasil keluar di printer USB! 🎉", "success");
+      if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+    } catch (err) {
+      alert("Gagal melakukan tes cetak USB: " + err.message);
+    }
+  } else if (mode === 'bluetooth') {
     const isConnected = isBluetoothConnected() || (await ensureBluetoothConnected(false));
     if (!isConnected) {
       const ok = confirm("Printer Bluetooth belum terhubung.\n\nKlik OK untuk mencari dan menghubungkan printer Bluetooth sekarang,\natau klik CANCEL untuk tes cetak via Dialog Sistem Browser (Kabel USB / PDF).");
@@ -2351,7 +2822,34 @@ async function printLpbReceiptUniversal(lpbDoc) {
 
   const mode = pos?.settings?.printerDriverMode || 'bluetooth';
 
-  if (mode === 'bluetooth') {
+  if (mode === 'webusb') {
+    const isConnected = await checkOrPromptUsbConnection("dokumen LPB");
+    if (isConnected) {
+      try {
+        showToast("Mencetak struk LPB ke printer USB...", "info");
+        const bytes = buildLpbReceiptEscPos(lpbDoc);
+        await sendBytesToUsb(bytes, { id: lpbDoc.id, title: 'LPB #' + lpbDoc.id, type: 'lpb' });
+        showToast("Struk LPB berhasil dicetak via USB! 🖨️", "success");
+        if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+        return;
+      } catch (err) {
+        console.warn("Gagal cetak LPB via USB:", err);
+        const retry = confirm(`Gagal kirim ke printer USB: ${err.message}\n\nKoneksi printer terputus. Apakah ingin menghubungkan ulang printer USB?`);
+        if (retry) {
+          const reconnected = await connectUsbPrinter();
+          if (reconnected) {
+            const bytes = buildLpbReceiptEscPos(lpbDoc);
+            await sendBytesToUsb(bytes, { id: lpbDoc.id, title: 'LPB #' + lpbDoc.id, type: 'lpb' });
+            showToast("Struk LPB berhasil dicetak via USB! 🖨️", "success");
+            if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+            return;
+          }
+        }
+      }
+    } else {
+      return;
+    }
+  } else if (mode === 'bluetooth') {
     const isConnected = await checkOrPromptBluetoothConnection("dokumen LPB");
     if (isConnected) {
       try {
@@ -2415,10 +2913,19 @@ function updateBluetoothUI() {
   const queueCountEl = document.getElementById("spooler-queue-count");
   const statusDescEl = document.getElementById("spooler-status-desc");
 
-  const connected = isBluetoothConnected();
-  const devName = (bluetoothPrinterDevice && bluetoothPrinterDevice.name) || (typeof pos !== "undefined" && pos.settings && pos.settings.lastPrinterName) || "VSC";
-  const shortDev = devName.length > 10 ? (devName.substring(0, 8) + '..') : devName;
+  const mode = (typeof pos !== "undefined" && pos.settings && pos.settings.printerDriverMode) || 'bluetooth';
+  let connected = false;
+  let devName = "VSC";
 
+  if (mode === 'webusb') {
+    connected = isUsbConnected();
+    devName = (usbPrinterDevice && usbPrinterDevice.productName) || (typeof pos !== "undefined" && pos.settings && pos.settings.lastUsbPrinterName) || "Printer USB";
+  } else {
+    connected = isBluetoothConnected();
+    devName = (bluetoothPrinterDevice && bluetoothPrinterDevice.name) || (typeof pos !== "undefined" && pos.settings && pos.settings.lastPrinterName) || "VSC";
+  }
+
+  const shortDev = devName.length > 10 ? (devName.substring(0, 8) + '..') : devName;
   const isBusy = typeof printSpooler !== 'undefined' && (printSpooler.isProcessing || printSpooler.queue.length > 0);
 
   // 1. UPDATE HEADER BADGE (Modern Retail Button & Micro Status Dot)
@@ -2434,19 +2941,21 @@ function updateBluetoothUI() {
       if (printerDot) printerDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse";
       badge.title = `Printer ${devName} Terhubung & Siap. Klik untuk Setting / Rekonek.`;
       if (label) label.textContent = "Printer Siap";
-    } else if (isConnectingBluetooth || startupAutoConnectActive) {
+    } else if (isConnectingBluetooth || isConnectingUsb || startupAutoConnectActive) {
       if (printerDot) printerDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse";
       badge.title = `Sedang menghubungkan ke ${devName}...`;
       if (label) label.textContent = "Konek...";
     } else {
-      const hasSaved = Boolean(typeof pos !== 'undefined' && pos.settings && (pos.settings.lastPrinterName || pos.settings.lastPrinterId));
+      const hasSaved = mode === 'webusb'
+        ? Boolean(typeof pos !== 'undefined' && pos.settings && (pos.settings.lastUsbPrinterName || pos.settings.lastUsbVendorId))
+        : Boolean(typeof pos !== 'undefined' && pos.settings && (pos.settings.lastPrinterName || pos.settings.lastPrinterId));
       if (hasSaved) {
         if (printerDot) printerDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500/80";
         badge.title = `Printer ${devName} Siaga. Klik untuk menyambungkan kembali.`;
         if (label) label.textContent = "Printer Siaga";
       } else {
         if (printerDot) printerDot.className = "w-1.5 h-1.5 rounded-full bg-slate-400";
-        badge.title = "Status Printer Bluetooth • Klik untuk Hubungkan / Menu Printer";
+        badge.title = mode === 'webusb' ? "Status Printer USB • Klik untuk Hubungkan" : "Status Printer Bluetooth • Klik untuk Hubungkan / Menu Printer";
         if (label) label.textContent = "Printer Off";
       }
     }
@@ -2462,11 +2971,13 @@ function updateBluetoothUI() {
     } else if (connected) {
       mobilePrinterDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse";
       if (mobilePrinterLabel) mobilePrinterLabel.textContent = "Printer Siap";
-    } else if (isConnectingBluetooth || startupAutoConnectActive) {
+    } else if (isConnectingBluetooth || isConnectingUsb || startupAutoConnectActive) {
       mobilePrinterDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse";
       if (mobilePrinterLabel) mobilePrinterLabel.textContent = "Konek...";
     } else {
-      const hasSaved = Boolean(typeof pos !== 'undefined' && pos.settings && (pos.settings.lastPrinterName || pos.settings.lastPrinterId));
+      const hasSaved = mode === 'webusb'
+        ? Boolean(typeof pos !== 'undefined' && pos.settings && (pos.settings.lastUsbPrinterName || pos.settings.lastUsbVendorId))
+        : Boolean(typeof pos !== 'undefined' && pos.settings && (pos.settings.lastPrinterName || pos.settings.lastPrinterId));
       if (hasSaved) {
         mobilePrinterDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500/80";
         if (mobilePrinterLabel) mobilePrinterLabel.textContent = "Printer Siaga";
@@ -2768,14 +3279,30 @@ async function printLabelsNativeFast(products, copies = 1, mode = 'shelf') {
     return;
   }
 
-  const isConnected = await ensureBluetoothConnected();
-  if (!isConnected) {
-    const ok = confirm("Printer Bluetooth belum terhubung.\n\nApakah Anda ingin mencari dan menghubungkan printer Bluetooth sekarang?");
-    if (ok) {
-      const connected = await connectBluetoothPrinter();
-      if (!connected) return;
-    } else {
-      return;
+  const printerMode = pos?.settings?.printerDriverMode || 'bluetooth';
+  let isConnected = false;
+
+  if (printerMode === 'webusb') {
+    isConnected = isUsbConnected() || (await ensureUsbConnected(false));
+    if (!isConnected) {
+      const ok = confirm("Printer USB belum terhubung.\n\nApakah Anda ingin memilih dan menghubungkan printer USB sekarang?");
+      if (ok) {
+        isConnected = await connectUsbPrinter();
+        if (!isConnected) return;
+      } else {
+        return;
+      }
+    }
+  } else {
+    isConnected = await ensureBluetoothConnected();
+    if (!isConnected) {
+      const ok = confirm("Printer Bluetooth belum terhubung.\n\nApakah Anda ingin mencari dan menghubungkan printer Bluetooth sekarang?");
+      if (ok) {
+        const connected = await connectBluetoothPrinter();
+        if (!connected) return;
+      } else {
+        return;
+      }
     }
   }
 
@@ -2801,7 +3328,11 @@ async function printLabelsNativeFast(products, copies = 1, mode = 'shelf') {
 
   try {
     const allBytes = builder.getBytes();
-    await sendBytesToBluetooth(allBytes, { id: 'fast_label_' + Date.now(), title: 'Cetak ' + totalCount + ' ' + labelTypeName, type: 'label' });
+    if (printerMode === 'webusb') {
+      await sendBytesToUsb(allBytes, { id: 'fast_label_' + Date.now(), title: 'Cetak ' + totalCount + ' ' + labelTypeName, type: 'label' });
+    } else {
+      await sendBytesToBluetooth(allBytes, { id: 'fast_label_' + Date.now(), title: 'Cetak ' + totalCount + ' ' + labelTypeName, type: 'label' });
+    }
     showToast(`✅ Berhasil mencetak ${totalCount} ${labelTypeName}! ✨`, "success");
     if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
   } catch (err) {
@@ -2820,3 +3351,14 @@ window.disconnectBluetoothPrinter = disconnectBluetoothPrinter;
 window.printReceiptUniversal = printReceiptUniversal;
 window.isBluetoothConnected = isBluetoothConnected;
 window.checkOrPromptBluetoothConnection = checkOrPromptBluetoothConnection;
+
+// WebUSB Exports
+window.isUsbConnected = isUsbConnected;
+window.isUsbSupported = isUsbSupported;
+window.connectUsbPrinter = connectUsbPrinter;
+window.disconnectUsbPrinter = disconnectUsbPrinter;
+window.ensureUsbConnected = ensureUsbConnected;
+window.checkOrPromptUsbConnection = checkOrPromptUsbConnection;
+window.sendBytesToUsb = sendBytesToUsb;
+window.handleUniversalConnectClick = handleUniversalConnectClick;
+window.handleUniversalDisconnectClick = handleUniversalDisconnectClick;

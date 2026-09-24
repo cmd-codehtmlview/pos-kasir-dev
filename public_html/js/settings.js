@@ -128,9 +128,11 @@ function loadSettingsToForm() {
   // Pengaturan Printer Thermal ESC/POS (VSC / Bluetooth / RawBT / Kabel)
   const printerMode = pos.settings.printerDriverMode || 'bluetooth';
   const radioBt = document.getElementById("printer-mode-bluetooth");
+  const radioWebusb = document.getElementById("printer-mode-webusb");
   const radioRawbt = document.getElementById("printer-mode-rawbt");
   const radioSys = document.getElementById("printer-mode-system");
   if (radioBt) radioBt.checked = printerMode === 'bluetooth';
+  if (radioWebusb) radioWebusb.checked = printerMode === 'webusb';
   if (radioRawbt) radioRawbt.checked = printerMode === 'rawbt';
   if (radioSys) radioSys.checked = printerMode === 'system';
 
@@ -326,6 +328,7 @@ function changePrinterDriverMode(mode) {
   pos.saveSettings();
   const labelMap = {
     'bluetooth': 'Direct Web Bluetooth (VSC BLE)',
+    'webusb': 'Direct WebUSB (Kabel USB ESC/POS)',
     'rawbt': 'Jembatan RawBT Android',
     'system': 'Dialog Sistem OS / Kabel USB'
   };

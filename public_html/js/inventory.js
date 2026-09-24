@@ -1516,7 +1516,8 @@ function executePrintLabelsSystem() {
 }
 
 function executePrintLabels() {
-  if (typeof isBluetoothConnected === 'function' && isBluetoothConnected()) {
+  const mode = pos?.settings?.printerDriverMode || 'bluetooth';
+  if (mode === 'webusb' || mode === 'bluetooth' || (typeof isBluetoothConnected === 'function' && isBluetoothConnected()) || (typeof isUsbConnected === 'function' && isUsbConnected())) {
     executePrintLabelsBluetooth();
   } else {
     executePrintLabelsSystem();
