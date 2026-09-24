@@ -480,18 +480,19 @@ html, body {
   }
   .print-format-sticker-50x30 .shelf-tag-header {
     font-size: 5.5pt !important;
-    margin-bottom: 0.3mm !important;
-    padding-bottom: 0.2mm !important;
+    margin-bottom: 0.6mm !important;
+    padding-bottom: 0.4mm !important;
   }
   .print-format-sticker-50x30 .shelf-tag-title {
     font-size: 7.5pt !important;
-    margin-bottom: 0.3mm !important;
+    margin-bottom: 0.6mm !important;
   }
   .print-format-sticker-50x30 .shelf-barcode-svg {
-    height: 9mm !important;
+    height: 9.5mm !important;
   }
   .print-format-sticker-50x30 .shelf-barcode-text {
     font-size: 5.5pt !important;
+    margin-top: 0.5mm !important;
   }
   .print-format-sticker-50x30 .shelf-tag-price-huge {
     font-size: 15.5pt !important;
@@ -499,15 +500,30 @@ html, body {
   .print-format-sticker-50x30 .thermal-snack-sticker {
     width: 48mm !important;
     height: 28.5mm !important;
-    padding: 0.8mm 1.2mm !important;
+    padding: 1.0mm 1.5mm !important;
     border-width: 1.2px !important;
+  }
+  .print-format-sticker-50x30 .snack-sticker-header {
+    padding-bottom: 0.5mm !important;
+    margin-bottom: 0.8mm !important;
   }
   .print-format-sticker-50x30 .snack-sticker-name {
     font-size: 7.5pt !important;
+    margin-bottom: 0.8mm !important;
+  }
+  .print-format-sticker-50x30 .snack-sticker-barcode-wrap {
+    margin-bottom: 0.8mm !important;
   }
   .print-format-sticker-50x30 .snack-sticker-barcode-svg {
-    width: 38mm !important;
-    height: 9.5mm !important;
+    width: 40mm !important;
+    height: 10mm !important;
+  }
+  .print-format-sticker-50x30 .snack-sticker-barcode-text {
+    margin-top: 0.5mm !important;
+  }
+  .print-format-sticker-50x30 .snack-sticker-footer {
+    padding-top: 0.5mm !important;
+    margin-top: auto !important;
   }
 
   /* FORMAT 4: KERTAS A4 / HVS GRID (3 KOLOM X 8 BARIS) */
@@ -575,13 +591,13 @@ html, body {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1.2px solid #000000;
-  padding-bottom: 0.5mm;
-  margin-bottom: 0.6mm;
+  padding-bottom: 0.8mm;
+  margin-bottom: 1.2mm;
   line-height: 1;
 }
 
 .shelf-tag-store {
-  font-size: 7pt;
+  font-size: 7.5pt;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -598,15 +614,15 @@ html, body {
 
 .shelf-tag-title {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  font-size: 8.5pt;
+  font-size: 9pt;
   font-weight: 900;
   text-transform: uppercase;
-  line-height: 1.15;
+  line-height: 1.2;
   letter-spacing: -0.1px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 0.6mm;
+  margin-bottom: 1.2mm;
   color: #000000;
 }
 
@@ -616,7 +632,7 @@ html, body {
   justify-content: space-between;
   flex: 1;
   gap: 2mm;
-  margin: 0.3mm 0;
+  margin: 0.6mm 0;
   min-height: 0;
 }
 
@@ -646,7 +662,7 @@ html, body {
   font-weight: 800;
   letter-spacing: 0.6px;
   text-align: center;
-  margin-top: 0.5mm;
+  margin-top: 0.8mm;
   line-height: 1;
   color: #000000;
 }
@@ -744,7 +760,7 @@ html, body {
   box-sizing: border-box;
   border: 1.5px solid #0f172a;
   border-radius: 4px;
-  padding: 1.4mm 2mm;
+  padding: 1.2mm 2mm;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -761,12 +777,13 @@ html, body {
 .snack-sticker-header {
   width: 100%;
   border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 0.4mm;
-  margin-bottom: 0.4mm;
+  padding-bottom: 0.8mm;
+  margin-bottom: 1.2mm;
+  line-height: 1;
 }
 
 .snack-sticker-store {
-  font-size: 6.5pt;
+  font-size: 7pt;
   font-weight: 900;
   letter-spacing: 0.5px;
   color: #0f172a;
@@ -774,16 +791,16 @@ html, body {
 }
 
 .snack-sticker-name {
-  font-size: 8pt;
+  font-size: 8.5pt;
   font-weight: 900;
   text-transform: uppercase;
-  line-height: 1.15;
+  line-height: 1.2;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #000000;
-  margin-bottom: 0.4mm;
+  margin-bottom: 1.2mm;
 }
 
 .snack-sticker-barcode-wrap {
@@ -792,14 +809,13 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex: 1;
-  min-height: 0;
+  margin-bottom: 1.2mm;
 }
 
 .snack-sticker-barcode-svg {
-  width: 40mm;
-  max-width: 95%;
-  height: 10.5mm;
+  width: 42mm;
+  max-width: 96%;
+  height: 11mm;
   display: block;
 }
 
@@ -809,7 +825,7 @@ html, body {
   font-weight: 800;
   letter-spacing: 1px;
   text-align: center;
-  margin-top: 0.5mm;
+  margin-top: 0.8mm;
   line-height: 1;
   color: #000000;
 }
@@ -823,8 +839,8 @@ html, body {
   justify-content: space-between;
   width: 100%;
   border-top: 1px solid #e2e8f0;
-  padding-top: 0.4mm;
-  margin-top: 0.4mm;
+  padding-top: 0.8mm;
+  margin-top: auto;
   line-height: 1;
 }
 

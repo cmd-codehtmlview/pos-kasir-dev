@@ -2617,28 +2617,28 @@ function generateLabelRasterBytes(product, mode = 'shelf', printableWidth = 384)
     ctx.fillStyle = '#000000';
     ctx.font = is80 ? 'bold 13px sans-serif' : 'bold 10.5px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(storeName.substring(0, is80 ? 36 : 28), printableWidth / 2, is80 ? 24 : 18);
+    ctx.fillText(storeName.substring(0, is80 ? 36 : 28), printableWidth / 2, is80 ? 28 : 20);
 
     // Nama Produk
     ctx.font = is80 ? 'bold 19px sans-serif' : 'bold 15px sans-serif';
     const prodName = String(product.name || 'Snack Lezat').substring(0, is80 ? 34 : 26);
-    ctx.fillText(prodName, printableWidth / 2, is80 ? 54 : 40);
+    ctx.fillText(prodName, printableWidth / 2, is80 ? 62 : 44);
 
     // Barcode Tengah (Lebar & Tinggi Maksimal, Sangat Jelas & Cepat Discan)
     ctx.textAlign = 'left';
     const barW = printableWidth - (is80 ? 48 : 32);
     const barX = (printableWidth - barW) / 2;
-    drawCode128OnCanvas(ctx, barcodeValue, barX, is80 ? 64 : 48, barW, is80 ? 76 : 56);
+    drawCode128OnCanvas(ctx, barcodeValue, barX, is80 ? 78 : 56, barW, is80 ? 74 : 52);
 
     // Barcode Text
     ctx.textAlign = 'center';
     ctx.font = is80 ? 'bold 14px monospace' : 'bold 11px monospace';
-    ctx.fillText(barcodeValue, printableWidth / 2, is80 ? 156 : 118);
+    ctx.fillText(barcodeValue, printableWidth / 2, is80 ? 172 : 122);
 
     // Footer Tanggal Bersih (Tanpa 'Renyah & Gurih')
     ctx.fillStyle = '#64748B';
     ctx.font = is80 ? 'bold 11px sans-serif' : 'bold 9.5px sans-serif';
-    ctx.fillText(`Tgl: ${todayStr} • Kualitas Terjamin`, printableWidth / 2, is80 ? 180 : 138);
+    ctx.fillText(`Tgl: ${todayStr} • Kualitas Terjamin`, printableWidth / 2, is80 ? 210 : 148);
 
     return canvasToEscPosRaster(canvas, 24);
   }
