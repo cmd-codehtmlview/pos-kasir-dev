@@ -1288,70 +1288,69 @@ function generateSingleLabelHtml(product, mode) {
   const hasWholesale = Boolean(wholesaleMinQty > 0 && wholesalePrice > 0 && wholesalePrice < price);
 
   if (mode === 'shelf') {
-    // MODE 1: LABEL RAK HARGA & BARCODE TERMAKSIMALKAN (STANDAR RAK MINIMARKET)
-    // Tinggi kompak 3,8 cm, lebar 6,8 cm
-    const barcodeSvg = generateCode128SVG(barcodeValue, { height: hasWholesale ? 36 : 46, className: 'shelf-barcode-svg' });
+    // MODE 1: LABEL RAK HARGA & BARCODE (STANDAR MINIMARKET)
+    // Redesign Proporsional: Tanpa PLU, layout lega dan tidak berhimpitan
+    const barcodeSvg = generateCode128SVG(barcodeValue, { height: hasWholesale ? 32 : 40, className: 'shelf-barcode-svg' });
 
     return `
       <div class="thermal-shelf-tag">
-        <!-- Header: Identitas Toko & PLU/Tanggal -->
+        <!-- Header: Identitas Toko & Tanggal (PLU Dihilangkan) -->
         <div class="shelf-tag-header">
-          <span class="font-bold uppercase tracking-tight truncate max-w-[65%]">${storeName}</span>
-          <span class="font-mono font-bold whitespace-nowrap">PLU: ${plu} • ${shortDate}</span>
+          <span class="shelf-tag-store truncate">${storeName}</span>
+          <span class="shelf-tag-date font-mono">${shortDate}</span>
         </div>
 
-        <!-- Nama Produk (Tegas, Kondensed, Maksimal) -->
+        <!-- Nama Produk (Tegas, Proporsional) -->
         <div class="shelf-tag-title" title="${safeName}">${product.name || 'Produk Snack'}</div>
 
-        <!-- Area Tengah: Barcode Jumbo & Harga Tinggi (100% Ruang Terpakai) -->
+        <!-- Area Tengah: Barcode & Harga Lega (Bebas Berhimpitan) -->
         <div class="shelf-tag-body">
-          <!-- Kiri: Barcode Jumbo -->
+          <!-- Kiri: Barcode & Angka Barcode Jelas -->
           <div class="shelf-barcode-container">
-            ${barcodeSvg}
-            <div class="shelf-barcode-text font-mono font-bold">${barcodeValue}</div>
+            <div class="shelf-barcode-svg-wrap">
+              ${barcodeSvg}
+            </div>
+            <div class="shelf-barcode-text">${barcodeValue}</div>
           </div>
 
-          <!-- Kanan: Harga Menjulang Tinggi -->
+          <!-- Kanan: Harga Menjulang & Proporsional -->
           <div class="shelf-price-container">
-            <div class="flex items-baseline justify-between w-full">
-              <span class="text-[6.5pt] font-black uppercase text-slate-800 tracking-wide">HARGA</span>
-              <span class="shelf-tag-price-prefix font-bold">Rp</span>
+            <div class="shelf-price-header">
+              <span class="shelf-price-label">HARGA</span>
+              <span class="shelf-price-currency">Rp</span>
             </div>
-            <div class="shelf-tag-price-huge font-black tracking-tight ${priceStr.length > 7 ? 'text-[20pt]' : priceStr.length > 5 ? 'text-[23pt]' : 'text-[26pt]'}">${priceStr}</div>
-            <div class="text-[6.5pt] font-black text-slate-700 uppercase">/ ${product.unit || 'Bungkus'}</div>
+            <div class="shelf-tag-price-huge ${priceStr.length > 7 ? 'price-len-long' : priceStr.length > 5 ? 'price-len-mid' : 'price-len-norm'}">${priceStr}</div>
+            <div class="shelf-price-unit">/${product.unit || 'Bks'}</div>
           </div>
         </div>
 
         <!-- Bawah: Banner Grosir Otomatis (Rapi & Bebas Overlap) -->
         ${hasWholesale ? `
           <div class="shelf-wholesale-banner">
-            <span style="font-weight:900;">🔥 GROSIR ≥${wholesaleMinQty}:</span>
-            <span style="font-weight:900; font-size:7pt;">@Rp ${formatRupiahSimple(wholesalePrice)}</span>
-            <span style="font-size:5.5pt; font-weight:900; opacity:0.9;">HEMAT ${formatRupiahSimple(price - wholesalePrice)}</span>
+            <span class="wholesale-qty">Grosir ≥${wholesaleMinQty} ${product.unit || 'Bks'}:</span>
+            <span class="wholesale-price">@Rp ${formatRupiahSimple(wholesalePrice)}</span>
           </div>
         ` : ''}
       </div>
     `;
   } else {
-    // MODE 2: STIKER KEMASAN SNACK (REPACKING / BEBAS HARGA)
-    // Ukuran 5,0 cm x 2,8 cm - BEBAS HARGA (hanya nama, barcode, netto/toko, garansi renyah)
-    const barcodeSvg = generateCode128SVG(barcodeValue, { height: 26, className: 'snack-sticker-barcode-svg' });
-    const nettoInfo = product.unit ? `Isi / Netto: ${product.unit} • ${storeName}` : storeName;
+    // MODE 2: STIKER KEMASAN SNACK (50x30mm / 50x28mm)
+    // Redesign Proporsional: Tanpa 'renyah dan gurih' & tanpa 'netto: pcs', barcode maksimal terbaca jelas
+    const barcodeSvg = generateCode128SVG(barcodeValue, { height: 32, className: 'snack-sticker-barcode-svg' });
 
     return `
       <div class="thermal-snack-sticker">
-        <div class="w-full">
-          <div class="snack-sticker-name" title="${safeName}">${product.name || 'Snack Lezat'}</div>
-          <div class="snack-sticker-netto truncate">${nettoInfo}</div>
+        <div class="snack-sticker-header">
+          <span class="snack-sticker-store truncate">${storeName}</span>
         </div>
-        <div class="w-full flex flex-col items-center justify-center my-auto">
+        <div class="snack-sticker-name" title="${safeName}">${product.name || 'Produk Snack'}</div>
+        <div class="snack-sticker-barcode-wrap">
           ${barcodeSvg}
-          <div class="snack-sticker-barcode-text font-mono font-bold">${barcodeValue}</div>
+          <div class="snack-sticker-barcode-text">${barcodeValue}</div>
         </div>
         <div class="snack-sticker-footer">
-          <span>Renyah & Gurih</span>
-          <span>•</span>
-          <span>Tgl: ${shortDate}</span>
+          <span class="snack-sticker-date">Tgl: ${shortDate}</span>
+          <span class="snack-sticker-badge">KUALITAS TERJAMIN</span>
         </div>
       </div>
     `;

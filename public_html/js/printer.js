@@ -2504,15 +2504,14 @@ function generateLabelRasterBytes(product, mode = 'shelf', printableWidth = 384)
     ctx.lineWidth = 2;
     ctx.strokeRect(marginX, 3, printableWidth - (marginX * 2), height - 6);
 
-    // Header Bar Hitam (Identitas Toko & PLU)
+    // Header Bar Hitam (Identitas Toko & Tanggal - Tanpa PLU)
     ctx.fillStyle = '#000000';
     ctx.fillRect(marginX, 3, printableWidth - (marginX * 2), is80 ? 28 : 22);
     ctx.fillStyle = '#FFFFFF';
     ctx.font = is80 ? '900 14px sans-serif' : '900 11.5px sans-serif';
     ctx.fillText(storeName.toUpperCase().substring(0, is80 ? 36 : 24), marginX + 6, is80 ? 20 : 16);
     ctx.font = is80 ? 'bold 12px monospace' : 'bold 9.5px monospace';
-    const pluStr = `PLU: ${pluText}`;
-    ctx.fillText(pluStr, printableWidth - (is80 ? 110 : 85) - marginX, is80 ? 20 : 16);
+    ctx.fillText(todayStr, printableWidth - (is80 ? 80 : 65) - marginX, is80 ? 20 : 16);
 
     // Nama Produk (Besar, Bold & Jelas)
     ctx.fillStyle = '#000000';
@@ -2564,47 +2563,39 @@ function generateLabelRasterBytes(product, mode = 'shelf', printableWidth = 384)
       ctx.fillText(`@Rp ${formatRupiahSimple(wholesalePrice)}`, marginX + 8, boxY + (is80 ? 68 : 58));
     } else {
       // Tanpa Grosir: Barcode ekstra tinggi agar scanner kasir sangat mudah membaca
-      const barH = is80 ? 80 : 60;
+      const barH = is80 ? 84 : 64;
       const barY = is80 ? 68 : 54;
       drawCode128OnCanvas(ctx, barcodeValue, marginX + 4, barY, leftWidth - 14, barH);
 
       ctx.fillStyle = '#000000';
       ctx.font = is80 ? 'bold 12px monospace' : 'bold 10px monospace';
-      ctx.fillText(`${barcodeValue} • ${todayStr}`, marginX + 4, is80 ? 164 : 128);
+      ctx.fillText(`${barcodeValue} • ${todayStr}`, marginX + 4, is80 ? 168 : 132);
 
-      ctx.fillStyle = '#333333';
+      ctx.fillStyle = '#64748B';
       ctx.font = is80 ? 'bold 12px sans-serif' : 'bold 10px sans-serif';
-      ctx.fillText(`Kategori: ${product.category || 'Camilan'}`, marginX + 4, is80 ? 198 : 156);
-      ctx.font = is80 ? '11px sans-serif' : '9.5px sans-serif';
-      ctx.fillText("Produk Pilihan Higienis", marginX + 4, is80 ? 226 : 178);
+      ctx.fillText(`Kategori: ${product.category || 'Camilan'}`, marginX + 4, is80 ? 200 : 160);
     }
 
-    // Kolom Kanan: Harga Eceran Super Jelas & Maksimal
-    const rightX = leftWidth + 6;
-    ctx.fillStyle = '#000000';
-    ctx.font = is80 ? 'bold 12px sans-serif' : 'bold 10.5px sans-serif';
-    ctx.fillText("HARGA JUAL", rightX, is80 ? 84 : 68);
+    // Kolom Kanan: Harga Eceran Bersih, Proporsional & Tidak Berhimpitan
+    const rightX = leftWidth + (is80 ? 12 : 8);
+    ctx.fillStyle = '#64748B';
+    ctx.font = is80 ? 'bold 12px sans-serif' : 'bold 9.5px sans-serif';
+    ctx.fillText("HARGA RP", rightX, is80 ? 84 : 68);
 
     const priceText = formatRupiahSimple(price);
-    ctx.font = is80 ? 'bold 17px sans-serif' : 'bold 13.5px sans-serif';
-    ctx.fillText("Rp", rightX, is80 ? 128 : 100);
-
-    // Skala font harga jika angka panjang
+    ctx.fillStyle = '#000000';
     if (priceText.length > 7) {
-      ctx.font = is80 ? '900 30px sans-serif' : '900 23px "Arial Black", Impact, sans-serif';
-      ctx.fillText(priceText, rightX + (is80 ? 28 : 22), is80 ? 130 : 102);
+      ctx.font = is80 ? '900 24px sans-serif' : '900 18px sans-serif';
+    } else if (priceText.length > 5) {
+      ctx.font = is80 ? '900 28px sans-serif' : '900 22px sans-serif';
     } else {
-      ctx.font = is80 ? '900 40px sans-serif' : '900 30px "Arial Black", Impact, sans-serif';
-      ctx.fillText(priceText, rightX + (is80 ? 32 : 25), is80 ? 132 : 104);
+      ctx.font = is80 ? '900 34px sans-serif' : '900 26px sans-serif';
     }
+    ctx.fillText(priceText, rightX, is80 ? 124 : 98);
 
+    ctx.fillStyle = '#334155';
     ctx.font = is80 ? 'bold 12px sans-serif' : 'bold 10px sans-serif';
-    ctx.fillText(`Per ${product.unit || 'Bungkus'}`, rightX, is80 ? 164 : 128);
-
-    ctx.font = is80 ? 'bold 10.5px sans-serif' : 'bold 9px sans-serif';
-    ctx.fillStyle = '#444444';
-    ctx.fillText("HEMAT & TERJANGKAU", rightX, is80 ? 198 : 156);
-    ctx.fillText(`Update: ${todayStr}`, rightX, is80 ? 226 : 178);
+    ctx.fillText(`/ ${product.unit || 'Bungkus'}`, rightX, is80 ? 154 : 122);
 
     return canvasToEscPosRaster(canvas, 24);
   } else {
@@ -2622,32 +2613,32 @@ function generateLabelRasterBytes(product, mode = 'shelf', printableWidth = 384)
     ctx.lineWidth = 2;
     ctx.strokeRect(marginX, 3, printableWidth - (marginX * 2), height - 6);
 
-    // Identitas Toko / Netto
+    // Identitas Toko (Tanpa Netto: Pcs)
     ctx.fillStyle = '#000000';
     ctx.font = is80 ? 'bold 13px sans-serif' : 'bold 10.5px sans-serif';
-    const headerInfo = `${storeName}${product.unit ? ' • ' + product.unit : ''}`;
     ctx.textAlign = 'center';
-    ctx.fillText(headerInfo.substring(0, is80 ? 40 : 32), printableWidth / 2, is80 ? 24 : 18);
+    ctx.fillText(storeName.substring(0, is80 ? 36 : 28), printableWidth / 2, is80 ? 24 : 18);
 
     // Nama Produk
     ctx.font = is80 ? 'bold 19px sans-serif' : 'bold 15px sans-serif';
     const prodName = String(product.name || 'Snack Lezat').substring(0, is80 ? 34 : 26);
     ctx.fillText(prodName, printableWidth / 2, is80 ? 54 : 40);
 
-    // Barcode Tengah
+    // Barcode Tengah (Lebar & Tinggi Maksimal, Sangat Jelas & Cepat Discan)
     ctx.textAlign = 'left';
-    const barW = printableWidth - (is80 ? 64 : 40);
+    const barW = printableWidth - (is80 ? 48 : 32);
     const barX = (printableWidth - barW) / 2;
-    drawCode128OnCanvas(ctx, barcodeValue, barX, is80 ? 66 : 50, barW, is80 ? 64 : 48);
+    drawCode128OnCanvas(ctx, barcodeValue, barX, is80 ? 64 : 48, barW, is80 ? 76 : 56);
 
     // Barcode Text
     ctx.textAlign = 'center';
     ctx.font = is80 ? 'bold 14px monospace' : 'bold 11px monospace';
-    ctx.fillText(barcodeValue, printableWidth / 2, is80 ? 150 : 114);
+    ctx.fillText(barcodeValue, printableWidth / 2, is80 ? 156 : 118);
 
-    // Slogan Kualitas
-    ctx.font = is80 ? '11px sans-serif' : '9px sans-serif';
-    ctx.fillText("Snack Renyah, Gurih & Terjamin Higienis", printableWidth / 2, is80 ? 176 : 134);
+    // Footer Tanggal Bersih (Tanpa 'Renyah & Gurih')
+    ctx.fillStyle = '#64748B';
+    ctx.font = is80 ? 'bold 11px sans-serif' : 'bold 9.5px sans-serif';
+    ctx.fillText(`Tgl: ${todayStr} • Kualitas Terjamin`, printableWidth / 2, is80 ? 180 : 138);
 
     return canvasToEscPosRaster(canvas, 24);
   }
@@ -4133,11 +4124,10 @@ function buildNativeLabelEscPos(product, is80 = false, mode = 'shelf') {
     // =========================================================================
     // MODE 1: LABEL HARGA (STANDAR MINIMARKET ~3.8 CM TINGGI - BEBAS TUMPANG TINDIH)
     // =========================================================================
-    // 1. Header Identitas Toko & PLU/Tgl
+    // 1. Header Identitas Toko & Tgl (Tanpa PLU)
     builder.alignLeft().bold(true);
-    const storeShort = storeName.substring(0, is80 ? 24 : 14);
-    const rightMeta = `PLU:${pluText} • ${todayStr}`;
-    builder.lineLeftRight(storeShort, rightMeta);
+    const storeShort = storeName.substring(0, is80 ? 24 : 16);
+    builder.lineLeftRight(storeShort, todayStr);
     builder.lineDashed('-');
 
     // 2. Deskripsi / Nama Produk (Tengah, Huruf Tebal)
@@ -4192,7 +4182,13 @@ function buildNativeLabelEscPos(product, is80 = false, mode = 'shelf') {
     // =========================================================================
     // MODE 2: STIKER BARCODE (BEBAS HARGA - 50x30mm)
     // =========================================================================
+    // 1. Identitas Toko
     builder.alignCenter().bold(true);
+    builder.text(storeName.substring(0, is80 ? 36 : 26)).newline();
+    builder.bold(false);
+
+    // 2. Nama Produk
+    builder.bold(true);
     const maxLineLen = is80 ? 44 : 30;
     if (prodName.length > maxLineLen) {
       builder.text(prodName.substring(0, maxLineLen)).newline();
@@ -4201,20 +4197,17 @@ function buildNativeLabelEscPos(product, is80 = false, mode = 'shelf') {
     }
     builder.bold(false);
 
-    // 2. Info Netto / Toko
-    builder.text(`Netto: ${unit} • ${storeName}`).newline();
-
-    // 3. Hardware Native Barcode (Code 128 - Prioritas Jelas & Tajam)
+    // 3. Hardware Native Barcode (Code 128 - Tinggi 48 dot, Sangat Mudah Discan)
     builder.alignCenter();
-    builder.raw([0x1D, 0x68, 44]); // GS h 44 (~5.5mm sangat mudah discan)
+    builder.raw([0x1D, 0x68, 48]); // GS h 48
     builder.raw([0x1D, 0x77, 2]);  // GS w 2
     builder.raw([0x1D, 0x48, 2]);  // GS H 2
     builder.raw([0x1D, 0x66, 1]);  // GS f 1
     builder.raw([0x1D, 0x6B, 73, barBytes.length + 2, 0x7B, 0x42, ...barBytes]);
     builder.newline();
 
-    // 4. Footer Kualitas & Tanggal
-    builder.text(`Renyah & Gurih • Tgl: ${todayStr}`).newline();
+    // 4. Footer Tanggal Bersih (Tanpa 'Renyah & Gurih')
+    builder.text(`Tgl: ${todayStr}`).newline();
     builder.lineDashed('=');
   }
 

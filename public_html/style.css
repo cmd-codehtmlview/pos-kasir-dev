@@ -396,10 +396,10 @@ html, body {
   .print-format-thermal-58 .thermal-shelf-tag {
     width: 54mm !important;
     height: 36mm !important;
-    padding: 0.8mm 1.2mm !important;
+    padding: 1mm 1.4mm !important;
   }
   .print-format-thermal-58 .shelf-tag-price-huge {
-    font-size: 22pt !important;
+    font-size: 18pt !important;
   }
   .print-format-thermal-58 .shelf-barcode-svg {
     width: 100% !important;
@@ -407,8 +407,12 @@ html, body {
   }
   .print-format-thermal-58 .thermal-snack-sticker {
     width: 52mm !important;
-    height: 28mm !important;
-    padding: 1mm 1.5mm !important;
+    height: 29mm !important;
+    padding: 1.2mm 1.6mm !important;
+  }
+  .print-format-thermal-58 .snack-sticker-barcode-svg {
+    width: 42mm !important;
+    height: 11mm !important;
   }
 
   /* FORMAT 2: THERMAL ROLL 80MM */
@@ -426,13 +430,13 @@ html, body {
     padding: 1.5mm 2mm !important;
   }
   .print-format-thermal-80 .shelf-tag-title {
-    font-size: 11pt !important;
+    font-size: 10.5pt !important;
   }
   .print-format-thermal-80 .shelf-tag-price-huge {
-    font-size: 30pt !important;
+    font-size: 24pt !important;
   }
   .print-format-thermal-80 .shelf-barcode-svg {
-    height: 15mm !important;
+    height: 14mm !important;
   }
   .print-format-thermal-80 .thermal-snack-sticker {
     width: 72mm !important;
@@ -443,8 +447,8 @@ html, body {
     font-size: 9.5pt !important;
   }
   .print-format-thermal-80 .snack-sticker-barcode-svg {
-    width: 50mm !important;
-    height: 12mm !important;
+    width: 52mm !important;
+    height: 13mm !important;
   }
 
   /* FORMAT 3: STIKER ROLL DIE-CUT 50X30MM */
@@ -470,7 +474,7 @@ html, body {
   }
   .print-format-sticker-50x30 .thermal-shelf-tag {
     width: 48mm !important;
-    height: 28mm !important;
+    height: 28.5mm !important;
     padding: 0.6mm 1mm !important;
     border-width: 1.5px !important;
   }
@@ -490,11 +494,11 @@ html, body {
     font-size: 5.5pt !important;
   }
   .print-format-sticker-50x30 .shelf-tag-price-huge {
-    font-size: 19pt !important;
+    font-size: 15.5pt !important;
   }
   .print-format-sticker-50x30 .thermal-snack-sticker {
     width: 48mm !important;
-    height: 28mm !important;
+    height: 28.5mm !important;
     padding: 0.8mm 1.2mm !important;
     border-width: 1.2px !important;
   }
@@ -502,8 +506,8 @@ html, body {
     font-size: 7.5pt !important;
   }
   .print-format-sticker-50x30 .snack-sticker-barcode-svg {
-    width: 34mm !important;
-    height: 8mm !important;
+    width: 38mm !important;
+    height: 9.5mm !important;
   }
 
   /* FORMAT 4: KERTAS A4 / HVS GRID (3 KOLOM X 8 BARIS) */
@@ -545,16 +549,16 @@ html, body {
    STIKER BARCODE & PRICE TAG RAK MINIMARKET
    ========================================================= */
 
-/* Mode 1: Label Rak Kompak Standar Minimarket Termaksimalkan (Lebar 6,8 cm x Tinggi 3,8 cm) */
+/* Mode 1: Label Rak Kompak Standar Minimarket (Lebar 6,8 cm x Tinggi 3,8 cm) - Bebas Berhimpitan */
 .thermal-shelf-tag {
   background: #ffffff;
   color: #000000;
   width: 68mm;
   height: 38mm;
   box-sizing: border-box;
-  border: 2.5px solid #000000;
-  border-radius: 3px;
-  padding: 1.2mm 2mm;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  padding: 1.4mm 2.2mm;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -570,25 +574,40 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #000000;
-  padding-bottom: 0.4mm;
+  border-bottom: 1.2px solid #000000;
+  padding-bottom: 0.5mm;
   margin-bottom: 0.6mm;
-  font-size: 6.5pt;
-  font-weight: 800;
   line-height: 1;
 }
 
-.shelf-tag-title {
-  font-family: 'Oswald', 'Arial Narrow', sans-serif;
-  font-size: 9.5pt;
+.shelf-tag-store {
+  font-size: 7pt;
   font-weight: 900;
   text-transform: uppercase;
-  line-height: 1.1;
-  letter-spacing: -0.2px;
+  letter-spacing: 0.3px;
+  color: #000000;
+  max-width: 75%;
+}
+
+.shelf-tag-date {
+  font-family: monospace;
+  font-size: 6.5pt;
+  font-weight: 800;
+  color: #475569;
+}
+
+.shelf-tag-title {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 8.5pt;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.15;
+  letter-spacing: -0.1px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   margin-bottom: 0.6mm;
+  color: #000000;
 }
 
 .shelf-tag-body {
@@ -596,8 +615,9 @@ html, body {
   align-items: center;
   justify-content: space-between;
   flex: 1;
-  gap: 1.5mm;
-  margin: 0.4mm 0;
+  gap: 2mm;
+  margin: 0.3mm 0;
+  min-height: 0;
 }
 
 .shelf-barcode-container {
@@ -605,23 +625,30 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 48%;
+  width: 44%;
+}
+
+.shelf-barcode-svg-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .shelf-barcode-svg {
   width: 100%;
-  height: 13.5mm;
+  height: 12.5mm;
   display: block;
 }
 
 .shelf-barcode-text {
   font-family: monospace;
   font-size: 6.5pt;
-  font-weight: 900;
-  letter-spacing: 0.5px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
   text-align: center;
-  margin-top: 0.4mm;
+  margin-top: 0.5mm;
   line-height: 1;
+  color: #000000;
 }
 
 .shelf-price-container {
@@ -629,49 +656,95 @@ html, body {
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
-  width: 52%;
+  width: 54%;
+  border-left: 1px dashed #cbd5e1;
+  padding-left: 2mm;
+  box-sizing: border-box;
 }
 
-.shelf-tag-price-huge {
-  font-family: 'Bebas Neue', 'Anton', 'Arial Black', Impact, sans-serif;
-  font-size: 26pt;
+.shelf-price-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  line-height: 1;
+}
+
+.shelf-price-label {
+  font-size: 6pt;
   font-weight: 900;
-  line-height: 0.88;
-  letter-spacing: -0.5px;
-  text-align: right;
-  display: block;
+  letter-spacing: 0.8px;
+  color: #64748b;
+  text-transform: uppercase;
 }
 
-.shelf-tag-price-prefix {
+.shelf-price-currency {
   font-size: 7.5pt;
-  font-weight: 800;
+  font-weight: 900;
   color: #000000;
 }
 
+.shelf-tag-price-huge {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Arial Black", sans-serif;
+  font-size: 20pt;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.3px;
+  text-align: right;
+  color: #000000;
+  display: block;
+  margin: 0.5mm 0;
+}
+
+.shelf-tag-price-huge.price-len-mid {
+  font-size: 17pt;
+}
+
+.shelf-tag-price-huge.price-len-long {
+  font-size: 14.5pt;
+}
+
+.shelf-price-unit {
+  font-size: 6.5pt;
+  font-weight: 800;
+  color: #334155;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
 .shelf-wholesale-banner {
-  background: #000000;
+  background: #0f172a;
   color: #ffffff;
   border-radius: 2px;
-  padding: 0.7mm 1.5mm;
+  padding: 0.6mm 1.8mm;
   font-size: 6pt;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 0.5mm;
-  line-height: 1;
+  margin-top: 0.6mm;
+  line-height: 1.1;
 }
 
-/* Mode 2: Stiker Barcode Kemasan Snack (Lebar 5,0 cm x Tinggi 2,8 cm) */
+.shelf-wholesale-banner .wholesale-qty {
+  font-weight: 800;
+}
+
+.shelf-wholesale-banner .wholesale-price {
+  font-weight: 900;
+  font-size: 6.5pt;
+}
+
+/* Mode 2: Stiker Barcode Kemasan Snack (Lebar 5,0 cm x Tinggi 2,8 - 3,0 cm) - Bersih & Proporsional */
 .thermal-snack-sticker {
   background: #ffffff;
   color: #000000;
   width: 50mm;
-  height: 28mm;
+  height: 29mm;
   box-sizing: border-box;
-  border: 1.5px dashed #000000;
+  border: 1.5px solid #0f172a;
   border-radius: 4px;
-  padding: 1.5mm 2mm;
+  padding: 1.4mm 2mm;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -681,30 +754,52 @@ html, body {
   break-inside: avoid;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.snack-sticker-header {
+  width: 100%;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.4mm;
+  margin-bottom: 0.4mm;
+}
+
+.snack-sticker-store {
+  font-size: 6.5pt;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #0f172a;
+  display: block;
 }
 
 .snack-sticker-name {
-  font-size: 7.5pt;
+  font-size: 8pt;
   font-weight: 900;
   text-transform: uppercase;
-  line-height: 1.1;
+  line-height: 1.15;
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: #000000;
+  margin-bottom: 0.4mm;
 }
 
-.snack-sticker-netto {
-  font-size: 6pt;
-  font-weight: 700;
-  color: #222222;
-  margin-top: 0.5mm;
-  line-height: 1;
+.snack-sticker-barcode-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 0;
 }
 
 .snack-sticker-barcode-svg {
-  width: 36mm;
-  height: 8.5mm;
+  width: 40mm;
+  max-width: 95%;
+  height: 10.5mm;
   display: block;
 }
 
@@ -712,10 +807,37 @@ html, body {
   font-family: monospace;
   font-size: 6.5pt;
   font-weight: 800;
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
   text-align: center;
   margin-top: 0.5mm;
   line-height: 1;
+  color: #000000;
+}
+
+.snack-sticker-footer {
+  font-size: 5.5pt;
+  font-weight: 700;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 0.4mm;
+  margin-top: 0.4mm;
+  line-height: 1;
+}
+
+.snack-sticker-date {
+  font-family: monospace;
+  font-weight: 700;
+}
+
+.snack-sticker-badge {
+  font-size: 5pt;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.3px;
 }
 
 /* Garis Sobek / Potong untuk Continuous Roll */
@@ -898,19 +1020,6 @@ html, body {
   }
 }
 
-.snack-sticker-footer {
-  font-size: 5.5pt;
-  font-weight: 700;
-  color: #475569;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  border-top: 1px dotted #cbd5e1;
-  padding-top: 0.4mm;
-  margin-top: 0.3mm;
-  line-height: 1;
-}
 
 /* =========================================================
    BLUETOOTH HARDWARE STATUS BADGE (NAVBAR HEADER)
