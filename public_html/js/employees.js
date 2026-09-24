@@ -447,7 +447,10 @@ function lockCashierScreen() {
 let financialsTempUnlocked = false;
 
 function isCurrentUserAuthorizedForFinancials() {
-  return true;
+  if (financialsTempUnlocked) return true;
+  if (!pos.employees || pos.employees.length === 0) return true;
+  if (!pos.currentUser) return false;
+  return pos.currentUser.role === "COS" || pos.currentUser.canViewFinancials === true;
 }
 
 function openOwnerDashboardWithAuth() {

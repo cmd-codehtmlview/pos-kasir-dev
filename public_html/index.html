@@ -4005,21 +4005,27 @@
               </div>
             </label>
 
-            <!-- 4. Diskon -->
-            <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
-              <input type="checkbox" id="sis-perm-diskon" checked class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
+            <!-- 4. Blind Klerk Mandiri -->
+            <label class="flex items-start gap-2.5 p-2 bg-white border border-emerald-200/80 rounded-xl hover:bg-emerald-50/40 cursor-pointer transition">
+              <input type="checkbox" id="sis-perm-klerk" checked class="w-4 h-4 text-emerald-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">4. Boleh Beri Diskon Manual / Potongan Transaksi</span>
-                <span class="block text-[10px] text-slate-400">Dapat memberikan potongan rupiah atau diskon persen kustom pada struk.</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="block text-xs font-bold text-slate-800">4. Boleh Klerk Mandiri Tanpa COS [F8]</span>
+                  <span class="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-[9px] font-black rounded-full">Blind View</span>
+                </div>
+                <span class="block text-[10px] text-slate-500">Dapat closing shift saat COS tidak ada; omzet sistem disensor dan murni hitung uang fisik di laci.</span>
               </div>
             </label>
 
-            <!-- 5. Buka Laci -->
-            <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
-              <input type="checkbox" id="sis-perm-drawer" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
+            <!-- 5. Laba Rugi & HPP Toko -->
+            <label class="flex items-start gap-2.5 p-2 bg-white border border-blue-200/80 rounded-xl hover:bg-blue-50/40 cursor-pointer transition">
+              <input type="checkbox" id="sis-perm-financials" class="w-4 h-4 text-blue-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">5. Boleh Buka Laci Kas Manual (No Sale / Cash Drawer)</span>
-                <span class="block text-[10px] text-slate-400">Dapat memicu sinyal open drawer tanpa harus menyelesaikan transaksi.</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="block text-xs font-bold text-slate-800">5. Boleh Lihat Laporan Operasional, Laba Rugi &amp; HPP Toko</span>
+                  <span class="px-1.5 py-0.2 bg-blue-100 text-blue-800 text-[9px] font-black rounded-full">Owner / COS</span>
+                </div>
+                <span class="block text-[10px] text-slate-500">Melihat omzet, persentase margin %, laba kotor/bersih, dan akses buka laporan operasional toko tanpa sensor.</span>
               </div>
             </label>
 
@@ -9163,13 +9169,13 @@
   <script src="js/repack.js?v=100"></script>
   <script src="js/reports.js?v=103"></script>
   <script src="js/settings.js?v=118"></script>
-  <script src="js/employees.js?v=123"></script>
+  <script src="js/employees.js?v=124"></script>
   
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=118"></script>
   <script src="js/sis-logistics.js?v=104"></script>
   <script src="js/sis-cashier-ops.js?v=100"></script>
-  <script src="js/sis-store-crm.js?v=100"></script>
+  <script src="js/sis-store-crm.js?v=101"></script>
   <script src="js/sis-analytics.js?v=100"></script>
 
   <script>

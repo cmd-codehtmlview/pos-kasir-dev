@@ -555,8 +555,10 @@ function editSisStaff(nik) {
   setCheckboxVal('sis-perm-void', emp.canVoid !== false);
   setCheckboxVal('sis-perm-retur', emp.canRetur !== false);
   setCheckboxVal('sis-perm-so', emp.canStockOpname !== false);
+  setCheckboxVal('sis-perm-klerk', emp.canBlindKlerk !== false);
   setCheckboxVal('sis-perm-diskon', emp.canBlindKlerk !== false);
-  setCheckboxVal('sis-perm-drawer', emp.canViewFinancials !== false);
+  setCheckboxVal('sis-perm-financials', emp.canViewFinancials === true);
+  setCheckboxVal('sis-perm-drawer', emp.canViewFinancials === true);
   setCheckboxVal('sis-perm-manage-staff', emp.canManageEmployees !== false);
   setCheckboxVal('sis-perm-manage-prod', emp.canManageProducts !== false);
   setCheckboxVal('sis-perm-lpb', emp.canStockMutation !== false);
@@ -603,7 +605,9 @@ function onSisStaffRoleChange() {
     setCheckboxVal('sis-perm-void', true);
     setCheckboxVal('sis-perm-retur', true);
     setCheckboxVal('sis-perm-so', true);
+    setCheckboxVal('sis-perm-klerk', true);
     setCheckboxVal('sis-perm-diskon', true);
+    setCheckboxVal('sis-perm-financials', true);
     setCheckboxVal('sis-perm-drawer', true);
     setCheckboxVal('sis-perm-manage-staff', true);
     setCheckboxVal('sis-perm-manage-prod', true);
@@ -613,7 +617,9 @@ function onSisStaffRoleChange() {
     setCheckboxVal('sis-perm-void', true);
     setCheckboxVal('sis-perm-retur', true);
     setCheckboxVal('sis-perm-so', true);
+    setCheckboxVal('sis-perm-klerk', true);
     setCheckboxVal('sis-perm-diskon', true);
+    setCheckboxVal('sis-perm-financials', false);
     setCheckboxVal('sis-perm-drawer', false);
     setCheckboxVal('sis-perm-manage-staff', false);
     setCheckboxVal('sis-perm-manage-prod', true);
@@ -623,7 +629,9 @@ function onSisStaffRoleChange() {
     setCheckboxVal('sis-perm-void', true);
     setCheckboxVal('sis-perm-retur', false);
     setCheckboxVal('sis-perm-so', false);
+    setCheckboxVal('sis-perm-klerk', true);
     setCheckboxVal('sis-perm-diskon', true);
+    setCheckboxVal('sis-perm-financials', false);
     setCheckboxVal('sis-perm-drawer', false);
     setCheckboxVal('sis-perm-manage-staff', false);
     setCheckboxVal('sis-perm-manage-prod', false);
@@ -656,8 +664,8 @@ function saveSisEmployee() {
     canVoid: getCheckboxVal('sis-perm-void'),
     canRetur: getCheckboxVal('sis-perm-retur'),
     canStockOpname: getCheckboxVal('sis-perm-so'),
-    canBlindKlerk: getCheckboxVal('sis-perm-diskon'),
-    canViewFinancials: getCheckboxVal('sis-perm-drawer'),
+    canBlindKlerk: getCheckboxVal('sis-perm-klerk') || getCheckboxVal('sis-perm-diskon'),
+    canViewFinancials: getCheckboxVal('sis-perm-financials') || getCheckboxVal('sis-perm-drawer'),
     canManageEmployees: getCheckboxVal('sis-perm-manage-staff'),
     canManageProducts: getCheckboxVal('sis-perm-manage-prod'),
     canStockMutation: getCheckboxVal('sis-perm-lpb')
@@ -701,6 +709,18 @@ function saveSisEmployee() {
     pos.saveEmployees();
   } else {
     localStorage.setItem('snack_pos_employees', JSON.stringify(pos.employees));
+  }
+
+  // Jika yang diedit adalah user yang sedang aktif login, sinkronkan pos.currentUser seketika
+  if (pos.currentUser && pos.currentUser.nik === (sisEditingStaffNik || nik)) {
+    const updatedEmp = pos.employees.find(e => e.nik === (sisEditingStaffNik || nik));
+    if (updatedEmp) {
+      if (typeof pos.saveCurrentUser === 'function') pos.saveCurrentUser(updatedEmp);
+      if (typeof renderEmployeeHeader === 'function') renderEmployeeHeader();
+      if (typeof renderReports === 'function') renderReports();
+      if (typeof renderInventoryTable === 'function') renderInventoryTable();
+      if (typeof updateDashboardButtonState === 'function') updateDashboardButtonState();
+    }
   }
 
   if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
