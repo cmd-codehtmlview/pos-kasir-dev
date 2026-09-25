@@ -599,36 +599,39 @@ let currentSupervisorActionType = null;
 
 function hasPermissionForAction(user, actionType) {
   if (!user) return true;
-  if (actionType === 'MANAGE_PRODUCTS') return true;
+  // Selaraskan dengan data karyawan terbaru dari pos.employees jika ada
+  const latestEmp = (pos && Array.isArray(pos.employees)) ? pos.employees.find(e => e.nik === user.nik) : null;
+  const u = latestEmp || user;
+
   if (actionType === "VOID_ITEM" || actionType === "VOID_CART") {
-    return user.canVoid !== undefined ? user.canVoid : (user.role === "COS" || user.role === "ACOS");
+    return u.canVoid !== undefined ? u.canVoid : (u.role === "COS" || u.role === "ACOS");
   }
   if (actionType === "RETUR_SALE") {
-    return user.canRetur !== undefined ? user.canRetur : (user.role === "COS" || user.role === "ACOS");
+    return u.canRetur !== undefined ? u.canRetur : (u.role === "COS" || u.role === "ACOS");
   }
   if (actionType === "STOCK_OPNAME") {
-    return user.canStockOpname !== undefined ? user.canStockOpname : (user.role === "COS" || user.role === "ACOS");
+    return u.canStockOpname !== undefined ? u.canStockOpname : (u.role === "COS" || u.role === "ACOS");
   }
   if (actionType === "BLIND_KLERK") {
-    return user.canBlindKlerk !== undefined ? user.canBlindKlerk : true;
+    return u.canBlindKlerk !== undefined ? u.canBlindKlerk : true;
   }
   if (actionType === "VIEW_FINANCIALS" || actionType === "OPEN_OWNER_DASHBOARD") {
-    return user.canViewFinancials !== undefined ? user.canViewFinancials : (user.role === "COS");
+    return u.canViewFinancials !== undefined ? u.canViewFinancials : (u.role === "COS");
   }
   if (actionType === "MANAGE_EMPLOYEES") {
-    return user.canManageEmployees !== undefined ? user.canManageEmployees : (user.role === "COS");
+    return u.canManageEmployees !== undefined ? u.canManageEmployees : (u.role === "COS");
   }
   if (actionType === "MANAGE_PRODUCTS") {
-    return user.canManageProducts !== undefined ? user.canManageProducts : (user.role === "COS" || user.role === "ACOS");
+    return u.canManageProducts !== undefined ? u.canManageProducts : (u.role === "COS" || u.role === "ACOS");
   }
   if (actionType === "STOCK_MUTATION") {
-    return user.canStockMutation !== undefined ? user.canStockMutation : (user.role === "COS" || user.role === "ACOS");
+    return u.canStockMutation !== undefined ? u.canStockMutation : (u.role === "COS" || u.role === "ACOS");
   }
-  return (user.role === "COS" || user.role === "ACOS");
+  return (u.role === "COS" || u.role === "ACOS");
 }
 
 function requestSupervisorAuth(actionType, actionDesc, onApproved) {
-  if (actionType === 'MANAGE_PRODUCTS' || !pos.currentUser || (pos.currentUser && pos.currentUser.role === 'COS')) {
+  if (!pos.currentUser || (pos.currentUser && pos.currentUser.role === 'COS')) {
     if (typeof onApproved === 'function') {
       onApproved(pos.currentUser || { nik: '1001', name: 'Kepala Toko', role: 'COS' });
     }
@@ -952,6 +955,13 @@ function onEmployeeRoleChange(role) {
 
 function handleSaveEmployee(event) {
   if (event && event.preventDefault) event.preventDefault();
+
+  if (!hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
+    requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Simpan Data Karyawan (Khusus COS)", () => {
+      handleSaveEmployee(event);
+    });
+    return;
+  }
 
   const origNik = document.getElementById("emp-form-original-nik")?.value.trim();
   const nik = document.getElementById("emp-form-nik")?.value.trim();

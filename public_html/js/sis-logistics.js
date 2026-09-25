@@ -397,6 +397,25 @@ function compressSisProductImageFallback(file, maxDimension = 360, quality = 0.7
 }
 
 function switchProductModalTab(tab) {
+  if (tab === 'form') {
+    if (typeof hasPermissionForAction === 'function' && pos && pos.currentUser) {
+      if (!hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+        if (typeof requestSupervisorAuth === 'function') {
+          requestSupervisorAuth("MANAGE_PRODUCTS", () => {
+            _doSwitchProductModalTab('form');
+          }, "Otorisasi Diperlukan: Anda memerlukan otorisasi Supervisor / Pejabat Toko untuk mengelola produk dan harga jual.");
+          return;
+        } else {
+          alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mengelola produk.");
+          return;
+        }
+      }
+    }
+  }
+  _doSwitchProductModalTab(tab);
+}
+
+function _doSwitchProductModalTab(tab) {
   const btnList = document.getElementById('prod-tab-btn-list');
   const btnForm = document.getElementById('prod-tab-btn-form');
   const tabList = document.getElementById('prod-tab-content-list');
@@ -551,6 +570,20 @@ function resetSisProductForm() {
 }
 
 function editSisProduct(productId) {
+  if (typeof hasPermissionForAction === 'function' && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+      if (typeof requestSupervisorAuth === 'function') {
+        requestSupervisorAuth("MANAGE_PRODUCTS", () => {
+          editSisProduct(productId);
+        }, "Otorisasi Diperlukan: Edit Data Produk & Harga membutuhkan PIN Supervisor.");
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mengelola produk.");
+        return;
+      }
+    }
+  }
+
   if (!pos || !Array.isArray(pos.products)) return;
   const p = pos.products.find(item => item.id === productId || String(item.id) === String(productId));
   if (!p) return;
@@ -626,6 +659,20 @@ function editSisProduct(productId) {
 }
 
 function saveSisProduct(andPrint = false) {
+  if (typeof hasPermissionForAction === 'function' && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+      if (typeof requestSupervisorAuth === 'function') {
+        requestSupervisorAuth("MANAGE_PRODUCTS", () => {
+          saveSisProduct(andPrint);
+        }, "Otorisasi Diperlukan: Simpan Produk & Harga membutuhkan PIN Supervisor.");
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mengelola produk.");
+        return;
+      }
+    }
+  }
+
   const getVal = id => (document.getElementById(id)?.value || "").trim();
   const id = getVal('sis-prod-id');
   const imageData = getVal('sis-prod-image-data');
@@ -766,6 +813,20 @@ function printCurrentSisProductLabel() {
 }
 
 function deleteSisProduct(productId) {
+  if (typeof hasPermissionForAction === 'function' && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+      if (typeof requestSupervisorAuth === 'function') {
+        requestSupervisorAuth("MANAGE_PRODUCTS", () => {
+          deleteSisProduct(productId);
+        }, "Otorisasi Diperlukan: Hapus Produk membutuhkan PIN Supervisor.");
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mengelola produk.");
+        return;
+      }
+    }
+  }
+
   if (!pos || !Array.isArray(pos.products)) return;
   const prod = pos.products.find(p => p.id === productId);
   if (!prod) return;
@@ -1080,6 +1141,20 @@ function printSisLpbReceiptById(lpbId) {
 }
 
 function saveSisLpb() {
+  if (typeof hasPermissionForAction === 'function' && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+      if (typeof requestSupervisorAuth === 'function') {
+        requestSupervisorAuth("STOCK_MUTATION", () => {
+          saveSisLpb();
+        }, "Otorisasi Diperlukan: Penerimaan Barang Masuk (LPB) membutuhkan PIN Supervisor.");
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mutasi stok barang.");
+        return;
+      }
+    }
+  }
+
   if (sisLpbDraft.length === 0) {
     alert("Faktur penerimaan masih kosong! Tambahkan minimal 1 produk barang masuk.");
     return;
@@ -1358,6 +1433,20 @@ function selectSisWasteProduct(prod) {
 }
 
 function saveSisWaste() {
+  if (typeof hasPermissionForAction === 'function' && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+      if (typeof requestSupervisorAuth === 'function') {
+        requestSupervisorAuth("STOCK_MUTATION", () => {
+          saveSisWaste();
+        }, "Otorisasi Diperlukan: Pemusnahan / Retur Rusak (BAP Waste) membutuhkan PIN Supervisor.");
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mutasi stok barang.");
+        return;
+      }
+    }
+  }
+
   const p = window.selectedWasteProduct;
   if (!p) {
     alert("Harap pilih produk yang rusak / waste!");
@@ -1472,6 +1561,20 @@ function updateRepackSummary() {
 }
 
 function executeRepackProcess() {
+  if (typeof hasPermissionForAction === 'function' && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+      if (typeof requestSupervisorAuth === 'function') {
+        requestSupervisorAuth("STOCK_MUTATION", () => {
+          executeRepackProcess();
+        }, "Otorisasi Diperlukan: Repack Stok Bal ke Eceran membutuhkan PIN Supervisor.");
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mutasi stok barang.");
+        return;
+      }
+    }
+  }
+
   const originProd = window.selectedRepackOrigin;
   const targetProd = window.selectedRepackTarget;
 

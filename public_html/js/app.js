@@ -6,6 +6,28 @@
 // 11. NAVIGATION & MODALS
 // ==========================================
 function switchTab(tabId) {
+  if (tabId === "tab-reports") {
+    const isAuth = typeof isCurrentUserAuthorizedForFinancials === "function" 
+      ? isCurrentUserAuthorizedForFinancials() 
+      : (typeof hasPermissionForAction === "function" && pos && pos.currentUser ? hasPermissionForAction(pos.currentUser, "VIEW_FINANCIALS") : true);
+    
+    if (!isAuth) {
+      if (typeof requestSupervisorAuth === "function") {
+        requestSupervisorAuth("VIEW_FINANCIALS", () => {
+          _doSwitchTab("tab-reports");
+        }, "Otorisasi Diperlukan: Akses Menu Laporan Penjualan & Keuangan Toko membutuhkan otorisasi Supervisor / Pejabat Toko.");
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk melihat laporan keuangan.");
+        return;
+      }
+    }
+  }
+
+  _doSwitchTab(tabId);
+}
+
+function _doSwitchTab(tabId) {
   const tabs = ["tab-pos", "tab-inventory", "tab-reports", "tab-settings"];
   tabs.forEach(t => {
     const el = document.getElementById(t);

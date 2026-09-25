@@ -9208,22 +9208,22 @@
   <script src="js/printer.js?v=135"></script>
   <script src="js/checkout.js?v=112"></script>
   <script src="js/member.js?v=108"></script>
-  <script src="js/returns.js?v=101"></script>
-  <script src="js/stock-opname.js?v=100"></script>
+  <script src="js/returns.js?v=102"></script>
+  <script src="js/stock-opname.js?v=101"></script>
   <script src="js/klerk.js?v=102"></script>
-  <script src="js/inventory.js?v=125"></script>
+  <script src="js/inventory.js?v=126"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/import-products.js?v=100"></script>
   <script src="js/repack.js?v=100"></script>
   <script src="js/reports.js?v=105"></script>
   <script src="js/settings.js?v=118"></script>
-  <script src="js/employees.js?v=126"></script>
+  <script src="js/employees.js?v=127"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=118"></script>
-  <script src="js/sis-logistics.js?v=104"></script>
+  <script src="js/app.js?v=119"></script>
+  <script src="js/sis-logistics.js?v=105"></script>
   <script src="js/sis-cashier-ops.js?v=100"></script>
-  <script src="js/sis-store-crm.js?v=101"></script>
+  <script src="js/sis-store-crm.js?v=102"></script>
   <script src="js/sis-analytics.js?v=102"></script>
 
   <script>
@@ -9448,6 +9448,25 @@
 
     // Tab switcher di modal produk
     function switchProductModalTab(tab) {
+      if (tab === 'form') {
+        if (typeof hasPermissionForAction === 'function' && typeof pos !== 'undefined' && pos && pos.currentUser) {
+          if (!hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+            if (typeof requestSupervisorAuth === 'function') {
+              requestSupervisorAuth("MANAGE_PRODUCTS", () => {
+                _doSwitchProductModalTab('form');
+              }, "Otorisasi Diperlukan: Anda memerlukan otorisasi Supervisor / Pejabat Toko untuk mengelola produk dan harga jual.");
+              return;
+            } else {
+              alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mengelola produk.");
+              return;
+            }
+          }
+        }
+      }
+      _doSwitchProductModalTab(tab);
+    }
+
+    function _doSwitchProductModalTab(tab) {
       const btnList = document.getElementById('prod-tab-btn-list');
       const btnForm = document.getElementById('prod-tab-btn-form');
       const tabList = document.getElementById('prod-tab-content-list');
@@ -9457,6 +9476,7 @@
         btnForm.className = "flex-1 py-1.5 rounded-xl font-bold text-slate-600 hover:text-emerald-950";
         tabList.classList.remove('hidden');
         tabForm.classList.add('hidden');
+        if (typeof renderSisProductsModal === 'function') renderSisProductsModal();
       } else {
         btnForm.className = "flex-1 py-1.5 rounded-xl font-bold bg-white text-emerald-950 border border-emerald-200 shadow-2xs";
         btnList.className = "flex-1 py-1.5 rounded-xl font-bold text-slate-600 hover:text-emerald-950";
@@ -9486,6 +9506,25 @@
 
     // Switcher Tab Modal Karyawan (Daftar vs Tambah + 8 Ceklis)
     function switchStaffModalTab(tab) {
+      if (tab === 'form') {
+        if (typeof hasPermissionForAction === 'function' && typeof pos !== 'undefined' && pos && pos.currentUser) {
+          if (!hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
+            if (typeof requestSupervisorAuth === 'function') {
+              requestSupervisorAuth("MANAGE_EMPLOYEES", () => {
+                _doSwitchStaffModalTab('form');
+              }, "Otorisasi Diperlukan: Tambah / Edit Karyawan & Hak Akses membutuhkan PIN Supervisor.");
+              return;
+            } else {
+              alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mengelola data karyawan.");
+              return;
+            }
+          }
+        }
+      }
+      _doSwitchStaffModalTab(tab);
+    }
+
+    function _doSwitchStaffModalTab(tab) {
       const btnList = document.getElementById('staff-tab-btn-list');
       const btnForm = document.getElementById('staff-tab-btn-form');
       const tabList = document.getElementById('staff-tab-content-list');
@@ -10363,7 +10402,7 @@
     }
 
     function openSisModal(modalId) {
-      // Proteksi Laporan Operasional Toko (Laporan Shift & Rekap Kas) khusus Pejabat Toko / COS
+      // 1. Proteksi Laporan Operasional Toko (Laporan Shift & Rekap Kas) khusus Pejabat Toko / COS (canViewFinancials)
       if (modalId === 'sis-modal-report' || modalId === 'sis-modal-recap') {
         if (typeof isCurrentUserAuthorizedForFinancials === 'function' && !isCurrentUserAuthorizedForFinancials()) {
           if (typeof requestSupervisorAuth === 'function') {
@@ -10375,6 +10414,108 @@
                 if (typeof updateDashboardButtonState === 'function') updateDashboardButtonState();
                 openSisModal(modalId);
               }
+            );
+            return;
+          }
+        }
+      }
+
+      // 2. Proteksi Retur Penjualan (canRetur)
+      if (modalId === 'sis-modal-retur') {
+        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "RETUR_SALE")) {
+          if (typeof requestSupervisorAuth === 'function') {
+            requestSupervisorAuth(
+              "RETUR_SALE",
+              "Otorisasi Akses Retur Barang & Refund Struk (Khusus Pejabat Toko / COS)",
+              () => openSisModal(modalId)
+            );
+            return;
+          }
+        }
+      }
+
+      // 3. Proteksi Stock Opname (canStockOpname)
+      if (modalId === 'sis-modal-so') {
+        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_OPNAME")) {
+          if (typeof requestSupervisorAuth === 'function') {
+            requestSupervisorAuth(
+              "STOCK_OPNAME",
+              "Otorisasi Akses Koreksi Stock Opname [F6] (Khusus Pejabat Toko / COS)",
+              () => openSisModal(modalId)
+            );
+            return;
+          }
+        }
+      }
+
+      // 4. Proteksi Closing Shift / Blind Klerk (canBlindKlerk)
+      if (modalId === 'sis-modal-klerk') {
+        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "BLIND_KLERK")) {
+          if (typeof requestSupervisorAuth === 'function') {
+            requestSupervisorAuth(
+              "BLIND_KLERK",
+              "Otorisasi Closing Shift Kasir (Pendampingan Pejabat Toko / COS)",
+              (supervisor) => {
+                const supervisorEl = document.getElementById("klerk-supervisor");
+                if (supervisorEl) supervisorEl.value = `${supervisor.role} ${supervisor.name} (${supervisor.nik})`;
+                openSisModal(modalId);
+              }
+            );
+            return;
+          }
+        }
+      }
+
+      // 5. Proteksi Manajemen Karyawan & Hak Akses (canManageEmployees)
+      if (modalId === 'sis-modal-staff') {
+        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
+          if (typeof requestSupervisorAuth === 'function') {
+            requestSupervisorAuth(
+              "MANAGE_EMPLOYEES",
+              "Otorisasi Akses Kelola Karyawan & Hak Akses (Khusus COS)",
+              () => openSisModal(modalId)
+            );
+            return;
+          }
+        }
+      }
+
+      // 6. Proteksi Mutasi Stok: LPB Faktur Masuk (canStockMutation)
+      if (modalId === 'sis-modal-lpb') {
+        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+          if (typeof requestSupervisorAuth === 'function') {
+            requestSupervisorAuth(
+              "STOCK_MUTATION",
+              "Otorisasi Akses Penerimaan Barang LPB Supplier [F7] (Khusus Pejabat Toko / COS)",
+              () => openSisModal(modalId)
+            );
+            return;
+          }
+        }
+      }
+
+      // 7. Proteksi Mutasi Stok: Barang Rusak / Waste (canStockMutation)
+      if (modalId === 'sis-modal-waste') {
+        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+          if (typeof requestSupervisorAuth === 'function') {
+            requestSupervisorAuth(
+              "STOCK_MUTATION",
+              "Otorisasi Akses Pembuatan BAP Barang Rusak / Waste (Khusus Pejabat Toko / COS)",
+              () => openSisModal(modalId)
+            );
+            return;
+          }
+        }
+      }
+
+      // 8. Proteksi Mutasi Stok: Repack Bal ke Ecer (canStockMutation)
+      if (modalId === 'sis-modal-repack') {
+        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+          if (typeof requestSupervisorAuth === 'function') {
+            requestSupervisorAuth(
+              "STOCK_MUTATION",
+              "Otorisasi Akses Repack Bal ke Eceran (Khusus Pejabat Toko / COS)",
+              () => openSisModal(modalId)
             );
             return;
           }

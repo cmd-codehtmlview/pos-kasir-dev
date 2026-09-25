@@ -9,6 +9,23 @@
 let soPhysicalCounts = {}; // { [productId]: count }
 
 function openStockOpnameModal() {
+  if (typeof hasPermissionForAction === "function" && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "STOCK_OPNAME")) {
+      if (typeof requestSupervisorAuth === "function") {
+        requestSupervisorAuth("STOCK_OPNAME", "Otorisasi Diperlukan: Buka Modul Stock Opname [F6]", () => {
+          _doOpenStockOpnameModal();
+        });
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk Stock Opname.");
+        return;
+      }
+    }
+  }
+  _doOpenStockOpnameModal();
+}
+
+function _doOpenStockOpnameModal() {
   soPhysicalCounts = {};
   // Defaultkan stok fisik sama dengan stok komputer awal
   pos.products.forEach(p => {
@@ -548,6 +565,20 @@ function renderLpbDraftTable() {
 
 // ---- Simpan Dokumen LPB (atomik) ----
 function processSaveLpbDocument(andPrint = false) {
+  if (typeof hasPermissionForAction === "function" && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+      if (typeof requestSupervisorAuth === "function") {
+        requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Simpan Dokumen LPB (Khusus Pejabat Toko)", () => {
+          processSaveLpbDocument(andPrint);
+        });
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mutasi stok barang.");
+        return;
+      }
+    }
+  }
+
   const supplierName = document.getElementById("lpb-supplier-name")?.value.trim();
   const invoiceNo = document.getElementById("lpb-invoice-no")?.value.trim() || "-";
   const paymentType = document.getElementById("lpb-payment-type")?.value || "KREDIT";

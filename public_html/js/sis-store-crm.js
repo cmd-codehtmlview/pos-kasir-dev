@@ -533,6 +533,20 @@ function renderSisStaffList() {
 }
 
 function editSisStaff(nik) {
+  if (typeof hasPermissionForAction === 'function' && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
+      if (typeof requestSupervisorAuth === 'function') {
+        requestSupervisorAuth("MANAGE_EMPLOYEES", () => {
+          editSisStaff(nik);
+        }, "Otorisasi Diperlukan: Edit Data Karyawan & Hak Akses membutuhkan PIN Supervisor.");
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mengelola data karyawan.");
+        return;
+      }
+    }
+  }
+
   sisEditingStaffNik = nik;
   const emp = (pos.employees || []).find(e => e.nik === nik);
   if (!emp) return;
@@ -640,6 +654,20 @@ function onSisStaffRoleChange() {
 }
 
 function saveSisEmployee() {
+  if (typeof hasPermissionForAction === 'function' && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
+      if (typeof requestSupervisorAuth === 'function') {
+        requestSupervisorAuth("MANAGE_EMPLOYEES", () => {
+          saveSisEmployee();
+        }, "Otorisasi Diperlukan: Simpan Data Karyawan & Hak Akses membutuhkan PIN Supervisor.");
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mengelola data karyawan.");
+        return;
+      }
+    }
+  }
+
   if (!window.pos) return;
   if (!Array.isArray(pos.employees)) pos.employees = [];
 
@@ -730,6 +758,20 @@ function saveSisEmployee() {
 }
 
 function deleteSisStaff(nik) {
+  if (typeof hasPermissionForAction === 'function' && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
+      if (typeof requestSupervisorAuth === 'function') {
+        requestSupervisorAuth("MANAGE_EMPLOYEES", () => {
+          deleteSisStaff(nik);
+        }, "Otorisasi Diperlukan: Hapus Karyawan membutuhkan PIN Supervisor.");
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk mengelola data karyawan.");
+        return;
+      }
+    }
+  }
+
   if (!window.pos || !Array.isArray(pos.employees)) return;
   const emp = pos.employees.find(e => e.nik === nik);
   if (!emp) return;

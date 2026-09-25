@@ -525,7 +525,14 @@ function toggleProductFormMultiUnit(isChecked) {
 }
 
 function openProductModal(productId = null) {
-  // Akses langsung tambah / edit produk tanpa hambatan PIN
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Kelola Produk & Ubah Harga Jual (Khusus Pejabat Toko / COS)", () => {
+        openProductModal(productId);
+      });
+      return;
+    }
+  }
 
   const title = document.getElementById("product-modal-title");
   const idInput = document.getElementById("product-form-id");
@@ -630,7 +637,16 @@ function openProductModal(productId = null) {
 }
 
 function handleSaveProductForm(event) {
-  event.preventDefault();
+  if (event && event.preventDefault) event.preventDefault();
+
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Simpan Master Produk (Khusus Pejabat Toko / COS)", () => {
+        handleSaveProductForm(event);
+      });
+      return;
+    }
+  }
 
   const id = document.getElementById("product-form-id")?.value;
   const name = document.getElementById("product-form-name")?.value.trim();

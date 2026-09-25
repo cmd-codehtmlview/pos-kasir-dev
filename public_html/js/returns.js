@@ -305,6 +305,20 @@ function recalcReturTotals() {
 }
 
 function executeProcessRetur() {
+  if (typeof hasPermissionForAction === 'function' && pos && pos.currentUser) {
+    if (!hasPermissionForAction(pos.currentUser, "RETUR_SALE")) {
+      if (typeof requestSupervisorAuth === 'function') {
+        requestSupervisorAuth("RETUR_SALE", () => {
+          executeProcessRetur();
+        }, "Otorisasi Diperlukan: Proses Retur Barang & Refund membutuhkan PIN Supervisor.");
+        return;
+      } else {
+        alert("Akses ditolak: Anda tidak memiliki hak otorisasi untuk retur barang.");
+        return;
+      }
+    }
+  }
+
   if (!activeReturTrx) return;
 
   const returnedItems = [];
