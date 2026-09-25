@@ -227,6 +227,16 @@ function loadSettingsToForm() {
 }
 
 function saveStoreSettings() {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
+    requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Simpan Profil Toko (Khusus Pejabat)", () => {
+      executeSaveStoreSettings();
+    });
+    return;
+  }
+  executeSaveStoreSettings();
+}
+
+function executeSaveStoreSettings() {
   pos.settings.storeName = document.getElementById("setting-store-name")?.value.trim() || "TOKO SNACK BERKAH";
   pos.settings.storeId = getOrCreateStoreId();
   pos.settings.storeTagline = document.getElementById("setting-store-tagline")?.value.trim() || "";
@@ -434,14 +444,18 @@ function toggleSettingSection(secId) {
 
   const isCurrentlyOpen = !targetContent.classList.contains("hidden");
 
-  // Proteksi khusus modul sensitif jika tidak memiliki izin MANAGE_EMPLOYEES (Data Karyawan, QRIS Payment, Backup Database)
-  if (!isCurrentlyOpen && (secId === "sec-employees" || secId === "sec-payment-gateway" || secId === "sec-backup")) {
+  // Proteksi khusus modul sensitif jika tidak memiliki izin MANAGE_EMPLOYEES (Data Karyawan, QRIS Payment, Backup Database, Profil Toko, Aturan Poin)
+  if (!isCurrentlyOpen && (secId === "sec-employees" || secId === "sec-payment-gateway" || secId === "sec-backup" || secId === "sec-store" || secId === "sec-member-points")) {
     if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
       const desc = secId === "sec-payment-gateway"
         ? "Otorisasi Akses Pengaturan QRIS & Rekening Toko (Khusus Pejabat)"
         : (secId === "sec-backup"
             ? "Otorisasi Akses Backup & Restore Database Toko (Khusus Pejabat)"
-            : "Otorisasi Akses Manajemen Karyawan Toko (Khusus COS)");
+            : (secId === "sec-store"
+                ? "Otorisasi Akses Profil Toko & Cloud Sync (Khusus Pejabat)"
+                : (secId === "sec-member-points"
+                    ? "Otorisasi Akses Aturan Poin Reward Member (Khusus Pejabat)"
+                    : "Otorisasi Akses Manajemen Karyawan Toko (Khusus COS)")));
       requestSupervisorAuth("MANAGE_EMPLOYEES", desc, () => {
         executeToggleSettingSection(secId, false);
       });

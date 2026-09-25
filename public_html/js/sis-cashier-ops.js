@@ -563,24 +563,41 @@ function reprintCashDropById(dropId) {
 
 function saveSisCashDrop() {
   const amountInput = document.getElementById('sis-cashdrop-amount');
-  const supInput = document.getElementById('sis-cashdrop-supervisor');
-  const notesInput = document.getElementById('sis-cashdrop-notes');
-
   const rawAmount = parseFloat((amountInput?.value || "").replace(/\./g, "").replace(/,/g, ""));
   if (isNaN(rawAmount) || rawAmount <= 0) {
-    alert("Harap masukkan nominal setoran kas yang valid (lebih dari Rp 0)!");
+    if (typeof showMockupToast === 'function') {
+      showMockupToast("⚠️ Harap masukkan nominal setoran kas yang valid (lebih dari Rp 0)!", 'error');
+    } else {
+      alert("Harap masukkan nominal setoran kas yang valid (lebih dari Rp 0)!");
+    }
     if (amountInput) amountInput.focus();
     return;
   }
 
-  const supervisor = (supInput?.value || "").trim() || "Pejabat Toko";
+  // Wajib otorisasi supervisor / pejabat toko (COS/ACOS) penerima fisik uang
+  if (typeof requestSupervisorAuth === 'function') {
+    requestSupervisorAuth("CASH_DROP", `Otorisasi Serah Terima Tarik Kas Laci Rp ${rawAmount.toLocaleString('id-ID')} (Khusus Pejabat Toko)`, (supervisor) => {
+      executeSaveSisCashDrop(supervisor, rawAmount);
+    });
+    return;
+  }
+
+  executeSaveSisCashDrop(null, rawAmount);
+}
+
+function executeSaveSisCashDrop(supervisor = null, rawAmount = 0) {
+  const supInput = document.getElementById('sis-cashdrop-supervisor');
+  const notesInput = document.getElementById('sis-cashdrop-notes');
+
+  const supervisorName = supervisor ? `${supervisor.name} (${supervisor.role || 'Pejabat Toko'})` : ((supInput?.value || "").trim() || "Pejabat Toko");
   const notes = (notesInput?.value || "").trim() || "Tarik kas pengamanan laci brankas";
-  const cashier = pos.currentUser ? pos.currentUser.name : "Kasir Toko";
+  const cashier = pos.currentUser ? `${pos.currentUser.name} (${pos.currentUser.nik})` : "Kasir Toko";
 
   const dropRecord = {
     id: `CDP-${Date.now()}`,
     amount: rawAmount,
-    supervisor: supervisor,
+    supervisor: supervisorName,
+    supervisorNik: supervisor ? supervisor.nik : null,
     cashier: cashier,
     notes: notes,
     timestamp: new Date().toISOString()
@@ -598,12 +615,16 @@ function saveSisCashDrop() {
   // Cetak Bukti Setoran Kas ke Printer
   printSisCashDropSlip(dropRecord);
 
-  const toastMsg = `📥 Setoran Cash Drop Rp ${rawAmount.toLocaleString('id-ID')} Berhasil Dicatat & Dicetak!`;
+  const toastMsg = `📥 Setoran Cash Drop Rp ${rawAmount.toLocaleString('id-ID')} Berhasil Dicatat & Dicetak! (Disahkan: ${supervisorName})`;
   if (typeof showMockupToast === 'function') {
     showMockupToast(toastMsg, 'success');
   } else if (typeof showToast === 'function') {
     showToast(toastMsg, 'success');
   }
+
+  // Reset input nominal
+  const amountInput = document.getElementById('sis-cashdrop-amount');
+  if (amountInput) amountInput.value = '';
 
   // Refresh riwayat dan alihkan ke tab riwayat
   renderSisCashDropHistory();

@@ -236,6 +236,10 @@ class POSStore {
     if (Array.isArray(this.employees) && this.employees.length > 0) {
       let needSave = false;
       this.employees.forEach(emp => {
+        if (emp.canVoidRetur === undefined) {
+          emp.canVoidRetur = (emp.role === "COS" || emp.role === "ACOS" || (emp.canVoid && emp.canRetur));
+          needSave = true;
+        }
         if (emp.canVoid === undefined) {
           emp.canVoid = (emp.role === "COS" || emp.role === "ACOS");
           needSave = true;
@@ -252,12 +256,19 @@ class POSStore {
           emp.canBlindKlerk = true;
           needSave = true;
         }
+        if (emp.canWasteStock === undefined) {
+          emp.canWasteStock = (emp.role === "COS" || emp.role === "ACOS");
+          needSave = true;
+        }
         if (emp.role === "CREW") {
           emp.canViewFinancials = false;
           emp.canManageEmployees = false;
           emp.canManageProducts = false;
           emp.canStockMutation = false;
+          emp.canWasteStock = false;
           emp.canRetur = false;
+          emp.canVoid = false;
+          emp.canVoidRetur = false;
           emp.canStockOpname = false;
           needSave = true;
         } else {
@@ -277,6 +288,10 @@ class POSStore {
             emp.canStockMutation = (emp.role === "COS" || emp.role === "ACOS");
             needSave = true;
           }
+          if (emp.canWasteStock === undefined) {
+            emp.canWasteStock = (emp.role === "COS" || emp.role === "ACOS");
+            needSave = true;
+          }
         }
         if (!emp.shift) {
           emp.shift = "Shift 1";
@@ -294,6 +309,8 @@ class POSStore {
         if (this.currentUser && this.currentUser.role === "CREW") {
           this.currentUser.canViewFinancials = false;
           this.currentUser.canManageEmployees = false;
+          this.currentUser.canWasteStock = false;
+          this.currentUser.canVoidRetur = false;
         }
       } catch (e) {
         this.currentUser = null;
@@ -304,6 +321,7 @@ class POSStore {
         name: "Owner / Kepala Toko",
         role: "COS",
         shift: "Shift 1",
+        canVoidRetur: true,
         canVoid: true,
         canRetur: true,
         canStockOpname: true,
@@ -311,7 +329,8 @@ class POSStore {
         canViewFinancials: true,
         canManageEmployees: true,
         canManageProducts: true,
-        canStockMutation: true
+        canStockMutation: true,
+        canWasteStock: true
       };
       this.saveCurrentUser(this.currentUser);
     }

@@ -25,6 +25,18 @@ function initSisProfileModal() {
 }
 
 function saveSisProfile() {
+  if (pos.currentUser && (pos.currentUser.role === "CREW" || (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")))) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Simpan Profil Toko (Khusus Pejabat)", (supervisor) => {
+        executeSaveSisProfile(supervisor);
+      });
+      return;
+    }
+  }
+  executeSaveSisProfile();
+}
+
+function executeSaveSisProfile(supervisor = null) {
   if (!window.pos || !pos.settings) return;
 
   const nameInput = document.getElementById('sis-profile-store-name');
@@ -448,6 +460,18 @@ function initSisPointsRulesModal() {
 }
 
 function saveSisPointsRules() {
+  if (pos.currentUser && (pos.currentUser.role === "CREW" || (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")))) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Simpan Aturan Poin Member (Khusus Pejabat)", (supervisor) => {
+        executeSaveSisPointsRules(supervisor);
+      });
+      return;
+    }
+  }
+  executeSaveSisPointsRules();
+}
+
+function executeSaveSisPointsRules(supervisor = null) {
   if (!window.pos || !pos.settings) return;
 
   const spendInput = document.getElementById('sis-points-spend-amount');
@@ -564,16 +588,19 @@ function editSisStaff(nik) {
   if (roleSelect) roleSelect.value = emp.role || 'CREW';
 
   // Set 8 permissions
-  setCheckboxVal('sis-perm-void', emp.canVoid !== undefined ? !!emp.canVoid : (emp.role === "COS" || emp.role === "ACOS" || emp.role === "CREW"));
-  setCheckboxVal('sis-perm-retur', emp.canRetur !== undefined ? !!emp.canRetur : (emp.role === "COS" || emp.role === "ACOS"));
+  const isVoidRetur = emp.canVoidRetur !== undefined ? !!emp.canVoidRetur : (!!emp.canVoid || !!emp.canRetur);
+  setCheckboxVal('sis-perm-void-retur', isVoidRetur);
+  setCheckboxVal('sis-perm-void', isVoidRetur);
+  setCheckboxVal('sis-perm-retur', isVoidRetur);
   setCheckboxVal('sis-perm-so', emp.canStockOpname !== undefined ? !!emp.canStockOpname : (emp.role === "COS" || emp.role === "ACOS"));
   setCheckboxVal('sis-perm-klerk', emp.canBlindKlerk !== undefined ? !!emp.canBlindKlerk : true);
   setCheckboxVal('sis-perm-diskon', emp.canBlindKlerk !== undefined ? !!emp.canBlindKlerk : true);
   setCheckboxVal('sis-perm-financials', emp.canViewFinancials !== undefined ? !!emp.canViewFinancials : (emp.role === "COS"));
   setCheckboxVal('sis-perm-drawer', emp.canViewFinancials !== undefined ? !!emp.canViewFinancials : (emp.role === "COS"));
-  setCheckboxVal('sis-perm-manage-staff', emp.canManageEmployees !== undefined ? !!emp.canManageEmployees : (emp.role === "COS"));
-  setCheckboxVal('sis-perm-manage-prod', emp.canManageProducts !== undefined ? !!emp.canManageProducts : (emp.role === "COS" || emp.role === "ACOS"));
   setCheckboxVal('sis-perm-lpb', emp.canStockMutation !== undefined ? !!emp.canStockMutation : (emp.role === "COS" || emp.role === "ACOS"));
+  setCheckboxVal('sis-perm-waste', emp.canWasteStock !== undefined ? !!emp.canWasteStock : (emp.role === "COS" || emp.role === "ACOS"));
+  setCheckboxVal('sis-perm-manage-prod', emp.canManageProducts !== undefined ? !!emp.canManageProducts : (emp.role === "COS" || emp.role === "ACOS"));
+  setCheckboxVal('sis-perm-manage-staff', emp.canManageEmployees !== undefined ? !!emp.canManageEmployees : (emp.role === "COS"));
 
   switchStaffModalTab('form');
 }
@@ -614,6 +641,7 @@ function onSisStaffRoleChange() {
 
   if (role === 'COS') {
     // All 8 permissions checked
+    setCheckboxVal('sis-perm-void-retur', true);
     setCheckboxVal('sis-perm-void', true);
     setCheckboxVal('sis-perm-retur', true);
     setCheckboxVal('sis-perm-so', true);
@@ -621,11 +649,13 @@ function onSisStaffRoleChange() {
     setCheckboxVal('sis-perm-diskon', true);
     setCheckboxVal('sis-perm-financials', true);
     setCheckboxVal('sis-perm-drawer', true);
-    setCheckboxVal('sis-perm-manage-staff', true);
-    setCheckboxVal('sis-perm-manage-prod', true);
     setCheckboxVal('sis-perm-lpb', true);
+    setCheckboxVal('sis-perm-waste', true);
+    setCheckboxVal('sis-perm-manage-prod', true);
+    setCheckboxVal('sis-perm-manage-staff', true);
   } else if (role === 'ACOS') {
     // Supervisor permissions (6 items)
+    setCheckboxVal('sis-perm-void-retur', true);
     setCheckboxVal('sis-perm-void', true);
     setCheckboxVal('sis-perm-retur', true);
     setCheckboxVal('sis-perm-so', true);
@@ -633,21 +663,24 @@ function onSisStaffRoleChange() {
     setCheckboxVal('sis-perm-diskon', true);
     setCheckboxVal('sis-perm-financials', false);
     setCheckboxVal('sis-perm-drawer', false);
-    setCheckboxVal('sis-perm-manage-staff', false);
-    setCheckboxVal('sis-perm-manage-prod', true);
     setCheckboxVal('sis-perm-lpb', true);
+    setCheckboxVal('sis-perm-waste', true);
+    setCheckboxVal('sis-perm-manage-prod', true);
+    setCheckboxVal('sis-perm-manage-staff', false);
   } else {
     // Cashier basic
-    setCheckboxVal('sis-perm-void', true);
+    setCheckboxVal('sis-perm-void-retur', false);
+    setCheckboxVal('sis-perm-void', false);
     setCheckboxVal('sis-perm-retur', false);
     setCheckboxVal('sis-perm-so', false);
     setCheckboxVal('sis-perm-klerk', true);
     setCheckboxVal('sis-perm-diskon', true);
     setCheckboxVal('sis-perm-financials', false);
     setCheckboxVal('sis-perm-drawer', false);
-    setCheckboxVal('sis-perm-manage-staff', false);
-    setCheckboxVal('sis-perm-manage-prod', false);
     setCheckboxVal('sis-perm-lpb', false);
+    setCheckboxVal('sis-perm-waste', false);
+    setCheckboxVal('sis-perm-manage-prod', false);
+    setCheckboxVal('sis-perm-manage-staff', false);
   }
 }
 
@@ -687,15 +720,18 @@ function executeSaveSisEmployee() {
     return;
   }
 
+  const voidReturVal = getCheckboxVal('sis-perm-void-retur') || (getCheckboxVal('sis-perm-void') && getCheckboxVal('sis-perm-retur'));
   const permissions = {
-    canVoid: getCheckboxVal('sis-perm-void'),
-    canRetur: getCheckboxVal('sis-perm-retur'),
+    canVoidRetur: voidReturVal,
+    canVoid: voidReturVal,
+    canRetur: voidReturVal,
     canStockOpname: getCheckboxVal('sis-perm-so'),
     canBlindKlerk: getCheckboxVal('sis-perm-klerk') || getCheckboxVal('sis-perm-diskon'),
     canViewFinancials: getCheckboxVal('sis-perm-financials') || getCheckboxVal('sis-perm-drawer'),
-    canManageEmployees: getCheckboxVal('sis-perm-manage-staff'),
+    canStockMutation: getCheckboxVal('sis-perm-lpb'),
+    canWasteStock: getCheckboxVal('sis-perm-waste'),
     canManageProducts: getCheckboxVal('sis-perm-manage-prod'),
-    canStockMutation: getCheckboxVal('sis-perm-lpb')
+    canManageEmployees: getCheckboxVal('sis-perm-manage-staff')
   };
 
   if (sisEditingStaffNik) {

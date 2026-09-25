@@ -3942,75 +3942,75 @@
           </p>
 
           <div class="space-y-1.5 pt-1">
-            <!-- 1. Void -->
+            <!-- 1. Void & Retur -->
             <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
-              <input type="checkbox" id="sis-perm-void" checked class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
+              <input type="checkbox" id="sis-perm-void-retur" checked class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">1. Boleh Void Item &amp; Batal Keranjang [F5]</span>
-                <span class="block text-[10px] text-slate-400">Dapat menghapus baris belanjaan atau membatalkan seluruh transaksi kasir.</span>
+                <span class="block text-xs font-bold text-slate-800">1. Boleh Koreksi Transaksi Kasir (Void &amp; Retur) [F3 / F5]</span>
+                <span class="block text-[10px] text-slate-400">Dapat menghapus baris belanjaan (Void Item), batal keranjang penuh, dan retur refund struk.</span>
               </div>
             </label>
 
-            <!-- 2. Retur -->
-            <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
-              <input type="checkbox" id="sis-perm-retur" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
-              <div>
-                <span class="block text-xs font-bold text-slate-800">2. Boleh Retur Barang &amp; Refund Struk [F3]</span>
-                <span class="block text-[10px] text-slate-400">Dapat memproses pengembalian barang dan refund struk belanja konsumen.</span>
-              </div>
-            </label>
-
-            <!-- 3. Stock Opname -->
+            <!-- 2. Stock Opname -->
             <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
               <input type="checkbox" id="sis-perm-so" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">3. Boleh Koreksi Stock Opname [F6]</span>
-                <span class="block text-[10px] text-slate-400">Dapat menyesuaikan selisih kuantiti fisik rak vs komputer ke stok buku.</span>
+                <span class="block text-xs font-bold text-slate-800">2. Boleh Koreksi Stock Opname Fisik Rak [F6]</span>
+                <span class="block text-[10px] text-slate-400">Dapat menyesuaikan selisih kuantiti fisik rak vs komputer ke pembukuan stok buku.</span>
               </div>
             </label>
 
-            <!-- 4. Blind Klerk Mandiri -->
+            <!-- 3. Blind Klerk Mandiri -->
             <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
               <input type="checkbox" id="sis-perm-klerk" checked class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">4. Boleh Closing / Klerk Mandiri Tanpa COS [F8]</span>
-                <span class="block text-[10px] text-slate-400">Dapat closing shift saat COS tidak ada; omzet sistem disensor dan murni hitung uang fisik.</span>
+                <span class="block text-xs font-bold text-slate-800">3. Boleh Closing Shift / Klerk Mandiri Tanpa COS [F8]</span>
+                <span class="block text-[10px] text-slate-400">Dapat closing shift saat COS tidak ada; omzet sistem disensor dan murni hitung uang fisik laci.</span>
               </div>
             </label>
 
-            <!-- 5. Laporan Finansial & HPP -->
+            <!-- 4. Laporan Finansial & HPP -->
             <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
               <input type="checkbox" id="sis-perm-financials" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">5. Boleh Lihat Laporan Laba Rugi &amp; HPP Toko</span>
-                <span class="block text-[10px] text-slate-400">Melihat modal HPP, margin laba %, laba bersih, rekap kas, dan ekspor laporan lengkap.</span>
+                <span class="block text-xs font-bold text-slate-800">4. Boleh Lihat Laporan Laba Rugi, HPP, &amp; Ekspor Excel Toko</span>
+                <span class="block text-[10px] text-slate-400">Melihat modal HPP, margin laba %, laba bersih, rekap kas harian, dan ekspor laporan lengkap.</span>
               </div>
             </label>
 
-            <!-- 6. Kelola Karyawan -->
-            <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
-              <input type="checkbox" id="sis-perm-manage-staff" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
-              <div>
-                <span class="block text-xs font-bold text-slate-800">6. Boleh Kelola Data Karyawan (Tambah/Edit)</span>
-                <span class="block text-[10px] text-slate-400">Dapat menambah NIK baru, ubah PIN kasir, dan atur otorisasi personil lain.</span>
-              </div>
-            </label>
-
-            <!-- 7. Kelola Produk -->
-            <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
-              <input type="checkbox" id="sis-perm-manage-prod" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
-              <div>
-                <span class="block text-xs font-bold text-slate-800">7. Boleh Kelola Produk &amp; Ubah Harga Jual</span>
-                <span class="block text-[10px] text-slate-400">Dapat menambah produk baru, ubah harga kasir, dan hapus master produk.</span>
-              </div>
-            </label>
-
-            <!-- 8. Mutasi Stok LPB -->
+            <!-- 5. Terima Barang Supplier (LPB) -->
             <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
               <input type="checkbox" id="sis-perm-lpb" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">8. Boleh Mutasi Stok Manual (LPB &amp; BAP Rusak) [F7]</span>
-                <span class="block text-[10px] text-slate-400">Dapat memproses barang masuk supplier (LPB) dan pengeluaran barang rusak.</span>
+                <span class="block text-xs font-bold text-slate-800">5. Boleh Terima Barang Datang Supplier (LPB Faktur) [F7]</span>
+                <span class="block text-[10px] text-slate-400">Dapat memproses barang masuk supplier (LPB) dan mencatat faktur distributor.</span>
+              </div>
+            </label>
+
+            <!-- 6. Pemusnahan Barang (BAP Waste) -->
+            <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
+              <input type="checkbox" id="sis-perm-waste" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
+              <div>
+                <span class="block text-xs font-bold text-slate-800">6. Boleh Pemusnahan Barang Rusak / Kadaluarsa (BAP Waste)</span>
+                <span class="block text-[10px] text-slate-400">Dapat memotong stok barang rusak, cacat, expired, atau hilang via Berita Acara Pemusnahan.</span>
+              </div>
+            </label>
+
+            <!-- 7. Kelola Master Produk & Repack -->
+            <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
+              <input type="checkbox" id="sis-perm-manage-prod" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
+              <div>
+                <span class="block text-xs font-bold text-slate-800">7. Boleh Kelola Master Produk, Ubah Harga, &amp; Repack Stok</span>
+                <span class="block text-[10px] text-slate-400">Dapat menambah produk baru, ubah harga kasir, impor Excel, dan repacking bal ke eceran.</span>
+              </div>
+            </label>
+
+            <!-- 8. Kelola Karyawan, QRIS & Sistem Toko -->
+            <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
+              <input type="checkbox" id="sis-perm-manage-staff" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
+              <div>
+                <span class="block text-xs font-bold text-slate-800">8. Boleh Kelola Karyawan, QRIS, &amp; Sistem Toko (Khusus COS)</span>
+                <span class="block text-[10px] text-slate-400">Dapat kelola staf/PIN, gambar QRIS/rekening, aturan poin member, profil toko, dan backup database.</span>
               </div>
             </label>
           </div>
@@ -8309,81 +8309,81 @@
           </p>
 
           <div class="space-y-2 pt-1">
-            <!-- 1. Void Item & Keranjang -->
+            <!-- 1. Void & Retur -->
             <label class="flex items-start gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition-all">
-              <input type="checkbox" id="emp-perm-void" class="w-4 h-4 text-alfa-red rounded border-slate-300 mt-0.5">
+              <input type="checkbox" id="emp-perm-void-retur" class="w-4 h-4 text-alfa-red rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">Boleh Void Item & Batal Keranjang [F5]</span>
-                <span class="block text-[10px] text-slate-400">Dapat menghapus baris belanjaan atau membatalkan seluruh isi struk langsung.</span>
+                <span class="block text-xs font-bold text-slate-800">1. Boleh Koreksi Transaksi Kasir (Void &amp; Retur) [F3 / F5]</span>
+                <span class="block text-[10px] text-slate-400">Dapat menghapus baris belanjaan (Void Item), batal keranjang penuh, dan retur refund struk.</span>
               </div>
             </label>
 
-            <!-- 2. Retur Penjualan -->
-            <label class="flex items-start gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition-all">
-              <input type="checkbox" id="emp-perm-retur" class="w-4 h-4 text-amber-500 rounded border-slate-300 mt-0.5">
-              <div>
-                <span class="block text-xs font-bold text-slate-800">Boleh Retur Barang & Refund Struk [F3]</span>
-                <span class="block text-[10px] text-slate-400">Dapat memproses pengembalian barang dan refund dana struk belanja konsumen.</span>
-              </div>
-            </label>
-
-            <!-- 3. Stock Opname -->
+            <!-- 2. Stock Opname -->
             <label class="flex items-start gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition-all">
               <input type="checkbox" id="emp-perm-so" class="w-4 h-4 text-purple-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">Boleh Koreksi Stock Opname [F6]</span>
-                <span class="block text-[10px] text-slate-400">Dapat menyesuaikan selisih kuantiti fisik rak vs komputer ke pembukuan stok.</span>
+                <span class="block text-xs font-bold text-slate-800">2. Boleh Koreksi Stock Opname Fisik Rak [F6]</span>
+                <span class="block text-[10px] text-slate-400">Dapat menyesuaikan selisih kuantiti fisik rak vs komputer ke pembukuan stok buku.</span>
               </div>
             </label>
 
-            <!-- 4. Blind Klerk Mandiri -->
+            <!-- 3. Blind Klerk Mandiri -->
             <label class="flex items-start gap-2.5 p-2.5 bg-white border border-emerald-200 rounded-xl hover:bg-emerald-50/50 cursor-pointer transition-all">
               <input type="checkbox" id="emp-perm-klerk" class="w-4 h-4 text-emerald-600 rounded border-slate-300 mt-0.5">
               <div>
                 <div class="flex items-center gap-1.5">
-                  <span class="text-xs font-bold text-slate-800">Boleh Klerk Mandiri Tanpa COS [F8]</span>
+                  <span class="text-xs font-bold text-slate-800">3. Boleh Closing Shift / Klerk Mandiri Tanpa COS [F8]</span>
                   <span class="px-1.5 py-0.2 bg-emerald-100 text-emerald-800 text-[9px] font-black rounded-full">Blind View</span>
                 </div>
-                <span class="block text-[10px] text-slate-500">Dapat closing shift saat COS tidak ada; omzet sistem disensor dan murni hitung uang fisik.</span>
+                <span class="block text-[10px] text-slate-500">Dapat closing shift saat COS tidak ada; omzet sistem disensor dan murni hitung uang fisik laci.</span>
               </div>
             </label>
 
-            <!-- 5. Laba Rugi & HPP -->
+            <!-- 4. Laba Rugi & HPP -->
             <label class="flex items-start gap-2.5 p-2.5 bg-white border border-blue-200 rounded-xl hover:bg-blue-50/50 cursor-pointer transition-all">
               <input type="checkbox" id="emp-perm-financials" class="w-4 h-4 text-blue-600 rounded border-slate-300 mt-0.5">
               <div>
                 <div class="flex items-center gap-1.5">
-                  <span class="text-xs font-bold text-slate-800">Boleh Lihat Laporan Laba Rugi & HPP Toko</span>
+                  <span class="text-xs font-bold text-slate-800">4. Boleh Lihat Laporan Laba Rugi, HPP, &amp; Ekspor Excel Toko</span>
                   <span class="px-1.5 py-0.2 bg-blue-100 text-blue-800 text-[9px] font-black rounded-full">Owner / COS</span>
                 </div>
-                <span class="block text-[10px] text-slate-500">Melihat modal HPP, persentase margin %, laba bersih, dan akses bebas dashboard online.</span>
+                <span class="block text-[10px] text-slate-500">Melihat modal HPP, margin laba %, laba bersih, rekap kas harian, dan ekspor laporan lengkap.</span>
               </div>
             </label>
 
-            <!-- 6. Kelola Data Karyawan -->
+            <!-- 5. Terima Barang Supplier (LPB) -->
             <label class="flex items-start gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition-all">
-              <input type="checkbox" id="emp-perm-manage-emp" class="w-4 h-4 text-indigo-600 rounded border-slate-300 mt-0.5">
+              <input type="checkbox" id="emp-perm-lpb" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">Boleh Kelola Data Karyawan (Tambah / Edit)</span>
-                <span class="block text-[10px] text-slate-400">Dapat menambah NIK baru, mengubah PIN, dan mengatur hak otorisasi karyawan lain.</span>
+                <span class="block text-xs font-bold text-slate-800">5. Boleh Terima Barang Datang Supplier (LPB Faktur) [F7]</span>
+                <span class="block text-[10px] text-slate-400">Dapat memproses barang masuk supplier (LPB) dan mencatat faktur distributor.</span>
               </div>
             </label>
 
-            <!-- 7. Kelola Produk & Harga Jual -->
+            <!-- 6. Pemusnahan Barang (BAP Waste) -->
+            <label class="flex items-start gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition-all">
+              <input type="checkbox" id="emp-perm-waste" class="w-4 h-4 text-rose-500 rounded border-slate-300 mt-0.5">
+              <div>
+                <span class="block text-xs font-bold text-slate-800">6. Boleh Pemusnahan Barang Rusak / Kadaluarsa (BAP Waste)</span>
+                <span class="block text-[10px] text-slate-400">Dapat memotong stok barang rusak, cacat, expired, atau hilang via Berita Acara Pemusnahan.</span>
+              </div>
+            </label>
+
+            <!-- 7. Kelola Master Produk & Repack -->
             <label class="flex items-start gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition-all">
               <input type="checkbox" id="emp-perm-manage-prod" class="w-4 h-4 text-rose-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">Boleh Kelola Produk & Ubah Harga Jual</span>
-                <span class="block text-[10px] text-slate-400">Dapat menambah produk baru, mengedit harga jual kasir, dan menghapus master produk.</span>
+                <span class="block text-xs font-bold text-slate-800">7. Boleh Kelola Master Produk, Ubah Harga, &amp; Repack Stok</span>
+                <span class="block text-[10px] text-slate-400">Dapat menambah produk baru, ubah harga kasir, impor Excel, dan repacking bal ke eceran.</span>
               </div>
             </label>
 
-            <!-- 8. Mutasi Stok LPB/BAP Rusak -->
+            <!-- 8. Kelola Karyawan, QRIS & Sistem Toko -->
             <label class="flex items-start gap-2.5 p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition-all">
-              <input type="checkbox" id="emp-perm-stock-mut" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
+              <input type="checkbox" id="emp-perm-manage-emp" class="w-4 h-4 text-indigo-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">Boleh Mutasi Stok Manual (LPB & BAP Rusak) [F7]</span>
-                <span class="block text-[10px] text-slate-400">Dapat memproses barang masuk supplier (LPB) dan pengeluaran barang rusak/expired.</span>
+                <span class="block text-xs font-bold text-slate-800">8. Boleh Kelola Karyawan, QRIS, &amp; Sistem Toko (Khusus COS)</span>
+                <span class="block text-[10px] text-slate-400">Dapat kelola staf/PIN, gambar QRIS/rekening, aturan poin member, profil toko, dan backup database.</span>
               </div>
             </label>
           </div>
@@ -9101,36 +9101,36 @@
 
   <!-- Scripts -->
   <!-- Core Data & Storage -->
-  <script src="products-data.js?v=257"></script>
-  <script src="js/db.js?v=257"></script>
-  <script src="js/store.js?v=257"></script>
-  <script src="js/license.js?v=257"></script>
-  <script src="js/sync.js?v=257"></script>
+  <script src="products-data.js?v=258"></script>
+  <script src="js/db.js?v=258"></script>
+  <script src="js/store.js?v=258"></script>
+  <script src="js/license.js?v=258"></script>
+  <script src="js/sync.js?v=258"></script>
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=257"></script>
-  <script src="js/cart.js?v=257"></script>
-  <script src="js/printer.js?v=257"></script>
-  <script src="js/checkout.js?v=257"></script>
-  <script src="js/member.js?v=257"></script>
-  <script src="js/returns.js?v=257"></script>
-  <script src="js/stock-opname.js?v=257"></script>
-  <script src="js/klerk.js?v=257"></script>
-  <script src="js/inventory.js?v=257"></script>
+  <script src="js/scanner.js?v=258"></script>
+  <script src="js/cart.js?v=258"></script>
+  <script src="js/printer.js?v=258"></script>
+  <script src="js/checkout.js?v=258"></script>
+  <script src="js/member.js?v=258"></script>
+  <script src="js/returns.js?v=258"></script>
+  <script src="js/stock-opname.js?v=258"></script>
+  <script src="js/klerk.js?v=258"></script>
+  <script src="js/inventory.js?v=258"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/import-products.js?v=257"></script>
-  <script src="js/repack.js?v=257"></script>
-  <script src="js/reports.js?v=257"></script>
-  <script src="js/settings.js?v=257"></script>
-  <script src="js/employees.js?v=257"></script>
+  <script src="js/import-products.js?v=258"></script>
+  <script src="js/repack.js?v=258"></script>
+  <script src="js/reports.js?v=258"></script>
+  <script src="js/settings.js?v=258"></script>
+  <script src="js/employees.js?v=258"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=257"></script>
-  <script src="js/sis-logistics.js?v=257"></script>
-  <script src="js/sis-cashier-ops.js?v=257"></script>
-  <script src="js/sis-store-crm.js?v=257"></script>
-  <script src="js/sis-analytics.js?v=257"></script>
+  <script src="js/app.js?v=258"></script>
+  <script src="js/sis-logistics.js?v=258"></script>
+  <script src="js/sis-cashier-ops.js?v=258"></script>
+  <script src="js/sis-store-crm.js?v=258"></script>
+  <script src="js/sis-analytics.js?v=258"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -10321,6 +10321,30 @@
         }
       }
 
+      // 5. Guard Akses Profil Toko & Struk (COS / Pejabat)
+      if (modalId === 'sis-modal-profile') {
+        if (pos.currentUser && (pos.currentUser.role === "CREW" || (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")))) {
+          if (typeof requestSupervisorAuth === "function") {
+            requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Akses Profil Toko & Struk (Khusus Pejabat)", (supervisor) => {
+              executeOpenSisModal(modalId);
+            });
+            return;
+          }
+        }
+      }
+
+      // 6. Guard Akses Aturan Poin Member (COS / Pejabat)
+      if (modalId === 'sis-modal-member-rules') {
+        if (pos.currentUser && (pos.currentUser.role === "CREW" || (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")))) {
+          if (typeof requestSupervisorAuth === "function") {
+            requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Akses Aturan Poin Member (Khusus Pejabat)", (supervisor) => {
+              executeOpenSisModal(modalId);
+            });
+            return;
+          }
+        }
+      }
+
       executeOpenSisModal(modalId);
     }
 
@@ -11185,7 +11209,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=257')
+          navigator.serviceWorker.register('./sw.js?v=258')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

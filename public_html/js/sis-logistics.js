@@ -1398,8 +1398,8 @@ function selectSisWasteProduct(prod) {
 }
 
 function saveSisWaste() {
-  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Pemusnahan Barang (BAP Waste / Barang Rusak)", (supervisor) => {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_WASTE")) {
+    requestSupervisorAuth("STOCK_WASTE", "Otorisasi Pemusnahan Barang (BAP Waste / Barang Rusak)", (supervisor) => {
       executeSaveSisWaste(supervisor);
     });
     return;
@@ -1522,8 +1522,8 @@ function updateRepackSummary() {
 }
 
 function executeRepackProcess() {
-  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repack Bal ke Eceran", (supervisor) => {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Repack Bal ke Eceran", (supervisor) => {
       executeFinalRepackProcess(supervisor);
     });
     return;

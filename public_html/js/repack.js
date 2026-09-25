@@ -11,8 +11,8 @@ let activeRepackTab = "form"; // "form" | "history"
  * @param {string|null} preselectedSourceId - ID produk asal opsional jika diklik dari tabel produk
  */
 function openRepackModal(preselectedSourceId = null) {
-  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repacking / Mutasi Stok (Khusus Pejabat Toko)", (supervisor) => {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Repacking / Mutasi Stok (Khusus Pejabat Toko)", (supervisor) => {
       executeOpenRepackModal(preselectedSourceId, supervisor);
     });
     return;
@@ -317,8 +317,8 @@ function calculateRepackPreview() {
  * Eksekusi repacking stok
  */
 function executeRepacking() {
-  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repacking / Mutasi Stok (Khusus Pejabat Toko)", (supervisor) => {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Repacking / Mutasi Stok (Khusus Pejabat Toko)", (supervisor) => {
       executeFinalRepacking(supervisor);
     });
     return;

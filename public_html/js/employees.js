@@ -444,11 +444,12 @@ let currentSupervisorActionType = null;
 
 function hasPermissionForAction(user, actionType) {
   if (!user) return true;
-  if (actionType === "VOID_ITEM" || actionType === "VOID_CART") {
+  if (actionType === "VOID_ITEM" || actionType === "VOID_CART" || actionType === "RETUR_SALE") {
+    if (user.canVoidRetur !== undefined) return user.canVoidRetur;
+    if (actionType === "RETUR_SALE") {
+      return user.canRetur !== undefined ? user.canRetur : (user.role === "COS" || user.role === "ACOS");
+    }
     return user.canVoid !== undefined ? user.canVoid : (user.role === "COS" || user.role === "ACOS");
-  }
-  if (actionType === "RETUR_SALE") {
-    return user.canRetur !== undefined ? user.canRetur : (user.role === "COS" || user.role === "ACOS");
   }
   if (actionType === "STOCK_OPNAME") {
     return user.canStockOpname !== undefined ? user.canStockOpname : (user.role === "COS" || user.role === "ACOS");
@@ -467,6 +468,12 @@ function hasPermissionForAction(user, actionType) {
   }
   if (actionType === "STOCK_MUTATION") {
     return user.canStockMutation !== undefined ? user.canStockMutation : (user.role === "COS" || user.role === "ACOS");
+  }
+  if (actionType === "STOCK_WASTE") {
+    return user.canWasteStock !== undefined ? user.canWasteStock : (user.role === "COS" || user.role === "ACOS");
+  }
+  if (actionType === "CASH_DROP") {
+    return (user.role === "COS" || user.role === "ACOS");
   }
   return (user.role === "COS" || user.role === "ACOS");
 }
@@ -786,14 +793,16 @@ function executeOpenEmployeeModal(nik = null, supervisor = null) {
   const roleInput = document.getElementById("emp-form-role");
   const shiftInput = document.getElementById("emp-form-shift");
 
+  const permVoidRetur = document.getElementById("emp-perm-void-retur");
   const permVoid = document.getElementById("emp-perm-void");
   const permRetur = document.getElementById("emp-perm-retur");
   const permSo = document.getElementById("emp-perm-so");
   const permKlerk = document.getElementById("emp-perm-klerk");
   const permFinancials = document.getElementById("emp-perm-financials");
-  const permManageEmp = document.getElementById("emp-perm-manage-emp");
+  const permLpb = document.getElementById("emp-perm-lpb") || document.getElementById("emp-perm-stock-mut");
+  const permWaste = document.getElementById("emp-perm-waste");
   const permManageProd = document.getElementById("emp-perm-manage-prod");
-  const permStockMut = document.getElementById("emp-perm-stock-mut");
+  const permManageEmp = document.getElementById("emp-perm-manage-emp");
 
   if (nik) {
     const emp = (pos.employees || []).find(e => e.nik === nik);
@@ -807,14 +816,17 @@ function executeOpenEmployeeModal(nik = null, supervisor = null) {
     if (roleInput) roleInput.value = emp.role || "CREW";
     if (shiftInput) shiftInput.value = emp.shift || "Shift 1";
 
-    if (permVoid) permVoid.checked = !!emp.canVoid;
-    if (permRetur) permRetur.checked = !!emp.canRetur;
+    const isVoidRetur = emp.canVoidRetur !== undefined ? !!emp.canVoidRetur : (!!emp.canVoid || !!emp.canRetur);
+    if (permVoidRetur) permVoidRetur.checked = isVoidRetur;
+    if (permVoid) permVoid.checked = isVoidRetur;
+    if (permRetur) permRetur.checked = isVoidRetur;
     if (permSo) permSo.checked = !!emp.canStockOpname;
     if (permKlerk) permKlerk.checked = emp.canBlindKlerk !== undefined ? !!emp.canBlindKlerk : true;
     if (permFinancials) permFinancials.checked = emp.canViewFinancials !== undefined ? !!emp.canViewFinancials : (emp.role === "COS");
-    if (permManageEmp) permManageEmp.checked = emp.canManageEmployees !== undefined ? !!emp.canManageEmployees : (emp.role === "COS");
+    if (permLpb) permLpb.checked = emp.canStockMutation !== undefined ? !!emp.canStockMutation : (emp.role === "COS" || emp.role === "ACOS");
+    if (permWaste) permWaste.checked = emp.canWasteStock !== undefined ? !!emp.canWasteStock : (emp.role === "COS" || emp.role === "ACOS");
     if (permManageProd) permManageProd.checked = emp.canManageProducts !== undefined ? !!emp.canManageProducts : (emp.role === "COS" || emp.role === "ACOS");
-    if (permStockMut) permStockMut.checked = emp.canStockMutation !== undefined ? !!emp.canStockMutation : (emp.role === "COS" || emp.role === "ACOS");
+    if (permManageEmp) permManageEmp.checked = emp.canManageEmployees !== undefined ? !!emp.canManageEmployees : (emp.role === "COS");
   } else {
     if (title) title.textContent = "Tambah Karyawan Baru";
     if (origNikInput) origNikInput.value = "";
@@ -827,14 +839,16 @@ function executeOpenEmployeeModal(nik = null, supervisor = null) {
     if (roleInput) roleInput.value = "CREW";
     if (shiftInput) shiftInput.value = "Shift 1";
 
+    if (permVoidRetur) permVoidRetur.checked = false;
     if (permVoid) permVoid.checked = false;
     if (permRetur) permRetur.checked = false;
     if (permSo) permSo.checked = false;
     if (permKlerk) permKlerk.checked = true;
     if (permFinancials) permFinancials.checked = false;
-    if (permManageEmp) permManageEmp.checked = false;
+    if (permLpb) permLpb.checked = false;
+    if (permWaste) permWaste.checked = false;
     if (permManageProd) permManageProd.checked = false;
-    if (permStockMut) permStockMut.checked = false;
+    if (permManageEmp) permManageEmp.checked = false;
   }
 
   openModal("modal-employee-form");
@@ -842,44 +856,52 @@ function executeOpenEmployeeModal(nik = null, supervisor = null) {
 }
 
 function onEmployeeRoleChange(role) {
+  const permVoidRetur = document.getElementById("emp-perm-void-retur");
   const permVoid = document.getElementById("emp-perm-void");
   const permRetur = document.getElementById("emp-perm-retur");
   const permSo = document.getElementById("emp-perm-so");
   const permKlerk = document.getElementById("emp-perm-klerk");
   const permFinancials = document.getElementById("emp-perm-financials");
-  const permManageEmp = document.getElementById("emp-perm-manage-emp");
+  const permLpb = document.getElementById("emp-perm-lpb") || document.getElementById("emp-perm-stock-mut");
+  const permWaste = document.getElementById("emp-perm-waste");
   const permManageProd = document.getElementById("emp-perm-manage-prod");
-  const permStockMut = document.getElementById("emp-perm-stock-mut");
+  const permManageEmp = document.getElementById("emp-perm-manage-emp");
 
   // Preset otomatis berdasarkan standar peran toko
   if (role === "COS") {
+    if (permVoidRetur) permVoidRetur.checked = true;
     if (permVoid) permVoid.checked = true;
     if (permRetur) permRetur.checked = true;
     if (permSo) permSo.checked = true;
     if (permKlerk) permKlerk.checked = true;
     if (permFinancials) permFinancials.checked = true;
-    if (permManageEmp) permManageEmp.checked = true;
+    if (permLpb) permLpb.checked = true;
+    if (permWaste) permWaste.checked = true;
     if (permManageProd) permManageProd.checked = true;
-    if (permStockMut) permStockMut.checked = true;
+    if (permManageEmp) permManageEmp.checked = true;
   } else if (role === "ACOS") {
+    if (permVoidRetur) permVoidRetur.checked = true;
     if (permVoid) permVoid.checked = true;
     if (permRetur) permRetur.checked = true;
     if (permSo) permSo.checked = true;
     if (permKlerk) permKlerk.checked = true;
     if (permFinancials) permFinancials.checked = false;
-    if (permManageEmp) permManageEmp.checked = false;
+    if (permLpb) permLpb.checked = true;
+    if (permWaste) permWaste.checked = true;
     if (permManageProd) permManageProd.checked = true;
-    if (permStockMut) permStockMut.checked = true;
+    if (permManageEmp) permManageEmp.checked = false;
   } else {
     // CREW: Default hanya Klerk Mandiri (Blind View) yang aktif
+    if (permVoidRetur) permVoidRetur.checked = false;
     if (permVoid) permVoid.checked = false;
     if (permRetur) permRetur.checked = false;
     if (permSo) permSo.checked = false;
     if (permKlerk) permKlerk.checked = true;
     if (permFinancials) permFinancials.checked = false;
-    if (permManageEmp) permManageEmp.checked = false;
+    if (permLpb) permLpb.checked = false;
+    if (permWaste) permWaste.checked = false;
     if (permManageProd) permManageProd.checked = false;
-    if (permStockMut) permStockMut.checked = false;
+    if (permManageEmp) permManageEmp.checked = false;
   }
 }
 
@@ -903,14 +925,17 @@ function executeSaveEmployee(supervisor = null) {
   const role = document.getElementById("emp-form-role")?.value || "CREW";
   const shift = document.getElementById("emp-form-shift")?.value.trim() || "Shift 1";
 
-  const canVoid = !!document.getElementById("emp-perm-void")?.checked;
-  const canRetur = !!document.getElementById("emp-perm-retur")?.checked;
+  const voidReturEl = document.getElementById("emp-perm-void-retur");
+  const canVoidRetur = voidReturEl ? !!voidReturEl.checked : (!!document.getElementById("emp-perm-void")?.checked || !!document.getElementById("emp-perm-retur")?.checked);
+  const canVoid = canVoidRetur;
+  const canRetur = canVoidRetur;
   const canStockOpname = !!document.getElementById("emp-perm-so")?.checked;
   const canBlindKlerk = !!document.getElementById("emp-perm-klerk")?.checked;
   const canViewFinancials = !!document.getElementById("emp-perm-financials")?.checked;
-  const canManageEmployees = !!document.getElementById("emp-perm-manage-emp")?.checked;
+  const canStockMutation = !!(document.getElementById("emp-perm-lpb")?.checked || document.getElementById("emp-perm-stock-mut")?.checked);
+  const canWasteStock = !!document.getElementById("emp-perm-waste")?.checked;
   const canManageProducts = !!document.getElementById("emp-perm-manage-prod")?.checked;
-  const canStockMutation = !!document.getElementById("emp-perm-stock-mut")?.checked;
+  const canManageEmployees = !!document.getElementById("emp-perm-manage-emp")?.checked;
 
   if (!nik || !name || !pin) {
     showToast("Harap isi NIK, Nama, dan PIN karyawan!", "warning");
@@ -941,14 +966,16 @@ function executeSaveEmployee(supervisor = null) {
       emp.pin = pin;
       emp.role = role;
       emp.shift = shift;
+      emp.canVoidRetur = canVoidRetur;
       emp.canVoid = canVoid;
       emp.canRetur = canRetur;
       emp.canStockOpname = canStockOpname;
       emp.canBlindKlerk = canBlindKlerk;
       emp.canViewFinancials = canViewFinancials;
-      emp.canManageEmployees = canManageEmployees;
-      emp.canManageProducts = canManageProducts;
       emp.canStockMutation = canStockMutation;
+      emp.canWasteStock = canWasteStock;
+      emp.canManageProducts = canManageProducts;
+      emp.canManageEmployees = canManageEmployees;
 
       if (pos.currentUser && pos.currentUser.nik === origNik) {
         pos.saveCurrentUser(emp);
@@ -966,14 +993,16 @@ function executeSaveEmployee(supervisor = null) {
       pin,
       role,
       shift,
+      canVoidRetur,
       canVoid,
       canRetur,
       canStockOpname,
       canBlindKlerk,
       canViewFinancials,
-      canManageEmployees,
+      canStockMutation,
+      canWasteStock,
       canManageProducts,
-      canStockMutation
+      canManageEmployees
     });
   }
 
