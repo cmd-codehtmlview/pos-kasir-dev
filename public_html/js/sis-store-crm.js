@@ -539,9 +539,12 @@ function renderSisStaffList() {
       roleTitle = 'Asst. Chief of Store (Supervisor)';
     }
 
-    // Count permissions
-    const permKeys = ['canVoid', 'canRetur', 'canStockOpname', 'canBlindKlerk', 'canViewFinancials', 'canManageEmployees', 'canManageProducts', 'canStockMutation'];
-    const activePerms = permKeys.filter(k => emp[k] === true).length;
+    // Count permissions (8 checklist terstruktur)
+    const permKeys = ['canVoidRetur', 'canStockOpname', 'canBlindKlerk', 'canViewFinancials', 'canStockMutation', 'canWasteStock', 'canManageProducts', 'canManageEmployees'];
+    const activePerms = permKeys.filter(k => {
+      if (k === 'canVoidRetur') return emp.canVoidRetur !== undefined ? !!emp.canVoidRetur : (!!emp.canVoid || !!emp.canRetur);
+      return !!emp[k];
+    }).length;
 
     return `
       <div class="p-3 bg-white border border-slate-200/80 rounded-2xl flex items-center justify-between hover:border-amber-300 transition shadow-2xs">
