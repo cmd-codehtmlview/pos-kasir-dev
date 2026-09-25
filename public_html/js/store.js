@@ -671,6 +671,12 @@ class SoundFx {
   }
 
   beep() {
+    try {
+      if (typeof NativeDevice !== 'undefined' && NativeDevice.haptic) {
+        NativeDevice.haptic.light();
+      }
+    } catch (e) {}
+
     if (!pos.settings.enableSound) return;
     try {
       const ctx = this.getAudioContext();
@@ -688,6 +694,12 @@ class SoundFx {
   }
 
   success() {
+    try {
+      if (typeof NativeDevice !== 'undefined' && NativeDevice.haptic) {
+        NativeDevice.haptic.success();
+      }
+    } catch (e) {}
+
     if (!pos.settings.enableSound) return;
     try {
       const ctx = this.getAudioContext();
@@ -708,6 +720,12 @@ class SoundFx {
   }
 
   warning() {
+    try {
+      if (typeof NativeDevice !== 'undefined' && NativeDevice.haptic) {
+        NativeDevice.haptic.warning();
+      }
+    } catch (e) {}
+
     if (!pos.settings.enableSound) return;
     try {
       const ctx = this.getAudioContext();
