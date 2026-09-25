@@ -685,6 +685,11 @@ function executeSaveSisEmployee() {
       emp.pin = pin;
       emp.role = role;
       Object.assign(emp, permissions);
+      if (role === 'COS' && pos.settings) {
+        pos.settings.supervisorPin = pin;
+        pos.settings.cosPin = pin;
+        if (typeof pos.saveSettings === 'function') pos.saveSettings();
+      }
     }
     if (typeof showMockupToast === 'function') {
       showMockupToast(`👤 Data karyawan "${name}" berhasil diperbarui!`, 'success');
@@ -707,6 +712,11 @@ function executeSaveSisEmployee() {
       ...permissions
     };
     pos.employees.push(newEmp);
+    if (role === 'COS' && pos.settings) {
+      pos.settings.supervisorPin = pin;
+      pos.settings.cosPin = pin;
+      if (typeof pos.saveSettings === 'function') pos.saveSettings();
+    }
     if (typeof showMockupToast === 'function') {
       showMockupToast(`🎉 Karyawan baru "${name}" berhasil ditambahkan!`, 'success');
     }

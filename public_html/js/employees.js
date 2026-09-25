@@ -488,30 +488,116 @@ function requestSupervisorAuth(actionType, arg2, arg3) {
   currentSupervisorActionType = actionType;
   pendingSupervisorCallback = onApproved;
   const descEl = document.getElementById("auth-action-description");
-  const nikInput = document.getElementById("auth-supervisor-nik");
+  const nikSelect = document.getElementById("auth-supervisor-nik");
   const pinInput = document.getElementById("auth-supervisor-pin");
   const errEl = document.getElementById("auth-error-msg");
 
   if (descEl) descEl.textContent = actionDesc || "Tindakan Kasir Dibatasi";
-  if (nikInput) nikInput.value = "";
   if (pinInput) pinInput.value = "";
   if (errEl) errEl.classList.add("hidden");
 
+  // Isi dropdown pejabat toko secara dinamis
+  if (nikSelect) {
+    const supervisors = (pos.employees || []).filter(e => e.role === "COS" || e.role === "ACOS");
+    let optionsHtml = `<option value="AUTO">⚡ Verifikasi Cepat (Cukup Masukkan PIN Pejabat)</option>`;
+    if (supervisors.length > 0) {
+      optionsHtml += supervisors.map(s => 
+        `<option value="${s.nik}">🛡️ ${s.role} - ${s.name} (NIK: ${s.nik})</option>`
+      ).join("");
+    }
+    nikSelect.innerHTML = optionsHtml;
+    // Defaultkan ke supervisor pertama jika ada, atau AUTO
+    nikSelect.value = supervisors.length > 0 ? supervisors[0].nik : "AUTO";
+  }
+
   openModal("modal-supervisor-auth");
-  setTimeout(() => nikInput?.focus(), 150);
+  setTimeout(() => pinInput?.focus(), 150);
 }
 
 function handleSupervisorAuthSubmit(event) {
   if (event && event.preventDefault) event.preventDefault();
 
-  const nik = document.getElementById("auth-supervisor-nik")?.value.trim();
-  const pin = document.getElementById("auth-supervisor-pin")?.value.trim();
+  const nik = (document.getElementById("auth-supervisor-nik")?.value || "").trim();
+  const pin = (document.getElementById("auth-supervisor-pin")?.value || "").trim();
   const errEl = document.getElementById("auth-error-msg");
 
-  const supervisor = (pos.employees || []).find(e => e.nik === nik);
+  if (!pin) {
+    if (errEl) {
+      errEl.textContent = "Harap masukkan PIN Pejabat Toko!";
+      errEl.classList.remove("hidden");
+    }
+    sfx.warning();
+    return;
+  }
+
+  let supervisor = null;
+  const employees = Array.isArray(pos.employees) ? pos.employees : [];
+
+  // 1. Jika NIK spesifik dipilih dan bukan "AUTO"
+  if (nik && nik !== "AUTO") {
+    supervisor = employees.find(e => String(e.nik) === nik);
+    if (supervisor) {
+      const pinMatches = (
+        String(supervisor.pin).trim() === pin ||
+        (supervisor.role === "COS" && (
+          (pos.settings && (String(pos.settings.supervisorPin).trim() === pin || String(pos.settings.cosPin).trim() === pin)) ||
+          pin === "1234"
+        ))
+      );
+      if (!pinMatches) {
+        // Cek apakah PIN cocok dengan supervisor COS/ACOS lain di toko
+        const altSupervisor = employees.find(e => 
+          (e.role === "COS" || e.role === "ACOS") && String(e.pin).trim() === pin
+        );
+        if (altSupervisor) {
+          supervisor = altSupervisor;
+        } else {
+          if (errEl) {
+            errEl.textContent = `PIN Pejabat untuk ${supervisor.name} (${supervisor.role}) salah!`;
+            errEl.classList.remove("hidden");
+          }
+          sfx.warning();
+          return;
+        }
+      }
+    }
+  }
+
+  // 2. Jika mode AUTO atau NIK tidak ditemukan: cari Pejabat Toko berdasarkan PIN yang dimasukkan
+  if (!supervisor) {
+    // Cari karyawan Pejabat Toko (COS/ACOS) dengan PIN yang sesuai
+    supervisor = employees.find(e => 
+      (e.role === "COS" || e.role === "ACOS" || hasPermissionForAction(e, currentSupervisorActionType)) && 
+      String(e.pin).trim() === pin
+    );
+
+    // Fallback: cek ke setting supervisorPin / cosPin / universal default PIN "1234"
+    if (!supervisor) {
+      const isSettingsPin = (
+        (pos.settings && (String(pos.settings.supervisorPin).trim() === pin || String(pos.settings.cosPin).trim() === pin)) ||
+        pin === "1234"
+      );
+      if (isSettingsPin) {
+        supervisor = employees.find(e => e.role === "COS") || employees.find(e => e.role === "ACOS") || {
+          nik: "COS-01",
+          name: "Kepala Toko (COS)",
+          role: "COS",
+          canVoid: true,
+          canRetur: true,
+          canStockOpname: true,
+          canBlindKlerk: true,
+          canViewFinancials: true,
+          canManageEmployees: true,
+          canManageProducts: true,
+          canStockMutation: true
+        };
+      }
+    }
+  }
+
   if (!supervisor) {
     if (errEl) {
-      errEl.textContent = `NIK "${nik}" tidak terdaftar di data karyawan toko!`;
+      errEl.textContent = "PIN Pejabat Toko (COS/ACOS) tidak cocok!";
       errEl.classList.remove("hidden");
     }
     sfx.warning();
@@ -522,15 +608,6 @@ function handleSupervisorAuthSubmit(event) {
   if (!hasPermissionForAction(supervisor, currentSupervisorActionType)) {
     if (errEl) {
       errEl.textContent = `User ${supervisor.name} (${supervisor.role}) tidak memiliki izin untuk aksi ini!`;
-      errEl.classList.remove("hidden");
-    }
-    sfx.warning();
-    return;
-  }
-
-  if (supervisor.pin !== pin) {
-    if (errEl) {
-      errEl.textContent = "PIN Pejabat / Pengawas Salah!";
       errEl.classList.remove("hidden");
     }
     sfx.warning();

@@ -8705,15 +8705,14 @@
       <form id="form-supervisor-auth" onsubmit="handleSupervisorAuthSubmit(event)" class="p-4 sm:p-5 space-y-3 sm:space-y-3.5 overflow-y-auto flex-1 custom-scrollbar">
         <div>
           <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1">
-            NIK Pejabat Toko (COS / ACOS) *
+            Pilih Pejabat Toko (COS / ACOS)
           </label>
-          <input 
-            type="text" 
+          <select 
             id="auth-supervisor-nik" 
-            required 
-            placeholder="Ketik NIK Pejabat (COS / ACOS)" 
-            class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
-          />
+            class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer"
+          >
+            <option value="AUTO">⚡ Verifikasi Cepat (Cukup Masukkan PIN Pejabat)</option>
+          </select>
         </div>
 
         <div>
@@ -8724,9 +8723,9 @@
             type="password" 
             id="auth-supervisor-pin" 
             required 
-            placeholder="Masukkan PIN Pejabat" 
+            placeholder="Ketik PIN Pejabat (Contoh: 1234)" 
             maxlength="8"
-            class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 tracking-widest"
+            class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 tracking-widest text-center text-sm"
           />
         </div>
 
@@ -9102,37 +9101,37 @@
 
   <!-- Scripts -->
   <!-- Core Data & Storage -->
-  <script src="products-data.js?v=240"></script>
-  <script src="js/db.js?v=240"></script>
-  <script src="js/store.js?v=240"></script>
-  <script src="js/license.js?v=240"></script>
-  <script src="js/sync.js?v=240"></script>
+  <script src="products-data.js?v=245"></script>
+  <script src="js/db.js?v=245"></script>
+  <script src="js/store.js?v=245"></script>
+  <script src="js/license.js?v=245"></script>
+  <script src="js/sync.js?v=245"></script>
   
 ... [truncated for diff preview]
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=240"></script>
-  <script src="js/cart.js?v=240"></script>
-  <script src="js/printer.js?v=240"></script>
-  <script src="js/checkout.js?v=240"></script>
-  <script src="js/member.js?v=240"></script>
-  <script src="js/returns.js?v=240"></script>
-  <script src="js/stock-opname.js?v=240"></script>
-  <script src="js/klerk.js?v=240"></script>
-  <script src="js/inventory.js?v=240"></script>
+  <script src="js/scanner.js?v=245"></script>
+  <script src="js/cart.js?v=245"></script>
+  <script src="js/printer.js?v=245"></script>
+  <script src="js/checkout.js?v=245"></script>
+  <script src="js/member.js?v=245"></script>
+  <script src="js/returns.js?v=245"></script>
+  <script src="js/stock-opname.js?v=245"></script>
+  <script src="js/klerk.js?v=245"></script>
+  <script src="js/inventory.js?v=245"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/import-products.js?v=240"></script>
-  <script src="js/repack.js?v=240"></script>
-  <script src="js/reports.js?v=240"></script>
-  <script src="js/settings.js?v=240"></script>
-  <script src="js/employees.js?v=240"></script>
+  <script src="js/import-products.js?v=245"></script>
+  <script src="js/repack.js?v=245"></script>
+  <script src="js/reports.js?v=245"></script>
+  <script src="js/settings.js?v=245"></script>
+  <script src="js/employees.js?v=245"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=240"></script>
-  <script src="js/sis-logistics.js?v=240"></script>
-  <script src="js/sis-cashier-ops.js?v=240"></script>
-  <script src="js/sis-store-crm.js?v=240"></script>
-  <script src="js/sis-analytics.js?v=240"></script>
+  <script src="js/app.js?v=245"></script>
+  <script src="js/sis-logistics.js?v=245"></script>
+  <script src="js/sis-cashier-ops.js?v=245"></script>
+  <script src="js/sis-store-crm.js?v=245"></script>
+  <script src="js/sis-analytics.js?v=245"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -11105,7 +11104,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=240')
+          navigator.serviceWorker.register('./sw.js?v=245')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
