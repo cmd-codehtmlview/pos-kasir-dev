@@ -305,6 +305,13 @@ function recalcReturTotals() {
 }
 
 function executeProcessRetur() {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "RETUR_SALE")) {
+    requestSupervisorAuth("RETUR_SALE", "Otorisasi Memproses Retur & Refund Struk Kasir", () => {
+      executeProcessRetur();
+    });
+    return;
+  }
+
   if (!activeReturTrx) return;
 
   const returnedItems = [];
