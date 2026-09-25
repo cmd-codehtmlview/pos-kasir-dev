@@ -9,6 +9,13 @@
 let soPhysicalCounts = {}; // { [productId]: count }
 
 function openStockOpnameModal() {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_OPNAME")) {
+    requestSupervisorAuth("STOCK_OPNAME", "Penyesuaian Fisik Stock Opname Toko [F6]", () => {
+      openStockOpnameModal();
+    });
+    return;
+  }
+
   soPhysicalCounts = {};
   // Defaultkan stok fisik sama dengan stok komputer awal
   pos.products.forEach(p => {

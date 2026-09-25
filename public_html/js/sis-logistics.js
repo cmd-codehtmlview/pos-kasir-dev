@@ -1292,6 +1292,13 @@ function updateSisSoDifference() {
 }
 
 function saveSisSo() {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_OPNAME")) {
+    requestSupervisorAuth("STOCK_OPNAME", "Otorisasi Penyesuaian Fisik Stock Opname", () => {
+      saveSisSo();
+    });
+    return;
+  }
+
   const p = window.selectedSoProduct;
   if (!p) {
     alert("Harap pilih produk yang akan di-stock opname!");
