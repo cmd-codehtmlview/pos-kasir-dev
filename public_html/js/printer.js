@@ -380,11 +380,269 @@ const COMMON_PRINTER_SERVICES = [
 ];
 
 // =========================================================
-// 1. MANAJEMEN KONEKSI WEB BLUETOOTH API
+// JEMBATAN NATIVE BLUETOOTH CAPACITOR (Android APK)
 // =========================================================
+(function initCapacitorBluetoothBridge() {
+  if (typeof window === 'undefined') return;
+
+  function getBlePlugin() {
+    try {
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.BluetoothLe) {
+        return window.Capacitor.Plugins.BluetoothLe;
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  function formatUuid128(uuid) {
+    if (!uuid) return "";
+    let str = String(uuid).toLowerCase().trim();
+    if (/^[0-9a-f]{4}$/.test(str)) {
+      return `0000${str}-0000-1000-8000-00805f9b34fb`;
+    }
+    return str;
+  }
+
+  function toSpaceSeparatedHex(value) {
+    let bytes;
+    if (value instanceof Uint8Array) {
+      bytes = value;
+    } else if (value instanceof ArrayBuffer) {
+      bytes = new Uint8Array(value);
+    } else if (value && value.buffer instanceof ArrayBuffer) {
+      bytes = new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
+    } else if (Array.isArray(value)) {
+      bytes = new Uint8Array(value);
+    } else {
+      bytes = new Uint8Array(value || 0);
+    }
+    const hex = [];
+    for (let i = 0; i < bytes.length; i++) {
+      let h = bytes[i].toString(16);
+      if (h.length === 1) h = '0' + h;
+      hex.push(h);
+    }
+    return hex.join(' ');
+  }
+
+  function setupBridge() {
+    const ble = getBlePlugin();
+    if (!ble) return false;
+
+    // Polyfill navigator.bluetooth if not available in WebView
+    if (typeof navigator !== 'undefined' && (!navigator.bluetooth || !navigator.bluetooth.requestDevice)) {
+      console.log("[Bluetooth] Mengaktifkan Jembatan Native Capacitor BluetoothLe...");
+
+      navigator.bluetooth = {
+        _isCapacitor: true,
+        async getAvailability() {
+          try {
+            await ble.initialize();
+            const res = await ble.isEnabled();
+            return Boolean(res && res.value);
+          } catch(e) {
+            return false;
+          }
+        },
+        async getDevices() {
+          try {
+            await ble.initialize();
+            const bonded = await ble.getBondedDevices();
+            const list = bonded.devices || [];
+            return list.map(d => wrapDevice(d.deviceId, d.name || "Printer Bluetooth"));
+          } catch(e) {
+            return [];
+          }
+        },
+        async requestDevice(options) {
+          await ble.initialize();
+
+          // Cek apakah Bluetooth aktif
+          try {
+            const enabledRes = await ble.isEnabled();
+            if (!enabledRes || !enabledRes.value) {
+              await ble.requestEnable();
+            }
+          } catch(e) {
+            console.warn("[Bluetooth] Request enable Bluetooth:", e);
+          }
+
+          // Panggil picker scanner Android native
+          const scanParams = {};
+          if (options && Array.isArray(options.filters)) {
+            const filterServices = [];
+            options.filters.forEach(f => {
+              if (Array.isArray(f.services)) {
+                f.services.forEach(s => filterServices.push(formatUuid128(s)));
+              }
+            });
+            if (filterServices.length > 0) {
+              scanParams.services = filterServices;
+            }
+          }
+
+          const deviceResult = await ble.requestDevice(scanParams);
+          if (!deviceResult || !deviceResult.deviceId) {
+            throw new DOMException("Pencarian printer dibatalkan.", "NotFoundError");
+          }
+
+          return wrapDevice(deviceResult.deviceId, deviceResult.name || "Printer Thermal");
+        }
+      };
+    }
+    return true;
+  }
+
+  function wrapDevice(deviceId, deviceName) {
+    const listeners = new Map();
+
+    const gattWrapper = {
+      connected: false,
+      async connect() {
+        const ble = getBlePlugin();
+        if (!ble) throw new Error("Capacitor Bluetooth plugin tidak tersedia");
+        console.log(`[Bluetooth] Menghubungkan native BLE ke ${deviceId}...`);
+        await ble.connect({ deviceId });
+        gattWrapper.connected = true;
+        return serverWrapper;
+      },
+      disconnect() {
+        const ble = getBlePlugin();
+        gattWrapper.connected = false;
+        if (ble) ble.disconnect({ deviceId }).catch(() => {});
+        emitEvent('gattserverdisconnected', { target: deviceWrapper });
+      }
+    };
+
+    const serverWrapper = {
+      get connected() {
+        return gattWrapper.connected;
+      },
+      async getPrimaryService(serviceUuid) {
+        const ble = getBlePlugin();
+        const sUuid128 = formatUuid128(serviceUuid);
+        const servicesRes = await ble.getServices({ deviceId });
+        const sList = servicesRes.services || [];
+        const found = sList.find(s => s.uuid.toLowerCase() === sUuid128.toLowerCase());
+        if (!found) {
+          throw new Error("Service Bluetooth tidak ditemukan: " + serviceUuid);
+        }
+        return wrapService(found);
+      },
+      async getPrimaryServices() {
+        const ble = getBlePlugin();
+        const servicesRes = await ble.getServices({ deviceId });
+        const sList = servicesRes.services || [];
+        return sList.map(wrapService);
+      }
+    };
+
+    function wrapService(serviceObj) {
+      const sUuid = formatUuid128(serviceObj.uuid);
+      return {
+        uuid: sUuid,
+        async getCharacteristics() {
+          const cList = serviceObj.characteristics || [];
+          return cList.map(c => wrapCharacteristic(sUuid, c));
+        },
+        async getCharacteristic(charUuid) {
+          const cUuid128 = formatUuid128(charUuid);
+          const cList = serviceObj.characteristics || [];
+          const found = cList.find(c => c.uuid.toLowerCase() === cUuid128.toLowerCase());
+          if (!found) {
+            throw new Error("Characteristic Bluetooth tidak ditemukan: " + charUuid);
+          }
+          return wrapCharacteristic(sUuid, found);
+        }
+      };
+    }
+
+    function wrapCharacteristic(serviceUuid, charObj) {
+      const cUuid = formatUuid128(charObj.uuid);
+      const props = charObj.properties || {};
+      const canWriteWithoutResponse = Boolean(props.writeWithoutResponse || !props.write);
+
+      return {
+        uuid: cUuid,
+        properties: {
+          write: Boolean(props.write),
+          writeWithoutResponse: canWriteWithoutResponse
+        },
+        async writeValue(value) {
+          return sendData(value, false);
+        },
+        async writeValueWithoutResponse(value) {
+          return sendData(value, true);
+        },
+        async writeValueWithResponse(value) {
+          return sendData(value, false);
+        }
+      };
+
+      async function sendData(val, withoutResponse) {
+        const ble = getBlePlugin();
+        if (!ble) throw new Error("Capacitor Bluetooth plugin tidak aktif");
+        const hex = toSpaceSeparatedHex(val);
+        if (withoutResponse) {
+          return ble.writeWithoutResponse({
+            deviceId,
+            service: serviceUuid,
+            characteristic: cUuid,
+            value: hex
+          });
+        } else {
+          return ble.write({
+            deviceId,
+            service: serviceUuid,
+            characteristic: cUuid,
+            value: hex
+          });
+        }
+      }
+    }
+
+    function emitEvent(name, evt) {
+      const list = listeners.get(name) || [];
+      list.forEach(fn => {
+        try { fn(evt); } catch(e) {}
+      });
+    }
+
+    const deviceWrapper = {
+      id: deviceId,
+      name: deviceName,
+      gatt: gattWrapper,
+      addEventListener(event, fn) {
+        if (!listeners.has(event)) listeners.set(event, []);
+        listeners.get(event).push(fn);
+      },
+      removeEventListener(event, fn) {
+        const list = listeners.get(event) || [];
+        listeners.set(event, list.filter(f => f !== fn));
+      }
+    };
+
+    return deviceWrapper;
+  }
+
+  if (!setupBridge()) {
+    document.addEventListener('DOMContentLoaded', setupBridge);
+    window.addEventListener('load', setupBridge);
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if (setupBridge() || attempts > 15) clearInterval(interval);
+    }, 250);
+  }
+})();
 
 function isBluetoothSupported() {
-  return typeof navigator !== 'undefined' && 'bluetooth' in navigator;
+  const isWebBt = typeof navigator !== 'undefined' && 'bluetooth' in navigator;
+  const isCapBt = typeof window !== 'undefined' && Boolean(
+    (window.Capacitor && window.Capacitor.isPluginAvailable && window.Capacitor.isPluginAvailable('BluetoothLe')) ||
+    (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.BluetoothLe)
+  );
+  return Boolean(isWebBt || isCapBt);
 }
 
 function isBluetoothConnected() {

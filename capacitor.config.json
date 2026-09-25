@@ -3,6 +3,7 @@
   "appName": "SnackPOS",
   "webDir": "public_html",
   "server": {
+    "url": "https://2.27.165.72.sslip.io/dev/",
     "androidScheme": "https",
     "cleartext": true,
     "allowNavigation": [
