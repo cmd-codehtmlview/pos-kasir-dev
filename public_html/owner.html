@@ -1101,7 +1101,7 @@
     <!-- ========================================== -->
     <!-- DATA MEMBER & PELANGGAN LOYALITAS ONLINE -->
     <!-- ========================================== -->
-    <section id="section-members-management" class="bg-slate-900 p-4 sm:p-5 rounded-3xl border border-indigo-900/40 stat-card-glow space-y-4 max-w-full overflow-hidden min-w-0">
+    <section id="section-members-management" class="bg-slate-900 p-4 sm:p-5 rounded-3xl border border-indigo-900/40 stat-card-glow space-y-4 max-w-full overflow-hidden min-w-0 scroll-mt-16 sm:scroll-mt-20">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 min-w-0">
         <div class="min-w-0">
           <h3 class="font-black text-sm text-white flex items-center gap-2">
@@ -1194,18 +1194,18 @@
   <!-- ========================================== -->
   <!-- MOBILE BOTTOM NAVIGATION (ALA TIKTOK SELLER CENTER) -->
   <!-- ========================================== -->
-  <nav id="owner-mobile-bottom-nav" class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/90 px-2 py-1.5 sm:hidden shadow-2xl">
-    <div class="grid grid-cols-4 items-center justify-around gap-1 max-w-md mx-auto">
+  <nav id="owner-mobile-bottom-nav" class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/90 px-1.5 py-1.5 sm:hidden shadow-2xl">
+    <div class="grid grid-cols-5 items-center justify-around gap-0.5 max-w-md mx-auto">
       
       <!-- Tab 1: Beranda / Sales Hero -->
       <button 
         type="button" 
         onclick="navToTab('beranda')" 
         id="tab-btn-beranda" 
-        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-1 rounded-xl text-emerald-400 font-bold transition-all active:scale-95 cursor-pointer"
+        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-emerald-400 font-bold transition-all active:scale-95 cursor-pointer"
       >
         <span class="text-base leading-none">📊</span>
-        <span class="tab-text text-[10px] mt-1 font-extrabold tracking-tight text-emerald-400">Beranda</span>
+        <span class="tab-text text-[10px] mt-1 font-extrabold tracking-tight text-emerald-400 truncate">Beranda</span>
       </button>
 
       <!-- Tab 2: Transaksi / Live Feed & Klerk -->
@@ -1213,10 +1213,10 @@
         type="button" 
         onclick="navToTab('transaksi')" 
         id="tab-btn-transaksi" 
-        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-1 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer"
+        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer"
       >
         <span class="text-base leading-none">🧾</span>
-        <span class="tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400">Transaksi</span>
+        <span class="tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400 truncate">Transaksi</span>
       </button>
 
       <!-- Tab 3: Stok & DSI -->
@@ -1224,21 +1224,32 @@
         type="button" 
         onclick="navToTab('stok')" 
         id="tab-btn-stok" 
-        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-1 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer"
+        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer"
       >
         <span class="text-base leading-none">📦</span>
-        <span class="tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400">Stok & DSI</span>
+        <span class="tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400 truncate">Stok</span>
       </button>
 
-      <!-- Tab 4: Kasir POS (Aksen Merah Toko) -->
+      <!-- Tab 4: Member CRM -->
+      <button 
+        type="button" 
+        onclick="navToTab('member')" 
+        id="tab-btn-member" 
+        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer"
+      >
+        <span class="text-base leading-none">👥</span>
+        <span class="tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400 truncate">Member</span>
+      </button>
+
+      <!-- Tab 5: Kasir POS (Aksen Merah Toko) -->
       <a 
         href="index.html" 
         id="tab-btn-kasir" 
-        class="flex flex-col items-center justify-center py-1 px-1 rounded-xl text-rose-400 hover:text-rose-300 font-bold transition-all active:scale-95"
+        class="flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-rose-400 hover:text-rose-300 font-bold transition-all active:scale-95"
         title="Beralih ke Layar Kasir"
       >
         <span class="text-base leading-none">🛒</span>
-        <span class="text-[10px] mt-1 font-extrabold text-rose-400 tracking-tight">Kasir POS</span>
+        <span class="text-[10px] mt-1 font-extrabold text-rose-400 tracking-tight truncate">Kasir</span>
       </a>
 
     </div>
@@ -4059,22 +4070,24 @@
         scrollToSection('section-live-feed');
       } else if (tab === 'stok') {
         scrollToSection('section-low-stock');
+      } else if (tab === 'member') {
+        scrollToSection('section-members-management');
       }
       setActiveNavTab(tab);
     }
 
     function setActiveNavTab(tab) {
-      const tabs = ['beranda', 'transaksi', 'stok'];
+      const tabs = ['beranda', 'transaksi', 'stok', 'member'];
       tabs.forEach(t => {
         const btn = document.getElementById('tab-btn-' + t);
         if (!btn) return;
         const textSpan = btn.querySelector('.tab-text');
         if (t === tab) {
-          btn.className = "nav-tab-btn flex flex-col items-center justify-center py-1 px-1 rounded-xl text-emerald-400 font-bold transition-all active:scale-95 cursor-pointer";
-          if (textSpan) textSpan.className = "tab-text text-[10px] mt-1 font-extrabold tracking-tight text-emerald-400";
+          btn.className = "nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-emerald-400 font-bold transition-all active:scale-95 cursor-pointer";
+          if (textSpan) textSpan.className = "tab-text text-[10px] mt-1 font-extrabold tracking-tight text-emerald-400 truncate";
         } else {
-          btn.className = "nav-tab-btn flex flex-col items-center justify-center py-1 px-1 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer";
-          if (textSpan) textSpan.className = "tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400";
+          btn.className = "nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer";
+          if (textSpan) textSpan.className = "tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400 truncate";
         }
       });
     }
@@ -4089,11 +4102,15 @@
         const scrollPos = window.scrollY;
         const txEl = document.getElementById('section-live-feed');
         const stockEl = document.getElementById('section-low-stock');
+        const memberEl = document.getElementById('section-members-management');
         
         const txTop = txEl ? (txEl.offsetTop - 150) : 999999;
         const stockTop = stockEl ? (stockEl.offsetTop - 150) : 999999;
+        const memberTop = memberEl ? (memberEl.offsetTop - 150) : 999999;
 
-        if (scrollPos >= stockTop) {
+        if (scrollPos >= memberTop) {
+          setActiveNavTab('member');
+        } else if (scrollPos >= stockTop) {
           setActiveNavTab('stok');
         } else if (scrollPos >= txTop) {
           setActiveNavTab('transaksi');
