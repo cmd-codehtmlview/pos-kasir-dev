@@ -1094,6 +1094,13 @@ function printSisLpbReceiptById(lpbId) {
 }
 
 function saveSisLpb() {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Penerimaan Barang (LPB Faktur Supplier)", () => {
+      saveSisLpb();
+    });
+    return;
+  }
+
   if (sisLpbDraft.length === 0) {
     alert("Faktur penerimaan masih kosong! Tambahkan minimal 1 produk barang masuk.");
     return;
@@ -1372,6 +1379,13 @@ function selectSisWasteProduct(prod) {
 }
 
 function saveSisWaste() {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Pemusnahan Barang (BAP Waste / Barang Rusak)", () => {
+      saveSisWaste();
+    });
+    return;
+  }
+
   const p = window.selectedWasteProduct;
   if (!p) {
     alert("Harap pilih produk yang rusak / waste!");
@@ -1486,6 +1500,13 @@ function updateRepackSummary() {
 }
 
 function executeRepackProcess() {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repack Bal ke Eceran", () => {
+      executeRepackProcess();
+    });
+    return;
+  }
+
   const originProd = window.selectedRepackOrigin;
   const targetProd = window.selectedRepackTarget;
 

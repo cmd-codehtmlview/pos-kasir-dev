@@ -11,6 +11,13 @@ let activeRepackTab = "form"; // "form" | "history"
  * @param {string|null} preselectedSourceId - ID produk asal opsional jika diklik dari tabel produk
  */
 function openRepackModal(preselectedSourceId = null) {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repacking / Mutasi Stok (Khusus Pejabat Toko)", () => {
+      openRepackModal(preselectedSourceId);
+    });
+    return;
+  }
+
   const sourceSearch = document.getElementById("repack-source-search");
   const targetSearch = document.getElementById("repack-target-search");
   if (sourceSearch) sourceSearch.value = "";
@@ -307,6 +314,13 @@ function calculateRepackPreview() {
  * Eksekusi repacking stok
  */
 function executeRepacking() {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repacking / Mutasi Stok (Khusus Pejabat Toko)", () => {
+      executeRepacking();
+    });
+    return;
+  }
+
   const sourceSelect = document.getElementById("repack-source-select");
   const targetSelect = document.getElementById("repack-target-select");
   const qtySourceInput = document.getElementById("repack-source-qty");

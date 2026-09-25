@@ -548,6 +548,13 @@ function renderLpbDraftTable() {
 
 // ---- Simpan Dokumen LPB (atomik) ----
 function processSaveLpbDocument(andPrint = false) {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Penerimaan Barang (LPB Faktur Supplier)", () => {
+      processSaveLpbDocument(andPrint);
+    });
+    return;
+  }
+
   const supplierName = document.getElementById("lpb-supplier-name")?.value.trim();
   const invoiceNo = document.getElementById("lpb-invoice-no")?.value.trim() || "-";
   const paymentType = document.getElementById("lpb-payment-type")?.value || "KREDIT";
