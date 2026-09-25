@@ -567,7 +567,9 @@ function editSisStaff(nik) {
   setCheckboxVal('sis-perm-void', emp.canVoid !== undefined ? !!emp.canVoid : (emp.role === "COS" || emp.role === "ACOS" || emp.role === "CREW"));
   setCheckboxVal('sis-perm-retur', emp.canRetur !== undefined ? !!emp.canRetur : (emp.role === "COS" || emp.role === "ACOS"));
   setCheckboxVal('sis-perm-so', emp.canStockOpname !== undefined ? !!emp.canStockOpname : (emp.role === "COS" || emp.role === "ACOS"));
+  setCheckboxVal('sis-perm-klerk', emp.canBlindKlerk !== undefined ? !!emp.canBlindKlerk : true);
   setCheckboxVal('sis-perm-diskon', emp.canBlindKlerk !== undefined ? !!emp.canBlindKlerk : true);
+  setCheckboxVal('sis-perm-financials', emp.canViewFinancials !== undefined ? !!emp.canViewFinancials : (emp.role === "COS"));
   setCheckboxVal('sis-perm-drawer', emp.canViewFinancials !== undefined ? !!emp.canViewFinancials : (emp.role === "COS"));
   setCheckboxVal('sis-perm-manage-staff', emp.canManageEmployees !== undefined ? !!emp.canManageEmployees : (emp.role === "COS"));
   setCheckboxVal('sis-perm-manage-prod', emp.canManageProducts !== undefined ? !!emp.canManageProducts : (emp.role === "COS" || emp.role === "ACOS"));
@@ -615,7 +617,9 @@ function onSisStaffRoleChange() {
     setCheckboxVal('sis-perm-void', true);
     setCheckboxVal('sis-perm-retur', true);
     setCheckboxVal('sis-perm-so', true);
+    setCheckboxVal('sis-perm-klerk', true);
     setCheckboxVal('sis-perm-diskon', true);
+    setCheckboxVal('sis-perm-financials', true);
     setCheckboxVal('sis-perm-drawer', true);
     setCheckboxVal('sis-perm-manage-staff', true);
     setCheckboxVal('sis-perm-manage-prod', true);
@@ -625,7 +629,9 @@ function onSisStaffRoleChange() {
     setCheckboxVal('sis-perm-void', true);
     setCheckboxVal('sis-perm-retur', true);
     setCheckboxVal('sis-perm-so', true);
+    setCheckboxVal('sis-perm-klerk', true);
     setCheckboxVal('sis-perm-diskon', true);
+    setCheckboxVal('sis-perm-financials', false);
     setCheckboxVal('sis-perm-drawer', false);
     setCheckboxVal('sis-perm-manage-staff', false);
     setCheckboxVal('sis-perm-manage-prod', true);
@@ -635,7 +641,9 @@ function onSisStaffRoleChange() {
     setCheckboxVal('sis-perm-void', true);
     setCheckboxVal('sis-perm-retur', false);
     setCheckboxVal('sis-perm-so', false);
+    setCheckboxVal('sis-perm-klerk', true);
     setCheckboxVal('sis-perm-diskon', true);
+    setCheckboxVal('sis-perm-financials', false);
     setCheckboxVal('sis-perm-drawer', false);
     setCheckboxVal('sis-perm-manage-staff', false);
     setCheckboxVal('sis-perm-manage-prod', false);
@@ -683,8 +691,8 @@ function executeSaveSisEmployee() {
     canVoid: getCheckboxVal('sis-perm-void'),
     canRetur: getCheckboxVal('sis-perm-retur'),
     canStockOpname: getCheckboxVal('sis-perm-so'),
-    canBlindKlerk: getCheckboxVal('sis-perm-diskon'),
-    canViewFinancials: getCheckboxVal('sis-perm-drawer'),
+    canBlindKlerk: getCheckboxVal('sis-perm-klerk') || getCheckboxVal('sis-perm-diskon'),
+    canViewFinancials: getCheckboxVal('sis-perm-financials') || getCheckboxVal('sis-perm-drawer'),
     canManageEmployees: getCheckboxVal('sis-perm-manage-staff'),
     canManageProducts: getCheckboxVal('sis-perm-manage-prod'),
     canStockMutation: getCheckboxVal('sis-perm-lpb')

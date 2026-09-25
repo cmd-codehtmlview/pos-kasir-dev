@@ -3969,21 +3969,21 @@
               </div>
             </label>
 
-            <!-- 4. Diskon -->
+            <!-- 4. Blind Klerk Mandiri -->
             <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
-              <input type="checkbox" id="sis-perm-diskon" checked class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
+              <input type="checkbox" id="sis-perm-klerk" checked class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">4. Boleh Beri Diskon Manual / Potongan Transaksi</span>
-                <span class="block text-[10px] text-slate-400">Dapat memberikan potongan rupiah atau diskon persen kustom pada struk.</span>
+                <span class="block text-xs font-bold text-slate-800">4. Boleh Closing / Klerk Mandiri Tanpa COS [F8]</span>
+                <span class="block text-[10px] text-slate-400">Dapat closing shift saat COS tidak ada; omzet sistem disensor dan murni hitung uang fisik.</span>
               </div>
             </label>
 
-            <!-- 5. Buka Laci -->
+            <!-- 5. Laporan Finansial & HPP -->
             <label class="flex items-start gap-2.5 p-2 bg-white border border-slate-200 rounded-xl hover:bg-amber-50/40 cursor-pointer transition">
-              <input type="checkbox" id="sis-perm-drawer" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
+              <input type="checkbox" id="sis-perm-financials" class="w-4 h-4 text-amber-600 rounded border-slate-300 mt-0.5">
               <div>
-                <span class="block text-xs font-bold text-slate-800">5. Boleh Buka Laci Kas Manual (No Sale / Cash Drawer)</span>
-                <span class="block text-[10px] text-slate-400">Dapat memicu sinyal open drawer tanpa harus menyelesaikan transaksi.</span>
+                <span class="block text-xs font-bold text-slate-800">5. Boleh Lihat Laporan Laba Rugi &amp; HPP Toko</span>
+                <span class="block text-[10px] text-slate-400">Melihat modal HPP, margin laba %, laba bersih, rekap kas, dan ekspor laporan lengkap.</span>
               </div>
             </label>
 
@@ -9101,37 +9101,36 @@
 
   <!-- Scripts -->
   <!-- Core Data & Storage -->
-  <script src="products-data.js?v=256"></script>
-  <script src="js/db.js?v=256"></script>
-  <script src="js/store.js?v=256"></script>
-  <script src="js/license.js?v=256"></script>
-  <script src="js/sync.js?v=256"></script>
+  <script src="products-data.js?v=257"></script>
+  <script src="js/db.js?v=257"></script>
+  <script src="js/store.js?v=257"></script>
+  <script src="js/license.js?v=257"></script>
+  <script src="js/sync.js?v=257"></script>
   
-... [truncated for diff preview]
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=256"></script>
-  <script src="js/cart.js?v=256"></script>
-  <script src="js/printer.js?v=256"></script>
-  <script src="js/checkout.js?v=256"></script>
-  <script src="js/member.js?v=256"></script>
-  <script src="js/returns.js?v=256"></script>
-  <script src="js/stock-opname.js?v=256"></script>
-  <script src="js/klerk.js?v=256"></script>
-  <script src="js/inventory.js?v=256"></script>
+  <script src="js/scanner.js?v=257"></script>
+  <script src="js/cart.js?v=257"></script>
+  <script src="js/printer.js?v=257"></script>
+  <script src="js/checkout.js?v=257"></script>
+  <script src="js/member.js?v=257"></script>
+  <script src="js/returns.js?v=257"></script>
+  <script src="js/stock-opname.js?v=257"></script>
+  <script src="js/klerk.js?v=257"></script>
+  <script src="js/inventory.js?v=257"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/import-products.js?v=256"></script>
-  <script src="js/repack.js?v=256"></script>
-  <script src="js/reports.js?v=256"></script>
-  <script src="js/settings.js?v=256"></script>
-  <script src="js/employees.js?v=256"></script>
+  <script src="js/import-products.js?v=257"></script>
+  <script src="js/repack.js?v=257"></script>
+  <script src="js/reports.js?v=257"></script>
+  <script src="js/settings.js?v=257"></script>
+  <script src="js/employees.js?v=257"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=256"></script>
-  <script src="js/sis-logistics.js?v=256"></script>
-  <script src="js/sis-cashier-ops.js?v=256"></script>
-  <script src="js/sis-store-crm.js?v=256"></script>
-  <script src="js/sis-analytics.js?v=256"></script>
+  <script src="js/app.js?v=257"></script>
+  <script src="js/sis-logistics.js?v=257"></script>
+  <script src="js/sis-cashier-ops.js?v=257"></script>
+  <script src="js/sis-store-crm.js?v=257"></script>
+  <script src="js/sis-analytics.js?v=257"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -11186,7 +11185,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=256')
+          navigator.serviceWorker.register('./sw.js?v=257')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
