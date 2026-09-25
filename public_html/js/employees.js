@@ -476,22 +476,24 @@ function openOwnerDashboardWithAuth() {
 function toggleFinancialCensorWithAuth() {
   if (financialsTempUnlocked) {
     financialsTempUnlocked = false;
+    if (typeof closeSisModal === "function") {
+      closeSisModal('sis-modal-report');
+      closeSisModal('sis-modal-recap');
+    }
     if (typeof renderReports === "function") renderReports();
     if (typeof renderInventoryTable === "function") renderInventoryTable();
     if (typeof renderKlerkHistoryTable === "function") renderKlerkHistoryTable();
-    if (typeof initSisReportModal === "function") initSisReportModal();
-    if (typeof initSisRecapModal === "function") initSisRecapModal();
     updateDashboardButtonState();
-    showToast("Angka finansial & laba rugi laporan disensor kembali.", "info");
+    showToast("Laporan operasional telah dikunci kembali.", "info");
     return;
   }
 
   if (isCurrentUserAuthorizedForFinancials()) {
-    showToast("Akun aktif sudah memiliki izin melihat angka laporan finansial.", "info");
+    showToast("Akun aktif sudah memiliki izin melihat laporan operasional.", "info");
     return;
   }
 
-  requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Membuka Sensor Angka Laporan Finansial (Khusus COS)", (supervisor) => {
+  requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Akses Laporan Operasional Toko (Khusus COS)", (supervisor) => {
     financialsTempUnlocked = true;
     if (typeof renderReports === "function") renderReports();
     if (typeof renderInventoryTable === "function") renderInventoryTable();
@@ -499,13 +501,25 @@ function toggleFinancialCensorWithAuth() {
     if (typeof initSisReportModal === "function") initSisReportModal();
     if (typeof initSisRecapModal === "function") initSisRecapModal();
     updateDashboardButtonState();
-    showToast(`Sensor Laporan Finansial dibuka oleh ${supervisor.name} (${supervisor.role})`, "success");
+    showToast(`Laporan Operasional dibuka oleh ${supervisor.name} (${supervisor.role})`, "success");
     sfx.success();
   });
 }
 
 function updateDashboardButtonState() {
   const isAuth = isCurrentUserAuthorizedForFinancials();
+
+  // Drawer Footer Portal Owner
+  const btnDrawerOwner = document.getElementById("btn-drawer-portal-owner");
+  if (btnDrawerOwner) {
+    if (isAuth) {
+      btnDrawerOwner.innerHTML = `<span>📊</span><span>Portal Owner ↗</span>`;
+      btnDrawerOwner.title = "Buka Portal Dashboard Owner";
+    } else {
+      btnDrawerOwner.innerHTML = `<span>🔒</span><span>Portal Owner</span>`;
+      btnDrawerOwner.title = "Akses Terbatas: Memerlukan Otorisasi PIN COS/Owner";
+    }
+  }
 
   // Tab Settings
   const btnSettings = document.getElementById("btn-open-owner-dashboard-settings");
@@ -555,11 +569,13 @@ function updateDashboardButtonState() {
   const txtSisReport = document.getElementById("btn-toggle-sis-report-censor-text");
   if (btnSisReport && txtSisReport) {
     if (isAuth) {
-      btnSisReport.innerHTML = `<span>🔓</span><span id="btn-toggle-sis-report-censor-text">${financialsTempUnlocked ? "Kunci Sensor" : "Laporan Terbuka"}</span>`;
-      btnSisReport.className = "px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer";
+      btnSisReport.innerHTML = `<span>🔒</span><span id="btn-toggle-sis-report-censor-text">Kunci Laporan</span>`;
+      btnSisReport.className = "px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer";
+      btnSisReport.title = "Kunci kembali laporan saat meninggalkan meja kasir";
     } else {
-      btnSisReport.innerHTML = `<span>🔒</span><span id="btn-toggle-sis-report-censor-text">Buka Sensor</span>`;
-      btnSisReport.className = "px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-purple-200 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer";
+      btnSisReport.innerHTML = `<span>🔒</span><span id="btn-toggle-sis-report-censor-text">Khusus COS</span>`;
+      btnSisReport.className = "px-2.5 py-1 bg-purple-100 text-purple-800 border border-purple-200 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs";
+      btnSisReport.title = "Akses terbatas khusus Pejabat Toko / COS";
     }
   }
 
@@ -568,11 +584,13 @@ function updateDashboardButtonState() {
   const txtSisRecap = document.getElementById("btn-toggle-sis-recap-censor-text");
   if (btnSisRecap && txtSisRecap) {
     if (isAuth) {
-      btnSisRecap.innerHTML = `<span>🔓</span><span id="btn-toggle-sis-recap-censor-text">${financialsTempUnlocked ? "Kunci Sensor" : "Laporan Terbuka"}</span>`;
-      btnSisRecap.className = "px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer";
+      btnSisRecap.innerHTML = `<span>🔒</span><span id="btn-toggle-sis-recap-censor-text">Kunci Laporan</span>`;
+      btnSisRecap.className = "px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer";
+      btnSisRecap.title = "Kunci kembali laporan saat meninggalkan meja kasir";
     } else {
-      btnSisRecap.innerHTML = `<span>🔒</span><span id="btn-toggle-sis-recap-censor-text">Buka Sensor</span>`;
-      btnSisRecap.className = "px-2.5 py-1 bg-white hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer";
+      btnSisRecap.innerHTML = `<span>🔒</span><span id="btn-toggle-sis-recap-censor-text">Khusus COS</span>`;
+      btnSisRecap.className = "px-2.5 py-1 bg-purple-100 text-purple-800 border border-purple-200 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs";
+      btnSisRecap.title = "Akses terbatas khusus Pejabat Toko / COS";
     }
   }
 }

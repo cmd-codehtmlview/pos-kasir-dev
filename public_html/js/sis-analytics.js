@@ -78,39 +78,25 @@ function initSisReportModal() {
   const fmt = typeof formatRupiah === 'function' ? formatRupiah : (val) => 'Rp ' + Number(val || 0).toLocaleString('id-ID');
 
   if (turnoverEl) {
-    if (isAuth) {
-      turnoverEl.textContent = fmt(totalTurnover);
-      turnoverEl.className = "font-bebas text-2xl text-slate-900 mt-0.5 tracking-wider font-mono";
-    } else {
-      turnoverEl.innerHTML = `<span class="text-slate-400 font-mono tracking-widest text-lg" title="Omzet bersih disensor untuk kasir">🔒 ••••••</span>`;
-      turnoverEl.className = "font-bebas text-2xl text-slate-400 mt-0.5 tracking-wider";
-    }
+    turnoverEl.textContent = fmt(totalTurnover);
+    turnoverEl.className = "font-bebas text-2xl text-slate-900 mt-0.5 tracking-wider font-mono";
   }
 
   if (trxCountEl) trxCountEl.textContent = `${todayTrx.length} Transaksi Selesai`;
 
   if (profitEl) {
-    if (isAuth) {
-      profitEl.textContent = `+${fmt(totalProfit)}`;
-      profitEl.className = "font-bebas text-2xl text-emerald-900 mt-0.5 tracking-wider font-mono";
-    } else {
-      profitEl.innerHTML = `<span class="text-emerald-400 font-mono tracking-widest text-lg" title="Laba bersih disensor untuk kasir">🔒 ••••••</span>`;
-      profitEl.className = "font-bebas text-2xl text-emerald-400 mt-0.5 tracking-wider";
-    }
+    profitEl.textContent = `+${fmt(totalProfit)}`;
+    profitEl.className = "font-bebas text-2xl text-emerald-900 mt-0.5 tracking-wider font-mono";
   }
 
-  if (marginEl) marginEl.textContent = isAuth ? `Margin Laba: ${marginPercent}%` : `Margin Laba: 🔒 •••`;
+  if (marginEl) marginEl.textContent = `Margin Laba: ${marginPercent}%`;
 
   if (cashSalesEl) {
-    cashSalesEl.innerHTML = isAuth 
-      ? `${fmt(cashAmount)} (${cashCount} nota)`
-      : `<span class="text-slate-400 font-mono">🔒 ••••••</span> (${cashCount} nota)`;
+    cashSalesEl.textContent = `${fmt(cashAmount)} (${cashCount} nota)`;
   }
 
   if (qrisSalesEl) {
-    qrisSalesEl.innerHTML = isAuth 
-      ? `${fmt(qrisAmount)} (${qrisCount} nota)`
-      : `<span class="text-slate-400 font-mono">🔒 ••••••</span> (${qrisCount} nota)`;
+    qrisSalesEl.textContent = `${fmt(qrisAmount)} (${qrisCount} nota)`;
   }
 
   if (typeof updateDashboardButtonState === 'function') updateDashboardButtonState();
@@ -232,23 +218,17 @@ function initSisRecapModal() {
   const drawerCashEl = document.getElementById('sis-recap-drawer-cash');
   const drawerNoteEl = document.getElementById('sis-recap-drawer-note');
 
-  if (turnoverEl) {
-    turnoverEl.innerHTML = isAuth 
-      ? fmt(totalTurnover)
-      : `<span class="text-purple-400 font-mono tracking-widest text-base" title="Omzet disensor untuk kasir">🔒 ••••••</span>`;
-  }
+  if (turnoverEl) turnoverEl.textContent = fmt(totalTurnover);
   if (countEl) countEl.textContent = `${todayTrx.length} Struk Selesai`;
-  if (cashEl) cashEl.innerHTML = isAuth ? fmt(cashSales) : `<span class="text-slate-400 font-mono">🔒 ••••••</span>`;
-  if (qrisEl) qrisEl.innerHTML = isAuth ? fmt(qrisSales) : `<span class="text-slate-400 font-mono">🔒 ••••••</span>`;
-  if (transferEl) transferEl.innerHTML = isAuth ? fmt(transferSales) : `<span class="text-slate-400 font-mono">🔒 ••••••</span>`;
-  if (pointsEl) pointsEl.innerHTML = isAuth ? `-${fmt(pointDiscount)}` : `<span class="text-indigo-300 font-mono">🔒 ••••••</span>`;
-  if (returnEl) returnEl.innerHTML = isAuth ? `-${fmt(returnAmount)}` : `<span class="text-rose-300 font-mono">🔒 ••••••</span>`;
-  if (cashdropEl) cashdropEl.innerHTML = isAuth ? `-${fmt(cashDropAmount)}` : `<span class="text-amber-400 font-mono">🔒 ••••••</span>`;
-  if (drawerCashEl) drawerCashEl.innerHTML = isAuth ? fmt(drawerCash) : `<span class="text-slate-400 font-mono">🔒 ••••••</span>`;
+  if (cashEl) cashEl.textContent = fmt(cashSales);
+  if (qrisEl) qrisEl.textContent = fmt(qrisSales);
+  if (transferEl) transferEl.textContent = fmt(transferSales);
+  if (pointsEl) pointsEl.textContent = `-${fmt(pointDiscount)}`;
+  if (returnEl) returnEl.textContent = `-${fmt(returnAmount)}`;
+  if (cashdropEl) cashdropEl.textContent = `-${fmt(cashDropAmount)}`;
+  if (drawerCashEl) drawerCashEl.textContent = fmt(drawerCash);
   if (drawerNoteEl) {
-    drawerNoteEl.textContent = isAuth 
-      ? `(Termasuk modal kasir ${fmt(initialCash)})`
-      : `(Nominal kas laci disensor untuk kasir)`;
+    drawerNoteEl.textContent = `(Termasuk modal kasir ${fmt(initialCash)})`;
   }
 
   if (typeof updateDashboardButtonState === 'function') updateDashboardButtonState();

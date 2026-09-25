@@ -1423,12 +1423,7 @@
              window.location.protocol === "file:";
     }
 
-    // Bypass instan otorisasi PIN jika di lingkungan dev/lokal
-    if (isDevEnvironment()) {
-      sessionStorage.setItem("snack_pos_owner_session", "active");
-    }
-
-    // Bersihkan cache Service Worker lama jika ada agar tampilan selalu terbaru
+    // State Aplikasi Owner
     if ('caches' in window) {
       caches.keys().then(keys => {
         keys.forEach(k => {
@@ -1499,14 +1494,6 @@
     }
 
     function checkOwnerPinAuth() {
-      // 0. Auto-auth di lingkungan dev / localhost / LAN
-      if (isDevEnvironment()) {
-        sessionStorage.setItem("snack_pos_owner_session", "active");
-        const gateModal = document.getElementById("modal-owner-pin-gate");
-        if (gateModal) gateModal.classList.add("hidden");
-        return true;
-      }
-
       // 1. Cek apakah ada token otorisasi instan dari POS Kasir (dibuka oleh COS dalam 30 detik terakhir)
       try {
         const token = localStorage.getItem("snack_pos_owner_auth_token");

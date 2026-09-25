@@ -2447,30 +2447,48 @@
           </div>
         </button>
         <div id="sis-cat-sub-5" class="hidden border-t border-slate-100 divide-y divide-slate-100 bg-slate-50/40">
-          <button type="button" onclick="openSisModal('sis-modal-report')" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+          <button type="button" onclick="openSisReportWithAuth()" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
             <div class="flex items-center gap-3 min-w-0">
               <div class="w-10 flex items-center justify-center shrink-0">
                 <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shadow-2xs">📊</span>
               </div>
-              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Laporan Penjualan Shift</span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Laporan Penjualan Shift</span>
+                  <span class="px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded font-mono font-bold text-[9px] shrink-0">🔒 COS</span>
+                </div>
+                <p class="text-[10px] text-slate-400 truncate">Omzet, profit &amp; produk terlaris shift</p>
+              </div>
             </div>
             <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
-          <button type="button" onclick="openSisModal('sis-modal-recap')" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+          <button type="button" onclick="openSisRecapWithAuth()" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
             <div class="flex items-center gap-3 min-w-0">
               <div class="w-10 flex items-center justify-center shrink-0">
                 <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shadow-2xs">📑</span>
               </div>
-              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Rekap Kas &amp; Transaksi Harian</span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Rekap Kas &amp; Transaksi Harian</span>
+                  <span class="px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded font-mono font-bold text-[9px] shrink-0">🔒 COS</span>
+                </div>
+                <p class="text-[10px] text-slate-400 truncate">Ringkasan kas, non-tunai &amp; cash drop</p>
+              </div>
             </div>
             <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
-          <button type="button" onclick="exportTransactionsToExcel()" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
+          <button type="button" onclick="exportTransactionsWithAuth()" class="w-full px-4 py-3 hover:bg-slate-100/80 active:bg-slate-200/70 text-left flex items-center justify-between gap-3 cursor-pointer group transition">
             <div class="flex items-center gap-3 min-w-0">
               <div class="w-10 flex items-center justify-center shrink-0">
                 <span class="w-8 h-8 rounded-lg bg-white border border-slate-200/80 text-slate-700 flex items-center justify-center text-sm shadow-2xs">📥</span>
               </div>
-              <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Ekspor Transaksi (Excel)</span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-retail-red transition truncate">Ekspor Transaksi (Excel)</span>
+                  <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 rounded font-mono font-bold text-[9px] shrink-0">🔒 COS</span>
+                </div>
+                <p class="text-[10px] text-slate-400 truncate">Unduh file Excel rekap transaksi</p>
+              </div>
             </div>
             <span class="text-xs text-slate-300 group-hover:text-slate-500 font-bold transition">›</span>
           </button>
@@ -2552,10 +2570,16 @@
         <span>🔒</span>
         <span>Logout Kasir</span>
       </button>
-      <a href="owner.html" target="_blank" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-2xs">
+      <button 
+        type="button" 
+        id="btn-drawer-portal-owner"
+        onclick="openOwnerDashboardWithAuth()" 
+        class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-2xs cursor-pointer"
+        title="Buka Portal Dashboard Owner (Perlu Otorisasi COS)"
+      >
         <span>📊</span>
         <span>Portal Owner ↗</span>
-      </a>
+      </button>
     </div>
 
   </div>
@@ -8972,8 +8996,9 @@
         </button>
 
         <!-- Opsi 4: Buka Dashboard Owner -->
-        <a 
-          href="owner.html" 
+        <button 
+          type="button" 
+          onclick="openOwnerDashboardWithAuth()" 
           class="w-full p-3.5 bg-indigo-50 hover:bg-indigo-100/80 border border-indigo-200 hover:border-indigo-300 rounded-2xl flex items-center gap-3 text-left transition-all cursor-pointer group block"
         >
           <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
@@ -8986,7 +9011,7 @@
             </div>
             <p class="text-[11px] text-indigo-700/80 mt-0.5">Pantau omzet realtime, stok kritis, dan data member online.</p>
           </div>
-        </a>
+        </button>
 
       </div>
 
@@ -9022,13 +9047,14 @@
         <span>🛒</span>
         <span>Buka Kasir Kembali</span>
       </button>
-      <a 
-        href="owner.html" 
+      <button 
+        type="button" 
+        onclick="openOwnerDashboardWithAuth()" 
         class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-black text-xs uppercase tracking-wider rounded-xl transition shadow-lg flex items-center gap-2 cursor-pointer"
       >
         <span>👑</span>
         <span>Dashboard Owner</span>
-      </a>
+      </button>
     </div>
     <p class="text-[11px] text-slate-500 mt-6 font-mono">
       Tekan <kbd class="px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-300 font-bold">Ctrl + W</kbd> untuk menutup jendela/tab ini.
@@ -9189,16 +9215,16 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/import-products.js?v=100"></script>
   <script src="js/repack.js?v=100"></script>
-  <script src="js/reports.js?v=104"></script>
+  <script src="js/reports.js?v=105"></script>
   <script src="js/settings.js?v=118"></script>
-  <script src="js/employees.js?v=125"></script>
+  <script src="js/employees.js?v=126"></script>
   
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=118"></script>
   <script src="js/sis-logistics.js?v=104"></script>
   <script src="js/sis-cashier-ops.js?v=100"></script>
   <script src="js/sis-store-crm.js?v=101"></script>
-  <script src="js/sis-analytics.js?v=101"></script>
+  <script src="js/sis-analytics.js?v=102"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -10310,7 +10336,51 @@
     }
 
     // ================= SIS ACTION SCREEN CONTROLLERS =================
+    function openSisReportWithAuth() {
+      openSisModal('sis-modal-report');
+    }
+
+    function openSisRecapWithAuth() {
+      openSisModal('sis-modal-recap');
+    }
+
+    function exportTransactionsWithAuth() {
+      if (typeof isCurrentUserAuthorizedForFinancials === 'function' && !isCurrentUserAuthorizedForFinancials()) {
+        if (typeof requestSupervisorAuth === 'function') {
+          requestSupervisorAuth(
+            "VIEW_FINANCIALS",
+            "Otorisasi Ekspor Data Transaksi Toko (Khusus Pejabat Toko / COS)",
+            (supervisor) => {
+              if (typeof financialsTempUnlocked !== 'undefined') financialsTempUnlocked = true;
+              if (typeof updateDashboardButtonState === 'function') updateDashboardButtonState();
+              if (typeof exportTransactionsToExcel === 'function') exportTransactionsToExcel();
+            }
+          );
+          return;
+        }
+      }
+      if (typeof exportTransactionsToExcel === 'function') exportTransactionsToExcel();
+    }
+
     function openSisModal(modalId) {
+      // Proteksi Laporan Operasional Toko (Laporan Shift & Rekap Kas) khusus Pejabat Toko / COS
+      if (modalId === 'sis-modal-report' || modalId === 'sis-modal-recap') {
+        if (typeof isCurrentUserAuthorizedForFinancials === 'function' && !isCurrentUserAuthorizedForFinancials()) {
+          if (typeof requestSupervisorAuth === 'function') {
+            requestSupervisorAuth(
+              "VIEW_FINANCIALS", 
+              "Otorisasi Akses Laporan Operasional Toko (Khusus Pejabat Toko / COS)", 
+              (supervisor) => {
+                if (typeof financialsTempUnlocked !== 'undefined') financialsTempUnlocked = true;
+                if (typeof updateDashboardButtonState === 'function') updateDashboardButtonState();
+                openSisModal(modalId);
+              }
+            );
+            return;
+          }
+        }
+      }
+
       const modal = document.getElementById(modalId);
       if (modal) {
         modal.classList.remove('hidden');

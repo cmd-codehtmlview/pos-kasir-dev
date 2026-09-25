@@ -438,13 +438,23 @@ function renderLpbReportsTable() {
 }
 
 function exportTransactionsCSV() {
+  const isAuth = typeof isCurrentUserAuthorizedForFinancials === "function" ? isCurrentUserAuthorizedForFinancials() : true;
+  if (!isAuth) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Ekspor Data Transaksi Toko (Khusus Pejabat Toko / COS)", (supervisor) => {
+        if (typeof financialsTempUnlocked !== "undefined") financialsTempUnlocked = true;
+        if (typeof updateDashboardButtonState === "function") updateDashboardButtonState();
+        exportTransactionsCSV();
+      });
+      return;
+    }
+  }
+
   const transactions = getFilteredTransactions();
   if (transactions.length === 0) {
     showToast("Tidak ada transaksi untuk diekspor!", "warning");
     return;
   }
-
-  const isAuth = typeof isCurrentUserAuthorizedForFinancials === "function" ? isCurrentUserAuthorizedForFinancials() : true;
 
   let csv = "data:text/csv;charset=utf-8,";
   csv += "No Struk,Tanggal,Waktu,Kasir,Shift,Jumlah Item,Subtotal,Diskon,Grand Total,Total Modal,Laba Bersih,Metode\n";
@@ -499,10 +509,22 @@ function exportTransactionsCSV() {
   link.click();
   document.body.removeChild(link);
 
-  showToast(isAuth ? "File Laporan Excel/CSV berhasil diunduh!" : "Laporan Excel/CSV diunduh (Nominal rupiah disensor untuk kasir)", "success");
+  showToast("File Laporan Excel/CSV berhasil diunduh!", "success");
 }
 
 function exportTransactionsToExcel() {
+  const isAuth = typeof isCurrentUserAuthorizedForFinancials === "function" ? isCurrentUserAuthorizedForFinancials() : true;
+  if (!isAuth) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Ekspor Data Transaksi Toko (Khusus Pejabat Toko / COS)", (supervisor) => {
+        if (typeof financialsTempUnlocked !== "undefined") financialsTempUnlocked = true;
+        if (typeof updateDashboardButtonState === "function") updateDashboardButtonState();
+        exportTransactionsToExcel();
+      });
+      return;
+    }
+  }
+
   const transactions = (typeof getFilteredTransactions === "function" && getFilteredTransactions().length > 0)
     ? getFilteredTransactions()
     : ((window.pos && window.pos.transactions) ? window.pos.transactions : []);
@@ -512,8 +534,6 @@ function exportTransactionsToExcel() {
     else alert("Tidak ada transaksi untuk diekspor!");
     return;
   }
-
-  const isAuth = typeof isCurrentUserAuthorizedForFinancials === "function" ? isCurrentUserAuthorizedForFinancials() : true;
 
   if (typeof XLSX !== "undefined") {
     try {
@@ -526,11 +546,11 @@ function exportTransactionsToExcel() {
           "Kasir": t.cashier || "",
           "Shift": t.shift || "Shift 1",
           "Total Item": totalQty,
-          "Subtotal (Rp)": isAuth ? (t.subtotal || 0) : "***",
-          "Diskon (Rp)": isAuth ? (t.discountAmount || 0) : "***",
-          "Grand Total (Rp)": isAuth ? (t.grandTotal || 0) : "***",
-          "Total Modal HPP (Rp)": isAuth ? (t.totalCost || 0) : "***",
-          "Laba Bersih (Rp)": isAuth ? (t.profit || 0) : "***",
+          "Subtotal (Rp)": t.subtotal || 0,
+          "Diskon (Rp)": t.discountAmount || 0,
+          "Grand Total (Rp)": t.grandTotal || 0,
+          "Total Modal HPP (Rp)": t.totalCost || 0,
+          "Laba Bersih (Rp)": t.profit || 0,
           "Metode Bayar": t.paymentMethod || "TUNAI"
         };
       });
