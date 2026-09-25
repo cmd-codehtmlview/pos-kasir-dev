@@ -9777,6 +9777,29 @@
     }
 
     function submitBlindKlerk() {
+      const inputEl = document.getElementById('klerk-input-nominal');
+      const rawVal = inputEl ? inputEl.value.replace(/[^0-9]/g, '') : '';
+      
+      if (!rawVal || parseInt(rawVal, 10) < 0) {
+        showMockupToast('⚠️ Mohon input total uang fisik kasir terlebih dahulu!', 'error');
+        if (inputEl) inputEl.focus();
+        return;
+      }
+
+      // Otorisasi: Jika kasir CREW tidak punya izin BLIND_KLERK (klerk mandiri), wajib didampingi supervisor
+      if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "BLIND_KLERK")) {
+        if (typeof requestSupervisorAuth === "function") {
+          requestSupervisorAuth("BLIND_KLERK", "Otorisasi Closing Shift Kasir (Pendampingan Pejabat Toko)", (supervisor) => {
+            executeSubmitBlindKlerk(supervisor);
+          });
+          return;
+        }
+      }
+
+      executeSubmitBlindKlerk();
+    }
+
+    function executeSubmitBlindKlerk(supervisor = null) {
       const state = window.sisActiveKlerkState || {};
       const inputEl = document.getElementById('klerk-input-nominal');
       const rawVal = inputEl ? inputEl.value.replace(/[^0-9]/g, '') : '';
@@ -9865,6 +9888,7 @@
         diff: diff,
         status: diff === 0 ? "KLOP" : (diff > 0 ? "LEBIH" : "KURANG"),
         notes: notesVal,
+        supervisor: supervisor ? `${supervisor.role} ${supervisor.name} (${supervisor.nik})` : (pos.currentUser && pos.currentUser.role !== "CREW" ? `${pos.currentUser.role} ${pos.currentUser.name}` : "Setoran Mandiri"),
         createdAt: now.toISOString()
       };
 
@@ -10244,6 +10268,47 @@
 
     // ================= SIS ACTION SCREEN CONTROLLERS =================
     function openSisModal(modalId) {
+      // 1. Guard Akses Laporan & Rekap Finansial (VIEW_FINANCIALS)
+      if (modalId === 'sis-modal-report' || modalId === 'sis-modal-recap') {
+        if (typeof isCurrentUserAuthorizedForFinancials === "function" && !isCurrentUserAuthorizedForFinancials()) {
+          if (typeof requestSupervisorAuth === "function") {
+            requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Melihat Laporan & Angka Finansial Toko (Khusus Pejabat)", (supervisor) => {
+              if (typeof financialsTempUnlocked !== "undefined") financialsTempUnlocked = true;
+              executeOpenSisModal(modalId);
+            });
+            return;
+          }
+        }
+      }
+
+      // 2. Guard Akses Manajemen Karyawan (MANAGE_EMPLOYEES)
+      if (modalId === 'sis-modal-staff') {
+        if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
+          if (typeof requestSupervisorAuth === "function") {
+            requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Kelola Data & Hak Akses Karyawan (Khusus COS)", (supervisor) => {
+              executeOpenSisModal(modalId);
+            });
+            return;
+          }
+        }
+      }
+
+      // 3. Guard Akses Cadangkan & Restore Database Toko (MANAGE_EMPLOYEES)
+      if (modalId === 'sis-modal-backup') {
+        if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
+          if (typeof requestSupervisorAuth === "function") {
+            requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Backup & Restore Database Toko (Khusus COS)", (supervisor) => {
+              executeOpenSisModal(modalId);
+            });
+            return;
+          }
+        }
+      }
+
+      executeOpenSisModal(modalId);
+    }
+
+    function executeOpenSisModal(modalId) {
       const modal = document.getElementById(modalId);
       if (modal) {
         modal.classList.remove('hidden');
