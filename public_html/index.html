@@ -2782,15 +2782,26 @@
 
             <div class="space-y-1.5 font-mono text-xs">
               <div class="flex justify-between text-slate-600">
-                <span>Modal Awal Laci:</span>
+                <span>Modal Awal Laci (+):</span>
                 <span id="klerk-result-modal-awal" class="font-bold text-slate-800">Rp 200.000</span>
               </div>
               <div class="flex justify-between text-slate-600">
-                <span>Penjualan Tunai (Sistem):</span>
+                <span>Penjualan Tunai (+)</span>
                 <span id="klerk-result-sales-val" class="font-bold text-slate-800">Rp 0</span>
               </div>
+              <div id="klerk-result-refunds-row" class="hidden flex justify-between text-rose-600 font-semibold">
+                <span>Retur Tunai Refund (-):</span>
+                <span id="klerk-result-refunds-val">-Rp 0</span>
+              </div>
+              <div id="klerk-result-cashdrop-row" class="hidden flex justify-between text-amber-700 font-semibold">
+                <span>Tarik Kas Laci / Drop (-):</span>
+                <span id="klerk-result-cashdrop-val">-Rp 0</span>
+              </div>
               <div class="flex justify-between text-slate-900 font-bold border-t border-dashed border-slate-200 pt-1">
-                <span>Target Kas Fisik:</span>
+                <div>
+                  <span>Target Kas Fisik:</span>
+                  <span id="klerk-result-formula-hint" class="text-[9px] text-slate-400 font-normal block font-sans">Saldo seharusnya di laci</span>
+                </div>
                 <span id="klerk-result-target-val" class="text-blue-700 font-black">Rp 200.000</span>
               </div>
               <div class="flex justify-between text-slate-900 font-bold">
@@ -9101,36 +9112,36 @@
 
   <!-- Scripts -->
   <!-- Core Data & Storage -->
-  <script src="products-data.js?v=259"></script>
-  <script src="js/db.js?v=259"></script>
-  <script src="js/store.js?v=259"></script>
-  <script src="js/license.js?v=259"></script>
-  <script src="js/sync.js?v=259"></script>
+  <script src="products-data.js?v=260"></script>
+  <script src="js/db.js?v=260"></script>
+  <script src="js/store.js?v=260"></script>
+  <script src="js/license.js?v=260"></script>
+  <script src="js/sync.js?v=260"></script>
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=259"></script>
-  <script src="js/cart.js?v=259"></script>
-  <script src="js/printer.js?v=259"></script>
-  <script src="js/checkout.js?v=259"></script>
-  <script src="js/member.js?v=259"></script>
-  <script src="js/returns.js?v=259"></script>
-  <script src="js/stock-opname.js?v=259"></script>
-  <script src="js/klerk.js?v=259"></script>
-  <script src="js/inventory.js?v=259"></script>
+  <script src="js/scanner.js?v=260"></script>
+  <script src="js/cart.js?v=260"></script>
+  <script src="js/printer.js?v=260"></script>
+  <script src="js/checkout.js?v=260"></script>
+  <script src="js/member.js?v=260"></script>
+  <script src="js/returns.js?v=260"></script>
+  <script src="js/stock-opname.js?v=260"></script>
+  <script src="js/klerk.js?v=260"></script>
+  <script src="js/inventory.js?v=260"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/import-products.js?v=259"></script>
-  <script src="js/repack.js?v=259"></script>
-  <script src="js/reports.js?v=259"></script>
-  <script src="js/settings.js?v=259"></script>
-  <script src="js/employees.js?v=259"></script>
+  <script src="js/import-products.js?v=260"></script>
+  <script src="js/repack.js?v=260"></script>
+  <script src="js/reports.js?v=260"></script>
+  <script src="js/settings.js?v=260"></script>
+  <script src="js/employees.js?v=260"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=259"></script>
-  <script src="js/sis-logistics.js?v=259"></script>
-  <script src="js/sis-cashier-ops.js?v=259"></script>
-  <script src="js/sis-store-crm.js?v=259"></script>
-  <script src="js/sis-analytics.js?v=259"></script>
+  <script src="js/app.js?v=260"></script>
+  <script src="js/sis-logistics.js?v=260"></script>
+  <script src="js/sis-cashier-ops.js?v=260"></script>
+  <script src="js/sis-store-crm.js?v=260"></script>
+  <script src="js/sis-analytics.js?v=260"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -9716,7 +9727,23 @@
         cashRefunds += Number(r.refundAmount || r.totalRefund || 0);
       });
 
-      const expectedCash = initialCash + cashSales - cashRefunds;
+      // Tarik Kas Laci (Cash Drop) hari ini yang belum diklerk
+      let cashDropAmount = 0;
+      try {
+        const rawDrops = localStorage.getItem('snack_pos_cashdrops');
+        if (rawDrops) {
+          const drops = JSON.parse(rawDrops);
+          const todayDrops = (Array.isArray(drops) ? drops : []).filter(d => {
+            const dropDate = (d.timestamp || d.date || '').slice(0, 10);
+            return dropDate === todayStr && !d.klerkId;
+          });
+          cashDropAmount = todayDrops.reduce((acc, d) => acc + (Number(d.amount) || 0), 0);
+        }
+      } catch (e) {
+        cashDropAmount = 0;
+      }
+
+      const expectedCash = Math.max(0, initialCash + cashSales - cashRefunds - cashDropAmount);
 
       window.sisActiveKlerkState = {
         activeUser,
@@ -9725,6 +9752,7 @@
         initialCash,
         cashSales,
         cashRefunds,
+        cashDropAmount,
         qrisSales,
         edcSales,
         expectedCash,
@@ -9820,6 +9848,39 @@
       if (modalAwalEl) modalAwalEl.textContent = 'Rp ' + (state.initialCash || 0).toLocaleString('id-ID');
       const salesEl = document.getElementById('klerk-result-sales-val');
       if (salesEl) salesEl.textContent = 'Rp ' + (state.cashSales || 0).toLocaleString('id-ID');
+
+      // Tampilkan baris potongan Retur Tunai jika ada
+      const refundsRow = document.getElementById('klerk-result-refunds-row');
+      const refundsEl = document.getElementById('klerk-result-refunds-val');
+      if (refundsRow && refundsEl) {
+        if (state.cashRefunds > 0) {
+          refundsRow.classList.remove('hidden');
+          refundsEl.textContent = '-Rp ' + (state.cashRefunds || 0).toLocaleString('id-ID');
+        } else {
+          refundsRow.classList.add('hidden');
+        }
+      }
+
+      // Tampilkan baris potongan Tarik Kas Laci (Cash Drop) jika ada
+      const cashdropRow = document.getElementById('klerk-result-cashdrop-row');
+      const cashdropEl = document.getElementById('klerk-result-cashdrop-val');
+      if (cashdropRow && cashdropEl) {
+        if (state.cashDropAmount > 0) {
+          cashdropRow.classList.remove('hidden');
+          cashdropEl.textContent = '-Rp ' + (state.cashDropAmount || 0).toLocaleString('id-ID');
+        } else {
+          cashdropRow.classList.add('hidden');
+        }
+      }
+
+      const formulaHint = document.getElementById('klerk-result-formula-hint');
+      if (formulaHint) {
+        let parts = ['Modal', 'Penjualan'];
+        if (state.cashRefunds > 0) parts.push('Retur (-)');
+        if (state.cashDropAmount > 0) parts.push('Tarik Kas (-)');
+        formulaHint.textContent = `(${parts.join(' + ').replace('+ Retur (-)', '- Retur').replace('+ Tarik Kas (-)', '- Tarik Kas')})`;
+      }
+
       const targetEl = document.getElementById('klerk-result-target-val');
       if (targetEl) targetEl.textContent = 'Rp ' + targetCash.toLocaleString('id-ID');
 
@@ -9880,6 +9941,7 @@
         initialCash: state.initialCash || 0,
         cashSales: state.cashSales || 0,
         cashRefunds: state.cashRefunds || 0,
+        cashDropAmount: state.cashDropAmount || 0,
         qrisSales: state.qrisSales || 0,
         edcSales: state.edcSales || 0,
         expectedCash: targetCash,
@@ -9902,6 +9964,34 @@
         state.todayTrxs.forEach(t => { t.klerkId = klerkId; });
         if (typeof pos.saveTransactions === 'function') pos.saveTransactions();
       }
+
+      // Tandai retur hari ini
+      if (Array.isArray(pos.returns)) {
+        pos.returns.forEach(r => {
+          const rDate = (r.date || r.createdAt || '').slice(0, 10);
+          if (rDate === now.toISOString().slice(0, 10) && !r.klerkId) {
+            r.klerkId = klerkId;
+          }
+        });
+        if (typeof pos.saveReturns === 'function') pos.saveReturns();
+      }
+
+      // Tandai cash drops hari ini
+      try {
+        const rawDrops = localStorage.getItem('snack_pos_cashdrops');
+        if (rawDrops) {
+          const drops = JSON.parse(rawDrops);
+          if (Array.isArray(drops)) {
+            drops.forEach(d => {
+              const dropDate = (d.timestamp || d.date || '').slice(0, 10);
+              if (dropDate === now.toISOString().slice(0, 10) && !d.klerkId) {
+                d.klerkId = klerkId;
+              }
+            });
+            localStorage.setItem('snack_pos_cashdrops', JSON.stringify(drops));
+          }
+        }
+      } catch (e) {}
 
       window.activeKlerkRecord = klerkDoc;
       window.lastCompletedKlerk = klerkDoc;
@@ -11211,7 +11301,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=259')
+          navigator.serviceWorker.register('./sw.js?v=260')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

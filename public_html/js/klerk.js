@@ -228,6 +228,22 @@ function openKlerkModal() {
     cashRefundsCount++;
   });
 
+  // Hitung tarik kas (cash drop) shift ini
+  let cashDropAmount = 0;
+  try {
+    const rawDrops = localStorage.getItem('snack_pos_cashdrops');
+    if (rawDrops) {
+      const drops = JSON.parse(rawDrops);
+      const todayDrops = (Array.isArray(drops) ? drops : []).filter(d => {
+        const dropDate = (d.timestamp || d.date || '').slice(0, 10);
+        return dropDate === todayStr && !d.klerkId;
+      });
+      cashDropAmount = todayDrops.reduce((acc, d) => acc + (Number(d.amount) || 0), 0);
+    }
+  } catch (e) {
+    cashDropAmount = 0;
+  }
+
   // Modal awal: jika kasir sudah pernah klerk dan tidak ada transaksi baru, set 0
   const defaultInitial = isAlreadyKlerkedSession ? 0 : 200000;
   const initialInput = document.getElementById("klerk-initial-cash");
@@ -254,6 +270,7 @@ function openKlerkModal() {
     cashSalesCount: cashSalesCount,
     cashRefunds: cashRefunds,
     cashRefundsCount: cashRefundsCount,
+    cashDropAmount: cashDropAmount,
     qrisSales: qrisSales,
     edcSales: edcSales,
     transferSales: transferSales,
@@ -315,7 +332,7 @@ function calculateKlerkTotals() {
   const initialCash = Number(document.getElementById("klerk-initial-cash")?.value) || 0;
   klerkCurrentData.initialCash = initialCash;
 
-  const expectedCash = initialCash + klerkCurrentData.cashSales - klerkCurrentData.cashRefunds;
+  const expectedCash = Math.max(0, initialCash + klerkCurrentData.cashSales - klerkCurrentData.cashRefunds - (klerkCurrentData.cashDropAmount || 0));
   klerkCurrentData.expectedCash = expectedCash;
 
   const user = klerkCurrentData.activeUser || pos.currentUser;
@@ -523,6 +540,7 @@ function executeSaveAndPrintKlerk(logoutAfter = false, isBlindClose = false) {
     initialCash: klerkCurrentData.initialCash,
     cashSales: klerkCurrentData.cashSales,
     cashRefunds: klerkCurrentData.cashRefunds,
+    cashDropAmount: klerkCurrentData.cashDropAmount || 0,
     expectedCash: klerkCurrentData.expectedCash,
     qrisSales: klerkCurrentData.qrisSales,
     edcSales: klerkCurrentData.edcSales,
@@ -552,6 +570,23 @@ function executeSaveAndPrintKlerk(logoutAfter = false, isBlindClose = false) {
     r.klerkedAt = klerkRecord.createdAt;
   });
   pos.saveReturns();
+
+  // Tandai cash drops shift ini
+  try {
+    const rawDrops = localStorage.getItem('snack_pos_cashdrops');
+    if (rawDrops) {
+      const drops = JSON.parse(rawDrops);
+      if (Array.isArray(drops)) {
+        drops.forEach(d => {
+          const dropDate = (d.timestamp || d.date || '').slice(0, 10);
+          if (dropDate === dateStr && !d.klerkId) {
+            d.klerkId = klerkRecord.id;
+          }
+        });
+        localStorage.setItem('snack_pos_cashdrops', JSON.stringify(drops));
+      }
+    }
+  } catch (e) {}
 
   pos.klerkHistory.unshift(klerkRecord);
   pos.saveKlerkHistory();
@@ -740,6 +775,11 @@ function renderKlerkReceipt(k) {
       <div class="flex justify-between text-rose-700">
         <span>Retur Tunai (-)</span>
         <span>-${formatRupiah(k.cashRefunds)}</span>
+      </div>` : ''}
+      ${k.cashDropAmount > 0 ? `
+      <div class="flex justify-between text-amber-700">
+        <span>Tarik Kas Laci (-)</span>
+        <span>-${formatRupiah(k.cashDropAmount)}</span>
       </div>` : ''}
       <div class="flex justify-between font-bold pt-1 border-t border-dotted border-slate-300">
         <span>Total Saldo Kas Tunai</span>
