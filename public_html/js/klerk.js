@@ -891,12 +891,32 @@ function openKlerkReceiptModalById(id) {
   openKlerkReceiptModal(k);
 }
 
-function reprintKlerkWithAuth(k) {
-  reprintKlerkDirect(k);
+function reprintKlerkWithAuthDirect(id) {
+  if (typeof isCurrentUserAuthorizedForFinancials === "function" && !isCurrentUserAuthorizedForFinancials()) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Cetak Ulang Struk Klerk Closing Shift", () => {
+        financialsTempUnlocked = true;
+        if (typeof renderKlerkHistoryTable === "function") renderKlerkHistoryTable();
+        reprintKlerkDirectById(id);
+      });
+      return;
+    }
+  }
+  reprintKlerkDirectById(id);
 }
 
-function openKlerkReceiptWithAuth(k) {
-  openKlerkReceiptModal(k);
+function openKlerkReceiptWithAuthDirect(id) {
+  if (typeof isCurrentUserAuthorizedForFinancials === "function" && !isCurrentUserAuthorizedForFinancials()) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Melihat Struk Klerk Closing Shift", () => {
+        financialsTempUnlocked = true;
+        if (typeof renderKlerkHistoryTable === "function") renderKlerkHistoryTable();
+        openKlerkReceiptModalById(id);
+      });
+      return;
+    }
+  }
+  openKlerkReceiptModalById(id);
 }
 
 function renderKlerkHistoryTable() {
@@ -915,6 +935,8 @@ function renderKlerkHistoryTable() {
     return;
   }
 
+  const isAuth = typeof isCurrentUserAuthorizedForFinancials === "function" ? isCurrentUserAuthorizedForFinancials() : true;
+
   tbody.innerHTML = history.map(k => {
     const diff = Number(k.variance) || 0;
     let badge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">✅ KLOP</span>`;
@@ -930,6 +952,11 @@ function renderKlerkHistoryTable() {
       diffText = `-${formatRupiah(Math.abs(diff))}`;
     }
 
+    const cashSalesStr = isAuth ? formatRupiah(k.cashSales) : `<span class="text-slate-400 font-mono" title="Omzet disensor">••••••</span>`;
+    const physicalCashStr = isAuth ? formatRupiah(k.physicalCash) : `<span class="text-slate-400 font-mono" title="Fisik kas laci disensor">••••••</span>`;
+    const diffStr = isAuth ? diffText : `<span class="text-slate-400 font-mono" title="Selisih kas disensor">••••••</span>`;
+    const badgeStr = isAuth ? badge : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">🔒 SENSOR</span>`;
+
     return `
       <tr class="border-b border-slate-100 hover:bg-slate-50 text-xs">
         <td class="py-2 px-2.5 sm:px-3 font-mono font-bold text-amber-800">${k.id}</td>
@@ -939,25 +966,25 @@ function renderKlerkHistoryTable() {
           <div class="text-[10px] font-mono text-amber-700">${k.shift || 'Shift 1'} • [${k.cashierNik || ''}]</div>
         </td>
         <td class="hidden md:table-cell py-2 px-3 font-mono text-slate-600 text-right">
-          ${formatRupiah(k.initialCash)}
+          ${isAuth ? formatRupiah(k.initialCash) : `<span class="text-slate-400 font-mono">••••••</span>`}
         </td>
         <td class="hidden lg:table-cell py-2 px-3 font-mono text-emerald-700 font-bold text-right">
-          ${formatRupiah(k.cashSales)}
+          ${cashSalesStr}
         </td>
         <td class="py-2 px-2.5 sm:px-3 font-mono font-black text-slate-900 text-right">
-          ${formatRupiah(k.physicalCash)}
+          ${physicalCashStr}
         </td>
         <td class="py-2 px-2.5 sm:px-3 font-mono font-black text-center ${diffColor}">
-          ${diffText}
+          ${diffStr}
         </td>
         <td class="py-2 px-2.5 sm:px-3 text-center">
-          ${badge}
+          ${badgeStr}
         </td>
         <td class="py-2 px-2 sm:px-3 text-right whitespace-nowrap">
-          <button onclick="reprintKlerkDirectById('${k.id}')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded font-bold text-[11px] cursor-pointer shadow-2xs mr-1" title="Cetak Ulang Langsung ke Printer Thermal">
+          <button onclick="reprintKlerkWithAuthDirect('${k.id}')" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded font-bold text-[11px] cursor-pointer shadow-2xs mr-1" title="Cetak Ulang Langsung ke Printer Thermal">
             🖨️ Cetak Ulang
           </button>
-          <button onclick="openKlerkReceiptModalById('${k.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-bold text-[11px] cursor-pointer shadow-2xs" title="Lihat Pratinjau Struk Klerk">
+          <button onclick="openKlerkReceiptWithAuthDirect('${k.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-bold text-[11px] cursor-pointer shadow-2xs" title="Lihat Pratinjau Struk Klerk">
             👁️ Struk
           </button>
         </td>

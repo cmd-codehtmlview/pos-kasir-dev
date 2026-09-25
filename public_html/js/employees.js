@@ -450,7 +450,10 @@ function isCurrentUserAuthorizedForFinancials() {
   if (financialsTempUnlocked) return true;
   if (!pos.employees || pos.employees.length === 0) return true;
   if (!pos.currentUser) return false;
-  return pos.currentUser.role === "COS" || pos.currentUser.canViewFinancials === true;
+  // Selaraskan dengan data karyawan terbaru dari pos.employees jika ada
+  const latestEmp = (pos.employees || []).find(e => e.nik === pos.currentUser.nik);
+  const u = latestEmp || pos.currentUser;
+  return u.role === "COS" || u.canViewFinancials === true;
 }
 
 function openOwnerDashboardWithAuth() {
@@ -475,6 +478,9 @@ function toggleFinancialCensorWithAuth() {
     financialsTempUnlocked = false;
     if (typeof renderReports === "function") renderReports();
     if (typeof renderInventoryTable === "function") renderInventoryTable();
+    if (typeof renderKlerkHistoryTable === "function") renderKlerkHistoryTable();
+    if (typeof initSisReportModal === "function") initSisReportModal();
+    if (typeof initSisRecapModal === "function") initSisRecapModal();
     updateDashboardButtonState();
     showToast("Angka finansial & laba rugi laporan disensor kembali.", "info");
     return;
@@ -489,6 +495,9 @@ function toggleFinancialCensorWithAuth() {
     financialsTempUnlocked = true;
     if (typeof renderReports === "function") renderReports();
     if (typeof renderInventoryTable === "function") renderInventoryTable();
+    if (typeof renderKlerkHistoryTable === "function") renderKlerkHistoryTable();
+    if (typeof initSisReportModal === "function") initSisReportModal();
+    if (typeof initSisRecapModal === "function") initSisRecapModal();
     updateDashboardButtonState();
     showToast(`Sensor Laporan Finansial dibuka oleh ${supervisor.name} (${supervisor.role})`, "success");
     sfx.success();
@@ -538,6 +547,32 @@ function updateDashboardButtonState() {
       btnCensor.innerHTML = `<span>🔒</span><span id="btn-toggle-financial-censor-text">Buka Sensor Angka</span>`;
       btnCensor.className = "px-3 py-1.5 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer";
       btnCensor.title = "Klik untuk memasukkan PIN Pejabat Toko (COS) dan membuka sensor angka laporan";
+    }
+  }
+
+  // Toggle button on SIS Shift Report Modal
+  const btnSisReport = document.getElementById("btn-toggle-sis-report-censor");
+  const txtSisReport = document.getElementById("btn-toggle-sis-report-censor-text");
+  if (btnSisReport && txtSisReport) {
+    if (isAuth) {
+      btnSisReport.innerHTML = `<span>🔓</span><span id="btn-toggle-sis-report-censor-text">${financialsTempUnlocked ? "Kunci Sensor" : "Laporan Terbuka"}</span>`;
+      btnSisReport.className = "px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer";
+    } else {
+      btnSisReport.innerHTML = `<span>🔒</span><span id="btn-toggle-sis-report-censor-text">Buka Sensor</span>`;
+      btnSisReport.className = "px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-purple-200 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer";
+    }
+  }
+
+  // Toggle button on SIS Daily Recap Modal
+  const btnSisRecap = document.getElementById("btn-toggle-sis-recap-censor");
+  const txtSisRecap = document.getElementById("btn-toggle-sis-recap-censor-text");
+  if (btnSisRecap && txtSisRecap) {
+    if (isAuth) {
+      btnSisRecap.innerHTML = `<span>🔓</span><span id="btn-toggle-sis-recap-censor-text">${financialsTempUnlocked ? "Kunci Sensor" : "Laporan Terbuka"}</span>`;
+      btnSisRecap.className = "px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer";
+    } else {
+      btnSisRecap.innerHTML = `<span>🔒</span><span id="btn-toggle-sis-recap-censor-text">Buka Sensor</span>`;
+      btnSisRecap.className = "px-2.5 py-1 bg-white hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-2xs transition-all cursor-pointer";
     }
   }
 }

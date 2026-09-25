@@ -638,6 +638,17 @@ function printCurrentTabSalesReport() {
     return;
   }
 
+  if (typeof isCurrentUserAuthorizedForFinancials === "function" && !isCurrentUserAuthorizedForFinancials()) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Cetak Ringkasan Laporan Penjualan Toko", () => {
+        financialsTempUnlocked = true;
+        if (typeof renderReports === "function") renderReports();
+        printCurrentTabSalesReport();
+      });
+      return;
+    }
+  }
+
   let periodLabel = "30 Hari Terakhir";
   if (reportDateFilter === "today") periodLabel = "Hari Ini";
   else if (reportDateFilter === "7days") periodLabel = "7 Hari Terakhir";
