@@ -112,19 +112,81 @@ const NativeDevice = {
     }
   },
 
-  // 4. Native Network Listener
+  // 4. Native Network Listener (Cerdas & Tidak Spam)
+  _hasShownConnectedToast: false,
+  _lastNetworkConnectedState: null,
+
   async initNetworkMonitoring() {
     try {
       const Network = this.getPlugin("Network");
       if (Network && typeof Network.addListener === "function") {
+        // Cek status koneksi awal secara hening
+        if (typeof Network.getStatus === "function") {
+          try {
+            const initialStatus = await Network.getStatus();
+            const isConn = Boolean(initialStatus?.connected);
+            this._lastNetworkConnectedState = isConn;
+            if (isConn && !this._hasShownConnectedToast) {
+              this._hasShownConnectedToast = true;
+              if (typeof showToast === "function") {
+                const connType = (initialStatus.connectionType || "online").toUpperCase();
+                showToast(`🌐 Terhubung ke Internet (${connType})`, "info", 3500);
+              }
+            }
+          } catch (e) {}
+        }
+
         Network.addListener("networkStatusChange", status => {
           console.log("[NativeDevice] Status Jaringan berubah:", status);
-          if (typeof showToast === "function") {
-            if (status.connected) {
-              const connType = (status.connectionType || "online").toUpperCase();
-              showToast(`🌐 Terhubung ke Internet (${connType})`, "info");
-            } else {
-              showToast("⚠️ Koneksi internet terputus (Mode Kasir Offline Aktif)", "warning");
+          const isConnected = Boolean(status?.connected);
+
+          // Jika status online/offline sama seperti sebelumnya, abaikan (mencegah spam)
+          if (this._lastNetworkConnectedState === isConnected) {
+            return;
+          }
+
+          if (isConnected) {
+            // Hanya tampilkan jika sebelumnya terputus (reconnect) atau saat pertama kali start
+            if (this._lastNetworkConnectedState === false) {
+              if (typeof showToast === "function") {
+                showToast("🌐 Koneksi internet kembali terhubung", "success", 3000);
+              }
+            } else if (!this._hasShownConnectedToast) {
+              this._hasShownConnectedToast = true;
+              if (typeof showToast === "function") {
+                const connType = (status.connectionType || "online").toUpperCase();
+                showToast(`🌐 Terhubung ke Internet (${connType})`, "info", 3500);
+              }
+            }
+          } else {
+            // Koneksi terputus: selalu beri tahu kasir bahwa mode offline aktif
+            this._hasShownConnectedToast = false;
+            if (typeof showToast === "function") {
+              showToast("⚠️ Koneksi internet terputus (Mode Kasir Offline Aktif)", "warning", 5000);
+            }
+          }
+
+          this._lastNetworkConnectedState = isConnected;
+        });
+        return;
+      }
+
+      // Fallback web browser standar
+      if (typeof window !== "undefined") {
+        window.addEventListener("offline", () => {
+          if (this._lastNetworkConnectedState !== false) {
+            this._lastNetworkConnectedState = false;
+            this._hasShownConnectedToast = false;
+            if (typeof showToast === "function") {
+              showToast("⚠️ Koneksi internet terputus (Mode Kasir Offline Aktif)", "warning", 5000);
+            }
+          }
+        });
+        window.addEventListener("online", () => {
+          if (this._lastNetworkConnectedState === false) {
+            this._lastNetworkConnectedState = true;
+            if (typeof showToast === "function") {
+              showToast("🌐 Koneksi internet kembali terhubung", "success", 3000);
             }
           }
         });
@@ -149,3 +211,4 @@ if (typeof window !== "undefined") {
     NativeDevice.init();
   }
 }
+
