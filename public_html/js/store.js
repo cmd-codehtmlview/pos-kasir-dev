@@ -260,38 +260,29 @@ class POSStore {
           emp.canWasteStock = (emp.role === "COS" || emp.role === "ACOS");
           needSave = true;
         }
-        if (emp.role === "CREW") {
-          emp.canViewFinancials = false;
-          emp.canManageEmployees = false;
-          emp.canManageProducts = false;
-          emp.canStockMutation = false;
-          emp.canWasteStock = false;
-          emp.canRetur = false;
-          emp.canVoid = false;
-          emp.canVoidRetur = false;
-          emp.canStockOpname = false;
+        if (emp.canViewFinancials === undefined) {
+          emp.canViewFinancials = (emp.role === "COS");
           needSave = true;
-        } else {
-          if (emp.canViewFinancials === undefined) {
-            emp.canViewFinancials = (emp.role === "COS");
-            needSave = true;
-          }
-          if (emp.canManageEmployees === undefined) {
-            emp.canManageEmployees = (emp.role === "COS");
-            needSave = true;
-          }
-          if (emp.canManageProducts === undefined) {
-            emp.canManageProducts = (emp.role === "COS" || emp.role === "ACOS");
-            needSave = true;
-          }
-          if (emp.canStockMutation === undefined) {
-            emp.canStockMutation = (emp.role === "COS" || emp.role === "ACOS");
-            needSave = true;
-          }
-          if (emp.canWasteStock === undefined) {
-            emp.canWasteStock = (emp.role === "COS" || emp.role === "ACOS");
-            needSave = true;
-          }
+        }
+        if (emp.canManageEmployees === undefined) {
+          emp.canManageEmployees = (emp.role === "COS");
+          needSave = true;
+        }
+        if (emp.canManageProducts === undefined) {
+          emp.canManageProducts = (emp.role === "COS" || emp.role === "ACOS");
+          needSave = true;
+        }
+        if (emp.canStockMutation === undefined) {
+          emp.canStockMutation = (emp.role === "COS" || emp.role === "ACOS");
+          needSave = true;
+        }
+        if (emp.canVoidRetur === undefined) {
+          emp.canVoidRetur = (emp.role === "COS" || emp.role === "ACOS");
+          needSave = true;
+        }
+        if (emp.canStockOpname === undefined) {
+          emp.canStockOpname = (emp.role === "COS" || emp.role === "ACOS");
+          needSave = true;
         }
         if (!emp.shift) {
           emp.shift = "Shift 1";
@@ -305,12 +296,13 @@ class POSStore {
     const storedCurrentUser = (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("snack_pos_active_employee") : null) || (typeof localStorage !== "undefined" ? localStorage.getItem("snack_pos_active_employee") : null);
     if (storedCurrentUser) {
       try {
-        this.currentUser = JSON.parse(storedCurrentUser);
-        if (this.currentUser && this.currentUser.role === "CREW") {
-          this.currentUser.canViewFinancials = false;
-          this.currentUser.canManageEmployees = false;
-          this.currentUser.canWasteStock = false;
-          this.currentUser.canVoidRetur = false;
+        const parsed = JSON.parse(storedCurrentUser);
+        // Sinkronkan selalu dengan database karyawan agar permission terbaru langsung aktif
+        const liveEmp = Array.isArray(this.employees) ? this.employees.find(e => e.nik === parsed?.nik) : null;
+        if (liveEmp) {
+          this.currentUser = { ...liveEmp, shift: parsed?.shift || liveEmp.shift || "Shift 1" };
+        } else {
+          this.currentUser = parsed;
         }
       } catch (e) {
         this.currentUser = null;

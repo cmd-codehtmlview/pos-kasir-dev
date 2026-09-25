@@ -133,11 +133,12 @@ function getUnklerkedReturnsForCashier(cashierUser) {
 }
 
 function openKlerkModal() {
-  const activeUser = pos.currentUser || {
+  const activeUser = pos.currentUser || (Array.isArray(pos.employees) && pos.employees.find(e => e.nik === (pos.settings?.cashierNik || "1001"))) || {
     nik: pos.settings.cashierNik || "1001",
     name: pos.settings.cashierName || "Kasir 1",
     role: "CREW",
-    shift: pos.settings.shiftName || "Shift 1"
+    shift: pos.settings.shiftName || "Shift 1",
+    canBlindKlerk: true
   };
 
   // Reset status Blind Klerk setiap kali modal dibuka baru

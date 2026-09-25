@@ -746,6 +746,10 @@ function executeSaveSisEmployee() {
         pos.settings.cosPin = pin;
         if (typeof pos.saveSettings === 'function') pos.saveSettings();
       }
+      if (pos.currentUser && pos.currentUser.nik === sisEditingStaffNik) {
+        pos.currentUser = { ...emp, shift: pos.currentUser.shift || emp.shift || 'Shift 1' };
+        if (typeof pos.saveCurrentUser === 'function') pos.saveCurrentUser(pos.currentUser);
+      }
     }
     if (typeof showMockupToast === 'function') {
       showMockupToast(`👤 Data karyawan "${name}" berhasil diperbarui!`, 'success');
