@@ -377,7 +377,10 @@ function prepareEmployeeLoginModal() {
   const nikInput = document.getElementById("login-employee-nik");
   const pinInput = document.getElementById("login-employee-pin");
   const errEl = document.getElementById("login-error-msg");
-  if (nikInput) nikInput.value = "";
+  const lockBadge = document.getElementById("login-nik-lock-badge");
+  const hintEl = document.getElementById("login-nik-hint");
+  const lockNoticeEl = document.getElementById("login-active-shift-notice");
+
   if (pinInput) pinInput.value = "";
   if (errEl) {
     errEl.innerHTML = "";
@@ -386,9 +389,9 @@ function prepareEmployeeLoginModal() {
 
   // Periksa apakah ada shift kasir aktif yang belum di-clerk
   const activeShift = typeof findActiveUnklerkedShift === "function" ? findActiveUnklerkedShift() : null;
-  const lockNoticeEl = document.getElementById("login-active-shift-notice");
-  if (lockNoticeEl) {
-    if (activeShift && activeShift.nik) {
+
+  if (activeShift && activeShift.nik) {
+    if (lockNoticeEl) {
       lockNoticeEl.innerHTML = `
         <div class="p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-950 text-xs shadow-2xs">
           <p class="font-black flex items-center gap-1.5 text-amber-900">
@@ -398,31 +401,50 @@ function prepareEmployeeLoginModal() {
             Kasir aktif: <strong>${activeShift.name} (NIK: ${activeShift.nik})</strong> memiliki <strong>${activeShift.totalCount} transaksi aktif</strong> yang belum di-Clerk.
           </p>
           <p class="text-[10px] text-amber-800 font-bold mt-1.5 bg-amber-100/70 p-1.5 rounded-lg border border-amber-200">
-            * Hanya NIK ${activeShift.nik} yang dapat login untuk melanjutkan atau melakukan Tutup Kasir / Clerk [F8].
+            * Hanya NIK ${activeShift.nik} yang dapat login untuk melanjutkan atau melakukan Tutup Kasir / Clerk [F8]. NIK lain tidak dapat membuka sesi baru sebelum Clerk selesai.
           </p>
         </div>
       `;
       lockNoticeEl.classList.remove("hidden");
-      if (nikInput) nikInput.value = activeShift.nik;
-      setTimeout(() => pinInput?.focus(), 150);
-    } else {
+    }
+
+    if (nikInput) {
+      nikInput.value = activeShift.nik;
+      nikInput.readOnly = true;
+      nikInput.classList.add("bg-slate-100", "cursor-not-allowed");
+    }
+    if (lockBadge) lockBadge.classList.remove("hidden");
+    if (hintEl) {
+      hintEl.textContent = `Sesi kasir terkunci pada NIK ${activeShift.nik} (${activeShift.name}) karena terdapat ${activeShift.totalCount} transaksi belum di-clerk.`;
+      hintEl.classList.remove("hidden");
+    }
+    setTimeout(() => pinInput?.focus(), 150);
+  } else {
+    if (lockNoticeEl) {
       lockNoticeEl.classList.add("hidden");
       lockNoticeEl.innerHTML = "";
-      setTimeout(() => nikInput?.focus(), 150);
     }
-  } else {
-    if (activeShift && activeShift.nik && nikInput) {
-      nikInput.value = activeShift.nik;
-      setTimeout(() => pinInput?.focus(), 150);
-    } else {
-      setTimeout(() => nikInput?.focus(), 150);
+    if (nikInput) {
+      nikInput.readOnly = false;
+      nikInput.classList.remove("bg-slate-100", "cursor-not-allowed");
+      nikInput.value = "";
     }
+    if (lockBadge) lockBadge.classList.add("hidden");
+    if (hintEl) {
+      hintEl.classList.add("hidden");
+      hintEl.textContent = "";
+    }
+    setTimeout(() => nikInput?.focus(), 150);
   }
 }
 window.prepareEmployeeLoginModal = prepareEmployeeLoginModal;
 
 function lockCashierScreen() {
   financialsTempUnlocked = false;
+  window.isSupervisorReviewMode = false;
+  const banner = document.getElementById("supervisor-review-banner");
+  if (banner) banner.classList.add("hidden");
+
   pos.saveCurrentUser(null);
   renderEmployeeHeader();
   if (typeof renderReports === "function") renderReports();
@@ -438,8 +460,89 @@ function lockCashierScreen() {
   }
 
   openModal("modal-employee-login");
-  showToast("Layar kasir dikunci. Silakan login kembali.", "info");
+  showToast("Layar kasir dikunci / logout. Silakan login kembali.", "info");
 }
+
+/**
+ * Buka Portal Owner Online langsung dari Modal Login via Otorisasi PIN COS
+ */
+function openOwnerPortalFromLoginModal() {
+  requestSupervisorAuth("OPEN_OWNER_DASHBOARD", "Otorisasi Akses Portal Dashboard Online Owner (Khusus COS)", (supervisor) => {
+    try {
+      localStorage.setItem("snack_pos_owner_auth_token", Date.now().toString());
+    } catch (e) {}
+    if (typeof showToast === "function") {
+      showToast(`Akses Portal Owner diizinkan oleh ${supervisor.name} (${supervisor.role})`, "success");
+    }
+    window.open("owner.html", "_blank");
+  });
+}
+window.openOwnerPortalFromLoginModal = openOwnerPortalFromLoginModal;
+
+/**
+ * Masuk Mode Peninjauan Supervisor (COS):
+ * Memungkinkan COS membuka Laporan Keuangan, SIS Toko, atau cek otorisasi karyawan
+ * tanpa merusak atau mengubah sesi kasir crew yang masih ada transaksi dan belum clerk!
+ */
+function openSupervisorReviewModeFromLoginModal() {
+  requestSupervisorAuth("VIEW_FINANCIALS", "Masuk Mode Peninjauan Pejabat Toko / Supervisor (Khusus COS)", (supervisor) => {
+    window.isSupervisorReviewMode = true;
+    financialsTempUnlocked = true;
+
+    // Tutup modal login kasir
+    closeModal("modal-employee-login");
+
+    // Ambil info shift kasir yang sedang dipause
+    const activeShift = typeof findActiveUnklerkedShift === "function" ? findActiveUnklerkedShift() : null;
+    const pausedCashierName = activeShift ? `${activeShift.name} (NIK: ${activeShift.nik}, ${activeShift.totalCount} trx belum clerk)` : "Belum Ada Kasir";
+
+    // Pasang banner indikator Mode Peninjauan Supervisor di paling atas layar
+    let banner = document.getElementById("supervisor-review-banner");
+    if (!banner) {
+      banner = document.createElement("div");
+      banner.id = "supervisor-review-banner";
+      banner.className = "bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 text-slate-950 px-3.5 py-2 flex items-center justify-between text-xs font-bold shadow-md z-[9990] sticky top-0 border-b border-amber-600";
+      document.body.prepend(banner);
+    }
+    banner.innerHTML = `
+      <div class="flex items-center gap-2 min-w-0 pr-2">
+        <span class="text-base shrink-0">🛡️</span>
+        <div class="min-w-0 truncate">
+          <span class="font-black uppercase tracking-wider">Mode Peninjauan Pejabat Toko (COS: ${supervisor.name})</span>
+          <span class="font-normal text-[11px] text-amber-950 hidden sm:inline ml-2">• Sesi Kasir: <strong class="underline">${pausedCashierName}</strong> (Transaksi Aman &amp; Belum di-Clerk)</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button type="button" onclick="openOwnerDashboardWithAuth()" class="px-2.5 py-1 bg-slate-900 hover:bg-black text-white rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-2xs cursor-pointer">
+          <span>📊</span><span class="hidden sm:inline">Portal</span> Owner
+        </button>
+        <button type="button" onclick="exitSupervisorReviewMode()" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[10px] font-black flex items-center gap-1 shadow-2xs cursor-pointer">
+          <span>🔒</span><span>Selesai Tinjau (Kunci)</span>
+        </button>
+      </div>
+    `;
+    banner.classList.remove("hidden");
+
+    // Alihkan langsung ke Tab Laporan agar COS bisa memeriksa kinerja toko
+    if (typeof switchTab === "function") {
+      switchTab("tab-reports");
+    }
+
+    if (typeof showToast === "function") {
+      showToast(`Mode Peninjauan COS diaktifkan (${supervisor.name}). Sesi kasir aman.`, "success");
+    }
+  });
+}
+window.openSupervisorReviewModeFromLoginModal = openSupervisorReviewModeFromLoginModal;
+
+function exitSupervisorReviewMode() {
+  window.isSupervisorReviewMode = false;
+  financialsTempUnlocked = false;
+  const banner = document.getElementById("supervisor-review-banner");
+  if (banner) banner.classList.add("hidden");
+  lockCashierScreen();
+}
+window.exitSupervisorReviewMode = exitSupervisorReviewMode;
 
 // ==========================================
 // KONTROL AKSES KEUANGAN & DASHBOARD OWNER (RBAC)
@@ -598,7 +701,10 @@ function updateDashboardButtonState() {
 let currentSupervisorActionType = null;
 
 function hasPermissionForAction(user, actionType) {
-  if (!user) return true;
+  if (!user) {
+    if (!pos.employees || pos.employees.length === 0) return true;
+    return false;
+  }
   // Selaraskan dengan data karyawan terbaru dari pos.employees jika ada
   const latestEmp = (pos && Array.isArray(pos.employees)) ? pos.employees.find(e => e.nik === user.nik) : null;
   const u = latestEmp || user;

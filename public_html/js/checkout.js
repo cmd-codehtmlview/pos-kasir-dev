@@ -13,6 +13,12 @@ let checkoutPointDiscount = 0;
 let checkoutPayableAmount = 0;
 
 function openCheckoutModal() {
+  if (window.isSupervisorReviewMode) {
+    showToast("⚠️ Sedang dalam Mode Peninjauan Supervisor. Kasir harus login kembali untuk memproses transaksi.", "warning");
+    if (typeof sfx !== 'undefined' && sfx.warning) sfx.warning();
+    return;
+  }
+
   if (pos.cart.length === 0) {
     showToast("Keranjang transaksi masih kosong!", "warning");
     sfx.warning();

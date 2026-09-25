@@ -285,21 +285,7 @@ class POSStore {
         this.currentUser = null;
       }
     } else {
-      this.currentUser = {
-        nik: "1001",
-        name: "Owner / Kepala Toko",
-        role: "COS",
-        shift: "Shift 1",
-        canVoid: true,
-        canRetur: true,
-        canStockOpname: true,
-        canBlindKlerk: true,
-        canViewFinancials: true,
-        canManageEmployees: true,
-        canManageProducts: true,
-        canStockMutation: true
-      };
-      this.saveCurrentUser(this.currentUser);
+      this.currentUser = null;
     }
 
     // 11. Transaksi Dipending (1 Slot Buffer)

@@ -473,6 +473,7 @@ let sisEditingStaffNik = null;
 
 function initSisStaffModal() {
   renderSisStaffList();
+  renderSisAttendanceHistory();
   switchStaffModalTab('list');
 }
 
@@ -800,41 +801,44 @@ function deleteSisStaff(nik) {
   renderSisStaffList();
 }
 
-function recordSisAttendance(type = 'MASUK') {
-  if (!window.pos) return;
-  const currentUser = pos.currentUser || (Array.isArray(pos.employees) && pos.employees[0]);
-  if (!currentUser) {
-    if (typeof showMockupToast === 'function') {
-      showMockupToast('⚠️ Belum ada kasir yang aktif login!', 'error');
-    }
+function renderSisAttendanceHistory() {
+  const container = document.getElementById('sis-staff-attendance-container');
+  if (!container) return;
+
+  const records = (typeof pos !== 'undefined' && Array.isArray(pos.attendance)) ? pos.attendance : [];
+  if (records.length === 0) {
+    container.innerHTML = `
+      <div class="p-4 text-center text-slate-400 bg-white border border-dashed border-slate-200 rounded-xl">
+        <span class="text-xl block mb-1">⏱️</span>
+        <span class="font-bold text-slate-600 block text-[11px]">Belum ada catatan presensi shift</span>
+        <span class="text-[10px] text-slate-400">Presensi otomatis tercatat saat kasir login dengan NIK &amp; PIN.</span>
+      </div>
+    `;
     return;
   }
 
-  const now = new Date();
-  const dateStr = now.toISOString().split('T')[0];
-  const timeStr = now.toLocaleTimeString('id-ID');
+  container.innerHTML = records.slice(0, 20).map(r => {
+    let roleBadge = 'bg-slate-100 text-slate-700';
+    if (r.role === 'COS') roleBadge = 'bg-red-100 text-red-800';
+    if (r.role === 'ACOS') roleBadge = 'bg-blue-100 text-blue-800';
 
-  if (!Array.isArray(pos.attendance)) pos.attendance = [];
-
-  const record = {
-    id: `ABS-${dateStr.replace(/-/g, '')}-${currentUser.nik}-${Date.now().toString().slice(-4)}`,
-    date: dateStr,
-    time: timeStr,
-    nik: currentUser.nik,
-    name: currentUser.name,
-    role: currentUser.role || 'CREW',
-    shift: currentUser.shift || 'Shift 1',
-    type: type
-  };
-
-  pos.attendance.unshift(record);
-  if (typeof pos.saveAttendance === 'function') {
-    pos.saveAttendance();
-  }
-
-  if (typeof showMockupToast === 'function') {
-    const icon = type === 'MASUK' ? '🟢' : '🔴';
-    showMockupToast(`${icon} Absensi ${type} berhasil dicatat: ${currentUser.name} (${timeStr} WIB)`, 'success');
-  }
-  if (typeof sfx !== 'undefined' && sfx.success) sfx.success();
+    return `
+      <div class="p-2.5 bg-white border border-slate-200/80 rounded-xl flex items-center justify-between text-xs shadow-2xs">
+        <div class="flex items-center gap-2 min-w-0 pr-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 font-bold flex items-center justify-center text-[10px] shrink-0 border border-emerald-200">
+            MASUK
+          </div>
+          <div class="min-w-0">
+            <span class="font-bold text-slate-900 block truncate text-[11px]">${r.name} (${r.nik})</span>
+            <span class="text-[10px] text-slate-400 block">${r.date} • ${r.time} • ${r.shift || 'Shift 1'}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <span class="px-2 py-0.5 rounded-full font-bold text-[9px] ${roleBadge}">${r.role || 'CREW'}</span>
+          <span class="text-[10px] font-bold text-emerald-600">✅ Hadir</span>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
+window.renderSisAttendanceHistory = renderSisAttendanceHistory;

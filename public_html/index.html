@@ -3949,15 +3949,25 @@
       <!-- Tab 1: Daftar Karyawan -->
       <div id="staff-tab-content-list" class="p-4 overflow-y-auto space-y-3.5 flex-1 text-xs">
         <div class="flex items-center justify-between">
-          <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">Personil Toko Aktif:</span>
-          <div class="flex gap-1.5">
-            <button type="button" onclick="recordSisAttendance('MASUK')" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold rounded-lg text-[10px] cursor-pointer transition">🟢 Absen Masuk</button>
-            <button type="button" onclick="recordSisAttendance('PULANG')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 font-bold rounded-lg text-[10px] cursor-pointer transition">🔴 Absen Pulang</button>
-          </div>
+          <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">Personil Toko Terdaftar:</span>
+          <span class="text-[10px] text-slate-400 font-medium">Klik ✏️ untuk atur 8 hak akses</span>
         </div>
 
         <div id="sis-staff-list-container" class="space-y-2">
           <!-- Rendered dynamically via renderSisStaffList() -->
+        </div>
+
+        <!-- Section Riwayat Absensi Masuk Shift Kasir (Hanya Tampilan Riwayat) -->
+        <div class="mt-4 pt-3 border-t border-slate-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-slate-800 uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+              <span>⏱️</span><span>Riwayat Presensi Masuk Shift Kasir</span>
+            </span>
+            <span class="text-[9px] text-slate-400 font-medium">*Sesi absensi otomatis tercatat saat login kasir</span>
+          </div>
+          <div id="sis-staff-attendance-container" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar">
+            <!-- Rendered dynamically via renderSisAttendanceHistory() -->
+          </div>
         </div>
       </div>
 
@@ -8699,9 +8709,14 @@
         <div id="login-active-shift-notice" class="hidden"></div>
 
         <div>
-          <label class="block text-xs font-black text-slate-800 uppercase tracking-wider mb-1">
-            NIK Karyawan (Nomor Induk Karyawan) *
-          </label>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-black text-slate-800 uppercase tracking-wider">
+              NIK Karyawan (Nomor Induk Karyawan) *
+            </label>
+            <span id="login-nik-lock-badge" class="hidden text-[9px] font-bold text-rose-700 bg-rose-100 border border-rose-300 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span>🔒</span><span>Terkunci Kasir Aktif</span>
+            </span>
+          </div>
           <div class="relative">
             <span class="absolute left-3.5 top-2.5 text-slate-400 text-sm">🆔</span>
             <input 
@@ -8712,6 +8727,7 @@
               class="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-alfa-red"
             />
           </div>
+          <p id="login-nik-hint" class="text-[10px] text-amber-800 font-medium mt-1 hidden"></p>
         </div>
 
         <div>
@@ -8752,7 +8768,7 @@
         <div id="login-error-msg" class="hidden p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold text-center">
         </div>
 
-        <div class="pt-2">
+        <div class="pt-1">
           <button 
             type="submit" 
             class="w-full py-3 bg-alfa-red hover:bg-red-700 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-red-700/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
@@ -8760,6 +8776,37 @@
             <span>⏱️</span>
             <span>Absen Masuk & Buka Kasir</span>
           </button>
+        </div>
+
+        <!-- Akses Pejabat Toko / Owner Saat Sesi Kasir Aktif Belum Clerk -->
+        <div class="pt-3 border-t border-slate-200 mt-2">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[10px] font-black text-slate-700 uppercase tracking-wider flex items-center gap-1">
+              <span>🛡️</span><span>Akses Pejabat Toko / Owner</span>
+            </span>
+            <span class="text-[9px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">Khusus COS</span>
+          </div>
+          <p class="text-[10px] text-slate-500 mb-2 leading-relaxed">
+            Perlu cek laporan omzet toko atau buka portal owner tanpa merusak transaksi kasir aktif?
+          </p>
+          <div class="grid grid-cols-2 gap-2">
+            <button 
+              type="button" 
+              onclick="openOwnerPortalFromLoginModal()" 
+              class="py-2 px-2.5 bg-slate-900 hover:bg-black text-white rounded-xl text-[10px] font-bold flex items-center justify-center gap-1.5 transition shadow-2xs cursor-pointer"
+              title="Buka Portal Owner Online via Otorisasi PIN COS"
+            >
+              <span>📊</span><span>Portal Owner ↗</span>
+            </button>
+            <button 
+              type="button" 
+              onclick="openSupervisorReviewModeFromLoginModal()" 
+              class="py-2 px-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-[10px] flex items-center justify-center gap-1.5 transition shadow-2xs cursor-pointer"
+              title="Tinjau Laporan & SIS Toko Sementara (Sesi Kasir Tetap Aman)"
+            >
+              <span>🛡️</span><span>Tinjau Laporan/SIS</span>
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -9197,7 +9244,7 @@
   <!-- Core Data & Storage -->
   <script src="products-data.js?v=99"></script>
   <script src="js/db.js?v=120"></script>
-  <script src="js/store.js?v=101"></script>
+  <script src="js/store.js?v=102"></script>
   <script src="js/license.js?v=120"></script>
   <script src="js/sync.js?v=104"></script>
   
@@ -9206,7 +9253,7 @@
   <script src="js/scanner.js?v=127"></script>
   <script src="js/cart.js?v=106"></script>
   <script src="js/printer.js?v=135"></script>
-  <script src="js/checkout.js?v=112"></script>
+  <script src="js/checkout.js?v=113"></script>
   <script src="js/member.js?v=108"></script>
   <script src="js/returns.js?v=102"></script>
   <script src="js/stock-opname.js?v=101"></script>
@@ -9217,13 +9264,13 @@
   <script src="js/repack.js?v=100"></script>
   <script src="js/reports.js?v=105"></script>
   <script src="js/settings.js?v=118"></script>
-  <script src="js/employees.js?v=127"></script>
+  <script src="js/employees.js?v=128"></script>
   
   <!-- Main Application Entry Point -->
   <script src="js/app.js?v=119"></script>
   <script src="js/sis-logistics.js?v=105"></script>
   <script src="js/sis-cashier-ops.js?v=100"></script>
-  <script src="js/sis-store-crm.js?v=102"></script>
+  <script src="js/sis-store-crm.js?v=103"></script>
   <script src="js/sis-analytics.js?v=102"></script>
 
   <script>
