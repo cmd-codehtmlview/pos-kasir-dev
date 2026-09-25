@@ -277,19 +277,12 @@ class POSStore {
     }
 
     // 10. Sesi Karyawan Aktif
-    // Gunakan sessionStorage agar setiap pembukaan aplikasi kasir / tab baru selalu wajib login & presensi
-    const storedCurrentUser = typeof sessionStorage !== "undefined" ? sessionStorage.getItem("snack_pos_active_employee") : null;
-    if (storedCurrentUser) {
-      try {
-        this.currentUser = JSON.parse(storedCurrentUser);
-      } catch (e) {
-        this.currentUser = null;
-      }
-    } else {
-      this.currentUser = null;
-    }
-    // Bersihkan residu di localStorage agar tidak membypass dialog login kasir
-    try { localStorage.removeItem("snack_pos_active_employee"); } catch (e) {}
+    // Selalu mulai dengan sesi terkunci agar setiap awal buka aplikasi / refresh kasir wajib login & presensi
+    this.currentUser = null;
+    try {
+      if (typeof sessionStorage !== "undefined") sessionStorage.removeItem("snack_pos_active_employee");
+      localStorage.removeItem("snack_pos_active_employee");
+    } catch (e) {}
 
     // 11. Transaksi Dipending (1 Slot Buffer)
     const storedPendingCart = localStorage.getItem("snack_pos_pending_cart");
