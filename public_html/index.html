@@ -2731,6 +2731,17 @@
           </div>
         </div>
 
+        <!-- Banner Peringatan Jika Shift Sebelumnya Sudah Selesai & Belum Ada Transaksi Baru -->
+        <div id="klerk-already-closed-banner" class="hidden p-3.5 bg-amber-50 border border-amber-300 rounded-2xl flex items-start gap-3">
+          <span class="text-xl flex-shrink-0">🔒</span>
+          <div class="text-xs text-amber-900 leading-relaxed">
+            <div id="klerk-already-closed-title" class="font-bold text-amber-950">Shift Kasir Sebelumnya Sudah Selesai Ditutup</div>
+            <p id="klerk-already-closed-desc" class="text-amber-800 text-[11px] mt-0.5">
+              Belum ada transaksi penjualan baru di kasir. Silakan lakukan transaksi penjualan baru, maka sistem akan otomatis memulai akumulasi shift kasir yang baru.
+            </p>
+          </div>
+        </div>
+
         <!-- 1. SECTION FORM INPUT KLERK (Sebelum Simpan) -->
         <div id="klerk-input-section" class="space-y-3">
           <!-- Single Nominal Input -->
@@ -2869,23 +2880,24 @@
       <!-- Footer Buttons -->
       <div class="p-3 bg-slate-50 border-t border-slate-200/80 flex justify-between gap-2">
         <div id="klerk-footer-input" class="w-full flex justify-between gap-2">
-          <button onclick="closeSisModal('sis-modal-klerk')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Batal</button>
-          <button onclick="submitBlindKlerk()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs flex items-center gap-1.5 active:scale-95 transition">
+          <button onclick="closeSisModal('sis-modal-klerk')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">Tutup [ESC]</button>
+          <button id="btn-submit-klerk" onclick="submitBlindKlerk()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs flex items-center gap-1.5 active:scale-95 transition">
             <span>💾</span>
             <span>Simpan & Kunci Closing Klerk</span>
           </button>
         </div>
-        <div id="klerk-footer-result" class="hidden w-full flex justify-between gap-2">
-          <button onclick="resetKlerkForm()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 transition">
-            ↺ Hitung Ulang
-          </button>
+        <div id="klerk-footer-result" class="hidden w-full flex justify-between items-center gap-2">
+          <div class="flex items-center gap-1.5 text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Closing Shift Sah &amp; Terkunci</span>
+          </div>
           <div class="flex items-center gap-2">
             <button onclick="printKlerkReceipt()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs cursor-pointer border border-slate-200/80 flex items-center gap-1.5 transition">
               <span>🖨️</span>
               <span>Cetak Struk Klerk</span>
             </button>
-            <button onclick="closeSisModal('sis-modal-klerk')" class="px-4 py-2 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs transition">
-              Selesai
+            <button onclick="finishKlerkSession()" class="px-4 py-2 bg-slate-900 hover:bg-black text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs transition">
+              Selesai &amp; Buka Shift Baru
             </button>
           </div>
         </div>
@@ -9771,6 +9783,45 @@
       const termEl = document.getElementById('sis-klerk-terminal-val');
       if (termEl) termEl.textContent = `${terminalId}`;
 
+      // Cek apakah shift kasir hari ini sudah pernah ditutup dan belum ada transaksi baru
+      const hasKlerkedToday = (pos && Array.isArray(pos.klerkHistory)) ? pos.klerkHistory.some(k => k.date === todayStr) : false;
+      const latestKlerkToday = hasKlerkedToday ? pos.klerkHistory.find(k => k.date === todayStr) : null;
+      const isAlreadyClosed = Boolean(hasKlerkedToday && todayTrxs.length === 0);
+
+      const bannerEl = document.getElementById('klerk-already-closed-banner');
+      const bannerTitle = document.getElementById('klerk-already-closed-title');
+      const bannerDesc = document.getElementById('klerk-already-closed-desc');
+      const btnSubmit = document.getElementById('btn-submit-klerk');
+      const inputNominal = document.getElementById('klerk-input-nominal');
+
+      if (isAlreadyClosed) {
+        if (bannerEl) bannerEl.classList.remove('hidden');
+        if (bannerTitle) bannerTitle.textContent = `Shift Kasir Sebelumnya Sudah Selesai Ditutup (${latestKlerkToday?.id || ''})`;
+        if (bannerDesc) bannerDesc.textContent = `Belum ada transaksi penjualan baru di kasir. Silakan buat transaksi penjualan baru, maka sistem akan otomatis memulai akumulasi shift kasir berikutnya.`;
+        if (btnSubmit) {
+          btnSubmit.disabled = true;
+          btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
+          btnSubmit.classList.remove('active:scale-95');
+          btnSubmit.innerHTML = `<span>🔒</span><span>Shift Sudah Ditutup</span>`;
+        }
+        if (inputNominal) {
+          inputNominal.disabled = true;
+          inputNominal.placeholder = "Shift sudah ditutup";
+        }
+      } else {
+        if (bannerEl) bannerEl.classList.add('hidden');
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
+          btnSubmit.classList.add('active:scale-95');
+          btnSubmit.innerHTML = `<span>💾</span><span>Simpan & Kunci Closing Klerk</span>`;
+        }
+        if (inputNominal) {
+          inputNominal.disabled = false;
+          inputNominal.placeholder = "0";
+        }
+      }
+
       renderSisKlerkHistory();
     }
 
@@ -9805,7 +9856,22 @@
       if (footerResult) footerResult.classList.add('hidden');
     }
 
+    function finishKlerkSession() {
+      closeSisModal('sis-modal-klerk');
+      showMockupToast('✅ Sesi shift kasir telah ditutup. Transaksi baru otomatis masuk shift berikutnya.', 'success');
+    }
+
     function submitBlindKlerk() {
+      const state = window.sisActiveKlerkState || {};
+      const todayStr = new Date().toISOString().split("T")[0];
+      const hasKlerkedToday = (pos && Array.isArray(pos.klerkHistory)) ? pos.klerkHistory.some(k => k.date === todayStr) : false;
+
+      // Larang closing ulang jika sesi sudah ditutup dan belum ada transaksi baru
+      if (hasKlerkedToday && (!state.todayTrxs || state.todayTrxs.length === 0)) {
+        showMockupToast('⚠️ Sesi shift kasir sudah ditutup sebelumnya. Belum ada transaksi penjualan baru!', 'warning');
+        return;
+      }
+
       const inputEl = document.getElementById('klerk-input-nominal');
       const rawVal = inputEl ? inputEl.value.replace(/[^0-9]/g, '') : '';
       
