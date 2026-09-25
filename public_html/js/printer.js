@@ -4425,16 +4425,8 @@ if (typeof document !== 'undefined') {
   }
 }
 
-// Proteksi anti-refresh tidak sengaja saat koneksi printer Bluetooth sedang aktif
-if (typeof window !== 'undefined') {
-  window.addEventListener('beforeunload', (e) => {
-    if (typeof isBluetoothConnected === 'function' && isBluetoothConnected()) {
-      e.preventDefault();
-      e.returnValue = "Koneksi printer Bluetooth sedang aktif. Memuat ulang halaman akan memutus koneksi printer.";
-      return e.returnValue;
-    }
-  });
-}
+// Catatan: Proteksi beforeunload dinonaktifkan agar navigasi ke Portal Owner dan antar-halaman berjalan mulus tanpa dialog konfirmasi browser
+
 
 // =========================================================
 // MODE CETAK KILAT NATIVE ESC/POS (0.5 DETIK PER LABEL)
