@@ -436,7 +436,6 @@ let currentSupervisorActionType = null;
 
 function hasPermissionForAction(user, actionType) {
   if (!user) return true;
-  if (actionType === 'MANAGE_PRODUCTS') return true;
   if (actionType === "VOID_ITEM" || actionType === "VOID_CART") {
     return user.canVoid !== undefined ? user.canVoid : (user.role === "COS" || user.role === "ACOS");
   }

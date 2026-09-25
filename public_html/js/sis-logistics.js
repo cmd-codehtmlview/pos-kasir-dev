@@ -626,6 +626,13 @@ function editSisProduct(productId) {
 }
 
 function saveSisProduct(andPrint = false) {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Menyimpan / Edit Data Master Produk", () => {
+      saveSisProduct(andPrint);
+    });
+    return;
+  }
+
   const getVal = id => (document.getElementById(id)?.value || "").trim();
   const id = getVal('sis-prod-id');
   const imageData = getVal('sis-prod-image-data');
@@ -766,6 +773,13 @@ function printCurrentSisProductLabel() {
 }
 
 function deleteSisProduct(productId) {
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Menghapus Produk dari Master Barang (Khusus Pejabat Toko)", () => {
+      deleteSisProduct(productId);
+    });
+    return;
+  }
+
   if (!pos || !Array.isArray(pos.products)) return;
   const prod = pos.products.find(p => p.id === productId);
   if (!prod) return;

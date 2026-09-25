@@ -630,7 +630,14 @@ function openProductModal(productId = null) {
 }
 
 function handleSaveProductForm(event) {
-  event.preventDefault();
+  if (event && typeof event.preventDefault === "function") event.preventDefault();
+
+  if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
+    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Menyimpan / Edit Data Master Produk", () => {
+      handleSaveProductForm();
+    });
+    return;
+  }
 
   const id = document.getElementById("product-form-id")?.value;
   const name = document.getElementById("product-form-name")?.value.trim();
