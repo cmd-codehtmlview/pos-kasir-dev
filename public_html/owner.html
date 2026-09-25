@@ -164,19 +164,19 @@
 
       <!-- Actions: Fullscreen, Lock, Cashier POS -->
       <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-        <!-- Fullscreen Button -->
+        <!-- Fullscreen Button (Hanya tampil di Desktop) -->
         <button 
           id="btn-toggle-fullscreen"
           type="button"
           onclick="toggleFullScreen()" 
-          class="p-1.5 sm:px-2.5 sm:py-1.5 bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold border border-slate-700/80 flex items-center gap-1 transition-all shadow-xs active:scale-95 cursor-pointer"
+          class="hidden sm:flex p-1.5 sm:px-2.5 sm:py-1.5 bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold border border-slate-700/80 items-center gap-1 transition-all shadow-xs active:scale-95 cursor-pointer"
           title="Mode Layar Penuh (Fullscreen)"
         >
           <span id="fullscreen-icon" class="text-xs">⛶</span>
-          <span class="hidden sm:inline text-[11px]">Fullscreen</span>
+          <span class="text-[11px]">Fullscreen</span>
         </button>
 
-        <!-- Lock Button: Proteksi Akses Dashboard -->
+        <!-- Lock Button: Proteksi Akses Dashboard (Minimalis di HP) -->
         <button 
           type="button"
           onclick="lockOwnerDashboard()" 
@@ -187,10 +187,10 @@
           <span class="hidden sm:inline text-[11px]">Kunci</span>
         </button>
 
-        <!-- Link back to POS Cashier -->
+        <!-- Link back to POS Cashier (Desktop Header Only - di HP dipindah ke Footer Nav) -->
         <a 
           href="index.html" 
-          class="px-2.5 py-1.5 sm:px-3.5 sm:py-1.5 bg-alfa-red hover:bg-red-700 text-white rounded-xl text-xs font-black shadow-md shadow-red-950/40 flex items-center gap-1.5 transition-all active:scale-95"
+          class="hidden sm:flex px-2.5 py-1.5 sm:px-3.5 sm:py-1.5 bg-alfa-red hover:bg-red-700 text-white rounded-xl text-xs font-black shadow-md shadow-red-950/40 items-center gap-1.5 transition-all active:scale-95"
           title="Kembali ke Layar Kasir"
         >
           <span class="text-xs">🛒</span>
@@ -204,7 +204,7 @@
   <!-- ========================================== -->
   <!-- MAIN CONTAINER -->
   <!-- ========================================== -->
-  <main class="max-w-7xl mx-auto px-3 sm:px-6 pt-5 space-y-6 flex-1 w-full max-w-full min-w-0 overflow-x-hidden">
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 pt-5 pb-24 sm:pb-8 space-y-6 flex-1 w-full max-w-full min-w-0 overflow-x-hidden">
 
     <!-- BANNER STATUS LANGGANAN CLOUD DASHBOARD -->
     <div id="owner-cloud-gate-banner" class="hidden p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg"></div>
@@ -564,7 +564,7 @@
     <!-- ========================================== -->
     <!-- TOP 10 PRODUK & FEED TRANSAKSI LIVE -->
     <!-- ========================================== -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div id="section-live-feed" class="grid grid-cols-1 lg:grid-cols-12 gap-6 scroll-mt-16 sm:scroll-mt-20">
       
       <!-- TOP 10 PRODUK TERLARIS (5 Kolom) -->
       <div class="lg:col-span-5 bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-800 stat-card-glow space-y-4 flex flex-col max-w-full overflow-hidden min-w-0">
@@ -624,7 +624,7 @@
     <!-- ========================================== -->
     <!-- PERINGATAN STOK MENIPIS (PERLU KULAKAN) -->
     <!-- ========================================== -->
-    <section id="section-low-stock" class="bg-slate-900 p-4 sm:p-5 rounded-3xl border border-rose-900/50 stat-card-glow space-y-4 max-w-full overflow-hidden min-w-0">
+    <section id="section-low-stock" class="bg-slate-900 p-4 sm:p-5 rounded-3xl border border-rose-900/50 stat-card-glow space-y-4 max-w-full overflow-hidden min-w-0 scroll-mt-16 sm:scroll-mt-20">
       <div class="flex items-center justify-between">
         <div>
           <h3 class="font-black text-sm text-white flex items-center gap-2">
@@ -1190,6 +1190,59 @@
     </div> <!-- /#owner-dashboard-body -->
 
   </main>
+
+  <!-- ========================================== -->
+  <!-- MOBILE BOTTOM NAVIGATION (ALA TIKTOK SELLER CENTER) -->
+  <!-- ========================================== -->
+  <nav id="owner-mobile-bottom-nav" class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/90 px-2 py-1.5 sm:hidden shadow-2xl">
+    <div class="grid grid-cols-4 items-center justify-around gap-1 max-w-md mx-auto">
+      
+      <!-- Tab 1: Beranda / Sales Hero -->
+      <button 
+        type="button" 
+        onclick="navToTab('beranda')" 
+        id="tab-btn-beranda" 
+        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-1 rounded-xl text-emerald-400 font-bold transition-all active:scale-95 cursor-pointer"
+      >
+        <span class="text-base leading-none">📊</span>
+        <span class="tab-text text-[10px] mt-1 font-extrabold tracking-tight text-emerald-400">Beranda</span>
+      </button>
+
+      <!-- Tab 2: Transaksi / Live Feed & Klerk -->
+      <button 
+        type="button" 
+        onclick="navToTab('transaksi')" 
+        id="tab-btn-transaksi" 
+        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-1 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer"
+      >
+        <span class="text-base leading-none">🧾</span>
+        <span class="tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400">Transaksi</span>
+      </button>
+
+      <!-- Tab 3: Stok & DSI -->
+      <button 
+        type="button" 
+        onclick="navToTab('stok')" 
+        id="tab-btn-stok" 
+        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-1 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer"
+      >
+        <span class="text-base leading-none">📦</span>
+        <span class="tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400">Stok & DSI</span>
+      </button>
+
+      <!-- Tab 4: Kasir POS (Aksen Merah Toko) -->
+      <a 
+        href="index.html" 
+        id="tab-btn-kasir" 
+        class="flex flex-col items-center justify-center py-1 px-1 rounded-xl text-rose-400 hover:text-rose-300 font-bold transition-all active:scale-95"
+        title="Beralih ke Layar Kasir"
+      >
+        <span class="text-base leading-none">🛒</span>
+        <span class="text-[10px] mt-1 font-extrabold text-rose-400 tracking-tight">Kasir POS</span>
+      </a>
+
+    </div>
+  </nav>
 
   <!-- ========================================== -->
   <!-- MODAL DETAIL STRUK TRANSAKSI (DIGITAL RECEIPT) -->
@@ -3998,6 +4051,57 @@
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
+
+    function navToTab(tab) {
+      if (tab === 'beranda') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tab === 'transaksi') {
+        scrollToSection('section-live-feed');
+      } else if (tab === 'stok') {
+        scrollToSection('section-low-stock');
+      }
+      setActiveNavTab(tab);
+    }
+
+    function setActiveNavTab(tab) {
+      const tabs = ['beranda', 'transaksi', 'stok'];
+      tabs.forEach(t => {
+        const btn = document.getElementById('tab-btn-' + t);
+        if (!btn) return;
+        const textSpan = btn.querySelector('.tab-text');
+        if (t === tab) {
+          btn.className = "nav-tab-btn flex flex-col items-center justify-center py-1 px-1 rounded-xl text-emerald-400 font-bold transition-all active:scale-95 cursor-pointer";
+          if (textSpan) textSpan.className = "tab-text text-[10px] mt-1 font-extrabold tracking-tight text-emerald-400";
+        } else {
+          btn.className = "nav-tab-btn flex flex-col items-center justify-center py-1 px-1 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer";
+          if (textSpan) textSpan.className = "tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400";
+        }
+      });
+    }
+
+    // Scroll Spy untuk Navigasi Mobile Ala TikTok Seller Center
+    let scrollSpyThrottleTimeout = null;
+    window.addEventListener("scroll", () => {
+      if (scrollSpyThrottleTimeout) return;
+      scrollSpyThrottleTimeout = setTimeout(() => {
+        scrollSpyThrottleTimeout = null;
+        if (window.innerWidth >= 640) return; // Hanya aktif di layar HP
+        const scrollPos = window.scrollY;
+        const txEl = document.getElementById('section-live-feed');
+        const stockEl = document.getElementById('section-low-stock');
+        
+        const txTop = txEl ? (txEl.offsetTop - 150) : 999999;
+        const stockTop = stockEl ? (stockEl.offsetTop - 150) : 999999;
+
+        if (scrollPos >= stockTop) {
+          setActiveNavTab('stok');
+        } else if (scrollPos >= txTop) {
+          setActiveNavTab('transaksi');
+        } else {
+          setActiveNavTab('beranda');
+        }
+      }, 100);
+    }, { passive: true });
 
     // Jam Digital Live
     function updateClock() {
