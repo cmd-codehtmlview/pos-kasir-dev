@@ -895,7 +895,7 @@ function reprintKlerkWithAuthDirect(id) {
   if (typeof isCurrentUserAuthorizedForFinancials === "function" && !isCurrentUserAuthorizedForFinancials()) {
     if (typeof requestSupervisorAuth === "function") {
       requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Cetak Ulang Struk Klerk Closing Shift", () => {
-        financialsTempUnlocked = true;
+        window.financialsTempUnlocked = true;
         if (typeof renderKlerkHistoryTable === "function") renderKlerkHistoryTable();
         reprintKlerkDirectById(id);
       });
@@ -909,7 +909,7 @@ function openKlerkReceiptWithAuthDirect(id) {
   if (typeof isCurrentUserAuthorizedForFinancials === "function" && !isCurrentUserAuthorizedForFinancials()) {
     if (typeof requestSupervisorAuth === "function") {
       requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Melihat Struk Klerk Closing Shift", () => {
-        financialsTempUnlocked = true;
+        window.financialsTempUnlocked = true;
         if (typeof renderKlerkHistoryTable === "function") renderKlerkHistoryTable();
         openKlerkReceiptModalById(id);
       });

@@ -442,7 +442,7 @@ function exportTransactionsCSV() {
   if (!isAuth) {
     if (typeof requestSupervisorAuth === "function") {
       requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Ekspor Data Transaksi Toko (Khusus Pejabat Toko / COS)", (supervisor) => {
-        if (typeof financialsTempUnlocked !== "undefined") financialsTempUnlocked = true;
+        window.financialsTempUnlocked = true;
         if (typeof updateDashboardButtonState === "function") updateDashboardButtonState();
         exportTransactionsCSV();
       });
@@ -517,7 +517,7 @@ function exportTransactionsToExcel() {
   if (!isAuth) {
     if (typeof requestSupervisorAuth === "function") {
       requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Ekspor Data Transaksi Toko (Khusus Pejabat Toko / COS)", (supervisor) => {
-        if (typeof financialsTempUnlocked !== "undefined") financialsTempUnlocked = true;
+        window.financialsTempUnlocked = true;
         if (typeof updateDashboardButtonState === "function") updateDashboardButtonState();
         exportTransactionsToExcel();
       });
@@ -661,7 +661,7 @@ function printCurrentTabSalesReport() {
   if (typeof isCurrentUserAuthorizedForFinancials === "function" && !isCurrentUserAuthorizedForFinancials()) {
     if (typeof requestSupervisorAuth === "function") {
       requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Cetak Ringkasan Laporan Penjualan Toko", () => {
-        financialsTempUnlocked = true;
+        window.financialsTempUnlocked = true;
         if (typeof renderReports === "function") renderReports();
         printCurrentTabSalesReport();
       });

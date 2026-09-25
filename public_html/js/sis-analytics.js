@@ -125,7 +125,7 @@ function printSisShiftReportReceipt() {
   if (typeof isCurrentUserAuthorizedForFinancials === 'function' && !isCurrentUserAuthorizedForFinancials()) {
     if (typeof requestSupervisorAuth === 'function') {
       requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Cetak Laporan Penjualan Shift Kasir", (supervisor) => {
-        financialsTempUnlocked = true;
+        window.financialsTempUnlocked = true;
         initSisReportModal();
         if (typeof updateDashboardButtonState === 'function') updateDashboardButtonState();
         doExecutePrintShiftReport();
@@ -238,7 +238,7 @@ function printSisDailyRecapReceipt() {
   if (typeof isCurrentUserAuthorizedForFinancials === 'function' && !isCurrentUserAuthorizedForFinancials()) {
     if (typeof requestSupervisorAuth === 'function') {
       requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Cetak Rekap Kas & Transaksi Harian", (supervisor) => {
-        financialsTempUnlocked = true;
+        window.financialsTempUnlocked = true;
         initSisRecapModal();
         if (typeof updateDashboardButtonState === 'function') updateDashboardButtonState();
         doExecutePrintDailyRecap();

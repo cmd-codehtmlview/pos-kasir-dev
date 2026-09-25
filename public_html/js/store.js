@@ -233,6 +233,25 @@ class POSStore {
       localStorage.setItem("snack_pos_demo_purged_v3", "true");
     }
 
+    if (!Array.isArray(this.employees) || this.employees.length === 0) {
+      this.employees = [{
+        nik: "1001",
+        name: "Kepala Toko / COS",
+        role: "COS",
+        pin: "1234",
+        shift: "Shift 1",
+        canVoid: true,
+        canRetur: true,
+        canStockOpname: true,
+        canBlindKlerk: true,
+        canViewFinancials: true,
+        canManageEmployees: true,
+        canManageProducts: true,
+        canStockMutation: true
+      }];
+      this.saveEmployees();
+    }
+
     if (Array.isArray(this.employees) && this.employees.length > 0) {
       let needSave = false;
       this.employees.forEach(emp => {

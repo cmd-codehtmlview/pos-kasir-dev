@@ -609,15 +609,22 @@ function initApp() {
   try { initUniversalPrinterDriver(); } catch (e) { console.error("Error initUniversalPrinterDriver:", e); }
 
   // Alur Inisialisasi Akun Kasir:
-  // 1. Jika aplikasi belum berlisensi, jangan buka modal setup/login dulu!
-  //    Biarkan modal-activation-lock aktif di layar agar pengguna menyelesaikan aktivasi lisensi / trial 7 hari.
+  // 1. Jika aplikasi belum berlisensi dan bukan lingkungan dev, jangan buka modal login dulu
   if (typeof isAppLicensed === "function" && !isAppLicensed()) {
     return;
   }
 
-  // 2. Jika sudah berlisensi, buka form setup COS perdana atau login kasir
-  if (typeof checkAndOpenPostLicenseSetup === "function") {
-    checkAndOpenPostLicenseSetup();
+  // 2. JAMINAN MUTLAK: Setiap awal buka aplikasi / refresh / logout,
+  // kasir WAJIB login & presensi via modal-employee-login jika belum ada sesi aktif!
+  if (!pos.currentUser) {
+    if (typeof openModal === "function") {
+      openModal("modal-employee-login");
+    }
+  } else {
+    setTimeout(() => {
+      const input = document.getElementById("pos-barcode-search");
+      if (input) input.focus();
+    }, 300);
   }
 }
 

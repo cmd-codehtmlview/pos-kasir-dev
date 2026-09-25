@@ -207,6 +207,7 @@ function saveStoredLicense(licenseObj) {
 }
 
 function isAppLicensed() {
+  if (typeof isDevEnvironment === "function" && isDevEnvironment()) return true;
   const lic = getStoredLicense();
   if (!lic || !lic.isLicensed) return false;
   if (lic.status === "BLOCKED" || lic.status === "EXPIRED") return false;
@@ -215,10 +216,11 @@ function isAppLicensed() {
 }
 
 async function checkLicenseOnStartup() {
+  const isDev = typeof isDevEnvironment === "function" && isDevEnvironment();
   const lic = getStoredLicense();
   const lockModal = document.getElementById("modal-activation-lock");
 
-  if (!lic || !isAppLicensed()) {
+  if (!isDev && (!lic || !isAppLicensed())) {
     // Pengguna baru pertama kali membuka web: Wajib diarahkan ke FORM PENDAFTARAN TOKO
     if (lockModal) {
       lockModal.classList.remove("hidden");
@@ -370,14 +372,24 @@ function checkAndOpenPostLicenseSetup() {
     return;
   }
   if (!pos.employees || pos.employees.length === 0) {
-    if (typeof openModal === "function") {
-      openModal("modal-first-time-setup");
-      setTimeout(() => {
-        const nameInput = document.getElementById("setup-cos-name");
-        if (nameInput) nameInput.focus();
-      }, 250);
-    }
-  } else if (!pos.currentUser) {
+    pos.employees = [{
+      nik: "1001",
+      name: "Kepala Toko / COS",
+      role: "COS",
+      pin: "1234",
+      shift: "Shift 1",
+      canVoid: true,
+      canRetur: true,
+      canStockOpname: true,
+      canBlindKlerk: true,
+      canViewFinancials: true,
+      canManageEmployees: true,
+      canManageProducts: true,
+      canStockMutation: true
+    }];
+    pos.saveEmployees();
+  }
+  if (!pos.currentUser) {
     if (typeof openModal === "function") {
       openModal("modal-employee-login");
       setTimeout(() => {

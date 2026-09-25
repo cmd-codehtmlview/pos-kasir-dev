@@ -9242,36 +9242,36 @@
 
   <!-- Scripts -->
   <!-- Core Data & Storage -->
-  <script src="products-data.js?v=151"></script>
-  <script src="js/db.js?v=151"></script>
-  <script src="js/store.js?v=151"></script>
-  <script src="js/license.js?v=151"></script>
-  <script src="js/sync.js?v=151"></script>
+  <script src="products-data.js?v=152"></script>
+  <script src="js/db.js?v=152"></script>
+  <script src="js/store.js?v=152"></script>
+  <script src="js/license.js?v=152"></script>
+  <script src="js/sync.js?v=152"></script>
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=151"></script>
-  <script src="js/cart.js?v=151"></script>
-  <script src="js/printer.js?v=151"></script>
-  <script src="js/checkout.js?v=151"></script>
-  <script src="js/member.js?v=151"></script>
-  <script src="js/returns.js?v=151"></script>
-  <script src="js/stock-opname.js?v=151"></script>
-  <script src="js/klerk.js?v=151"></script>
-  <script src="js/inventory.js?v=151"></script>
+  <script src="js/scanner.js?v=152"></script>
+  <script src="js/cart.js?v=152"></script>
+  <script src="js/printer.js?v=152"></script>
+  <script src="js/checkout.js?v=152"></script>
+  <script src="js/member.js?v=152"></script>
+  <script src="js/returns.js?v=152"></script>
+  <script src="js/stock-opname.js?v=152"></script>
+  <script src="js/klerk.js?v=152"></script>
+  <script src="js/inventory.js?v=152"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/import-products.js?v=151"></script>
-  <script src="js/repack.js?v=151"></script>
-  <script src="js/reports.js?v=151"></script>
-  <script src="js/settings.js?v=151"></script>
-  <script src="js/employees.js?v=151"></script>
+  <script src="js/import-products.js?v=152"></script>
+  <script src="js/repack.js?v=152"></script>
+  <script src="js/reports.js?v=152"></script>
+  <script src="js/settings.js?v=152"></script>
+  <script src="js/employees.js?v=152"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=151"></script>
-  <script src="js/sis-logistics.js?v=151"></script>
-  <script src="js/sis-cashier-ops.js?v=151"></script>
-  <script src="js/sis-store-crm.js?v=151"></script>
-  <script src="js/sis-analytics.js?v=151"></script>
+  <script src="js/app.js?v=152"></script>
+  <script src="js/sis-logistics.js?v=152"></script>
+  <script src="js/sis-cashier-ops.js?v=152"></script>
+  <script src="js/sis-store-crm.js?v=152"></script>
+  <script src="js/sis-analytics.js?v=152"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -10437,7 +10437,7 @@
             "VIEW_FINANCIALS",
             "Otorisasi Ekspor Data Transaksi Toko (Khusus Pejabat Toko / COS)",
             (supervisor) => {
-              if (typeof financialsTempUnlocked !== 'undefined') financialsTempUnlocked = true;
+              window.financialsTempUnlocked = true;
               if (typeof updateDashboardButtonState === 'function') updateDashboardButtonState();
               if (typeof exportTransactionsToExcel === 'function') exportTransactionsToExcel();
             }
@@ -10448,123 +10448,125 @@
       if (typeof exportTransactionsToExcel === 'function') exportTransactionsToExcel();
     }
 
-    function openSisModal(modalId) {
-      // 1. Proteksi Laporan Operasional Toko (Laporan Shift & Rekap Kas) khusus Pejabat Toko / COS (canViewFinancials)
-      if (modalId === 'sis-modal-report' || modalId === 'sis-modal-recap') {
-        if (typeof isCurrentUserAuthorizedForFinancials === 'function' && !isCurrentUserAuthorizedForFinancials()) {
-          if (typeof requestSupervisorAuth === 'function') {
-            requestSupervisorAuth(
-              "VIEW_FINANCIALS", 
-              "Otorisasi Akses Laporan Operasional Toko (Khusus Pejabat Toko / COS)", 
-              (supervisor) => {
-                if (typeof financialsTempUnlocked !== 'undefined') financialsTempUnlocked = true;
-                if (typeof updateDashboardButtonState === 'function') updateDashboardButtonState();
-                openSisModal(modalId);
-              }
-            );
-            return;
+    function openSisModal(modalId, forceBypass = false) {
+      if (!forceBypass) {
+        // 1. Proteksi Laporan Operasional Toko (Laporan Shift & Rekap Kas) khusus Pejabat Toko / COS (canViewFinancials)
+        if (modalId === 'sis-modal-report' || modalId === 'sis-modal-recap') {
+          if (typeof isCurrentUserAuthorizedForFinancials === 'function' && !isCurrentUserAuthorizedForFinancials()) {
+            if (typeof requestSupervisorAuth === 'function') {
+              requestSupervisorAuth(
+                "VIEW_FINANCIALS", 
+                "Otorisasi Akses Laporan Operasional Toko (Khusus Pejabat Toko / COS)", 
+                (supervisor) => {
+                  window.financialsTempUnlocked = true;
+                  if (typeof updateDashboardButtonState === 'function') updateDashboardButtonState();
+                  openSisModal(modalId, true);
+                }
+              );
+              return;
+            }
           }
         }
-      }
 
-      // 2. Proteksi Retur Penjualan (canRetur)
-      if (modalId === 'sis-modal-retur') {
-        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "RETUR_SALE")) {
-          if (typeof requestSupervisorAuth === 'function') {
-            requestSupervisorAuth(
-              "RETUR_SALE",
-              "Otorisasi Akses Retur Barang & Refund Struk (Khusus Pejabat Toko / COS)",
-              () => openSisModal(modalId)
-            );
-            return;
+        // 2. Proteksi Retur Penjualan (canRetur)
+        if (modalId === 'sis-modal-retur') {
+          if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "RETUR_SALE")) {
+            if (typeof requestSupervisorAuth === 'function') {
+              requestSupervisorAuth(
+                "RETUR_SALE",
+                "Otorisasi Akses Retur Barang & Refund Struk (Khusus Pejabat Toko / COS)",
+                () => openSisModal(modalId, true)
+              );
+              return;
+            }
           }
         }
-      }
 
-      // 3. Proteksi Stock Opname (canStockOpname)
-      if (modalId === 'sis-modal-so') {
-        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_OPNAME")) {
-          if (typeof requestSupervisorAuth === 'function') {
-            requestSupervisorAuth(
-              "STOCK_OPNAME",
-              "Otorisasi Akses Koreksi Stock Opname [F6] (Khusus Pejabat Toko / COS)",
-              () => openSisModal(modalId)
-            );
-            return;
+        // 3. Proteksi Stock Opname (canStockOpname)
+        if (modalId === 'sis-modal-so') {
+          if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_OPNAME")) {
+            if (typeof requestSupervisorAuth === 'function') {
+              requestSupervisorAuth(
+                "STOCK_OPNAME",
+                "Otorisasi Akses Koreksi Stock Opname [F6] (Khusus Pejabat Toko / COS)",
+                () => openSisModal(modalId, true)
+              );
+              return;
+            }
           }
         }
-      }
 
-      // 4. Proteksi Closing Shift / Blind Klerk (canBlindKlerk)
-      if (modalId === 'sis-modal-klerk') {
-        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "BLIND_KLERK")) {
-          if (typeof requestSupervisorAuth === 'function') {
-            requestSupervisorAuth(
-              "BLIND_KLERK",
-              "Otorisasi Closing Shift Kasir (Pendampingan Pejabat Toko / COS)",
-              (supervisor) => {
-                const supervisorEl = document.getElementById("klerk-supervisor");
-                if (supervisorEl) supervisorEl.value = `${supervisor.role} ${supervisor.name} (${supervisor.nik})`;
-                openSisModal(modalId);
-              }
-            );
-            return;
+        // 4. Proteksi Closing Shift / Blind Klerk (canBlindKlerk)
+        if (modalId === 'sis-modal-klerk') {
+          if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "BLIND_KLERK")) {
+            if (typeof requestSupervisorAuth === 'function') {
+              requestSupervisorAuth(
+                "BLIND_KLERK",
+                "Otorisasi Closing Shift Kasir (Pendampingan Pejabat Toko / COS)",
+                (supervisor) => {
+                  const supervisorEl = document.getElementById("klerk-supervisor");
+                  if (supervisorEl) supervisorEl.value = `${supervisor.role} ${supervisor.name} (${supervisor.nik})`;
+                  openSisModal(modalId, true);
+                }
+              );
+              return;
+            }
           }
         }
-      }
 
-      // 5. Proteksi Manajemen Karyawan & Hak Akses (canManageEmployees)
-      if (modalId === 'sis-modal-staff') {
-        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
-          if (typeof requestSupervisorAuth === 'function') {
-            requestSupervisorAuth(
-              "MANAGE_EMPLOYEES",
-              "Otorisasi Akses Kelola Karyawan & Hak Akses (Khusus COS)",
-              () => openSisModal(modalId)
-            );
-            return;
+        // 5. Proteksi Manajemen Karyawan & Hak Akses (canManageEmployees)
+        if (modalId === 'sis-modal-staff') {
+          if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
+            if (typeof requestSupervisorAuth === 'function') {
+              requestSupervisorAuth(
+                "MANAGE_EMPLOYEES",
+                "Otorisasi Akses Kelola Karyawan & Hak Akses (Khusus COS)",
+                () => openSisModal(modalId, true)
+              );
+              return;
+            }
           }
         }
-      }
 
-      // 6. Proteksi Mutasi Stok: LPB Faktur Masuk (canStockMutation)
-      if (modalId === 'sis-modal-lpb') {
-        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-          if (typeof requestSupervisorAuth === 'function') {
-            requestSupervisorAuth(
-              "STOCK_MUTATION",
-              "Otorisasi Akses Penerimaan Barang LPB Supplier [F7] (Khusus Pejabat Toko / COS)",
-              () => openSisModal(modalId)
-            );
-            return;
+        // 6. Proteksi Mutasi Stok: LPB Faktur Masuk (canStockMutation)
+        if (modalId === 'sis-modal-lpb') {
+          if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+            if (typeof requestSupervisorAuth === 'function') {
+              requestSupervisorAuth(
+                "STOCK_MUTATION",
+                "Otorisasi Akses Penerimaan Barang LPB Supplier [F7] (Khusus Pejabat Toko / COS)",
+                () => openSisModal(modalId, true)
+              );
+              return;
+            }
           }
         }
-      }
 
-      // 7. Proteksi Mutasi Stok: Barang Rusak / Waste (canStockMutation)
-      if (modalId === 'sis-modal-waste') {
-        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-          if (typeof requestSupervisorAuth === 'function') {
-            requestSupervisorAuth(
-              "STOCK_MUTATION",
-              "Otorisasi Akses Pembuatan BAP Barang Rusak / Waste (Khusus Pejabat Toko / COS)",
-              () => openSisModal(modalId)
-            );
-            return;
+        // 7. Proteksi Mutasi Stok: Barang Rusak / Waste (canStockMutation)
+        if (modalId === 'sis-modal-waste') {
+          if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+            if (typeof requestSupervisorAuth === 'function') {
+              requestSupervisorAuth(
+                "STOCK_MUTATION",
+                "Otorisasi Akses Pembuatan BAP Barang Rusak / Waste (Khusus Pejabat Toko / COS)",
+                () => openSisModal(modalId, true)
+              );
+              return;
+            }
           }
         }
-      }
 
-      // 8. Proteksi Mutasi Stok: Repack Bal ke Ecer (canStockMutation)
-      if (modalId === 'sis-modal-repack') {
-        if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-          if (typeof requestSupervisorAuth === 'function') {
-            requestSupervisorAuth(
-              "STOCK_MUTATION",
-              "Otorisasi Akses Repack Bal ke Eceran (Khusus Pejabat Toko / COS)",
-              () => openSisModal(modalId)
-            );
-            return;
+        // 8. Proteksi Mutasi Stok: Repack Bal ke Ecer (canStockMutation)
+        if (modalId === 'sis-modal-repack') {
+          if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
+            if (typeof requestSupervisorAuth === 'function') {
+              requestSupervisorAuth(
+                "STOCK_MUTATION",
+                "Otorisasi Akses Repack Bal ke Eceran (Khusus Pejabat Toko / COS)",
+                () => openSisModal(modalId, true)
+              );
+              return;
+            }
           }
         }
       }
@@ -11429,7 +11431,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=151')
+          navigator.serviceWorker.register('./sw.js?v=152')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

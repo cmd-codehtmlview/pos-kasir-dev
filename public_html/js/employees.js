@@ -7,6 +7,7 @@
 // COS (Chief of Store), ACOS (Asst. Chief of Store), CREW (Kasir)
 // ==========================================
 let pendingSupervisorCallback = null;
+window.financialsTempUnlocked = false;
 
 /**
  * Mencari sesi shift kasir aktif yang saat ini memiliki transaksi belum di-Clerk
@@ -238,7 +239,7 @@ function handleEmployeeLogin(event) {
   pos.attendance.unshift(attRecord);
   pos.saveAttendance();
 
-  financialsTempUnlocked = false; // Reset unlock sementara saat login kasir baru
+  window.financialsTempUnlocked = false; // Reset unlock sementara saat login kasir baru
   if (errEl) errEl.classList.add("hidden");
   pos.saveCurrentUser(emp);
   pos.settings.cashierName = emp.name;
@@ -352,7 +353,7 @@ function handleFirstTimeSetup(event) {
   pos.settings.shiftName = shift;
   pos.saveSettings();
 
-  financialsTempUnlocked = false;
+  window.financialsTempUnlocked = false;
   if (errEl) errEl.classList.add("hidden");
 
   closeModal("modal-first-time-setup");
@@ -440,7 +441,7 @@ function prepareEmployeeLoginModal() {
 window.prepareEmployeeLoginModal = prepareEmployeeLoginModal;
 
 function lockCashierScreen() {
-  financialsTempUnlocked = false;
+  window.financialsTempUnlocked = false;
   window.isSupervisorReviewMode = false;
   const banner = document.getElementById("supervisor-review-banner");
   if (banner) banner.classList.add("hidden");
@@ -450,13 +451,33 @@ function lockCashierScreen() {
   if (typeof renderReports === "function") renderReports();
   if (typeof renderInventoryTable === "function") renderInventoryTable();
 
+  // Pastikan akun COS default tersedia jika list karyawan kosong
   if (!pos.employees || pos.employees.length === 0) {
-    openModal("modal-first-time-setup");
-    setTimeout(() => {
-      const nameInput = document.getElementById("setup-cos-name");
-      if (nameInput) nameInput.focus();
-    }, 150);
-    return;
+    pos.employees = [{
+      nik: "1001",
+      name: "Kepala Toko / COS",
+      role: "COS",
+      pin: "1234",
+      shift: "Shift 1",
+      canVoid: true,
+      canRetur: true,
+      canStockOpname: true,
+      canBlindKlerk: true,
+      canViewFinancials: true,
+      canManageEmployees: true,
+      canManageProducts: true,
+      canStockMutation: true
+    }];
+    pos.saveEmployees();
+  }
+
+  // Bersihkan input PIN login
+  const pinInput = document.getElementById("login-employee-pin");
+  if (pinInput) pinInput.value = "";
+  const errEl = document.getElementById("login-error-msg");
+  if (errEl) {
+    errEl.innerHTML = "";
+    errEl.classList.add("hidden");
   }
 
   openModal("modal-employee-login");
@@ -487,7 +508,7 @@ window.openOwnerPortalFromLoginModal = openOwnerPortalFromLoginModal;
 function openSupervisorReviewModeFromLoginModal() {
   requestSupervisorAuth("VIEW_FINANCIALS", "Masuk Mode Peninjauan Pejabat Toko / Supervisor (Khusus COS)", (supervisor) => {
     window.isSupervisorReviewMode = true;
-    financialsTempUnlocked = true;
+    window.financialsTempUnlocked = true;
 
     // Tutup modal login kasir
     closeModal("modal-employee-login");
@@ -537,7 +558,7 @@ window.openSupervisorReviewModeFromLoginModal = openSupervisorReviewModeFromLogi
 
 function exitSupervisorReviewMode() {
   window.isSupervisorReviewMode = false;
-  financialsTempUnlocked = false;
+  window.financialsTempUnlocked = false;
   const banner = document.getElementById("supervisor-review-banner");
   if (banner) banner.classList.add("hidden");
   lockCashierScreen();
@@ -547,10 +568,8 @@ window.exitSupervisorReviewMode = exitSupervisorReviewMode;
 // ==========================================
 // KONTROL AKSES KEUANGAN & DASHBOARD OWNER (RBAC)
 // ==========================================
-let financialsTempUnlocked = false;
-
 function isCurrentUserAuthorizedForFinancials() {
-  if (financialsTempUnlocked) return true;
+  if (window.financialsTempUnlocked) return true;
   if (!pos.employees || pos.employees.length === 0) return true;
   if (!pos.currentUser) return false;
   // Selaraskan dengan data karyawan terbaru dari pos.employees jika ada
@@ -577,8 +596,8 @@ function openOwnerDashboardWithAuth() {
 }
 
 function toggleFinancialCensorWithAuth() {
-  if (financialsTempUnlocked) {
-    financialsTempUnlocked = false;
+  if (window.financialsTempUnlocked) {
+    window.financialsTempUnlocked = false;
     if (typeof closeSisModal === "function") {
       closeSisModal('sis-modal-report');
       closeSisModal('sis-modal-recap');
@@ -597,7 +616,7 @@ function toggleFinancialCensorWithAuth() {
   }
 
   requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Akses Laporan Operasional Toko (Khusus COS)", (supervisor) => {
-    financialsTempUnlocked = true;
+    window.financialsTempUnlocked = true;
     if (typeof renderReports === "function") renderReports();
     if (typeof renderInventoryTable === "function") renderInventoryTable();
     if (typeof renderKlerkHistoryTable === "function") renderKlerkHistoryTable();
@@ -657,9 +676,9 @@ function updateDashboardButtonState() {
   const txtCensor = document.getElementById("btn-toggle-financial-censor-text");
   if (btnCensor && txtCensor) {
     if (isAuth) {
-      btnCensor.innerHTML = `<span>🔓</span><span id="btn-toggle-financial-censor-text">${financialsTempUnlocked ? "Kunci Sensor" : "Laporan Terbuka"}</span>`;
+      btnCensor.innerHTML = `<span>🔓</span><span id="btn-toggle-financial-censor-text">${window.financialsTempUnlocked ? "Kunci Sensor" : "Laporan Terbuka"}</span>`;
       btnCensor.className = "px-3 py-1.5 sm:py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer";
-      btnCensor.title = financialsTempUnlocked ? "Klik untuk mengunci kembali sensor angka laporan" : "Anda memiliki izin akses laporan finansial terbuka.";
+      btnCensor.title = window.financialsTempUnlocked ? "Klik untuk mengunci kembali sensor angka laporan" : "Anda memiliki izin akses laporan finansial terbuka.";
     } else {
       btnCensor.innerHTML = `<span>🔒</span><span id="btn-toggle-financial-censor-text">Buka Sensor Angka</span>`;
       btnCensor.className = "px-3 py-1.5 sm:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer";
@@ -737,15 +756,11 @@ function hasPermissionForAction(user, actionType) {
 }
 
 function requestSupervisorAuth(actionType, actionDesc, onApproved) {
-  if (!pos.currentUser || (pos.currentUser && pos.currentUser.role === 'COS')) {
+  // Hanya jika kasir yang sedang aktif login berstatus COS atau memiliki izin mandiri untuk aksi ini
+  if (pos.currentUser && (pos.currentUser.role === 'COS' || hasPermissionForAction(pos.currentUser, actionType))) {
     if (typeof onApproved === 'function') {
-      onApproved(pos.currentUser || { nik: '1001', name: 'Kepala Toko', role: 'COS' });
+      onApproved(pos.currentUser);
     }
-    return;
-  }
-  // Jika user aktif sudah memiliki hak mandiri untuk aksi ini, langsung eksekusi tanpa popup otorisasi
-  if (pos.currentUser && hasPermissionForAction(pos.currentUser, actionType)) {
-    onApproved(pos.currentUser);
     return;
   }
 
