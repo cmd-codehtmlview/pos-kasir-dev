@@ -169,11 +169,11 @@
       <!-- Kanan: Tombol Kunci Layar & Tombol SIS (Tanpa Tombol Printer & Sync yang Dobel) -->
       <div class="flex items-center gap-1.5 flex-shrink-0">
         
-        <!-- Kunci Layar Kasir (Lock) -->
+        <!-- Kunci Layar Kasir (Lock) - Tampil di Mobile & Desktop -->
         <button 
           type="button" 
           onclick="lockCashierScreen()" 
-          class="hidden sm:flex h-8 w-8 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white/90 hover:text-white transition active:scale-95 items-center justify-center cursor-pointer shadow-xs text-xs" 
+          class="flex h-8 w-8 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white/90 hover:text-white transition active:scale-95 items-center justify-center cursor-pointer shadow-xs text-xs" 
           title="Kunci Kasir / Ganti User (Lock Screen)"
         >
           🔒
@@ -2509,7 +2509,7 @@
     <div class="p-3.5 bg-white border-t border-slate-200 flex items-center justify-between gap-2 flex-shrink-0" style="padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));">
       <button 
         type="button" 
-        onclick="confirmOrLockCashier()" 
+        onclick="if (typeof toggleSisDrawer === 'function') toggleSisDrawer(); lockCashierScreen();" 
         class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-xs cursor-pointer"
         title="Kunci Layar & Logout Kasir"
       >
@@ -7863,7 +7863,6 @@
                 Multi-Scan ON
               </span>
             </div>
-            <p id="pos-camera-scanner-subtitle" class="text-[11px] text-slate-400">Arahkan kamera ke barcode kemasan p
             <p id="pos-camera-scanner-subtitle" class="text-[11px] text-slate-400">Arahkan kamera ke barcode kemasan produk snack / minuman.</p>
           </div>
         </div>
@@ -9103,37 +9102,37 @@
 
   <!-- Scripts -->
   <!-- Core Data & Storage -->
-  <script src="products-data.js?v=205"></script>
-  <script src="js/db.js?v=205"></script>
-  <script src="js/store.js?v=205"></script>
-  <script src="js/license.js?v=205"></script>
-  <script src="js/sync.js?v=205"></script>
+  <script src="products-data.js?v=210"></script>
+  <script src="js/db.js?v=210"></script>
+  <script src="js/store.js?v=210"></script>
+  <script src="js/license.js?v=210"></script>
+  <script src="js/sync.js?v=210"></script>
   
 ... [truncated for diff preview]
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=205"></script>
-  <script src="js/cart.js?v=205"></script>
-  <script src="js/printer.js?v=205"></script>
-  <script src="js/checkout.js?v=205"></script>
-  <script src="js/member.js?v=205"></script>
-  <script src="js/returns.js?v=205"></script>
-  <script src="js/stock-opname.js?v=205"></script>
-  <script src="js/klerk.js?v=205"></script>
-  <script src="js/inventory.js?v=205"></script>
+  <script src="js/scanner.js?v=210"></script>
+  <script src="js/cart.js?v=210"></script>
+  <script src="js/printer.js?v=210"></script>
+  <script src="js/checkout.js?v=210"></script>
+  <script src="js/member.js?v=210"></script>
+  <script src="js/returns.js?v=210"></script>
+  <script src="js/stock-opname.js?v=210"></script>
+  <script src="js/klerk.js?v=210"></script>
+  <script src="js/inventory.js?v=210"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/import-products.js?v=205"></script>
-  <script src="js/repack.js?v=205"></script>
-  <script src="js/reports.js?v=205"></script>
-  <script src="js/settings.js?v=205"></script>
-  <script src="js/employees.js?v=205"></script>
+  <script src="js/import-products.js?v=210"></script>
+  <script src="js/repack.js?v=210"></script>
+  <script src="js/reports.js?v=210"></script>
+  <script src="js/settings.js?v=210"></script>
+  <script src="js/employees.js?v=210"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=205"></script>
-  <script src="js/sis-logistics.js?v=205"></script>
-  <script src="js/sis-cashier-ops.js?v=205"></script>
-  <script src="js/sis-store-crm.js?v=205"></script>
-  <script src="js/sis-analytics.js?v=205"></script>
+  <script src="js/app.js?v=210"></script>
+  <script src="js/sis-logistics.js?v=210"></script>
+  <script src="js/sis-cashier-ops.js?v=210"></script>
+  <script src="js/sis-store-crm.js?v=210"></script>
+  <script src="js/sis-analytics.js?v=210"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -11106,7 +11105,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=205')
+          navigator.serviceWorker.register('./sw.js?v=210')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
