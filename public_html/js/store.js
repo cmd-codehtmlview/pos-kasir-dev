@@ -277,7 +277,8 @@ class POSStore {
     }
 
     // 10. Sesi Karyawan Aktif
-    const storedCurrentUser = (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("snack_pos_active_employee") : null) || (typeof localStorage !== "undefined" ? localStorage.getItem("snack_pos_active_employee") : null);
+    // Gunakan sessionStorage agar setiap pembukaan aplikasi kasir / tab baru selalu wajib login & presensi
+    const storedCurrentUser = typeof sessionStorage !== "undefined" ? sessionStorage.getItem("snack_pos_active_employee") : null;
     if (storedCurrentUser) {
       try {
         this.currentUser = JSON.parse(storedCurrentUser);
@@ -287,6 +288,8 @@ class POSStore {
     } else {
       this.currentUser = null;
     }
+    // Bersihkan residu di localStorage agar tidak membypass dialog login kasir
+    try { localStorage.removeItem("snack_pos_active_employee"); } catch (e) {}
 
     // 11. Transaksi Dipending (1 Slot Buffer)
     const storedPendingCart = localStorage.getItem("snack_pos_pending_cart");
@@ -589,7 +592,7 @@ class POSStore {
     if (emp) {
       try {
         sessionStorage.setItem("snack_pos_active_employee", JSON.stringify(emp));
-        localStorage.setItem("snack_pos_active_employee", JSON.stringify(emp));
+        localStorage.removeItem("snack_pos_active_employee");
       } catch (e) {}
     } else {
       try {

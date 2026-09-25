@@ -15,11 +15,11 @@ function findActiveUnklerkedShift() {
   const todayStr = new Date().toISOString().split("T")[0];
   const savedNik = localStorage.getItem("snack_pos_active_shift_cashier");
 
-  // Ambil transaksi & retur hari ini yang belum diklerk (klerkId null/empty)
-  const unklerkedTrx = (pos.transactions || []).filter(t => t.date === todayStr && !t.klerkId);
-  const unklerkedRet = (pos.returns || []).filter(r => r.date === todayStr && !r.klerkId);
+  // Ambil semua transaksi & retur yang belum diklerk (klerkId null/empty)
+  const unklerkedTrx = (pos.transactions || []).filter(t => !t.klerkId);
+  const unklerkedRet = (pos.returns || []).filter(r => !r.klerkId);
 
-  // Jika tidak ada transaksi sama sekali yang menggantung hari ini, shift bersih (bebas login NIK lain)
+  // Jika tidak ada transaksi sama sekali yang menggantung, shift bersih (bebas login NIK lain)
   if (unklerkedTrx.length === 0 && unklerkedRet.length === 0) {
     return null;
   }
