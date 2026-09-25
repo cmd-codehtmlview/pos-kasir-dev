@@ -345,108 +345,24 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- RINGKASAN VALUASI ASET INVENTORI TOKO -->
-    <!-- ========================================== -->
-    <div class="mb-5">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-          <span>💎</span>
-          <span>VALUASI ASET INVENTORI TOKO (REAL-TIME STOK & RUPIAH)</span>
-        </h3>
-        <span class="text-[10px] text-slate-400 font-mono" id="kpi-inventory-sku-badge">Memuat Aset...</span>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        
-        <!-- VALUASI 1: MODAL HPP TERTANAM -->
-        <div class="bg-gradient-to-br from-indigo-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-indigo-500/30 stat-card-glow flex flex-col justify-between min-w-0">
-          <div class="min-w-0">
-            <div class="flex items-center justify-between text-indigo-400 text-xs">
-              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Nilai Modal Aset Barang (HPP)</span>
-              <span class="text-base sm:text-lg flex-shrink-0">💰</span>
-            </div>
-            <div id="kpi-inventory-asset-cost" class="text-lg sm:text-2xl font-black font-mono text-emerald-400 mt-1.5 sm:mt-2 truncate">
-              Rp 0
-            </div>
-          </div>
-          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-            <span class="truncate">Uang Modal Tertanam di Rak</span>
-            <span class="text-indigo-300 font-semibold font-mono flex-shrink-0">Modal Fisik</span>
-          </div>
-        </div>
-
-        <!-- VALUASI 2: TOTAL FISIK STOK (QTY & SKU) -->
-        <div class="bg-gradient-to-br from-cyan-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-cyan-500/30 stat-card-glow flex flex-col justify-between min-w-0">
-          <div class="min-w-0">
-            <div class="flex items-center justify-between text-cyan-400 text-xs">
-              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Total Fisik Stok Barang</span>
-              <span class="text-base sm:text-lg flex-shrink-0">📦</span>
-            </div>
-            <div id="kpi-inventory-qty" class="text-lg sm:text-2xl font-black font-mono text-cyan-300 mt-1.5 sm:mt-2 truncate">
-              0 Pcs
-            </div>
-          </div>
-          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-            <span id="kpi-inventory-sku-count" class="truncate">0 Jenis Produk (SKU)</span>
-            <span class="text-cyan-400 font-semibold flex-shrink-0">Toko & Gudang</span>
-          </div>
-        </div>
-
-        <!-- VALUASI 3: POTENSI OMZET PENJUALAN -->
-        <div class="bg-gradient-to-br from-amber-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-amber-500/30 stat-card-glow flex flex-col justify-between min-w-0">
-          <div class="min-w-0">
-            <div class="flex items-center justify-between text-amber-400 text-xs">
-              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Potensi Nilai Penjualan</span>
-              <span class="text-base sm:text-lg flex-shrink-0">🏷️</span>
-            </div>
-            <div id="kpi-inventory-asset-retail" class="text-lg sm:text-2xl font-black font-mono text-amber-400 mt-1.5 sm:mt-2 truncate">
-              Rp 0
-            </div>
-          </div>
-          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-            <span class="truncate">Jika Semua Stok Terjual</span>
-            <span class="text-amber-400 font-semibold font-mono flex-shrink-0">Gross Retail</span>
-          </div>
-        </div>
-
-        <!-- VALUASI 4: PROYEKSI LABA KOTOR INVENTORI -->
-        <div class="bg-gradient-to-br from-emerald-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-emerald-500/30 stat-card-glow flex flex-col justify-between min-w-0">
-          <div class="min-w-0">
-            <div class="flex items-center justify-between text-emerald-400 text-xs">
-              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Proyeksi Laba dari Stok</span>
-              <span class="text-base sm:text-lg flex-shrink-0">📈</span>
-            </div>
-            <div id="kpi-inventory-profit-projection" class="text-lg sm:text-2xl font-black font-mono text-emerald-300 mt-1.5 sm:mt-2 truncate">
-              Rp 0
-            </div>
-          </div>
-          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-            <span id="kpi-inventory-margin-projection" class="truncate">Potensi Margin: 0%</span>
-            <span class="text-emerald-400 font-semibold flex-shrink-0">Estimasi Bersih</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- 9 KARTU KPI UTAMA (METRICS) -->
+    <!-- 9 KARTU KPI UTAMA PENJUALAN (TIKTOK SELLER CENTER STYLE) -->
     <!-- ========================================== -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-9 gap-2.5 sm:gap-4">
       
-      <!-- KPI 1: TOTAL OMZET -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+      <!-- KPI 1: TOTAL OMZET (HERO HIGHLIGHT CARD) -->
+      <div class="col-span-2 sm:col-span-1 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/50 p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-500/50 stat-card-glow flex flex-col justify-between min-w-0 shadow-lg shadow-emerald-950/20">
         <div class="min-w-0">
           <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Total Omzet</span>
+            <span class="font-black uppercase tracking-wider text-[10px] text-emerald-400 truncate">Total Omzet Penjualan</span>
             <span class="text-base sm:text-lg flex-shrink-0">💰</span>
           </div>
-          <div id="kpi-omzet" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-emerald-400 mt-1.5 sm:mt-2 truncate">
+          <div id="kpi-omzet" class="text-xl sm:text-2xl xl:text-lg 2xl:text-xl font-black font-mono text-emerald-400 mt-1 sm:mt-2 truncate">
             Rp 0
           </div>
         </div>
         <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
           <span class="truncate">Gross Revenue</span>
-          <span id="kpi-omzet-sub" class="text-emerald-500 font-semibold flex-shrink-0">Tercatat</span>
+          <span id="kpi-omzet-sub" class="text-emerald-400 font-bold flex-shrink-0">Tercatat</span>
         </div>
       </div>
 
@@ -743,6 +659,129 @@
     </section>
 
     <!-- ========================================== -->
+    <!-- RIWAYAT RETUR BARANG & REFUND (ACTION CENTER) -->
+    <!-- ========================================== -->
+    <section id="section-returns-history" class="bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-800 stat-card-glow space-y-4 max-w-full overflow-hidden min-w-0">
+      <div class="flex items-center justify-between min-w-0">
+        <div class="min-w-0">
+          <h3 class="font-black text-sm text-white flex items-center gap-2">
+            <span>🔄</span>
+            <span>Riwayat Retur Penjualan Kasir</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Pengembalian barang dan refund dana yang diproses dengan verifikasi nomor struk.</p>
+        </div>
+        <span id="returns-badge-count" class="px-3 py-1 bg-slate-800 text-amber-300 border border-slate-700 font-mono text-xs font-bold rounded-xl flex-shrink-0">
+          0 Retur
+        </span>
+      </div>
+
+      <div class="overflow-x-auto max-h-[260px] custom-scrollbar touch-scroll overscroll-x-contain rounded-2xl border border-slate-800/80 bg-slate-950/40">
+        <table class="w-full text-left border-collapse text-xs min-w-[560px]">
+          <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <tr>
+              <th class="py-2.5 px-3">No. Retur</th>
+              <th class="py-2.5 px-3">No. Struk Asal</th>
+              <th class="py-2.5 px-3">Waktu</th>
+              <th class="py-2.5 px-3">Alasan Retur</th>
+              <th class="py-2.5 px-3 font-mono text-rose-400">Total Refund</th>
+              <th class="py-2.5 px-3 text-center">Status Stok</th>
+              <th class="py-2.5 px-3">Kasir</th>
+            </tr>
+          </thead>
+          <tbody id="returns-tbody" class="divide-y divide-slate-800/60">
+            <!-- Diisi otomatis -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- MANAJEMEN INVENTORI, LOGISTIK & ASET GUDANG -->
+    <!-- ========================================== -->
+
+    <!-- RINGKASAN VALUASI ASET INVENTORI TOKO -->
+    <div id="section-inventory-valuation" class="mb-5 space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+          <span>💎</span>
+          <span>Valuasi Aset Inventori Toko (Real-Time Stok &amp; Rupiah)</span>
+        </h3>
+        <span class="text-[10px] text-slate-400 font-mono" id="kpi-inventory-sku-badge">Memuat Aset...</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        
+        <!-- VALUASI 1: MODAL HPP TERTANAM -->
+        <div class="bg-gradient-to-br from-indigo-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-indigo-500/30 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-indigo-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Nilai Modal Aset Barang (HPP)</span>
+              <span class="text-base sm:text-lg flex-shrink-0">💰</span>
+            </div>
+            <div id="kpi-inventory-asset-cost" class="text-lg sm:text-2xl font-black font-mono text-emerald-400 mt-1.5 sm:mt-2 truncate">
+              Rp 0
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span class="truncate">Uang Modal Tertanam di Rak</span>
+            <span class="text-indigo-300 font-semibold font-mono flex-shrink-0">Modal Fisik</span>
+          </div>
+        </div>
+
+        <!-- VALUASI 2: TOTAL FISIK STOK (QTY & SKU) -->
+        <div class="bg-gradient-to-br from-cyan-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-cyan-500/30 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-cyan-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Total Fisik Stok Barang</span>
+              <span class="text-base sm:text-lg flex-shrink-0">📦</span>
+            </div>
+            <div id="kpi-inventory-qty" class="text-lg sm:text-2xl font-black font-mono text-cyan-300 mt-1.5 sm:mt-2 truncate">
+              0 Pcs
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span id="kpi-inventory-sku-count" class="truncate">0 Jenis Produk (SKU)</span>
+            <span class="text-cyan-400 font-semibold flex-shrink-0">Toko &amp; Gudang</span>
+          </div>
+        </div>
+
+        <!-- VALUASI 3: POTENSI OMZET PENJUALAN -->
+        <div class="bg-gradient-to-br from-amber-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-amber-500/30 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-amber-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Potensi Nilai Penjualan</span>
+              <span class="text-base sm:text-lg flex-shrink-0">🏷️</span>
+            </div>
+            <div id="kpi-inventory-asset-retail" class="text-lg sm:text-2xl font-black font-mono text-amber-400 mt-1.5 sm:mt-2 truncate">
+              Rp 0
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span class="truncate">Jika Semua Stok Terjual</span>
+            <span class="text-amber-400 font-semibold font-mono flex-shrink-0">Gross Retail</span>
+          </div>
+        </div>
+
+        <!-- VALUASI 4: PROYEKSI LABA KOTOR INVENTORI -->
+        <div class="bg-gradient-to-br from-emerald-950/80 via-slate-900 to-slate-950 p-3.5 sm:p-4 rounded-2xl border border-emerald-500/30 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-emerald-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Proyeksi Laba dari Stok</span>
+              <span class="text-base sm:text-lg flex-shrink-0">📈</span>
+            </div>
+            <div id="kpi-inventory-profit-projection" class="text-lg sm:text-2xl font-black font-mono text-emerald-300 mt-1.5 sm:mt-2 truncate">
+              Rp 0
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span id="kpi-inventory-margin-projection" class="truncate">Potensi Margin: 0%</span>
+            <span class="text-emerald-400 font-semibold flex-shrink-0">Estimasi Bersih</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================== -->
     <!-- ANALISIS DAY SALES INVENTORY (DSI) PRODUK LARIS -->
     <!-- ========================================== -->
     <section id="section-dsi-analysis" class="bg-slate-900 p-4 sm:p-5 rounded-3xl border border-cyan-900/40 stat-card-glow space-y-4 max-w-full overflow-hidden min-w-0">
@@ -827,42 +866,7 @@
       </div>
     </section>
 
-    <!-- ========================================== -->
-    <!-- RIWAYAT RETUR BARANG & REFUND -->
-    <!-- ========================================== -->
-    <section id="section-returns-history" class="bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-800 stat-card-glow space-y-4 max-w-full overflow-hidden min-w-0">
-      <div class="flex items-center justify-between min-w-0">
-        <div class="min-w-0">
-          <h3 class="font-black text-sm text-white flex items-center gap-2">
-            <span>🔄</span>
-            <span>Riwayat Retur Penjualan Kasir</span>
-          </h3>
-          <p class="text-xs text-slate-400 mt-0.5">Pengembalian barang dan refund dana yang diproses dengan verifikasi nomor struk.</p>
-        </div>
-        <span id="returns-badge-count" class="px-3 py-1 bg-slate-800 text-amber-300 border border-slate-700 font-mono text-xs font-bold rounded-xl flex-shrink-0">
-          0 Retur
-        </span>
-      </div>
 
-      <div class="overflow-x-auto max-h-[260px] custom-scrollbar touch-scroll overscroll-x-contain rounded-2xl border border-slate-800/80 bg-slate-950/40">
-        <table class="w-full text-left border-collapse text-xs min-w-[560px]">
-          <thead class="sticky top-0 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            <tr>
-              <th class="py-2.5 px-3">No. Retur</th>
-              <th class="py-2.5 px-3">No. Struk Asal</th>
-              <th class="py-2.5 px-3">Waktu</th>
-              <th class="py-2.5 px-3">Alasan Retur</th>
-              <th class="py-2.5 px-3 font-mono text-rose-400">Total Refund</th>
-              <th class="py-2.5 px-3 text-center">Status Stok</th>
-              <th class="py-2.5 px-3">Kasir</th>
-            </tr>
-          </thead>
-          <tbody id="returns-tbody" class="divide-y divide-slate-800/60">
-            <!-- Diisi otomatis -->
-          </tbody>
-        </table>
-      </div>
-    </section>
 
     <!-- ========================================== -->
     <!-- RIWAYAT STOCK OPNAME TOKO (AUDIT FISIK) -->
