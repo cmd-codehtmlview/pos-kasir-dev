@@ -177,29 +177,40 @@ function promptChangeQty() {
 }
 
 function voidSelectedItem() {
-  if (pos.cart.length === 0) {
+  if (!pos || !Array.isArray(pos.cart) || pos.cart.length === 0) {
     showToast("Keranjang transaksi kosong!", "warning");
     return;
   }
   const item = pos.cart[selectedCartIndex] || pos.cart[pos.cart.length - 1];
+  if (!item) return;
   requestSupervisorAuth("VOID_ITEM", `Void / Hapus Item "${item.name}" [F5]`, () => {
-    executeVoidItem();
+    executeVoidItem(item);
   });
 }
 
 function voidCartItemByIndex(idx) {
-  if (!pos.cart || !pos.cart[idx]) return;
+  if (!pos || !Array.isArray(pos.cart) || !pos.cart[idx]) return;
   selectedCartIndex = idx;
   const item = pos.cart[idx];
   requestSupervisorAuth("VOID_ITEM", `Void / Hapus Item "${item.name}" [F5]`, () => {
-    executeVoidItem();
+    executeVoidItem(item);
   });
 }
 
-function executeVoidItem() {
-  if (pos.cart.length === 0) return;
-  const item = pos.cart[selectedCartIndex] || pos.cart[pos.cart.length - 1];
-  pos.cart.splice(selectedCartIndex, 1);
+function executeVoidItem(targetItem = null) {
+  if (!pos || !Array.isArray(pos.cart) || pos.cart.length === 0) return;
+  let targetIndex = selectedCartIndex;
+  if (targetItem) {
+    const foundIdx = pos.cart.indexOf(targetItem);
+    if (foundIdx >= 0) targetIndex = foundIdx;
+  }
+  if (targetIndex < 0 || targetIndex >= pos.cart.length) {
+    targetIndex = Math.max(0, pos.cart.length - 1);
+  }
+  const item = pos.cart[targetIndex];
+  if (!item) return;
+
+  pos.cart.splice(targetIndex, 1);
   selectedCartIndex = Math.max(0, pos.cart.length - 1);
   renderPosCart();
   showToast(`Item "${item.name}" berhasil di-void (dihapus)`, "info");
@@ -207,7 +218,7 @@ function executeVoidItem() {
 }
 
 function clearCart(silent = false) {
-  if (pos.cart.length === 0) return;
+  if (!pos || !Array.isArray(pos.cart) || pos.cart.length === 0) return;
   if (silent) {
     executeClearCart(true);
     return;
@@ -218,7 +229,7 @@ function clearCart(silent = false) {
 }
 
 function executeClearCart(silent = false) {
-  if (pos.cart.length === 0) return;
+  if (!pos || !Array.isArray(pos.cart) || pos.cart.length === 0) return;
   if (pos && typeof pos.clearActiveCart === "function") {
     pos.clearActiveCart();
   } else {
