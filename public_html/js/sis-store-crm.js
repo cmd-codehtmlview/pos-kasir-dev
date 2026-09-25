@@ -633,6 +633,21 @@ function onSisStaffRoleChange() {
 
 function saveSisEmployee() {
   if (!window.pos) return;
+
+  // Cek otorisasi jika kasir aktif tidak memiliki izin MANAGE_EMPLOYEES
+  if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, 'MANAGE_EMPLOYEES')) {
+    if (typeof requestSupervisorAuth === 'function') {
+      requestSupervisorAuth('MANAGE_EMPLOYEES', 'Otorisasi Simpan Data & Hak Akses Karyawan (Khusus COS)', () => {
+        executeSaveSisEmployee();
+      });
+      return;
+    }
+  }
+
+  executeSaveSisEmployee();
+}
+
+function executeSaveSisEmployee() {
   if (!Array.isArray(pos.employees)) pos.employees = [];
 
   const nikInput = document.getElementById('sis-staff-nik');
@@ -720,6 +735,23 @@ function deleteSisStaff(nik) {
     }
     return;
   }
+
+  // Cek otorisasi jika kasir aktif tidak memiliki izin MANAGE_EMPLOYEES
+  if (typeof hasPermissionForAction === 'function' && !hasPermissionForAction(pos.currentUser, 'MANAGE_EMPLOYEES')) {
+    if (typeof requestSupervisorAuth === 'function') {
+      requestSupervisorAuth('MANAGE_EMPLOYEES', 'Otorisasi Menghapus Data Karyawan (Khusus COS)', () => {
+        executeDeleteSisStaff(nik);
+      });
+      return;
+    }
+  }
+
+  executeDeleteSisStaff(nik);
+}
+
+function executeDeleteSisStaff(nik) {
+  const emp = pos.employees.find(e => e.nik === nik);
+  if (!emp) return;
 
   const conf = confirm(`Apakah Anda yakin ingin menghapus karyawan:\n${emp.name} (NIK: ${emp.nik})?`);
   if (!conf) return;

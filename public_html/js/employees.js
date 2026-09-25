@@ -464,16 +464,25 @@ function hasPermissionForAction(user, actionType) {
   return (user.role === "COS" || user.role === "ACOS");
 }
 
-function requestSupervisorAuth(actionType, actionDesc, onApproved) {
-  if (actionType === 'MANAGE_PRODUCTS' || !pos.currentUser || (pos.currentUser && pos.currentUser.role === 'COS')) {
-    if (typeof onApproved === 'function') {
-      onApproved(pos.currentUser || { nik: '1001', name: 'Kepala Toko', role: 'COS' });
-    }
-    return;
+function requestSupervisorAuth(actionType, arg2, arg3) {
+  let actionDesc = "Tindakan Kasir Dibatasi";
+  let onApproved = null;
+
+  if (typeof arg2 === "function") {
+    onApproved = arg2;
+    if (typeof arg3 === "string") actionDesc = arg3;
+  } else if (typeof arg3 === "function") {
+    onApproved = arg3;
+    if (typeof arg2 === "string") actionDesc = arg2;
+  } else if (typeof arg2 === "string") {
+    actionDesc = arg2;
   }
-  // Jika user aktif sudah memiliki hak mandiri untuk aksi ini, langsung eksekusi tanpa popup otorisasi
-  if (pos.currentUser && hasPermissionForAction(pos.currentUser, actionType)) {
-    onApproved(pos.currentUser);
+
+  // Jika kasir aktif berstatus COS atau memiliki izin mandiri untuk aksi ini, langsung loloskan
+  if (pos.currentUser && (pos.currentUser.role === 'COS' || hasPermissionForAction(pos.currentUser, actionType))) {
+    if (typeof onApproved === 'function') {
+      onApproved(pos.currentUser);
+    }
     return;
   }
 
@@ -789,6 +798,13 @@ function onEmployeeRoleChange(role) {
 
 function handleSaveEmployee(event) {
   if (event && event.preventDefault) event.preventDefault();
+
+  if (!hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
+    requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Simpan Data Karyawan (Khusus COS)", () => {
+      handleSaveEmployee(event);
+    });
+    return;
+  }
 
   const origNik = document.getElementById("emp-form-original-nik")?.value.trim();
   const nik = document.getElementById("emp-form-nik")?.value.trim();
