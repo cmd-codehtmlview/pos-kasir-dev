@@ -434,10 +434,15 @@ function toggleSettingSection(secId) {
 
   const isCurrentlyOpen = !targetContent.classList.contains("hidden");
 
-  // Proteksi khusus modul data karyawan jika tidak memiliki izin MANAGE_EMPLOYEES
-  if (!isCurrentlyOpen && secId === "sec-employees") {
+  // Proteksi khusus modul sensitif jika tidak memiliki izin MANAGE_EMPLOYEES (Data Karyawan, QRIS Payment, Backup Database)
+  if (!isCurrentlyOpen && (secId === "sec-employees" || secId === "sec-payment-gateway" || secId === "sec-backup")) {
     if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
-      requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Akses Manajemen Karyawan Toko (Khusus COS)", () => {
+      const desc = secId === "sec-payment-gateway"
+        ? "Otorisasi Akses Pengaturan QRIS & Rekening Toko (Khusus Pejabat)"
+        : (secId === "sec-backup"
+            ? "Otorisasi Akses Backup & Restore Database Toko (Khusus Pejabat)"
+            : "Otorisasi Akses Manajemen Karyawan Toko (Khusus COS)");
+      requestSupervisorAuth("MANAGE_EMPLOYEES", desc, () => {
         executeToggleSettingSection(secId, false);
       });
       return;

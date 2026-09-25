@@ -133,6 +133,18 @@ function initSisQrisModal() {
 }
 
 function saveSisQris() {
+  if (pos.currentUser && (pos.currentUser.role === "CREW" || (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")))) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Simpan Pengaturan QRIS & Rekening Toko (Khusus Pejabat)", (supervisor) => {
+        executeSaveSisQris(supervisor);
+      });
+      return;
+    }
+  }
+  executeSaveSisQris();
+}
+
+function executeSaveSisQris(supervisor = null) {
   if (!window.pos || !pos.settings) return;
 
   const merchantInput = document.getElementById('sis-qris-merchant-name');
