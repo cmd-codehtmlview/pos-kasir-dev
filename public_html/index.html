@@ -1612,16 +1612,8 @@
               </div>
 
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <p class="text-xs text-slate-600">Catatan riwayat absensi masuk shift karyawan toko.</p>
-            <button 
-              type="button" 
-              onclick="openModal('modal-employee-login')" 
-              class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs flex items-center gap-1.5 shadow-xs transition-all cursor-pointer self-start sm:self-auto"
-            >
-              <span>⏱️</span>
-              <span>+ Absensi Masuk Shift</span>
-            </button>
-          </div>
+                <p class="text-xs text-slate-600">Catatan riwayat absensi masuk shift karyawan toko (otomatis tercatat saat login kasir).</p>
+              </div>
 
           <div class="overflow-x-auto rounded-xl border border-slate-200 max-h-[300px]">
             <table class="w-full text-left border-collapse text-xs">
@@ -8688,7 +8680,7 @@
   <!-- ============================================================ -->
   <!-- MODAL: LOGIN KARYAWAN KASIR (NIK + PIN) -->
   <!-- ============================================================ -->
-  <div id="modal-employee-login" class="modal-backdrop fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-[9998] hidden no-print overflow-y-auto">
+  <div id="modal-employee-login" class="modal-backdrop modal-high-priority fixed inset-0 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 z-[9998] hidden no-print overflow-y-auto">
     <div class="bg-white w-full max-w-md rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-alfa-red overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh] my-auto">
       <!-- Header -->
       <div class="p-3.5 sm:p-4 bg-gradient-to-r from-alfa-red to-red-700 text-white flex items-center justify-between shrink-0">
@@ -8815,7 +8807,7 @@
   <!-- ============================================================ -->
   <!-- MODAL: OTORISASI PEJABAT TOKO (COS / ACOS) -->
   <!-- ============================================================ -->
-  <div id="modal-supervisor-auth" class="modal-backdrop fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999] hidden no-print overflow-y-auto">
+  <div id="modal-supervisor-auth" class="modal-backdrop modal-high-priority fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 z-[9999] hidden no-print overflow-y-auto">
     <div class="bg-white w-full max-w-md rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-yellow-500 overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh] my-auto">
       <!-- Header -->
       <div class="p-3.5 sm:p-4 bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-500 text-slate-950 flex items-center justify-between shrink-0">
@@ -9242,36 +9234,36 @@
 
   <!-- Scripts -->
   <!-- Core Data & Storage -->
-  <script src="products-data.js?v=152"></script>
-  <script src="js/db.js?v=152"></script>
-  <script src="js/store.js?v=152"></script>
-  <script src="js/license.js?v=152"></script>
-  <script src="js/sync.js?v=152"></script>
+  <script src="products-data.js?v=153"></script>
+  <script src="js/db.js?v=153"></script>
+  <script src="js/store.js?v=153"></script>
+  <script src="js/license.js?v=153"></script>
+  <script src="js/sync.js?v=153"></script>
   
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=152"></script>
-  <script src="js/cart.js?v=152"></script>
-  <script src="js/printer.js?v=152"></script>
-  <script src="js/checkout.js?v=152"></script>
-  <script src="js/member.js?v=152"></script>
-  <script src="js/returns.js?v=152"></script>
-  <script src="js/stock-opname.js?v=152"></script>
-  <script src="js/klerk.js?v=152"></script>
-  <script src="js/inventory.js?v=152"></script>
+  <script src="js/scanner.js?v=153"></script>
+  <script src="js/cart.js?v=153"></script>
+  <script src="js/printer.js?v=153"></script>
+  <script src="js/checkout.js?v=153"></script>
+  <script src="js/member.js?v=153"></script>
+  <script src="js/returns.js?v=153"></script>
+  <script src="js/stock-opname.js?v=153"></script>
+  <script src="js/klerk.js?v=153"></script>
+  <script src="js/inventory.js?v=153"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/import-products.js?v=152"></script>
-  <script src="js/repack.js?v=152"></script>
-  <script src="js/reports.js?v=152"></script>
-  <script src="js/settings.js?v=152"></script>
-  <script src="js/employees.js?v=152"></script>
+  <script src="js/import-products.js?v=153"></script>
+  <script src="js/repack.js?v=153"></script>
+  <script src="js/reports.js?v=153"></script>
+  <script src="js/settings.js?v=153"></script>
+  <script src="js/employees.js?v=153"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=152"></script>
-  <script src="js/sis-logistics.js?v=152"></script>
-  <script src="js/sis-cashier-ops.js?v=152"></script>
-  <script src="js/sis-store-crm.js?v=152"></script>
-  <script src="js/sis-analytics.js?v=152"></script>
+  <script src="js/app.js?v=153"></script>
+  <script src="js/sis-logistics.js?v=153"></script>
+  <script src="js/sis-cashier-ops.js?v=153"></script>
+  <script src="js/sis-store-crm.js?v=153"></script>
+  <script src="js/sis-analytics.js?v=153"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -11431,7 +11423,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=152')
+          navigator.serviceWorker.register('./sw.js?v=153')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);

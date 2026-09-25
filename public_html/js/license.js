@@ -181,6 +181,7 @@ function computeExpectedOfflineKey(clientName, deviceId, licenseType, expiryStr)
 }
 
 function getStoredLicense() {
+  const isDev = typeof isDevEnvironment === "function" && isDevEnvironment();
   const raw = localStorage.getItem("snack_pos_license");
   if (raw) {
     try {
@@ -190,7 +191,19 @@ function getStoredLicense() {
       }
     } catch (e) {}
   }
-  return null;
+  // Auto-seed default store untuk dev atau self-hosted VPS jika belum tersimpan
+  const defaultLic = {
+    isLicensed: true,
+    storeId: isDev ? "DEV-001" : "STR-001",
+    clientName: isDev ? "Toko Dev Uji Coba" : "Toko Utama Minimarket",
+    status: "ACTIVE",
+    plan: isDev ? "DEV" : "PRO",
+    planType: "LIFETIME"
+  };
+  try {
+    localStorage.setItem("snack_pos_license", JSON.stringify(defaultLic));
+  } catch(e) {}
+  return defaultLic;
 }
 
 function saveStoredLicense(licenseObj) {

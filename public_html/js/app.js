@@ -609,12 +609,7 @@ function initApp() {
   try { initUniversalPrinterDriver(); } catch (e) { console.error("Error initUniversalPrinterDriver:", e); }
 
   // Alur Inisialisasi Akun Kasir:
-  // 1. Jika aplikasi belum berlisensi dan bukan lingkungan dev, jangan buka modal login dulu
-  if (typeof isAppLicensed === "function" && !isAppLicensed()) {
-    return;
-  }
-
-  // 2. JAMINAN MUTLAK: Setiap awal buka aplikasi / refresh / logout,
+  // JAMINAN MUTLAK: Setiap awal buka aplikasi / refresh / logout,
   // kasir WAJIB login & presensi via modal-employee-login jika belum ada sesi aktif!
   if (!pos.currentUser) {
     if (typeof openModal === "function") {

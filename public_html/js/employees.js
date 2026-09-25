@@ -82,26 +82,13 @@ window.findActiveUnklerkedShift = findActiveUnklerkedShift;
  * Konfirmasi dan lakukan Kunci Layar / Logout Kasir (Aman untuk Mobile & Desktop)
  */
 function confirmOrLockCashier() {
-  const current = pos.currentUser;
-  const name = current ? current.name : (pos.settings?.cashierName || "Kasir");
-  const nik = current ? current.nik : (pos.settings?.cashierNik || "-");
-
-  const activeShift = typeof findActiveUnklerkedShift === "function" ? findActiveUnklerkedShift() : null;
-  let confirmMsg = `Apakah Anda yakin ingin mengunci layar & logout dari sesi kasir ${name} (${nik})?`;
-
-  if (activeShift && (activeShift.nik === nik || !nik)) {
-    confirmMsg += `\n\n📌 Catatan Penting:\nAnda memiliki ${activeShift.totalCount} transaksi aktif yang belum di-Clerk.\nAnda harus login kembali dengan NIK ${activeShift.nik} jika ingin melanjutkan transaksi atau melakukan Closing Kasir [F8]. NIK lain tidak dapat login sebelum Klerk selesai.`;
-  }
-
-  if (confirm(confirmMsg)) {
-    if (typeof toggleSisDrawer === "function") {
-      const drawer = document.getElementById("sis-drawer");
-      if (drawer && !drawer.classList.contains("translate-x-full")) {
-        toggleSisDrawer();
-      }
+  if (typeof toggleSisDrawer === "function") {
+    const drawer = document.getElementById("sis-drawer");
+    if (drawer && !drawer.classList.contains("translate-x-full")) {
+      toggleSisDrawer();
     }
-    lockCashierScreen();
   }
+  lockCashierScreen();
 }
 window.confirmOrLockCashier = confirmOrLockCashier;
 
@@ -755,7 +742,20 @@ function hasPermissionForAction(user, actionType) {
   return (u.role === "COS" || u.role === "ACOS");
 }
 
-function requestSupervisorAuth(actionType, actionDesc, onApproved) {
+function requestSupervisorAuth(actionType, arg2, arg3) {
+  let actionDesc = "Tindakan Kasir Dibatasi";
+  let onApproved = null;
+
+  if (typeof arg2 === "function") {
+    onApproved = arg2;
+    if (typeof arg3 === "string") actionDesc = arg3;
+  } else if (typeof arg3 === "function") {
+    onApproved = arg3;
+    if (typeof arg2 === "string") actionDesc = arg2;
+  } else if (typeof arg2 === "string") {
+    actionDesc = arg2;
+  }
+
   // Hanya jika kasir yang sedang aktif login berstatus COS atau memiliki izin mandiri untuk aksi ini
   if (pos.currentUser && (pos.currentUser.role === 'COS' || hasPermissionForAction(pos.currentUser, actionType))) {
     if (typeof onApproved === 'function') {
