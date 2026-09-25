@@ -539,34 +539,40 @@ const COMMON_PRINTER_SERVICES = [
 
     function wrapService(serviceObj) {
       const sUuid = formatUuid128(serviceObj.uuid);
+      const cList = serviceObj.characteristics || [];
       return {
         uuid: sUuid,
         async getCharacteristics() {
-          const cList = serviceObj.characteristics || [];
-          return cList.map(c => wrapCharacteristic(sUuid, c));
+          return cList.map(c => wrapCharacteristic(sUuid, c, cList));
         },
         async getCharacteristic(charUuid) {
           const cUuid128 = formatUuid128(charUuid);
-          const cList = serviceObj.characteristics || [];
           const found = cList.find(c => c.uuid.toLowerCase() === cUuid128.toLowerCase());
           if (!found) {
             throw new Error("Characteristic Bluetooth tidak ditemukan: " + charUuid);
           }
-          return wrapCharacteristic(sUuid, found);
+          return wrapCharacteristic(sUuid, found, cList);
         }
       };
     }
 
-    function wrapCharacteristic(serviceUuid, charObj) {
+    function wrapCharacteristic(serviceUuid, charObj, siblingChars = []) {
       const cUuid = formatUuid128(charObj.uuid);
       const props = charObj.properties || {};
-      const canWriteWithoutResponse = Boolean(props.writeWithoutResponse || !props.write);
+
+      // Deteksi kapabilitas penulisan
+      const hasWriteNoResp = Boolean(props.writeWithoutResponse);
+      const hasWrite = Boolean(props.write);
+      const supportsNoResponse = hasWriteNoResp || (!hasWrite);
+
+      let verifiedMode = null; // 'noResponse' | 'withResponse'
+      let activeCharUuid = cUuid;
 
       return {
         uuid: cUuid,
         properties: {
-          write: Boolean(props.write),
-          writeWithoutResponse: canWriteWithoutResponse
+          write: hasWrite,
+          writeWithoutResponse: supportsNoResponse
         },
         async writeValue(value) {
           return sendData(value, false);
@@ -579,24 +585,80 @@ const COMMON_PRINTER_SERVICES = [
         }
       };
 
-      async function sendData(val, withoutResponse) {
+      async function sendData(val, requestWithoutResponse) {
         const ble = getBlePlugin();
         if (!ble) throw new Error("Capacitor Bluetooth plugin tidak aktif");
         const hex = toSpaceSeparatedHex(val);
-        if (withoutResponse) {
-          return ble.writeWithoutResponse({
-            deviceId,
-            service: serviceUuid,
-            characteristic: cUuid,
-            value: hex
-          });
-        } else {
-          return ble.write({
-            deviceId,
-            service: serviceUuid,
-            characteristic: cUuid,
-            value: hex
-          });
+
+        // Jika mode sudah terverifikasi sukses sebelumnya, gunakan langsung
+        let useNoResponse = verifiedMode ? (verifiedMode === 'noResponse') : (hasWriteNoResp ? true : (hasWrite ? false : true));
+
+        // Helper fungsi penulisan ke target characteristic
+        const performWrite = async (targetUuid, noResp) => {
+          if (noResp) {
+            return await ble.writeWithoutResponse({
+              deviceId,
+              service: serviceUuid,
+              characteristic: targetUuid,
+              value: hex
+            });
+          } else {
+            return await ble.write({
+              deviceId,
+              service: serviceUuid,
+              characteristic: targetUuid,
+              value: hex
+            });
+          }
+        };
+
+        // 1. Coba penulisan dengan mode saat ini
+        try {
+          const res = await performWrite(activeCharUuid, useNoResponse);
+          verifiedMode = useNoResponse ? 'noResponse' : 'withResponse';
+          return res;
+        } catch (firstErr) {
+          const errText = String(firstErr?.message || firstErr);
+          console.warn(`[Bluetooth] Penulisan ke ${activeCharUuid} (mode ${useNoResponse ? 'noResponse' : 'withResponse'}) gagal: ${errText}`);
+
+          // Jika gagal karena status code 200 (ERROR_GATT_WRITE_NOT_ALLOWED) atau error penulisan serupa
+          if (errText.includes("200") || errText.includes("Writing characteristic failed") || errText.includes("not allowed")) {
+            // Coba mode kebalikannya (noResponse <-> withResponse)
+            try {
+              console.log(`[Bluetooth] Mencoba mode sebaliknya (${!useNoResponse ? 'noResponse' : 'withResponse'})...`);
+              const res2 = await performWrite(activeCharUuid, !useNoResponse);
+              verifiedMode = (!useNoResponse) ? 'noResponse' : 'withResponse';
+              console.log(`[Bluetooth] ✅ Berhasil dengan mode alternatif ${verifiedMode}!`);
+              return res2;
+            } catch (secondErr) {
+              console.warn(`[Bluetooth] Mode alternatif juga gagal:`, secondErr);
+
+              // Jika ada karakteristik saudara (sibling characteristics) dalam service yang sama
+              const alternativeChars = siblingChars.filter(c => formatUuid128(c.uuid) !== activeCharUuid && (c.properties?.writeWithoutResponse || c.properties?.write));
+              for (const altChar of alternativeChars) {
+                const altUuid = formatUuid128(altChar.uuid);
+                console.log(`[Bluetooth] Mencoba karakteristik alternatif di service yang sama: ${altUuid}...`);
+                try {
+                  const res3 = await performWrite(altUuid, true);
+                  activeCharUuid = altUuid;
+                  verifiedMode = 'noResponse';
+                  console.log(`[Bluetooth] ✅ Karakteristik alternatif ${altUuid} BERHASIL (noResponse)!`);
+                  return res3;
+                } catch (e3) {
+                  try {
+                    const res4 = await performWrite(altUuid, false);
+                    activeCharUuid = altUuid;
+                    verifiedMode = 'withResponse';
+                    console.log(`[Bluetooth] ✅ Karakteristik alternatif ${altUuid} BERHASIL (withResponse)!`);
+                    return res4;
+                  } catch (e4) {}
+                }
+              }
+
+              throw secondErr;
+            }
+          }
+          throw firstErr;
         }
       }
     }
@@ -735,9 +797,22 @@ async function discoverPrinterWritableCharacteristic(server) {
       const s = await server.getPrimaryService(sUuid);
       if (s) {
         const characteristics = await s.getCharacteristics();
-        for (const char of characteristics) {
-          if (char.properties.writeWithoutResponse || char.properties.write) {
-            console.log(`[Bluetooth] Ditemukan printer characteristic dari service POS dikenal: ${sUuid} -> ${char.uuid}`);
+        // Prioritaskan karakteristik penulisan murni (RX) yang TIDAK memiliki notify/indicate
+        // karena TX (notify) kadang-kadang menyertakan bendera write palsu pada chip murah
+        const sortedChars = characteristics.slice().sort((a, b) => {
+          const aWritable = (a.properties?.writeWithoutResponse || a.properties?.write) ? 1 : 0;
+          const bWritable = (b.properties?.writeWithoutResponse || b.properties?.write) ? 1 : 0;
+          if (bWritable !== aWritable) return bWritable - aWritable;
+
+          // Karakteristik murni write (bukan notify) didahulukan
+          const aPureWrite = aWritable && !a.properties?.notify && !a.properties?.indicate ? 1 : 0;
+          const bPureWrite = bWritable && !b.properties?.notify && !b.properties?.indicate ? 1 : 0;
+          return bPureWrite - aPureWrite;
+        });
+
+        for (const char of sortedChars) {
+          if (char.properties?.writeWithoutResponse || char.properties?.write) {
+            console.log(`[Bluetooth] Ditemukan printer characteristic dari service POS dikenal: ${sUuid} -> ${char.uuid} (write=${char.properties?.write}, writeNoResp=${char.properties?.writeWithoutResponse})`);
             return char;
           }
         }
@@ -765,9 +840,19 @@ async function discoverPrinterWritableCharacteristic(server) {
       }
       try {
         const characteristics = await service.getCharacteristics();
-        for (const char of characteristics) {
-          if (char.properties.writeWithoutResponse || char.properties.write) {
-            console.log(`[Bluetooth] Ditemukan printer characteristic dari service generic: ${service.uuid} -> ${char.uuid}`);
+        const sortedChars = characteristics.slice().sort((a, b) => {
+          const aWritable = (a.properties?.writeWithoutResponse || a.properties?.write) ? 1 : 0;
+          const bWritable = (b.properties?.writeWithoutResponse || b.properties?.write) ? 1 : 0;
+          if (bWritable !== aWritable) return bWritable - aWritable;
+
+          const aPureWrite = aWritable && !a.properties?.notify && !a.properties?.indicate ? 1 : 0;
+          const bPureWrite = bWritable && !b.properties?.notify && !b.properties?.indicate ? 1 : 0;
+          return bPureWrite - aPureWrite;
+        });
+
+        for (const char of sortedChars) {
+          if (char.properties?.writeWithoutResponse || char.properties?.write) {
+            console.log(`[Bluetooth] Ditemukan printer characteristic dari service generic: ${service.uuid} -> ${char.uuid} (write=${char.properties?.write}, writeNoResp=${char.properties?.writeWithoutResponse})`);
             return char;
           }
         }
