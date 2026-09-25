@@ -323,6 +323,17 @@ function lockCashierScreen() {
   showToast("Layar kasir dikunci. Silakan login kembali.", "info");
 }
 
+function confirmOrLockCashier() {
+  const drawer = document.getElementById("sis-drawer");
+  if (drawer && !drawer.classList.contains("translate-x-full")) {
+    if (typeof toggleSisDrawer === "function") {
+      toggleSisDrawer();
+    }
+  }
+  lockCashierScreen();
+}
+window.confirmOrLockCashier = confirmOrLockCashier;
+
 // ==========================================
 // KONTROL AKSES KEUANGAN & DASHBOARD OWNER (RBAC)
 // ==========================================

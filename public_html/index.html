@@ -2511,6 +2511,15 @@
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
         <span class="truncate">SnackPOS Cloud Active</span>
       </div>
+      <button 
+        type="button" 
+        onclick="confirmOrLockCashier()" 
+        class="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-xs cursor-pointer"
+        title="Kunci Layar & Logout Kasir"
+      >
+        <span>🔒</span>
+        <span>Logout Kasir</span>
+      </button>
       <a href="owner.html" target="_blank" class="px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-2xs">
         <span>📊</span>
         <span>Portal Owner ↗</span>
@@ -9097,36 +9106,37 @@
 
   <!-- Scripts -->
   <!-- Core Data & Storage -->
-  <script src="products-data.js?v=200"></script>
-  <script src="js/db.js?v=200"></script>
-  <script src="js/store.js?v=200"></script>
-  <script src="js/license.js?v=200"></script>
-  <script src="js/sync.js?v=200"></script>
+  <script src="products-data.js?v=201"></script>
+  <script src="js/db.js?v=201"></script>
+  <script src="js/store.js?v=201"></script>
+  <script src="js/license.js?v=201"></script>
+  <script src="js/sync.js?v=201"></script>
   
+... [truncated for diff preview]
   <!-- POS Modules -->
   <script src="js/html5-qrcode.min.js"></script>
-  <script src="js/scanner.js?v=200"></script>
-  <script src="js/cart.js?v=200"></script>
-  <script src="js/printer.js?v=200"></script>
-  <script src="js/checkout.js?v=200"></script>
-  <script src="js/member.js?v=200"></script>
-  <script src="js/returns.js?v=200"></script>
-  <script src="js/stock-opname.js?v=200"></script>
-  <script src="js/klerk.js?v=200"></script>
-  <script src="js/inventory.js?v=200"></script>
+  <script src="js/scanner.js?v=201"></script>
+  <script src="js/cart.js?v=201"></script>
+  <script src="js/printer.js?v=201"></script>
+  <script src="js/checkout.js?v=201"></script>
+  <script src="js/member.js?v=201"></script>
+  <script src="js/returns.js?v=201"></script>
+  <script src="js/stock-opname.js?v=201"></script>
+  <script src="js/klerk.js?v=201"></script>
+  <script src="js/inventory.js?v=201"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/import-products.js?v=200"></script>
-  <script src="js/repack.js?v=200"></script>
-  <script src="js/reports.js?v=200"></script>
-  <script src="js/settings.js?v=200"></script>
-  <script src="js/employees.js?v=200"></script>
+  <script src="js/import-products.js?v=201"></script>
+  <script src="js/repack.js?v=201"></script>
+  <script src="js/reports.js?v=201"></script>
+  <script src="js/settings.js?v=201"></script>
+  <script src="js/employees.js?v=201"></script>
   
   <!-- Main Application Entry Point -->
-  <script src="js/app.js?v=200"></script>
-  <script src="js/sis-logistics.js?v=200"></script>
-  <script src="js/sis-cashier-ops.js?v=200"></script>
-  <script src="js/sis-store-crm.js?v=200"></script>
-  <script src="js/sis-analytics.js?v=200"></script>
+  <script src="js/app.js?v=201"></script>
+  <script src="js/sis-logistics.js?v=201"></script>
+  <script src="js/sis-cashier-ops.js?v=201"></script>
+  <script src="js/sis-store-crm.js?v=201"></script>
+  <script src="js/sis-analytics.js?v=201"></script>
 
   <script>
     // Live digital clock (Hari Bahasa Indonesia, Tanggal, Bulan, Tahun, HH:MM:SS)
@@ -11099,7 +11109,7 @@
         });
       } else {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js?v=200')
+          navigator.serviceWorker.register('./sw.js?v=201')
             .then((registration) => {
               registration.update();
               console.log('PWA Service Worker terdaftar dengan cakupan:', registration.scope);
