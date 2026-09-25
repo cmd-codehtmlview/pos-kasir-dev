@@ -204,7 +204,7 @@
   <!-- ========================================== -->
   <!-- MAIN CONTAINER -->
   <!-- ========================================== -->
-  <main class="max-w-7xl mx-auto px-3 sm:px-6 pt-5 pb-24 sm:pb-8 space-y-6 flex-1 w-full max-w-full min-w-0 overflow-x-hidden">
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 pt-2 sm:pt-3 pb-24 sm:pb-8 space-y-3 sm:space-y-4 flex-1 w-full max-w-full min-w-0 overflow-x-hidden">
 
     <!-- BANNER STATUS LANGGANAN CLOUD DASHBOARD -->
     <div id="owner-cloud-gate-banner" class="hidden p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg"></div>
@@ -264,10 +264,10 @@
     </div>
 
     <!-- WRAPPER BODY DASHBOARD PEMILIK -->
-    <div id="owner-dashboard-body" class="space-y-6">
-    <!-- BAR FILTER TANGGAL & STATUS TOKO -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-2xl border border-slate-800">
-      <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full lg:w-auto">
+    <div id="owner-dashboard-body" class="space-y-3.5 sm:space-y-5">
+    <!-- BAR FILTER TANGGAL PERIODE -->
+    <div class="flex items-center justify-between gap-2 bg-slate-900/60 p-2 sm:p-2.5 rounded-2xl border border-slate-800">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full">
         
         <!-- Pilihan Periode Scrollable Pills (Anti-Patah / Anti-Tumpang Tindih di Layar HP 9:16 & 9:18) -->
         <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 max-w-full flex-nowrap -mx-1 px-1">
@@ -284,7 +284,7 @@
         </div>
 
         <!-- Custom Date Range Picker Container (Responsif Penuh di Mobile 9:16 & Tablet) -->
-        <div id="custom-date-box" class="hidden w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-slate-950 p-2.5 sm:px-3 sm:py-1.5 rounded-xl border border-amber-500/50 text-xs shadow-lg">
+        <div id="custom-date-box" class="hidden w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-slate-950 p-2 sm:px-3 sm:py-1.5 rounded-xl border border-amber-500/50 text-xs shadow-lg">
           <div class="flex items-center justify-between sm:justify-start gap-1.5 flex-1">
             <span class="text-[11px] text-amber-300 font-bold uppercase whitespace-nowrap">Dari:</span>
             <input 
@@ -310,36 +310,6 @@
             <span>🔍</span>
             <span>Terapkan</span>
           </button>
-        </div>
-      </div>
-
-      <!-- Quick Dummy & Kasir Aktif (Tier Bersih Bawah di Layar HP) -->
-      <div class="flex items-center justify-between sm:justify-end gap-2 w-full lg:w-auto pt-2 lg:pt-0 border-t border-slate-800/60 lg:border-t-0">
-        <div class="flex items-center gap-1.5">
-          <button 
-            type="button"
-            onclick="seedRealisticOwnerData(true)" 
-            id="btn-seed-dummy"
-            class="px-2.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs flex items-center gap-1 shadow-md transition cursor-pointer active:scale-95 whitespace-nowrap"
-            title="Isi data simulasi 30 hari & produk untuk melihat grafik & laporan realtime"
-          >
-            <span>⚡</span>
-            <span class="text-[11px] sm:text-xs">Isi Dummy 30 Hari</span>
-          </button>
-          <button 
-            type="button"
-            onclick="clearDummyData()" 
-            class="px-2 py-1.5 bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-300 font-bold rounded-xl text-xs border border-slate-700 hover:border-rose-800 flex items-center gap-1 transition cursor-pointer"
-            title="Kosongkan data simulasi demo"
-          >
-            <span>🗑️</span>
-            <span class="text-[11px] sm:text-xs">Reset</span>
-          </button>
-        </div>
-
-        <div class="flex items-center gap-1.5 text-xs text-slate-400 flex-shrink-0">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span class="text-[10px] sm:text-xs"><span class="hidden sm:inline">Kasir Aktif: </span><strong class="text-white font-mono" id="active-cashier-label">POS 01</strong></span>
         </div>
       </div>
     </div>
@@ -1391,14 +1361,6 @@
             class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-amber-500/20 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2"
           >
             <span>🔓 Buka Dashboard</span>
-          </button>
-
-          <button 
-            type="button" 
-            onclick="quickDevLogin()"
-            class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <span>⚡ Masuk Cepat (Mode Dev / PIN: 1234)</span>
           </button>
 
           <a 
