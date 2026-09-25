@@ -1,0 +1,34 @@
+{
+  "name": "snackpos-kasir-retail",
+  "version": "1.0.0",
+  "description": "Aplikasi Kasir Retail Toko Snack & Minimarket Modern",
+  "main": "public_html/index.html",
+  "scripts": {
+    "cap:sync": "cap sync",
+    "cap:open": "cap open android"
+  },
+  "keywords": [
+    "pos",
+    "cashier",
+    "minimarket",
+    "retail",
+    "capacitor",
+    "android"
+  ],
+  "author": "SnackPOS Team",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/camera": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/haptics": "^6.0.0",
+    "@capacitor/network": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
+    "@capacitor-community/bluetooth-le": "^6.0.0",
+    "@capacitor-community/keep-awake": "^5.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0"
+  }
+}
+

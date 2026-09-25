@@ -16,3 +16,13 @@ Thumbs.db
 
 # Backup files
 *.bak*
+
+# Android Build Outputs & Gradle Cache
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/.idea/
+android/*.iml
+android/app/*.iml
+public_html/download/*.apk

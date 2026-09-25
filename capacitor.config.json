@@ -1,0 +1,38 @@
+{
+  "appId": "com.snackpos.app",
+  "appName": "SnackPOS",
+  "webDir": "public_html",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true,
+    "allowNavigation": [
+      "2.27.165.72.sslip.io",
+      "pos-kasir-coj.pages.dev",
+      "*.supabase.co"
+    ]
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true
+  },
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0b1120"
+    },
+    "Keyboard": {
+      "resize": "body",
+      "resizeOnFullScreen": true
+    },
+    "BluetoothLe": {
+      "displayStrings": {
+        "scanning": "Mencari Printer Thermal...",
+        "cancel": "Batal",
+        "availableDevices": "Printer Bluetooth Ditemukan",
+        "noDeviceFound": "Tidak Ada Printer Bluetooth"
+      }
+    }
+  }
+}
+
