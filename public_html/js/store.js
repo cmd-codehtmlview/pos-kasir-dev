@@ -252,21 +252,31 @@ class POSStore {
           emp.canBlindKlerk = true;
           needSave = true;
         }
-        if (emp.canViewFinancials === undefined) {
-          emp.canViewFinancials = (emp.role === "COS");
+        if (emp.role === "CREW") {
+          emp.canViewFinancials = false;
+          emp.canManageEmployees = false;
+          emp.canManageProducts = false;
+          emp.canStockMutation = false;
+          emp.canRetur = false;
+          emp.canStockOpname = false;
           needSave = true;
-        }
-        if (emp.canManageEmployees === undefined) {
-          emp.canManageEmployees = (emp.role === "COS");
-          needSave = true;
-        }
-        if (emp.canManageProducts === undefined) {
-          emp.canManageProducts = (emp.role === "COS" || emp.role === "ACOS");
-          needSave = true;
-        }
-        if (emp.canStockMutation === undefined) {
-          emp.canStockMutation = (emp.role === "COS" || emp.role === "ACOS");
-          needSave = true;
+        } else {
+          if (emp.canViewFinancials === undefined) {
+            emp.canViewFinancials = (emp.role === "COS");
+            needSave = true;
+          }
+          if (emp.canManageEmployees === undefined) {
+            emp.canManageEmployees = (emp.role === "COS");
+            needSave = true;
+          }
+          if (emp.canManageProducts === undefined) {
+            emp.canManageProducts = (emp.role === "COS" || emp.role === "ACOS");
+            needSave = true;
+          }
+          if (emp.canStockMutation === undefined) {
+            emp.canStockMutation = (emp.role === "COS" || emp.role === "ACOS");
+            needSave = true;
+          }
         }
         if (!emp.shift) {
           emp.shift = "Shift 1";
@@ -281,6 +291,10 @@ class POSStore {
     if (storedCurrentUser) {
       try {
         this.currentUser = JSON.parse(storedCurrentUser);
+        if (this.currentUser && this.currentUser.role === "CREW") {
+          this.currentUser.canViewFinancials = false;
+          this.currentUser.canManageEmployees = false;
+        }
       } catch (e) {
         this.currentUser = null;
       }

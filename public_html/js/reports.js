@@ -438,19 +438,33 @@ function renderLpbReportsTable() {
 }
 
 function exportTransactionsCSV() {
+  const isAuth = typeof isCurrentUserAuthorizedForFinancials === "function" ? isCurrentUserAuthorizedForFinancials() : false;
+  if (!isAuth) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Ekspor Data Finansial Toko (Khusus Pejabat)", () => {
+        if (typeof window !== "undefined") window.financialsTempUnlocked = true;
+        executeExportTransactionsCSV(true);
+      });
+      return;
+    }
+  }
+  executeExportTransactionsCSV(isAuth);
+}
+
+function executeExportTransactionsCSV(forceAuth = false) {
   const transactions = getFilteredTransactions();
   if (transactions.length === 0) {
     showToast("Tidak ada transaksi untuk diekspor!", "warning");
     return;
   }
 
-  const isAuth = typeof isCurrentUserAuthorizedForFinancials === "function" ? isCurrentUserAuthorizedForFinancials() : true;
+  const isAuth = forceAuth || (typeof isCurrentUserAuthorizedForFinancials === "function" && isCurrentUserAuthorizedForFinancials());
 
   let csv = "data:text/csv;charset=utf-8,";
   csv += "No Struk,Tanggal,Waktu,Kasir,Shift,Jumlah Item,Subtotal,Diskon,Grand Total,Total Modal,Laba Bersih,Metode\n";
 
   transactions.forEach(t => {
-    const totalQty = t.items.reduce((s, i) => s + i.qty, 0);
+    const totalQty = (t.items || []).reduce((s, i) => s + (Number(i.qty) || 0), 0);
     const subtotalVal = isAuth ? (t.subtotal || 0) : "***";
     const discountVal = isAuth ? (t.discountAmount || 0) : "***";
     const grandTotalVal = isAuth ? (t.grandTotal || 0) : "***";
@@ -503,6 +517,20 @@ function exportTransactionsCSV() {
 }
 
 function exportTransactionsToExcel() {
+  const isAuth = typeof isCurrentUserAuthorizedForFinancials === "function" ? isCurrentUserAuthorizedForFinancials() : false;
+  if (!isAuth) {
+    if (typeof requestSupervisorAuth === "function") {
+      requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Ekspor Data Finansial Toko (Khusus Pejabat)", () => {
+        if (typeof window !== "undefined") window.financialsTempUnlocked = true;
+        executeExportTransactionsToExcel(true);
+      });
+      return;
+    }
+  }
+  executeExportTransactionsToExcel(isAuth);
+}
+
+function executeExportTransactionsToExcel(forceAuth = false) {
   const transactions = (typeof getFilteredTransactions === "function" && getFilteredTransactions().length > 0)
     ? getFilteredTransactions()
     : ((window.pos && window.pos.transactions) ? window.pos.transactions : []);
@@ -513,7 +541,7 @@ function exportTransactionsToExcel() {
     return;
   }
 
-  const isAuth = typeof isCurrentUserAuthorizedForFinancials === "function" ? isCurrentUserAuthorizedForFinancials() : true;
+  const isAuth = forceAuth || (typeof isCurrentUserAuthorizedForFinancials === "function" && isCurrentUserAuthorizedForFinancials());
 
   if (typeof XLSX !== "undefined") {
     try {
@@ -543,9 +571,9 @@ function exportTransactionsToExcel() {
             "Tanggal": t.date || "",
             "Barcode": item.id || item.barcode || "",
             "Nama Produk": item.name || "",
-            "Harga Satuan": item.price || 0,
+            "Harga Satuan": isAuth ? (item.price || 0) : "***",
             "Kuantitas": item.qty || 0,
-            "Total Harga": (item.price || 0) * (item.qty || 0)
+            "Total Harga": isAuth ? ((item.price || 0) * (item.qty || 0)) : "***"
           });
         });
       });
@@ -571,7 +599,7 @@ function exportTransactionsToExcel() {
   }
 
   // Fallback to CSV
-  exportTransactionsCSV();
+  executeExportTransactionsCSV(isAuth);
 }
 
 function exportProductsToExcel() {

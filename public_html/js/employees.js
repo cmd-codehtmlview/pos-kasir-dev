@@ -164,7 +164,7 @@ function handleEmployeeLogin(event) {
   pos.attendance.unshift(attRecord);
   pos.saveAttendance();
 
-  financialsTempUnlocked = false; // Reset unlock sementara saat login kasir baru
+  window.financialsTempUnlocked = false; // Reset unlock sementara saat login kasir baru
   if (errEl) errEl.classList.add("hidden");
   pos.saveCurrentUser(emp);
   pos.settings.cashierName = emp.name;
@@ -337,15 +337,19 @@ window.confirmOrLockCashier = confirmOrLockCashier;
 // ==========================================
 // KONTROL AKSES KEUANGAN & DASHBOARD OWNER (RBAC)
 // ==========================================
-let financialsTempUnlocked = false;
+window.financialsTempUnlocked = false;
 
 function isCurrentUserAuthorizedForFinancials() {
-  if (financialsTempUnlocked) return true;
+  if (window.financialsTempUnlocked === true) return true;
   if (!window.pos || !pos.currentUser) return false;
+  if (pos.currentUser.role === "CREW") {
+    return pos.currentUser.canViewFinancials === true;
+  }
   return typeof hasPermissionForAction === "function" 
     ? hasPermissionForAction(pos.currentUser, "VIEW_FINANCIALS") 
-    : (pos.currentUser.role === "COS");
+    : (pos.currentUser.role === "COS" || pos.currentUser.role === "ACOS");
 }
+window.isCurrentUserAuthorizedForFinancials = isCurrentUserAuthorizedForFinancials;
 
 function openOwnerDashboardWithAuth() {
   if (isCurrentUserAuthorizedForFinancials()) {
@@ -365,8 +369,8 @@ function openOwnerDashboardWithAuth() {
 }
 
 function toggleFinancialCensorWithAuth() {
-  if (financialsTempUnlocked) {
-    financialsTempUnlocked = false;
+  if (window.financialsTempUnlocked) {
+    window.financialsTempUnlocked = false;
     if (typeof renderReports === "function") renderReports();
     if (typeof renderInventoryTable === "function") renderInventoryTable();
     updateDashboardButtonState();
@@ -380,7 +384,7 @@ function toggleFinancialCensorWithAuth() {
   }
 
   requestSupervisorAuth("VIEW_FINANCIALS", "Otorisasi Membuka Sensor Angka Laporan Finansial (Khusus COS)", (supervisor) => {
-    financialsTempUnlocked = true;
+    window.financialsTempUnlocked = true;
     if (typeof renderReports === "function") renderReports();
     if (typeof renderInventoryTable === "function") renderInventoryTable();
     updateDashboardButtonState();

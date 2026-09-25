@@ -552,14 +552,14 @@ function editSisStaff(nik) {
   if (roleSelect) roleSelect.value = emp.role || 'CREW';
 
   // Set 8 permissions
-  setCheckboxVal('sis-perm-void', emp.canVoid !== false);
-  setCheckboxVal('sis-perm-retur', emp.canRetur !== false);
-  setCheckboxVal('sis-perm-so', emp.canStockOpname !== false);
-  setCheckboxVal('sis-perm-diskon', emp.canBlindKlerk !== false);
-  setCheckboxVal('sis-perm-drawer', emp.canViewFinancials !== false);
-  setCheckboxVal('sis-perm-manage-staff', emp.canManageEmployees !== false);
-  setCheckboxVal('sis-perm-manage-prod', emp.canManageProducts !== false);
-  setCheckboxVal('sis-perm-lpb', emp.canStockMutation !== false);
+  setCheckboxVal('sis-perm-void', emp.canVoid !== undefined ? !!emp.canVoid : (emp.role === "COS" || emp.role === "ACOS" || emp.role === "CREW"));
+  setCheckboxVal('sis-perm-retur', emp.canRetur !== undefined ? !!emp.canRetur : (emp.role === "COS" || emp.role === "ACOS"));
+  setCheckboxVal('sis-perm-so', emp.canStockOpname !== undefined ? !!emp.canStockOpname : (emp.role === "COS" || emp.role === "ACOS"));
+  setCheckboxVal('sis-perm-diskon', emp.canBlindKlerk !== undefined ? !!emp.canBlindKlerk : true);
+  setCheckboxVal('sis-perm-drawer', emp.canViewFinancials !== undefined ? !!emp.canViewFinancials : (emp.role === "COS"));
+  setCheckboxVal('sis-perm-manage-staff', emp.canManageEmployees !== undefined ? !!emp.canManageEmployees : (emp.role === "COS"));
+  setCheckboxVal('sis-perm-manage-prod', emp.canManageProducts !== undefined ? !!emp.canManageProducts : (emp.role === "COS" || emp.role === "ACOS"));
+  setCheckboxVal('sis-perm-lpb', emp.canStockMutation !== undefined ? !!emp.canStockMutation : (emp.role === "COS" || emp.role === "ACOS"));
 
   switchStaffModalTab('form');
 }
