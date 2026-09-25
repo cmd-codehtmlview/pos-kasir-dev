@@ -12,12 +12,15 @@ let activeRepackTab = "form"; // "form" | "history"
  */
 function openRepackModal(preselectedSourceId = null) {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repacking / Mutasi Stok (Khusus Pejabat Toko)", () => {
-      openRepackModal(preselectedSourceId);
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repacking / Mutasi Stok (Khusus Pejabat Toko)", (supervisor) => {
+      executeOpenRepackModal(preselectedSourceId, supervisor);
     });
     return;
   }
+  executeOpenRepackModal(preselectedSourceId);
+}
 
+function executeOpenRepackModal(preselectedSourceId = null, supervisor = null) {
   const sourceSearch = document.getElementById("repack-source-search");
   const targetSearch = document.getElementById("repack-target-search");
   if (sourceSearch) sourceSearch.value = "";
@@ -315,12 +318,15 @@ function calculateRepackPreview() {
  */
 function executeRepacking() {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repacking / Mutasi Stok (Khusus Pejabat Toko)", () => {
-      executeRepacking();
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repacking / Mutasi Stok (Khusus Pejabat Toko)", (supervisor) => {
+      executeFinalRepacking(supervisor);
     });
     return;
   }
+  executeFinalRepacking();
+}
 
+function executeFinalRepacking(supervisor = null) {
   const sourceSelect = document.getElementById("repack-source-select");
   const targetSelect = document.getElementById("repack-target-select");
   const qtySourceInput = document.getElementById("repack-source-qty");

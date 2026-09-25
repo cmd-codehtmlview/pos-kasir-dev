@@ -244,12 +244,15 @@ function recalcSisReturRefund() {
 
 function processSisRetur() {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "RETUR_SALE")) {
-    requestSupervisorAuth("RETUR_SALE", "Otorisasi Memproses Retur & Refund Struk Kasir", () => {
-      processSisRetur();
+    requestSupervisorAuth("RETUR_SALE", "Otorisasi Memproses Retur & Refund Struk Kasir", (supervisor) => {
+      executeProcessSisRetur(supervisor);
     });
     return;
   }
+  executeProcessSisRetur();
+}
 
+function executeProcessSisRetur(supervisor = null) {
   const trx = window.activeReturTransaction;
   if (!trx) {
     alert("Harap cari dan pilih transaksi yang ingin diretur terlebih dahulu!");

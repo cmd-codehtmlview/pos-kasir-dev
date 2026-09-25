@@ -9,11 +9,15 @@ let currentImportTab = "local";
 // Buka Modal Impor Produk
 function openImportModal() {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
-    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Impor Produk ke Master Barang (Khusus Pejabat Toko)", () => {
-      openImportModal();
+    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Impor Produk ke Master Barang (Khusus Pejabat Toko)", (supervisor) => {
+      executeOpenImportModal(supervisor);
     });
     return;
   }
+  executeOpenImportModal();
+}
+
+function executeOpenImportModal(supervisor = null) {
   const modal = document.getElementById("modal-import-products");
   if (!modal) return;
   modal.classList.remove("hidden");

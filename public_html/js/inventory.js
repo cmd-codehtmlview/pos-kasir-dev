@@ -633,12 +633,15 @@ function handleSaveProductForm(event) {
   if (event && typeof event.preventDefault === "function") event.preventDefault();
 
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
-    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Menyimpan / Edit Data Master Produk", () => {
-      handleSaveProductForm();
+    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Menyimpan / Edit Data Master Produk", (supervisor) => {
+      executeSaveProductForm(supervisor);
     });
     return;
   }
+  executeSaveProductForm();
+}
 
+function executeSaveProductForm(supervisor = null) {
   const id = document.getElementById("product-form-id")?.value;
   const name = document.getElementById("product-form-name")?.value.trim();
   const barcode = document.getElementById("product-form-barcode")?.value.trim();
@@ -722,12 +725,15 @@ function handleSaveProductForm(event) {
 
 function deleteProduct(productId) {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
-    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Menghapus Produk dari Master Barang (Khusus Pejabat Toko)", () => {
-      deleteProduct(productId);
+    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Menghapus Produk dari Master Barang (Khusus Pejabat Toko)", (supervisor) => {
+      executeDeleteProduct(productId, supervisor);
     });
     return;
   }
+  executeDeleteProduct(productId);
+}
 
+function executeDeleteProduct(productId, supervisor = null) {
   const p = pos.products.find(prod => prod.id === productId);
   if (!p) return;
 

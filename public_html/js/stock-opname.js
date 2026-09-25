@@ -10,12 +10,15 @@ let soPhysicalCounts = {}; // { [productId]: count }
 
 function openStockOpnameModal() {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_OPNAME")) {
-    requestSupervisorAuth("STOCK_OPNAME", "Penyesuaian Fisik Stock Opname Toko [F6]", () => {
-      openStockOpnameModal();
+    requestSupervisorAuth("STOCK_OPNAME", "Penyesuaian Fisik Stock Opname Toko [F6]", (supervisor) => {
+      executeOpenStockOpnameModal(supervisor);
     });
     return;
   }
+  executeOpenStockOpnameModal();
+}
 
+function executeOpenStockOpnameModal(supervisor = null) {
   soPhysicalCounts = {};
   // Defaultkan stok fisik sama dengan stok komputer awal
   pos.products.forEach(p => {
@@ -177,12 +180,15 @@ let currentLpbDetailId = null;
 // ---- Buka Modal ----
 function openMutationModal() {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Penerimaan Barang (LPB) / Mutasi Stok (Khusus Pejabat Toko)", () => {
-      openMutationModal();
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Penerimaan Barang (LPB) / Mutasi Stok (Khusus Pejabat Toko)", (supervisor) => {
+      executeOpenMutationModal(supervisor);
     });
     return;
   }
+  executeOpenMutationModal();
+}
 
+function executeOpenMutationModal(supervisor = null) {
   // Reset draft baru setiap kali buka
   activeLpbDraft = { items: [] };
 
@@ -556,12 +562,15 @@ function renderLpbDraftTable() {
 // ---- Simpan Dokumen LPB (atomik) ----
 function processSaveLpbDocument(andPrint = false) {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Penerimaan Barang (LPB Faktur Supplier)", () => {
-      processSaveLpbDocument(andPrint);
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Penerimaan Barang (LPB Faktur Supplier)", (supervisor) => {
+      executeSaveLpbDocument(andPrint, supervisor);
     });
     return;
   }
+  executeSaveLpbDocument(andPrint);
+}
 
+function executeSaveLpbDocument(andPrint = false, supervisor = null) {
   const supplierName = document.getElementById("lpb-supplier-name")?.value.trim();
   const invoiceNo = document.getElementById("lpb-invoice-no")?.value.trim() || "-";
   const paymentType = document.getElementById("lpb-payment-type")?.value || "KREDIT";

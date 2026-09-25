@@ -340,7 +340,11 @@ window.confirmOrLockCashier = confirmOrLockCashier;
 let financialsTempUnlocked = false;
 
 function isCurrentUserAuthorizedForFinancials() {
-  return true;
+  if (financialsTempUnlocked) return true;
+  if (!window.pos || !pos.currentUser) return false;
+  return typeof hasPermissionForAction === "function" 
+    ? hasPermissionForAction(pos.currentUser, "VIEW_FINANCIALS") 
+    : (pos.currentUser.role === "COS");
 }
 
 function openOwnerDashboardWithAuth() {
@@ -761,12 +765,15 @@ function renderAttendanceTable() {
 
 function openEmployeeModal(nik = null) {
   if (!hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
-    requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Kelola Data & Hak Akses Karyawan (Khusus COS)", () => {
-      openEmployeeModal(nik);
+    requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Kelola Data & Hak Akses Karyawan (Khusus COS)", (supervisor) => {
+      executeOpenEmployeeModal(nik, supervisor);
     });
     return;
   }
+  executeOpenEmployeeModal(nik);
+}
 
+function executeOpenEmployeeModal(nik = null, supervisor = null) {
   const title = document.getElementById("employee-modal-title");
   const origNikInput = document.getElementById("emp-form-original-nik");
   const nikInput = document.getElementById("emp-form-nik");
@@ -876,12 +883,15 @@ function handleSaveEmployee(event) {
   if (event && event.preventDefault) event.preventDefault();
 
   if (!hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
-    requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Simpan Data Karyawan (Khusus COS)", () => {
-      handleSaveEmployee(event);
+    requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Simpan Data Karyawan (Khusus COS)", (supervisor) => {
+      executeSaveEmployee(supervisor);
     });
     return;
   }
+  executeSaveEmployee();
+}
 
+function executeSaveEmployee(supervisor = null) {
   const origNik = document.getElementById("emp-form-original-nik")?.value.trim();
   const nik = document.getElementById("emp-form-nik")?.value.trim();
   const name = document.getElementById("emp-form-name")?.value.trim();
@@ -972,12 +982,15 @@ function handleSaveEmployee(event) {
 
 function deleteEmployee(nik) {
   if (!hasPermissionForAction(pos.currentUser, "MANAGE_EMPLOYEES")) {
-    requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Menghapus Data Karyawan (Khusus COS)", () => {
-      deleteEmployee(nik);
+    requestSupervisorAuth("MANAGE_EMPLOYEES", "Otorisasi Menghapus Data Karyawan (Khusus COS)", (supervisor) => {
+      executeDeleteEmployee(nik, supervisor);
     });
     return;
   }
+  executeDeleteEmployee(nik);
+}
 
+function executeDeleteEmployee(nik, supervisor = null) {
   const emp = (pos.employees || []).find(e => e.nik === nik);
   if (!emp) return;
 

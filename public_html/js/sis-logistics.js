@@ -627,12 +627,15 @@ function editSisProduct(productId) {
 
 function saveSisProduct(andPrint = false) {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
-    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Menyimpan / Edit Data Master Produk", () => {
-      saveSisProduct(andPrint);
+    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Menyimpan / Edit Data Master Produk", (supervisor) => {
+      executeSaveSisProduct(andPrint, supervisor);
     });
     return;
   }
+  executeSaveSisProduct(andPrint);
+}
 
+function executeSaveSisProduct(andPrint = false, supervisor = null) {
   const getVal = id => (document.getElementById(id)?.value || "").trim();
   const id = getVal('sis-prod-id');
   const imageData = getVal('sis-prod-image-data');
@@ -774,12 +777,15 @@ function printCurrentSisProductLabel() {
 
 function deleteSisProduct(productId) {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "MANAGE_PRODUCTS")) {
-    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Menghapus Produk dari Master Barang (Khusus Pejabat Toko)", () => {
-      deleteSisProduct(productId);
+    requestSupervisorAuth("MANAGE_PRODUCTS", "Otorisasi Menghapus Produk dari Master Barang (Khusus Pejabat Toko)", (supervisor) => {
+      executeDeleteSisProduct(productId, supervisor);
     });
     return;
   }
+  executeDeleteSisProduct(productId);
+}
 
+function executeDeleteSisProduct(productId, supervisor = null) {
   if (!pos || !Array.isArray(pos.products)) return;
   const prod = pos.products.find(p => p.id === productId);
   if (!prod) return;
@@ -1095,12 +1101,15 @@ function printSisLpbReceiptById(lpbId) {
 
 function saveSisLpb() {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Penerimaan Barang (LPB Faktur Supplier)", () => {
-      saveSisLpb();
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Penerimaan Barang (LPB Faktur Supplier)", (supervisor) => {
+      executeSaveSisLpb(supervisor);
     });
     return;
   }
+  executeSaveSisLpb();
+}
 
+function executeSaveSisLpb(supervisor = null) {
   if (sisLpbDraft.length === 0) {
     alert("Faktur penerimaan masih kosong! Tambahkan minimal 1 produk barang masuk.");
     return;
@@ -1293,12 +1302,15 @@ function updateSisSoDifference() {
 
 function saveSisSo() {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_OPNAME")) {
-    requestSupervisorAuth("STOCK_OPNAME", "Otorisasi Penyesuaian Fisik Stock Opname", () => {
-      saveSisSo();
+    requestSupervisorAuth("STOCK_OPNAME", "Otorisasi Penyesuaian Fisik Stock Opname", (supervisor) => {
+      executeSaveSisSo(supervisor);
     });
     return;
   }
+  executeSaveSisSo();
+}
 
+function executeSaveSisSo(supervisor = null) {
   const p = window.selectedSoProduct;
   if (!p) {
     alert("Harap pilih produk yang akan di-stock opname!");
@@ -1387,12 +1399,15 @@ function selectSisWasteProduct(prod) {
 
 function saveSisWaste() {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Pemusnahan Barang (BAP Waste / Barang Rusak)", () => {
-      saveSisWaste();
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Pemusnahan Barang (BAP Waste / Barang Rusak)", (supervisor) => {
+      executeSaveSisWaste(supervisor);
     });
     return;
   }
+  executeSaveSisWaste();
+}
 
+function executeSaveSisWaste(supervisor = null) {
   const p = window.selectedWasteProduct;
   if (!p) {
     alert("Harap pilih produk yang rusak / waste!");
@@ -1508,12 +1523,15 @@ function updateRepackSummary() {
 
 function executeRepackProcess() {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "STOCK_MUTATION")) {
-    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repack Bal ke Eceran", () => {
-      executeRepackProcess();
+    requestSupervisorAuth("STOCK_MUTATION", "Otorisasi Repack Bal ke Eceran", (supervisor) => {
+      executeFinalRepackProcess(supervisor);
     });
     return;
   }
+  executeFinalRepackProcess();
+}
 
+function executeFinalRepackProcess(supervisor = null) {
   const originProd = window.selectedRepackOrigin;
   const targetProd = window.selectedRepackTarget;
 

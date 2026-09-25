@@ -306,12 +306,15 @@ function recalcReturTotals() {
 
 function executeProcessRetur() {
   if (typeof hasPermissionForAction === "function" && !hasPermissionForAction(pos.currentUser, "RETUR_SALE")) {
-    requestSupervisorAuth("RETUR_SALE", "Otorisasi Memproses Retur & Refund Struk Kasir", () => {
-      executeProcessRetur();
+    requestSupervisorAuth("RETUR_SALE", "Otorisasi Memproses Retur & Refund Struk Kasir", (supervisor) => {
+      executeFinalProcessRetur(supervisor);
     });
     return;
   }
+  executeFinalProcessRetur();
+}
 
+function executeFinalProcessRetur(supervisor = null) {
   if (!activeReturTrx) return;
 
   const returnedItems = [];
