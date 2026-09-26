@@ -767,22 +767,31 @@ function formatAngka(number) {
   return new Intl.NumberFormat("id-ID").format(number);
 }
 
-// Toast Notifikasi (Opsi 2: Dynamic Pill - Minimalist & Non-Intrusive)
+// Toast Notifikasi (Opsi 1: Clean Floating Card - Modern Light Theme)
 function showToast(message, type = "success", duration = null) {
   const container = document.getElementById("toast-container");
   if (!container) return;
 
-  const dotColors = {
-    success: "bg-emerald-400",
-    error: "bg-rose-400",
-    info: "bg-blue-400",
-    warning: "bg-amber-400"
+  const typeConfig = {
+    success: { icon: "✓", bgIcon: "bg-emerald-50 text-emerald-600 border-emerald-200", border: "border-slate-200/90" },
+    error: { icon: "✕", bgIcon: "bg-rose-50 text-rose-600 border-rose-200", border: "border-rose-200" },
+    warning: { icon: "⚠️", bgIcon: "bg-amber-50 text-amber-700 border-amber-200", border: "border-amber-200" },
+    info: { icon: "ℹ️", bgIcon: "bg-blue-50 text-blue-600 border-blue-200", border: "border-blue-200" }
   };
 
-  const dot = dotColors[type] || dotColors.info;
+  const cfg = typeConfig[type] || typeConfig.info;
+  const cleanMsg = typeof message === 'string' ? message : String(message);
+
   const toast = document.createElement("div");
-  toast.className = "inline-flex items-center gap-2.5 px-4 py-2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl border border-slate-700/80 text-xs font-bold transition-all duration-300 transform -translate-y-3 opacity-0 pointer-events-auto select-none max-w-full truncate";
-  toast.innerHTML = `<span class="w-2 h-2 rounded-full ${dot} shrink-0 animate-pulse"></span><span class="leading-snug truncate">${message}</span>`;
+  toast.className = `flex items-center gap-3 px-4 py-3 bg-white/95 backdrop-blur-md border ${cfg.border} rounded-2xl shadow-xl shadow-slate-900/10 min-w-[280px] max-w-sm transition-all duration-300 transform -translate-y-3 opacity-0 pointer-events-auto select-none`;
+  toast.innerHTML = `
+    <div class="w-7 h-7 rounded-xl ${cfg.bgIcon} border flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
+      ${cfg.icon}
+    </div>
+    <div class="text-xs font-bold text-slate-800 leading-snug">
+      ${cleanMsg}
+    </div>
+  `;
 
   container.appendChild(toast);
   requestAnimationFrame(() => {
