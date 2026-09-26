@@ -184,7 +184,6 @@
     html.theme-light .bg-slate-900,
     html.theme-light .stat-card-glow,
     html.theme-light section[id^="section-"],
-    html.theme-light div[id^="section-"],
     html.theme-light [class*="bg-gradient-to-br"]:not(header *):not(#modal-owner-pin-gate .w-16),
     html.theme-light [class*="from-slate-900"],
     html.theme-light [class*="from-emerald-950"],
@@ -197,6 +196,16 @@
       border-color: #e2e8f0 !important;
       box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.03) !important;
       color: #0f172a !important;
+    }
+
+    /* Wrapper Grid / Layout Sections must remain transparent without square white backgrounds */
+    html.theme-light #section-live-feed,
+    html.theme-light #section-inventory-valuation {
+      background: transparent !important;
+      background-color: transparent !important;
+      background-image: none !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
     }
 
     /* Subtle hover effect on cards */
