@@ -1722,7 +1722,7 @@
   <!-- MOBILE BOTTOM NAVIGATION (FLOATING TELEGRAM DOCK) -->
   <!-- ========================================== -->
   <nav id="owner-mobile-bottom-nav" class="fixed bottom-3 inset-x-3 max-w-sm sm:max-w-md mx-auto z-40 rounded-2xl p-1.5 sm:hidden transition-all duration-300">
-    <div class="grid grid-cols-5 items-center justify-around gap-1 w-full">
+    <div id="owner-mobile-nav-grid" class="grid grid-cols-4 items-center justify-around gap-1 w-full">
       
       <!-- Tab 1: Beranda / Sales Hero -->
       <button 
@@ -1768,12 +1768,12 @@
         <span class="tab-text text-[10px] mt-1 tracking-tight truncate">Member</span>
       </button>
 
-      <!-- Tab 5: Kasir POS (Aksen Merah Toko) -->
+      <!-- Tab 5: Kasir POS (Khusus Muncul di APK Native Android Toko) -->
       <a 
         href="index.html" 
         id="tab-btn-kasir" 
-        class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl font-bold transition-all active:scale-95 cursor-pointer"
-        title="Beralih ke Layar Kasir"
+        class="hidden flex-col items-center justify-center py-1.5 px-0.5 rounded-xl font-bold transition-all active:scale-95 cursor-pointer"
+        title="Beralih ke Layar Kasir (Khusus APK Native Toko)"
       >
         <span class="text-base leading-none">🛒</span>
         <span class="tab-text text-[10px] mt-1 font-extrabold tracking-tight truncate">Kasir</span>
@@ -1781,6 +1781,24 @@
 
     </div>
   </nav>
+  <script>
+    (function() {
+      try {
+        const isNative = typeof window !== 'undefined' && (
+          (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) ||
+          (window.Capacitor && window.Capacitor.platform && window.Capacitor.platform !== 'web') ||
+          (window.location.protocol === 'capacitor:') ||
+          (window.location.protocol === 'ionic:')
+        );
+        if (isNative) {
+          const grid = document.getElementById("owner-mobile-nav-grid");
+          const kTab = document.getElementById("tab-btn-kasir");
+          if (grid) { grid.classList.remove("grid-cols-4"); grid.classList.add("grid-cols-5"); }
+          if (kTab) { kTab.classList.remove("hidden"); kTab.classList.add("flex"); }
+        }
+      } catch(e) {}
+    })();
+  </script>
 
   <!-- ========================================== -->
   <!-- MODAL DETAIL STRUK TRANSAKSI (DIGITAL RECEIPT) -->
@@ -4832,6 +4850,39 @@
       });
     }
 
+    // Deteksi Perangkat: Tampilkan Tab Kasir hanya jika dibuka di APK Native Android (Toko)
+    function initDeviceAwareNavigation() {
+      const isNativeApp = typeof window !== 'undefined' && (
+        (window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()) ||
+        (window.Capacitor && window.Capacitor.platform && window.Capacitor.platform !== 'web') ||
+        (window.location.protocol === 'capacitor:') ||
+        (window.location.protocol === 'ionic:')
+      );
+
+      const navGrid = document.getElementById("owner-mobile-nav-grid");
+      const kasirTab = document.getElementById("tab-btn-kasir");
+
+      if (isNativeApp) {
+        if (navGrid) {
+          navGrid.classList.remove("grid-cols-4");
+          navGrid.classList.add("grid-cols-5");
+        }
+        if (kasirTab) {
+          kasirTab.classList.remove("hidden");
+          kasirTab.classList.add("flex");
+        }
+      } else {
+        if (navGrid) {
+          navGrid.classList.remove("grid-cols-5");
+          navGrid.classList.add("grid-cols-4");
+        }
+        if (kasirTab) {
+          kasirTab.classList.add("hidden");
+          kasirTab.classList.remove("flex");
+        }
+      }
+    }
+
     // Scroll Spy untuk Navigasi Mobile Ala TikTok Seller Center
     let scrollSpyThrottleTimeout = null;
     window.addEventListener("scroll", () => {
@@ -4918,6 +4969,7 @@
     // Inisialisasi Saat Dokumen Dimuat
     document.addEventListener("DOMContentLoaded", () => {
       initOwnerTheme();
+      initDeviceAwareNavigation();
       setInterval(updateClock, 1000);
       updateClock();
 
