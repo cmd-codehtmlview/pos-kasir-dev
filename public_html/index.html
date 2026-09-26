@@ -7921,6 +7921,8 @@
   </div>
 
   <!-- ============================================================ -->
+ 
+... [truncated for diff preview]
   <!-- MODAL: MANAJEMEN MEMBER PELANGGAN (LOYALTY SYSTEM) -->
   <!-- ============================================================ -->
   <div id="modal-member-management" class="modal-backdrop fixed inset-0 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 z-50 hidden no-print">
@@ -11044,15 +11046,9 @@
           if (diffX < 0 && posCatalogViewMode !== 'grid') {
             // Geser ke Kiri (Swipe Left) -> Pindah ke Grid
             setPosCatalogViewMode('grid');
-            if (typeof showToast === 'function') {
-              showToast("⊞ Tampilan Grid (Geser Kanan untuk List)", "info", 1800);
-            }
           } else if (diffX > 0 && posCatalogViewMode !== 'list') {
             // Geser ke Kanan (Swipe Right) -> Pindah ke List
             setPosCatalogViewMode('list');
-            if (typeof showToast === 'function') {
-              showToast("☰ Tampilan List (Geser Kiri untuk Grid)", "info", 1800);
-            }
           }
         }
       }, { passive: true });
@@ -11081,10 +11077,8 @@
         if (Math.abs(diffX) >= 50 && Math.abs(diffX) > Math.abs(diffY) * 1.25 && elapsed < 650) {
           if (diffX < 0 && posCatalogViewMode !== 'grid') {
             setPosCatalogViewMode('grid');
-            if (typeof showToast === 'function') showToast("⊞ Tampilan Grid", "info", 1600);
           } else if (diffX > 0 && posCatalogViewMode !== 'list') {
             setPosCatalogViewMode('list');
-            if (typeof showToast === 'function') showToast("☰ Tampilan List", "info", 1600);
           }
         }
       });
