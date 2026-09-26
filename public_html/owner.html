@@ -515,17 +515,81 @@
       background: #cbd5e1 !important;
     }
 
-    /* 11. Mobile Bottom Navigation */
-    html.theme-light #owner-mobile-bottom-nav {
-      background-color: rgba(255, 255, 255, 0.96) !important;
-      border-color: #e2e8f0 !important;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important;
+    /* 11. Mobile Bottom Navigation (Floating Telegram-Style Dock) */
+    #owner-mobile-bottom-nav {
+      background-color: rgba(15, 23, 42, 0.90);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.5), 0 4px 12px -2px rgba(0, 0, 0, 0.3);
     }
-    html.theme-light .nav-tab-btn span.tab-text {
+    .nav-tab-btn {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-tab-btn.tab-active {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+    }
+    .nav-tab-btn.tab-active .tab-text {
+      color: #34d399;
+      font-weight: 800;
+    }
+    .nav-tab-btn.tab-inactive {
+      color: #94a3b8;
+    }
+    .nav-tab-btn.tab-inactive:hover {
+      color: #f1f5f9;
+      background-color: rgba(51, 65, 85, 0.3);
+    }
+    .nav-tab-btn.tab-inactive .tab-text {
+      color: #94a3b8;
+    }
+    #tab-btn-kasir {
+      color: #fb7185;
+      transition: all 0.2s ease;
+    }
+    #tab-btn-kasir:hover {
+      background-color: rgba(244, 63, 94, 0.12);
+      color: #f43f5e;
+    }
+    #tab-btn-kasir .tab-text {
+      color: #fb7185;
+    }
+
+    /* Light Theme Styling for Floating Dock */
+    html.theme-light #owner-mobile-bottom-nav {
+      background-color: rgba(255, 255, 255, 0.92) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(226, 232, 240, 0.95) !important;
+      box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.14), 0 4px 10px -2px rgba(15, 23, 42, 0.08) !important;
+    }
+    html.theme-light .nav-tab-btn.tab-active {
+      background-color: #ecfdf5 !important;
+      color: #059669 !important;
+    }
+    html.theme-light .nav-tab-btn.tab-active .tab-text {
+      color: #059669 !important;
+    }
+    html.theme-light .nav-tab-btn.tab-inactive {
+      color: #64748b !important;
+      background-color: transparent !important;
+    }
+    html.theme-light .nav-tab-btn.tab-inactive:hover {
+      color: #0f172a !important;
+      background-color: #f1f5f9 !important;
+    }
+    html.theme-light .nav-tab-btn.tab-inactive .tab-text {
       color: #64748b !important;
     }
-    html.theme-light .nav-tab-btn.text-emerald-400 span.tab-text {
-      color: #059669 !important;
+    html.theme-light #tab-btn-kasir {
+      color: #e11d48 !important;
+    }
+    html.theme-light #tab-btn-kasir:hover {
+      background-color: #fff1f2 !important;
+    }
+    html.theme-light #tab-btn-kasir .tab-text {
+      color: #e11d48 !important;
     }
 
     /* 12. Modals */
@@ -675,7 +739,7 @@
   <!-- ========================================== -->
   <!-- MAIN CONTAINER -->
   <!-- ========================================== -->
-  <main class="max-w-7xl mx-auto px-3 sm:px-6 pt-2 sm:pt-3 pb-24 sm:pb-8 space-y-3 sm:space-y-4 flex-1 w-full max-w-full min-w-0 overflow-x-hidden">
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 pt-2 sm:pt-3 pb-28 sm:pb-8 space-y-3 sm:space-y-4 flex-1 w-full max-w-full min-w-0 overflow-x-hidden">
 
     <!-- BANNER STATUS LANGGANAN CLOUD DASHBOARD -->
     <div id="owner-cloud-gate-banner" class="hidden p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg"></div>
@@ -1646,20 +1710,20 @@
   </main>
 
   <!-- ========================================== -->
-  <!-- MOBILE BOTTOM NAVIGATION (ALA TIKTOK SELLER CENTER) -->
+  <!-- MOBILE BOTTOM NAVIGATION (FLOATING TELEGRAM DOCK) -->
   <!-- ========================================== -->
-  <nav id="owner-mobile-bottom-nav" class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/90 px-1.5 py-1.5 sm:hidden shadow-2xl">
-    <div class="grid grid-cols-5 items-center justify-around gap-0.5 max-w-md mx-auto">
+  <nav id="owner-mobile-bottom-nav" class="fixed bottom-3 inset-x-3 max-w-sm sm:max-w-md mx-auto z-40 rounded-2xl p-1.5 sm:hidden transition-all duration-300">
+    <div class="grid grid-cols-5 items-center justify-around gap-1 w-full">
       
       <!-- Tab 1: Beranda / Sales Hero -->
       <button 
         type="button" 
         onclick="navToTab('beranda')" 
         id="tab-btn-beranda" 
-        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-emerald-400 font-bold transition-all active:scale-95 cursor-pointer"
+        class="nav-tab-btn tab-active flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl font-bold transition-all active:scale-95 cursor-pointer"
       >
         <span class="text-base leading-none">📊</span>
-        <span class="tab-text text-[10px] mt-1 font-extrabold tracking-tight text-emerald-400 truncate">Beranda</span>
+        <span class="tab-text text-[10px] mt-1 font-extrabold tracking-tight truncate">Beranda</span>
       </button>
 
       <!-- Tab 2: Transaksi / Live Feed & Klerk -->
@@ -1667,10 +1731,10 @@
         type="button" 
         onclick="navToTab('transaksi')" 
         id="tab-btn-transaksi" 
-        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer"
+        class="nav-tab-btn tab-inactive flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl font-semibold transition-all active:scale-95 cursor-pointer"
       >
         <span class="text-base leading-none">🧾</span>
-        <span class="tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400 truncate">Transaksi</span>
+        <span class="tab-text text-[10px] mt-1 tracking-tight truncate">Transaksi</span>
       </button>
 
       <!-- Tab 3: Stok & DSI -->
@@ -1678,10 +1742,10 @@
         type="button" 
         onclick="navToTab('stok')" 
         id="tab-btn-stok" 
-        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer"
+        class="nav-tab-btn tab-inactive flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl font-semibold transition-all active:scale-95 cursor-pointer"
       >
         <span class="text-base leading-none">📦</span>
-        <span class="tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400 truncate">Stok</span>
+        <span class="tab-text text-[10px] mt-1 tracking-tight truncate">Stok</span>
       </button>
 
       <!-- Tab 4: Member CRM -->
@@ -1689,21 +1753,21 @@
         type="button" 
         onclick="navToTab('member')" 
         id="tab-btn-member" 
-        class="nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer"
+        class="nav-tab-btn tab-inactive flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl font-semibold transition-all active:scale-95 cursor-pointer"
       >
         <span class="text-base leading-none">👥</span>
-        <span class="tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400 truncate">Member</span>
+        <span class="tab-text text-[10px] mt-1 tracking-tight truncate">Member</span>
       </button>
 
       <!-- Tab 5: Kasir POS (Aksen Merah Toko) -->
       <a 
         href="index.html" 
         id="tab-btn-kasir" 
-        class="flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-rose-400 hover:text-rose-300 font-bold transition-all active:scale-95"
+        class="flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl font-bold transition-all active:scale-95 cursor-pointer"
         title="Beralih ke Layar Kasir"
       >
         <span class="text-base leading-none">🛒</span>
-        <span class="text-[10px] mt-1 font-extrabold text-rose-400 tracking-tight truncate">Kasir</span>
+        <span class="tab-text text-[10px] mt-1 font-extrabold tracking-tight truncate">Kasir</span>
       </a>
 
     </div>
@@ -4750,11 +4814,11 @@
         if (!btn) return;
         const textSpan = btn.querySelector('.tab-text');
         if (t === tab) {
-          btn.className = "nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-emerald-400 font-bold transition-all active:scale-95 cursor-pointer";
-          if (textSpan) textSpan.className = "tab-text text-[10px] mt-1 font-extrabold tracking-tight text-emerald-400 truncate";
+          btn.className = "nav-tab-btn tab-active flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl font-bold transition-all active:scale-95 cursor-pointer";
+          if (textSpan) textSpan.className = "tab-text text-[10px] mt-1 font-extrabold tracking-tight truncate";
         } else {
-          btn.className = "nav-tab-btn flex flex-col items-center justify-center py-1 px-0.5 rounded-xl text-slate-400 hover:text-slate-200 transition-all active:scale-95 cursor-pointer";
-          if (textSpan) textSpan.className = "tab-text text-[10px] mt-1 font-semibold tracking-tight text-slate-400 truncate";
+          btn.className = "nav-tab-btn tab-inactive flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl font-semibold transition-all active:scale-95 cursor-pointer";
+          if (textSpan) textSpan.className = "tab-text text-[10px] mt-1 tracking-tight truncate";
         }
       });
     }
