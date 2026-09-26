@@ -149,20 +149,30 @@
       border-color: #e2e8f0 !important;
       box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
     }
-    html.theme-light #filter-btn-7days,
-    html.theme-light #filter-btn-30days,
-    html.theme-light #filter-btn-custom {
-      color: #475569 !important;
+    html.theme-light #period-filter-container {
+      background-color: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
     }
-    html.theme-light #filter-btn-7days:hover,
-    html.theme-light #filter-btn-30days:hover,
-    html.theme-light #filter-btn-custom:hover {
+    html.theme-light .filter-btn-inactive {
+      color: #475569 !important;
+      background-color: transparent !important;
+    }
+    html.theme-light .filter-btn-inactive:hover {
       color: #0f172a !important;
       background-color: #e2e8f0 !important;
+    }
+    html.theme-light .filter-btn-active,
+    html.theme-light .filter-btn-active * {
+      background-color: #059669 !important; /* emerald-600 */
+      color: #ffffff !important;
+      box-shadow: 0 1px 3px 0 rgba(5, 150, 105, 0.3) !important;
     }
     html.theme-light #custom-date-box {
       background-color: #ffffff !important;
       border-color: #cbd5e1 !important;
+    }
+    html.theme-light #custom-date-box span.text-amber-300 {
+      color: #b45309 !important;
     }
     html.theme-light #custom-date-box input[type="date"] {
       background-color: #f8fafc !important;
@@ -733,11 +743,11 @@
         <!-- Pilihan Periode Scrollable Pills (Anti-Patah / Anti-Tumpang Tindih di Layar HP 9:16 & 9:18) -->
         <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 max-w-full flex-nowrap -mx-1 px-1">
           <span class="text-xs font-bold text-slate-400 whitespace-nowrap flex-shrink-0 mr-1 hidden sm:inline">Periode:</span>
-          <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs flex-nowrap">
-            <button onclick="setDateFilter('today')" id="filter-btn-today" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all bg-alfa-red text-white whitespace-nowrap flex-shrink-0 cursor-pointer text-xs">Hari Ini</button>
-            <button onclick="setDateFilter('7days')" id="filter-btn-7days" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white whitespace-nowrap flex-shrink-0 cursor-pointer text-xs">7 Hari</button>
-            <button onclick="setDateFilter('30days')" id="filter-btn-30days" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white whitespace-nowrap flex-shrink-0 cursor-pointer text-xs">30 Hari</button>
-            <button onclick="setDateFilter('custom')" id="filter-btn-custom" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white whitespace-nowrap flex-shrink-0 cursor-pointer text-xs flex items-center gap-1" title="Pilih rentang tanggal spesifik (tanggal, bulan, tahun)">
+          <div id="period-filter-container" class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs flex-nowrap">
+            <button onclick="setDateFilter('today')" id="filter-btn-today" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all bg-emerald-600 text-white shadow-xs filter-btn-active whitespace-nowrap flex-shrink-0 cursor-pointer text-xs flex items-center gap-1">Hari Ini</button>
+            <button onclick="setDateFilter('7days')" id="filter-btn-7days" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white filter-btn-inactive whitespace-nowrap flex-shrink-0 cursor-pointer text-xs flex items-center gap-1">7 Hari</button>
+            <button onclick="setDateFilter('30days')" id="filter-btn-30days" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white filter-btn-inactive whitespace-nowrap flex-shrink-0 cursor-pointer text-xs flex items-center gap-1">30 Hari</button>
+            <button onclick="setDateFilter('custom')" id="filter-btn-custom" class="px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white filter-btn-inactive whitespace-nowrap flex-shrink-0 cursor-pointer text-xs flex items-center gap-1" title="Pilih rentang tanggal spesifik (tanggal, bulan, tahun)">
               <span>📅</span>
               <span id="filter-custom-label">Pilih Periode</span>
             </button>
@@ -3011,9 +3021,9 @@
         const btn = document.getElementById(`filter-btn-${f}`);
         if (btn) {
           if (f === filter) {
-            btn.className = "px-3 py-1 rounded-lg font-bold transition-all bg-alfa-red text-white shadow-xs flex items-center gap-1";
+            btn.className = "px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all bg-emerald-600 text-white shadow-xs filter-btn-active whitespace-nowrap flex-shrink-0 cursor-pointer text-xs flex items-center gap-1";
           } else {
-            btn.className = "px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white flex items-center gap-1";
+            btn.className = "px-2.5 sm:px-3 py-1 rounded-lg font-bold transition-all text-slate-400 hover:text-white filter-btn-inactive whitespace-nowrap flex-shrink-0 cursor-pointer text-xs flex items-center gap-1";
           }
         }
       });
