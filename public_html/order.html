@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <meta name="theme-color" content="#090e17" />
+  <meta name="theme-color" content="#ffffff" />
   <title>Aktivasi & Pembayaran Lisensi - SnackPOS Retail</title>
   
   <link rel="icon" type="image/png" href="icons/favicon.png">
@@ -63,37 +63,37 @@
   </script>
 
   <style>
-    body { background-color: #090e17; color: #f1f5f9; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #f8fafc; color: #1e293b; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
 
   <!-- ================= TOP HEADER ================= -->
-  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-lg sticky top-0 z-30">
+  <header class="border-b border-slate-200 bg-white/90 backdrop-blur-lg sticky top-0 z-30 shadow-xs">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-red-600 flex items-center justify-center text-base sm:text-lg shadow-md shadow-rose-900/30">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-red-600 flex items-center justify-center text-base sm:text-lg shadow-md shadow-rose-900/10 text-white">
           ⚡
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <h1 class="text-xs sm:text-base font-black tracking-tight text-white">SnackPOS Checkout</h1>
-            <span class="px-2 py-0.5 text-[8px] sm:text-[9px] font-black uppercase rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Aktivasi Instan</span>
+            <h1 class="text-xs sm:text-base font-black tracking-tight text-slate-900">SnackPOS Checkout</h1>
+            <span class="px-2 py-0.5 text-[8px] sm:text-[9px] font-black uppercase rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Aktivasi Instan</span>
           </div>
-          <p class="text-[10px] sm:text-[11px] text-slate-400">Pembayaran Resmi Lisensi Kasir Toko</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-500">Pembayaran Resmi Lisensi Kasir Toko</p>
         </div>
       </div>
 
       <div class="flex items-center gap-2">
         <button type="button" onclick="forceRefreshOrderPage()" title="Segarkan halaman jika data belum update"
-          class="px-2 sm:px-2.5 py-1.5 text-[10px] sm:text-xs font-bold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 rounded-lg border border-amber-500/30 transition flex items-center gap-1 cursor-pointer">
+          class="px-2 sm:px-2.5 py-1.5 text-[10px] sm:text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 rounded-lg border border-amber-200 transition flex items-center gap-1 cursor-pointer shadow-xs">
           <span>🔄</span> <span class="hidden xs:inline">Segarkan</span>
         </button>
-        <a href="index.html" class="px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700/60 transition flex items-center gap-1">
+        <a href="index.html" class="px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-200 transition flex items-center gap-1 shadow-xs">
           <span>🏪</span> <span class="hidden xs:inline">Buka</span> Kasir
         </a>
       </div>
@@ -105,18 +105,18 @@
 
     <!-- STEPPER INDICATOR (OPTIMAL UNTUK HP & TABLET) -->
     <div class="flex items-center justify-center gap-1.5 sm:gap-4 max-w-md mx-auto text-[11px] sm:text-xs font-bold px-2">
-      <div id="step-indicator-1" class="flex items-center gap-1 text-emerald-400 shrink-0">
-        <span class="w-5 h-5 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center text-[10px] sm:text-[11px] font-black">1</span>
+      <div id="step-indicator-1" class="flex items-center gap-1 text-emerald-700 shrink-0">
+        <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] sm:text-[11px] font-black shadow-xs">1</span>
         <span>Pilih Paket</span>
       </div>
-      <span class="text-slate-700 text-[10px]">───</span>
-      <div id="step-indicator-2" class="flex items-center gap-1 text-slate-500 shrink-0">
-        <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] sm:text-[11px] font-black">2</span>
+      <span class="text-slate-300 text-[10px]">───</span>
+      <div id="step-indicator-2" class="flex items-center gap-1 text-slate-400 shrink-0">
+        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] sm:text-[11px] font-black">2</span>
         <span>Data Toko</span>
       </div>
-      <span class="text-slate-700 text-[10px]">───</span>
-      <div id="step-indicator-3" class="flex items-center gap-1 text-slate-500 shrink-0">
-        <span class="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] sm:text-[11px] font-black">3</span>
+      <span class="text-slate-300 text-[10px]">───</span>
+      <div id="step-indicator-3" class="flex items-center gap-1 text-slate-400 shrink-0">
+        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] sm:text-[11px] font-black">3</span>
         <span>Bayar</span>
       </div>
     </div>
@@ -126,8 +126,8 @@
       
       <!-- HERO BANNER -->
       <div class="text-center space-y-1.5 max-w-xl mx-auto">
-        <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Tingkatkan Operasional Toko Anda</h2>
-        <p class="text-xs text-slate-400 leading-relaxed">
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Tingkatkan Operasional Toko Anda</h2>
+        <p class="text-xs text-slate-500 leading-relaxed">
           Pilih paket lisensi kasir retail terbaik untuk bisnis Anda. Setelah pembayaran diverifikasi, akun email toko Anda langsung aktif otomatis.
         </p>
       </div>
@@ -137,66 +137,66 @@
         
         <!-- PAKET 1: LIFETIME POS OFFLINE -->
         <div id="card-plan-paket1" onclick="selectPlan('PAKET_1')" 
-          class="relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-emerald-500 shadow-lg shadow-emerald-950/30 flex flex-col justify-between">
-          <div class="absolute -top-3 right-4 px-3 py-0.5 bg-emerald-500 text-slate-950 font-black text-[10px] uppercase tracking-wider rounded-full shadow-md">
+          class="relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-white border-emerald-500 shadow-md flex flex-col justify-between">
+          <div class="absolute -top-3 right-4 px-3 py-0.5 bg-emerald-500 text-white font-black text-[10px] uppercase tracking-wider rounded-full shadow-sm">
             💎 SEKALI BAYAR
           </div>
           <div class="space-y-3">
             <div class="flex items-center gap-2">
               <span class="text-2xl">💎</span>
               <div>
-                <h3 class="font-black text-white text-base">Paket 1: Beli Putus POS Offline</h3>
-                <span class="text-[11px] text-emerald-400 font-semibold">Bayar 1 Kali, Kasir Aktif Selamanya</span>
+                <h3 class="font-black text-slate-900 text-base">Paket 1: Beli Putus POS Offline</h3>
+                <span class="text-[11px] text-emerald-600 font-semibold">Bayar 1 Kali, Kasir Aktif Selamanya</span>
               </div>
             </div>
 
-            <div class="py-2 border-y border-slate-800">
+            <div class="py-2 border-y border-slate-100">
               <div class="flex items-baseline gap-1.5">
-                <span class="text-2xl sm:text-3xl font-black text-white font-mono" id="display-price-p1">Rp 99.000</span>
-                <span class="text-xs text-slate-400 font-semibold">/ selamanya</span>
+                <span class="text-2xl sm:text-3xl font-black text-slate-900 font-mono" id="display-price-p1">Rp 99.000</span>
+                <span class="text-xs text-slate-500 font-semibold">/ selamanya</span>
               </div>
-              <p class="text-[11px] text-slate-400 mt-1">Cocok untuk toko yang ingin kasir mandiri offline tanpa beban biaya bulanan.</p>
+              <p class="text-[11px] text-slate-500 mt-1">Cocok untuk toko yang ingin kasir mandiri offline tanpa beban biaya bulanan.</p>
             </div>
 
-            <ul class="space-y-1.5 text-xs text-slate-300">
-              <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <strong>Unlimited SKU</strong> Produk & Transaksi Harian</li>
-              <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> <strong>100% Offline-First</strong> (Jualan tanpa internet)</li>
-              <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Cetak Struk Bluetooth & Scanner Barcode</li>
-              <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Laporan Grafik Profit & Ekspor Excel di Kasir</li>
+            <ul class="space-y-1.5 text-xs text-slate-600">
+              <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> <strong>Unlimited SKU</strong> Produk & Transaksi Harian</li>
+              <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> <strong>100% Offline-First</strong> (Jualan tanpa internet)</li>
+              <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> Cetak Struk Bluetooth & Scanner Barcode</li>
+              <li class="flex items-center gap-2"><span class="text-emerald-600 font-bold">✓</span> Laporan Grafik Profit & Ekspor Excel di Kasir</li>
             </ul>
 
             <!-- Add-on Cloud Option for Paket 1 -->
-            <div class="pt-3 border-t border-slate-800 space-y-2" onclick="event.stopPropagation()">
-              <label class="flex items-center justify-between text-xs font-bold text-amber-400 cursor-pointer">
+            <div class="pt-3 border-t border-slate-100 space-y-2" onclick="event.stopPropagation()">
+              <label class="flex items-center justify-between text-xs font-bold text-amber-700 cursor-pointer">
                 <span class="flex items-center gap-1.5">
-                  <input type="checkbox" id="check-addon-cloud" onchange="toggleAddonCloud()" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 bg-slate-950 border-slate-700" />
+                  <input type="checkbox" id="check-addon-cloud" onchange="toggleAddonCloud()" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 bg-white border-slate-300" />
                   <span>+ Tambah Akses Cloud Dashboard HP</span>
                 </span>
-                <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">Opsional</span>
+                <span class="text-[10px] bg-amber-50 text-amber-800 px-2 py-0.5 rounded border border-amber-200">Opsional</span>
               </label>
 
               <!-- Kartu Pilihan Durasi Addon Cloud (Langsung Terlihat) -->
               <div id="div-addon-duration" class="hidden space-y-1.5 pt-1">
-                <div class="text-[10px] uppercase font-bold text-slate-400">Pilih Durasi Cloud HP:</div>
+                <div class="text-[10px] uppercase font-bold text-slate-500">Pilih Durasi Cloud HP:</div>
                 <div class="grid grid-cols-2 gap-2">
-                  <button type="button" id="btn-addon-1m" onclick="chooseAddonDuration('1m')" class="p-2 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-amber-500/50 text-left transition-all">
-                    <div class="text-[10px] text-slate-400 font-semibold">1 Bulan</div>
-                    <div class="text-xs font-black text-amber-300 font-mono" id="label-addon-1m">+Rp 25.000</div>
+                  <button type="button" id="btn-addon-1m" onclick="chooseAddonDuration('1m')" class="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:border-amber-400 text-left transition-all">
+                    <div class="text-[10px] text-slate-500 font-semibold">1 Bulan</div>
+                    <div class="text-xs font-black text-amber-700 font-mono" id="label-addon-1m">+Rp 25.000</div>
                   </button>
-                  <button type="button" id="btn-addon-3m" onclick="chooseAddonDuration('3m')" class="p-2 rounded-xl border border-amber-500 bg-amber-500/10 text-left transition-all">
+                  <button type="button" id="btn-addon-3m" onclick="chooseAddonDuration('3m')" class="p-2 rounded-xl border-2 border-amber-500 bg-amber-50 text-left transition-all shadow-xs">
                     <div class="flex items-center justify-between">
-                      <span class="text-[10px] text-amber-300 font-semibold">3 Bulan</span>
-                      <span class="text-[8px] bg-amber-500 text-slate-950 font-black px-1 rounded">FAVORIT</span>
+                      <span class="text-[10px] text-amber-800 font-bold">3 Bulan</span>
+                      <span class="text-[8px] bg-amber-500 text-white font-black px-1 rounded">FAVORIT</span>
                     </div>
-                    <div class="text-xs font-black text-amber-300 font-mono" id="label-addon-3m">+Rp 65.000</div>
+                    <div class="text-xs font-black text-amber-800 font-mono" id="label-addon-3m">+Rp 65.000</div>
                   </button>
-                  <button type="button" id="btn-addon-6m" onclick="chooseAddonDuration('6m')" class="p-2 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-amber-500/50 text-left transition-all">
-                    <div class="text-[10px] text-slate-400 font-semibold">6 Bulan</div>
-                    <div class="text-xs font-black text-amber-300 font-mono" id="label-addon-6m">+Rp 120.000</div>
+                  <button type="button" id="btn-addon-6m" onclick="chooseAddonDuration('6m')" class="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:border-amber-400 text-left transition-all">
+                    <div class="text-[10px] text-slate-500 font-semibold">6 Bulan</div>
+                    <div class="text-xs font-black text-amber-700 font-mono" id="label-addon-6m">+Rp 120.000</div>
                   </button>
-                  <button type="button" id="btn-addon-1y" onclick="chooseAddonDuration('1y')" class="p-2 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-amber-500/50 text-left transition-all">
-                    <div class="text-[10px] text-slate-400 font-semibold">1 Tahun</div>
-                    <div class="text-xs font-black text-amber-300 font-mono" id="label-addon-1y">+Rp 200.000</div>
+                  <button type="button" id="btn-addon-1y" onclick="chooseAddonDuration('1y')" class="p-2 rounded-xl border border-slate-200 bg-slate-50 hover:border-amber-400 text-left transition-all">
+                    <div class="text-[10px] text-slate-500 font-semibold">1 Tahun</div>
+                    <div class="text-xs font-black text-amber-700 font-mono" id="label-addon-1y">+Rp 200.000</div>
                   </button>
                 </div>
                 <select id="select-addon-cloud-duration" class="hidden">
@@ -205,13 +205,13 @@
                   <option value="6m">6m</option>
                   <option value="1y">1y</option>
                 </select>
-                <p class="text-[10px] text-slate-500">Pantau omzet toko secara live kapan saja dari smartphone pemilik.</p>
+                <p class="text-[10px] text-slate-400">Pantau omzet toko secara live kapan saja dari smartphone pemilik.</p>
               </div>
             </div>
           </div>
           
           <div class="pt-4">
-            <div id="radio-p1-indicator" class="w-full py-2 rounded-xl text-xs font-black text-center bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+            <div id="radio-p1-indicator" class="w-full py-2 rounded-xl text-xs font-black text-center bg-emerald-50 text-emerald-700 border border-emerald-300">
               ✓ PAKET INI TERPILIH
             </div>
           </div>
@@ -219,56 +219,56 @@
 
         <!-- PAKET 2: FULL SAAS ALL-IN -->
         <div id="card-plan-paket2" onclick="selectPlan('PAKET_2')" 
-          class="relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-slate-800 hover:border-slate-700 flex flex-col justify-between">
+          class="relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-white border-slate-200 hover:border-slate-300 shadow-sm flex flex-col justify-between">
           <div class="space-y-3">
             <div class="flex items-center gap-2">
               <span class="text-2xl">🔄</span>
               <div>
-                <h3 class="font-black text-white text-base">Paket 2: Full SaaS Langganan</h3>
-                <span class="text-[11px] text-blue-400 font-semibold">POS Kasir Lengkap + Cloud Dashboard HP</span>
+                <h3 class="font-black text-slate-900 text-base">Paket 2: Full SaaS Langganan</h3>
+                <span class="text-[11px] text-blue-600 font-semibold">POS Kasir Lengkap + Cloud Dashboard HP</span>
               </div>
             </div>
 
             <!-- Kartu Pilihan Durasi Langganan SaaS Terbuka (Langsung Tampil Semua) -->
-            <div class="py-2 border-y border-slate-800 space-y-2" onclick="event.stopPropagation()">
+            <div class="py-2 border-y border-slate-100 space-y-2" onclick="event.stopPropagation()">
               <div class="flex items-center justify-between">
-                <span class="text-[10px] uppercase font-bold text-slate-400">Pilih Durasi Paket:</span>
-                <span class="text-[10px] text-blue-400 font-mono font-bold" id="display-duration-summary">Aktif: 1 Bulan</span>
+                <span class="text-[10px] uppercase font-bold text-slate-500">Pilih Durasi Paket:</span>
+                <span class="text-[10px] text-blue-600 font-mono font-bold" id="display-duration-summary">Aktif: 1 Bulan</span>
               </div>
 
               <div class="grid grid-cols-2 gap-2">
                 <!-- Durasi 1 Bulan -->
-                <div id="card-saas-1m" onclick="chooseSaasDuration('1m')" class="p-3 rounded-2xl border-2 border-blue-500 bg-blue-500/10 cursor-pointer transition-all hover:border-blue-400">
-                  <div class="text-[10px] font-bold text-slate-300">1 Bulan</div>
-                  <div class="text-sm font-black text-white font-mono mt-0.5" id="label-saas-1m">Rp 30.000</div>
-                  <div class="text-[9px] text-slate-400 mt-0.5">Fleksibel bulanan</div>
+                <div id="card-saas-1m" onclick="chooseSaasDuration('1m')" class="p-3 rounded-2xl border-2 border-blue-500 bg-blue-50 cursor-pointer transition-all hover:border-blue-600">
+                  <div class="text-[10px] font-bold text-slate-700">1 Bulan</div>
+                  <div class="text-sm font-black text-slate-900 font-mono mt-0.5" id="label-saas-1m">Rp 30.000</div>
+                  <div class="text-[9px] text-slate-500 mt-0.5">Fleksibel bulanan</div>
                 </div>
 
                 <!-- Durasi 3 Bulan -->
-                <div id="card-saas-3m" onclick="chooseSaasDuration('3m')" class="p-3 rounded-2xl border border-slate-800 bg-slate-950/80 cursor-pointer transition-all hover:border-blue-500/50">
+                <div id="card-saas-3m" onclick="chooseSaasDuration('3m')" class="p-3 rounded-2xl border border-slate-200 bg-slate-50 cursor-pointer transition-all hover:border-blue-300">
                   <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-slate-300">3 Bulan</span>
+                    <span class="text-[10px] font-bold text-slate-700">3 Bulan</span>
                     <span class="text-[8px] bg-blue-500 text-white font-black px-1.5 py-0.5 rounded">HEMAT</span>
                   </div>
-                  <div class="text-sm font-black text-white font-mono mt-0.5" id="label-saas-3m">Rp 85.000</div>
-                  <div class="text-[9px] text-slate-400 mt-0.5">Rekomendasi toko</div>
+                  <div class="text-sm font-black text-slate-900 font-mono mt-0.5" id="label-saas-3m">Rp 85.000</div>
+                  <div class="text-[9px] text-slate-500 mt-0.5">Rekomendasi toko</div>
                 </div>
 
                 <!-- Durasi 6 Bulan -->
-                <div id="card-saas-6m" onclick="chooseSaasDuration('6m')" class="p-3 rounded-2xl border border-slate-800 bg-slate-950/80 cursor-pointer transition-all hover:border-blue-500/50">
-                  <div class="text-[10px] font-bold text-slate-300">6 Bulan</div>
-                  <div class="text-sm font-black text-white font-mono mt-0.5" id="label-saas-6m">Rp 160.000</div>
-                  <div class="text-[9px] text-slate-400 mt-0.5">Paket semester</div>
+                <div id="card-saas-6m" onclick="chooseSaasDuration('6m')" class="p-3 rounded-2xl border border-slate-200 bg-slate-50 cursor-pointer transition-all hover:border-blue-300">
+                  <div class="text-[10px] font-bold text-slate-700">6 Bulan</div>
+                  <div class="text-sm font-black text-slate-900 font-mono mt-0.5" id="label-saas-6m">Rp 160.000</div>
+                  <div class="text-[9px] text-slate-500 mt-0.5">Paket semester</div>
                 </div>
 
                 <!-- Durasi 1 Tahun -->
-                <div id="card-saas-1y" onclick="chooseSaasDuration('1y')" class="p-3 rounded-2xl border border-slate-800 bg-slate-950/80 cursor-pointer transition-all hover:border-blue-500/50">
+                <div id="card-saas-1y" onclick="chooseSaasDuration('1y')" class="p-3 rounded-2xl border border-slate-200 bg-slate-50 cursor-pointer transition-all hover:border-blue-300">
                   <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold text-slate-300">1 Tahun</span>
-                    <span class="text-[8px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.5 rounded">TERBAIK</span>
+                    <span class="text-[10px] font-bold text-slate-700">1 Tahun</span>
+                    <span class="text-[8px] bg-emerald-600 text-white font-black px-1.5 py-0.5 rounded">TERBAIK</span>
                   </div>
-                  <div class="text-sm font-black text-white font-mono mt-0.5" id="label-saas-1y">Rp 300.000</div>
-                  <div class="text-[9px] text-emerald-400 mt-0.5">Paling populer</div>
+                  <div class="text-sm font-black text-slate-900 font-mono mt-0.5" id="label-saas-1y">Rp 300.000</div>
+                  <div class="text-[9px] text-emerald-600 font-medium mt-0.5">Paling populer</div>
                 </div>
               </div>
 
@@ -283,16 +283,16 @@
               <span class="hidden" id="display-duration-p2"></span>
             </div>
 
-            <ul class="space-y-1.5 text-xs text-slate-300">
-              <li class="flex items-center gap-2"><span class="text-blue-400">✓</span> <strong>Semua Fitur Kasir Offline Lengkap</strong></li>
-              <li class="flex items-center gap-2"><span class="text-blue-400">✓</span> <strong>Dashboard Pemilik HP Aktif Otomatis</strong></li>
-              <li class="flex items-center gap-2"><span class="text-blue-400">✓</span> Pantau Grafik Omzet & Profit Real-time</li>
-              <li class="flex items-center gap-2"><span class="text-blue-400">✓</span> Backup Otomatis Database Toko ke Cloud</li>
+            <ul class="space-y-1.5 text-xs text-slate-600">
+              <li class="flex items-center gap-2"><span class="text-blue-600 font-bold">✓</span> <strong>Semua Fitur Kasir Offline Lengkap</strong></li>
+              <li class="flex items-center gap-2"><span class="text-blue-600 font-bold">✓</span> <strong>Dashboard Pemilik HP Aktif Otomatis</strong></li>
+              <li class="flex items-center gap-2"><span class="text-blue-600 font-bold">✓</span> Pantau Grafik Omzet & Profit Real-time</li>
+              <li class="flex items-center gap-2"><span class="text-blue-600 font-bold">✓</span> Backup Otomatis Database Toko ke Cloud</li>
             </ul>
           </div>
 
           <div class="pt-4">
-            <div id="radio-p2-indicator" class="w-full py-2 rounded-xl text-xs font-black text-center bg-slate-800 text-slate-400 border border-slate-700">
+            <div id="radio-p2-indicator" class="w-full py-2 rounded-xl text-xs font-black text-center bg-slate-100 text-slate-600 border border-slate-200">
               Pilih Paket Ini
             </div>
           </div>
@@ -301,75 +301,76 @@
       </div>
 
       <!-- FORM DATA TOKO PEMBELI -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-7 space-y-4 shadow-xl">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
-          <h3 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+      <!-- FORM DATA TOKO PEMBELI -->
+      <div class="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-7 space-y-4 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+          <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
             <span>📋</span> Formulir Data Merchant & Akun Kasir
           </h3>
           <!-- Checkbox Opsi Perpanjang Toko Lama -->
-          <label class="inline-flex items-center gap-2 cursor-pointer bg-slate-950 px-3 py-1.5 rounded-xl border border-indigo-500/30 hover:border-indigo-500/60 transition">
-            <input type="checkbox" id="order-is-renewal" onchange="toggleOrderRenewalMode()" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-700 focus:ring-0 cursor-pointer">
-            <span class="text-[11px] font-bold text-indigo-300">Saya ingin perpanjang toko yang sudah ada</span>
+          <label class="inline-flex items-center gap-2 cursor-pointer bg-slate-50 px-3 py-1.5 rounded-xl border border-indigo-200 hover:border-indigo-300 transition">
+            <input type="checkbox" id="order-is-renewal" onchange="toggleOrderRenewalMode()" class="w-3.5 h-3.5 text-indigo-600 rounded border-slate-300 focus:ring-0 cursor-pointer">
+            <span class="text-[11px] font-bold text-indigo-700">Saya ingin perpanjang toko yang sudah ada</span>
           </label>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
               1. Nama Toko Anda *
             </label>
             <input type="text" id="order-store-name" required placeholder="Contoh: Toko Snack Berkah"
               oninput="autoFillStoreId()"
-              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl font-bold text-xs text-white focus:outline-none" />
+              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:border-indigo-600 focus:bg-white rounded-xl font-bold text-xs text-slate-900 focus:outline-none" />
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+            <label class="block text-xs font-bold text-indigo-700 uppercase tracking-wider mb-1 flex items-center justify-between">
               <span id="label-order-store-id">2. ID Toko (Store ID Tenant) *</span>
-              <button type="button" id="btn-regen-store-id" onclick="reGenOrderStoreId()" class="text-indigo-400 hover:text-indigo-300 font-normal text-[10px] cursor-pointer">🔄 Acak ID Baru</button>
+              <button type="button" id="btn-regen-store-id" onclick="reGenOrderStoreId()" class="text-indigo-600 hover:text-indigo-800 font-bold text-[10px] cursor-pointer">🔄 Acak ID Baru</button>
             </label>
             <input type="text" id="order-store-id" required placeholder="STR-XXXX" readonly
-              class="w-full px-4 py-2.5 bg-slate-950 border border-indigo-500/40 rounded-xl font-mono font-bold text-xs text-indigo-300 uppercase focus:outline-none select-all" />
+              class="w-full px-4 py-2.5 bg-indigo-50/50 border border-indigo-200 rounded-xl font-mono font-bold text-xs text-indigo-800 uppercase focus:outline-none select-all" />
             <p class="text-[10px] text-slate-500 mt-1" id="hint-order-store-id">Kode tenant unik toko kasir Anda (terbuat otomatis).</p>
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
               3. Nomor WhatsApp Pemilik Toko *
             </label>
             <input type="tel" id="order-wa" required placeholder="Contoh: 081234567890"
-              class="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl font-bold text-xs text-white focus:outline-none" />
+              class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 focus:border-indigo-600 focus:bg-white rounded-xl font-bold text-xs text-slate-900 focus:outline-none" />
             <p class="text-[10px] text-slate-500 mt-1">Digunakan untuk kwitansi digital & pemulihan jika lupa PIN.</p>
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
+            <label class="block text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">
               4. Buat PIN Kasir (6 Digit Angka) *
             </label>
             <input type="password" id="order-pin" maxlength="6" required placeholder="• • • • • •"
-              class="w-full px-4 py-2.5 bg-slate-950 border border-amber-500/40 focus:border-amber-500 rounded-xl font-mono font-bold text-sm tracking-widest text-white focus:outline-none text-center" />
+              class="w-full px-4 py-2.5 bg-slate-50 border border-amber-300 focus:border-amber-500 focus:bg-white rounded-xl font-mono font-bold text-sm tracking-widest text-slate-900 focus:outline-none text-center" />
             <p class="text-[10px] text-slate-500 mt-1">PIN 6 digit ini digunakan untuk masuk ke kasir toko Anda.</p>
           </div>
 
           <div class="sm:col-span-2">
-            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">
               5. Alamat Email Pemilik Toko (Opsional / Arsip Kwitansi)
             </label>
             <input type="email" id="order-email" placeholder="Contoh: tokoberkah@gmail.com (opsional)"
-              class="w-full px-4 py-2 bg-slate-950 border border-slate-800 focus:border-slate-700 rounded-xl font-semibold text-xs text-white focus:outline-none" />
+              class="w-full px-4 py-2 bg-slate-50 border border-slate-200 focus:border-slate-400 focus:bg-white rounded-xl font-semibold text-xs text-slate-900 focus:outline-none" />
           </div>
         </div>
 
         <!-- RINGKASAN & TOMBOL LANJUT -->
-        <div class="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <span class="text-[11px] text-slate-400 uppercase font-bold block">Total Tagihan Pembayaran:</span>
-            <div class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono" id="order-summary-total">Rp 1.000.000</div>
+            <span class="text-[11px] text-slate-500 uppercase font-bold block">Total Tagihan Pembayaran:</span>
+            <div class="text-2xl sm:text-3xl font-black text-emerald-600 font-mono" id="order-summary-total">Rp 1.000.000</div>
             <span class="text-[10px] text-slate-500" id="order-summary-desc">Paket 1: Beli Putus POS Offline</span>
           </div>
 
           <button onclick="handleProceedToPayment()" id="btn-proceed-pay"
-            class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.99] text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition cursor-pointer">
+            class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-[0.99] text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition cursor-pointer">
             <span>⚡ LANJUT KE PEMBAYARAN &rarr;</span>
           </button>
         </div>
@@ -379,64 +380,64 @@
 
     <!-- ================= VIEW 2: QRIS PAYMENT SCREEN ================= -->
     <section id="view-payment-screen" class="hidden space-y-6 max-w-lg mx-auto animate-in fade-in zoom-in duration-300">
-      <div class="bg-slate-900/95 border-2 border-emerald-500/50 rounded-3xl p-6 text-center space-y-5 shadow-2xl relative overflow-hidden">
+      <div class="bg-white border-2 border-emerald-500/40 rounded-3xl p-6 text-center space-y-5 shadow-xl relative overflow-hidden">
         
         <!-- HEADER PEMBAYARAN -->
         <div class="space-y-1">
-          <span id="pay-badge-method" class="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-[10px] font-black uppercase tracking-wider">
+          <span id="pay-badge-method" class="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[10px] font-black uppercase tracking-wider">
             📸 QRIS RESMI VENDOR
           </span>
-          <h3 class="text-lg font-black text-white" id="pay-store-name-display">Toko Snack Berkah</h3>
-          <p class="text-xs text-slate-400" id="pay-subtitle-desc">Lakukan pembayaran dan kirim bukti transfer ke WhatsApp Vendor untuk aktivasi instan</p>
+          <h3 class="text-lg font-black text-slate-900" id="pay-store-name-display">Toko Snack Berkah</h3>
+          <p class="text-xs text-slate-500" id="pay-subtitle-desc">Lakukan pembayaran dan kirim bukti transfer ke WhatsApp Vendor untuk aktivasi instan</p>
         </div>
 
         <!-- TOTAL HARGA -->
-        <div class="p-3 bg-slate-950 rounded-2xl border border-slate-800">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase">Total Nominal Pembayaran:</span>
+        <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200">
+          <span class="text-[11px] font-bold text-slate-500 block uppercase">Total Nominal Pembayaran:</span>
           <div class="flex items-center justify-center gap-2 mt-0.5">
-            <span class="text-3xl font-black text-emerald-400 font-mono" id="pay-amount-display">Rp 1.000.000</span>
-            <button type="button" onclick="copyPayAmount()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[10px] font-bold cursor-pointer" title="Salin Nominal">📋 Salin</button>
+            <span class="text-3xl font-black text-emerald-600 font-mono" id="pay-amount-display">Rp 1.000.000</span>
+            <button type="button" onclick="copyPayAmount()" class="px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded text-[10px] font-bold cursor-pointer shadow-xs" title="Salin Nominal">📋 Salin</button>
           </div>
           <span class="text-[10px] text-slate-500 block mt-1" id="pay-order-ref">REF: SPOS-ORD-172635</span>
         </div>
 
         <!-- ================= CONTAINER 1: QRIS STATIS / DINAMIS ================= -->
         <div id="container-pay-qris" class="space-y-3">
-          <div class="p-4 bg-white rounded-2xl max-w-[260px] mx-auto shadow-inner flex flex-col items-center justify-center">
+          <div class="p-4 bg-white border border-slate-200 rounded-2xl max-w-[260px] mx-auto shadow-sm flex flex-col items-center justify-center">
             <div id="qris-image-container" class="w-full flex items-center justify-center">
-              <img id="qris-img" src="" alt="QRIS Code" class="w-48 h-48 rounded-lg shadow-sm object-contain" />
+              <img id="qris-img" src="" alt="QRIS Code" class="w-48 h-48 rounded-lg shadow-xs object-contain" />
             </div>
-            <div class="mt-2 text-slate-900 font-bold text-[10px] tracking-wider text-center">
+            <div class="mt-2 text-slate-700 font-bold text-[10px] tracking-wider text-center">
               <span>BCA • Mandiri • BRI • BNI • GoPay • OVO • Dana • ShopeePay</span>
             </div>
           </div>
-          <p class="text-[11px] text-slate-400">
+          <p class="text-[11px] text-slate-500">
             Scan barcode QRIS di atas dengan aplikasi m-Banking atau e-Wallet apa saja, lalu kirimkan bukti bayar ke Vendor.
           </p>
         </div>
 
         <!-- ================= CONTAINER 2: TRANSFER REKENING BANK ================= -->
-        <div id="container-pay-bank" class="hidden p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3 text-left">
-          <div class="text-center pb-2 border-b border-slate-800">
-            <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">Tujuan Transfer Bank</span>
+        <div id="container-pay-bank" class="hidden p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 text-left">
+          <div class="text-center pb-2 border-b border-slate-200">
+            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Tujuan Transfer Bank</span>
           </div>
           <div class="space-y-2 text-xs">
             <div class="flex justify-between items-center">
-              <span class="text-slate-400">Bank Tujuan:</span>
-              <span class="font-bold text-white uppercase font-mono" id="bank-name-display">BCA</span>
+              <span class="text-slate-500">Bank Tujuan:</span>
+              <span class="font-bold text-slate-900 uppercase font-mono" id="bank-name-display">BCA</span>
             </div>
-            <div class="flex justify-between items-center bg-slate-900 p-2.5 rounded-xl border border-slate-800">
+            <div class="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200">
               <div>
-                <span class="text-[10px] text-slate-400 block uppercase">Nomor Rekening:</span>
-                <span class="font-mono font-black text-sm text-emerald-400 tracking-wider" id="bank-acc-display">-</span>
+                <span class="text-[10px] text-slate-500 block uppercase">Nomor Rekening:</span>
+                <span class="font-mono font-black text-sm text-emerald-600 tracking-wider" id="bank-acc-display">-</span>
               </div>
-              <button type="button" onclick="copyBankAccount()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer">
+              <button type="button" onclick="copyBankAccount()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs cursor-pointer shadow-xs">
                 Salin
               </button>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-slate-400">Atas Nama:</span>
-              <span class="font-bold text-slate-200" id="bank-holder-display">-</span>
+              <span class="text-slate-500">Atas Nama:</span>
+              <span class="font-bold text-slate-800" id="bank-holder-display">-</span>
             </div>
           </div>
         </div>
@@ -444,23 +445,23 @@
         <!-- ================= TOMBOL UTAMA: KIRIM BUKTI PEMBAYARAN KE WHATSAPP ================= -->
         <div class="pt-2 space-y-2">
           <button id="btn-send-wa-proof" onclick="sendProofToVendorWhatsApp()" 
-            class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition cursor-pointer hover:scale-[1.01]">
+            class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition cursor-pointer hover:scale-[1.01]">
             <span class="text-base">📲</span>
             <span>KIRIM BUKTI PEMBAYARAN KE WHATSAPP VENDOR</span>
           </button>
-          <p class="text-[10px] text-slate-400">
+          <p class="text-[10px] text-slate-500">
             Klik tombol di atas untuk membuka WhatsApp Vendor dan mengirimkan foto bukti transfer agar akun toko segera diaktifkan.
           </p>
         </div>
 
         <!-- TIMER COUNTDOWN & STATUS POLLING -->
-        <div class="space-y-2 pt-2 border-t border-slate-800/80">
-          <div class="flex items-center justify-center gap-2 text-xs font-bold text-amber-400">
+        <div class="space-y-2 pt-2 border-t border-slate-200">
+          <div class="flex items-center justify-center gap-2 text-xs font-bold text-amber-700">
             <span>⏳ Waktu Menunggu:</span>
-            <span class="font-mono text-sm font-black px-2 py-0.5 bg-amber-500/20 rounded-md border border-amber-500/30" id="countdown-timer">14:59</span>
+            <span class="font-mono text-sm font-black px-2 py-0.5 bg-amber-50 rounded-md border border-amber-200" id="countdown-timer">14:59</span>
           </div>
-          <div class="flex items-center justify-center gap-2 text-[11px] text-slate-400 font-semibold">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <div class="flex items-center justify-center gap-2 text-[11px] text-slate-500 font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
             <span>Mengecek aktivasi lisensi otomatis...</span>
           </div>
         </div>
@@ -471,7 +472,7 @@
             class="hidden w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer">
             <span>💳 BUKA KEMBALI POPUP MIDTRANS SNAP</span>
           </button>
-          <button onclick="cancelPaymentAndBack()" class="text-xs text-slate-500 hover:text-slate-300 underline cursor-pointer">
+          <button onclick="cancelPaymentAndBack()" class="text-xs text-slate-500 hover:text-slate-800 underline cursor-pointer">
             &larr; Batalkan & Ganti Paket
           </button>
         </div>
@@ -481,59 +482,59 @@
 
     <!-- ================= VIEW 3: SUKSES AKTIVASI & KWITANSI ================= -->
     <section id="view-success-screen" class="hidden space-y-6 max-w-lg mx-auto animate-in zoom-in duration-300">
-      <div class="bg-slate-900/95 border-2 border-emerald-500 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-2xl">
+      <div class="bg-white border-2 border-emerald-500 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-xl">
         
-        <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/20">
+        <div class="w-16 h-16 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-sm">
           🎉
         </div>
 
         <div class="space-y-1">
-          <h2 class="text-xl font-black text-white">Pembayaran Sukses!</h2>
-          <p class="text-xs text-emerald-400 font-semibold">Akun Kasir Toko Anda Telah Otomatis Aktif</p>
+          <h2 class="text-xl font-black text-slate-900">Pembayaran Sukses!</h2>
+          <p class="text-xs text-emerald-600 font-bold">Akun Kasir Toko Anda Telah Otomatis Aktif</p>
         </div>
 
         <!-- RINCIAN KWITANSI LUNAS -->
-        <div class="p-4 bg-slate-950 rounded-2xl border border-slate-800 text-left space-y-2.5 text-xs">
-          <div class="flex justify-between border-b border-slate-800/80 pb-2">
-            <span class="text-slate-400">Nama Toko:</span>
-            <span class="font-bold text-white" id="receipt-store-name">-</span>
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-left space-y-2.5 text-xs">
+          <div class="flex justify-between border-b border-slate-200 pb-2">
+            <span class="text-slate-500">Nama Toko:</span>
+            <span class="font-bold text-slate-900" id="receipt-store-name">-</span>
           </div>
-          <div class="flex justify-between border-b border-slate-800/80 pb-2">
-            <span class="text-slate-400">ID Toko (Store ID):</span>
-            <span class="font-mono font-black text-indigo-400" id="receipt-store-id">-</span>
+          <div class="flex justify-between border-b border-slate-200 pb-2">
+            <span class="text-slate-500">ID Toko (Store ID):</span>
+            <span class="font-mono font-black text-indigo-600" id="receipt-store-id">-</span>
           </div>
-          <div class="flex justify-between border-b border-slate-800/80 pb-2">
-            <span class="text-slate-400">No. WhatsApp Pemilik:</span>
-            <span class="font-mono font-bold text-white" id="receipt-wa">-</span>
+          <div class="flex justify-between border-b border-slate-200 pb-2">
+            <span class="text-slate-500">No. WhatsApp Pemilik:</span>
+            <span class="font-mono font-bold text-slate-900" id="receipt-wa">-</span>
           </div>
-          <div class="flex justify-between items-center border-b border-slate-800/80 pb-2 bg-emerald-500/10 -mx-4 px-4 py-2 rounded-xl">
+          <div class="flex justify-between items-center border-b border-slate-200 pb-2 bg-emerald-50 -mx-4 px-4 py-2 rounded-xl">
             <div>
-              <span class="text-emerald-400 font-bold block">PIN Kasir Anda:</span>
-              <span class="text-[10px] text-slate-400">Gunakan PIN ini untuk masuk ke kasir</span>
+              <span class="text-emerald-800 font-bold block">PIN Kasir Anda:</span>
+              <span class="text-[10px] text-slate-500">Gunakan PIN ini untuk masuk ke kasir</span>
             </div>
-            <span class="font-mono font-black text-emerald-300 text-lg tracking-widest" id="receipt-pin">------</span>
+            <span class="font-mono font-black text-emerald-700 text-lg tracking-widest" id="receipt-pin">------</span>
           </div>
-          <div class="flex justify-between border-b border-slate-800/80 pb-2">
-            <span class="text-slate-400">Paket Lisensi:</span>
-            <span class="font-bold text-emerald-400" id="receipt-plan">-</span>
+          <div class="flex justify-between border-b border-slate-200 pb-2">
+            <span class="text-slate-500">Paket Lisensi:</span>
+            <span class="font-bold text-emerald-600" id="receipt-plan">-</span>
           </div>
           <div class="flex justify-between pt-1">
-            <span class="text-slate-400">Status Pembayaran:</span>
-            <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 font-black rounded text-[10px]">LUNAS</span>
+            <span class="text-slate-500">Status Pembayaran:</span>
+            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-black rounded text-[10px]">LUNAS</span>
           </div>
         </div>
 
         <!-- ACTION BUTTONS -->
         <div class="space-y-2.5 pt-2">
-          <a href="index.html" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition">
+          <a href="index.html" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition">
             <span>🏪 BUKA POS KASIR & MASUK SEKARANG &rarr;</span>
           </a>
 
-          <a id="btn-open-cloud-receipt" href="owner.html" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2">
+          <a id="btn-open-cloud-receipt" href="owner.html" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2">
             <span>📊 BUKA DASHBOARD CLOUD DI HP</span>
           </a>
 
-          <button onclick="shareReceiptWhatsApp()" class="w-full py-2.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center justify-center gap-1.5 cursor-pointer">
+          <button onclick="shareReceiptWhatsApp()" class="w-full py-2.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center justify-center gap-1.5 cursor-pointer">
             <span>💬 Salin / Kirim Bukti Pembayaran ke WhatsApp</span>
           </button>
         </div>
@@ -674,9 +675,9 @@
         const card = document.getElementById(`card-saas-${d}`);
         if (!card) return;
         if (d === dur) {
-          card.className = "p-3 rounded-2xl border-2 border-blue-500 bg-blue-500/10 cursor-pointer transition-all hover:border-blue-400 shadow-md shadow-blue-950/40";
+          card.className = "p-3 rounded-2xl border-2 border-blue-600 bg-blue-50 cursor-pointer transition-all shadow-sm";
         } else {
-          card.className = "p-3 rounded-2xl border border-slate-800 bg-slate-950/80 cursor-pointer transition-all hover:border-blue-500/50";
+          card.className = "p-3 rounded-2xl border border-slate-200 bg-slate-50/50 cursor-pointer transition-all hover:border-blue-400";
         }
       });
 
@@ -703,9 +704,9 @@
         const btn = document.getElementById(`btn-addon-${d}`);
         if (!btn) return;
         if (d === dur) {
-          btn.className = "p-2 rounded-xl border border-amber-500 bg-amber-500/10 text-left transition-all shadow-xs";
+          btn.className = "p-2 rounded-xl border-2 border-amber-500 bg-amber-50 text-left transition-all shadow-xs";
         } else {
-          btn.className = "p-2 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-amber-500/50 text-left transition-all";
+          btn.className = "p-2 rounded-xl border border-slate-200 bg-white hover:border-amber-400 text-left transition-all";
         }
       });
 
@@ -720,18 +721,18 @@
       const indP2 = document.getElementById("radio-p2-indicator");
 
       if (plan === "PAKET_1") {
-        cardP1.className = "relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-emerald-500 shadow-lg shadow-emerald-950/30 flex flex-col justify-between";
-        cardP2.className = "relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-slate-800 hover:border-slate-700 flex flex-col justify-between";
-        indP1.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-emerald-500/20 text-emerald-400 border border-emerald-500/40";
+        cardP1.className = "relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-white border-emerald-600 shadow-md flex flex-col justify-between";
+        cardP2.className = "relative p-5 rounded-3xl border transition-all cursor-pointer bg-white border-slate-200 hover:border-slate-300 flex flex-col justify-between";
+        indP1.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-emerald-50 text-emerald-700 border border-emerald-300";
         indP1.textContent = "✓ PAKET INI TERPILIH";
-        indP2.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-slate-800 text-slate-400 border border-slate-700";
+        indP2.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-slate-100 text-slate-600 border border-slate-200";
         indP2.textContent = "Pilih Paket Ini";
       } else {
-        cardP2.className = "relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-blue-500 shadow-lg shadow-blue-950/30 flex flex-col justify-between";
-        cardP1.className = "relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-slate-900/90 border-slate-800 hover:border-slate-700 flex flex-col justify-between";
-        indP2.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-blue-500/20 text-blue-400 border border-blue-500/40";
+        cardP2.className = "relative p-5 rounded-3xl border-2 transition-all cursor-pointer bg-white border-blue-600 shadow-md flex flex-col justify-between";
+        cardP1.className = "relative p-5 rounded-3xl border transition-all cursor-pointer bg-white border-slate-200 hover:border-slate-300 flex flex-col justify-between";
+        indP2.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-blue-50 text-blue-700 border border-blue-300";
         indP2.textContent = "✓ PAKET INI TERPILIH";
-        indP1.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-slate-800 text-slate-400 border border-slate-700";
+        indP1.className = "w-full py-2 rounded-xl text-xs font-black text-center bg-slate-100 text-slate-600 border border-slate-200";
         indP1.textContent = "Pilih Paket Ini";
       }
       calculateTotal();
