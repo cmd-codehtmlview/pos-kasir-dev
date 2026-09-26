@@ -46,6 +46,18 @@
     }
   </script>
 
+  <script>
+    // Inisialisasi Tema Lebih Awal Sebelum Render (Default: Dark, Mencegah Kedip Layar)
+    (function() {
+      try {
+        var savedTheme = localStorage.getItem("snack_pos_owner_theme") || "dark";
+        if (savedTheme === "light") {
+          document.documentElement.classList.add("theme-light");
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <style>
     html, body {
       overflow-x: hidden;
@@ -83,6 +95,209 @@
     }
     .overscroll-x-contain {
       overscroll-behavior-x: contain;
+    }
+
+    /* ========================================================= */
+    /* THEME LIGHT: FLAT CLEAN MINIMALIST (ALA TIKTOK SELLER CENTER) */
+    /* ========================================================= */
+    html.theme-light body {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+
+    /* Header Nav */
+    html.theme-light header {
+      background-color: rgba(255, 255, 255, 0.96) !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+    }
+    html.theme-light header #owner-store-name {
+      color: #0f172a !important;
+    }
+    html.theme-light header #owner-store-id-badge {
+      background-color: #f1f5f9 !important;
+      color: #475569 !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.theme-light header #owner-clock {
+      color: #64748b !important;
+    }
+    html.theme-light #btn-toggle-theme,
+    html.theme-light #btn-toggle-fullscreen,
+    html.theme-light button[onclick="lockOwnerDashboard()"] {
+      background-color: #f1f5f9 !important;
+      color: #334155 !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.theme-light #btn-toggle-theme:hover,
+    html.theme-light #btn-toggle-fullscreen:hover,
+    html.theme-light button[onclick="lockOwnerDashboard()"]:hover {
+      background-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+
+    /* Bar Filter Periode */
+    html.theme-light .bg-slate-900\/60 {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+    }
+    html.theme-light .bg-slate-950 {
+      background-color: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.theme-light #filter-btn-7days,
+    html.theme-light #filter-btn-30days,
+    html.theme-light #filter-btn-custom {
+      color: #475569 !important;
+    }
+    html.theme-light #filter-btn-7days:hover,
+    html.theme-light #filter-btn-30days:hover,
+    html.theme-light #filter-btn-custom:hover {
+      color: #0f172a !important;
+      background-color: #e2e8f0 !important;
+    }
+    html.theme-light #custom-date-box {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.theme-light #custom-date-box input[type="date"] {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+
+    /* Cards & Containers (Pure Flat White) */
+    html.theme-light .bg-slate-900 {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    html.theme-light .stat-card-glow {
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
+    }
+    html.theme-light .stat-card-glow:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    /* Hero Card (Omzet) */
+    html.theme-light .col-span-2.sm\:col-span-1.bg-gradient-to-br {
+      background: #ffffff !important;
+      border-color: #10b981 !important;
+      box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.12) !important;
+    }
+
+    /* Text & Headings */
+    html.theme-light .text-white {
+      color: #0f172a !important;
+    }
+    html.theme-light .text-slate-400 {
+      color: #64748b !important;
+    }
+    html.theme-light .text-slate-300 {
+      color: #475569 !important;
+    }
+    html.theme-light .text-slate-200 {
+      color: #334155 !important;
+    }
+    html.theme-light .text-slate-500 {
+      color: #64748b !important;
+    }
+    html.theme-light .border-slate-800,
+    html.theme-light .border-slate-800\/60,
+    html.theme-light .border-slate-800\/80,
+    html.theme-light .border-slate-800\/90,
+    html.theme-light .border-slate-700,
+    html.theme-light .border-slate-700\/60,
+    html.theme-light .border-slate-700\/80 {
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Sub-containers & Inner Badges */
+    html.theme-light .bg-slate-950\/40,
+    html.theme-light .bg-slate-950\/60,
+    html.theme-light .bg-slate-950\/80,
+    html.theme-light .bg-slate-950\/90,
+    html.theme-light .bg-slate-800,
+    html.theme-light .bg-slate-800\/60,
+    html.theme-light .bg-slate-800\/80,
+    html.theme-light .bg-slate-800\/90 {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Tables */
+    html.theme-light table thead,
+    html.theme-light table thead tr {
+      background-color: #f1f5f9 !important;
+      color: #475569 !important;
+    }
+    html.theme-light table thead th {
+      color: #475569 !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+    }
+    html.theme-light table tbody tr {
+      border-bottom: 1px solid #f1f5f9 !important;
+    }
+    html.theme-light table tbody tr:hover {
+      background-color: #f8fafc !important;
+    }
+    html.theme-light table tbody td {
+      color: #1e293b !important;
+    }
+    html.theme-light .divide-slate-800,
+    html.theme-light .divide-slate-800\/60 {
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Form Inputs & Selects */
+    html.theme-light input[type="text"],
+    html.theme-light input[type="search"],
+    html.theme-light input[type="password"],
+    html.theme-light select {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.theme-light input::placeholder {
+      color: #94a3b8 !important;
+    }
+
+    /* Custom Scrollbar in Light */
+    html.theme-light .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9 !important;
+    }
+    html.theme-light .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1 !important;
+    }
+
+    /* Bottom Navigation Bar Mobile */
+    html.theme-light #owner-mobile-bottom-nav {
+      background-color: rgba(255, 255, 255, 0.96) !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.theme-light .nav-tab-btn span.tab-text {
+      color: #64748b !important;
+    }
+    html.theme-light .nav-tab-btn.text-emerald-400 span.tab-text {
+      color: #059669 !important;
+    }
+
+    /* Modals in Light */
+    html.theme-light #modal-receipt-detail > div,
+    html.theme-light #modal-owner-settings > div,
+    html.theme-light #modal-owner-pin-gate > div {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #0f172a !important;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    }
+    html.theme-light #modal-receipt-detail .bg-slate-950,
+    html.theme-light #modal-owner-settings .bg-slate-950,
+    html.theme-light #modal-owner-pin-gate .bg-slate-950 {
+      background-color: #f8fafc !important;
+      border-color: #e2e8f0 !important;
     }
   </style>
 </head>
@@ -162,8 +377,20 @@
         </div>
       </div>
 
-      <!-- Actions: Fullscreen, Lock, Cashier POS -->
+      <!-- Actions: Theme Toggle, Fullscreen, Lock, Cashier POS -->
       <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+        <!-- Theme Toggle (☀️ Terang / 🌙 Gelap - Default Gelap) -->
+        <button 
+          id="btn-toggle-theme"
+          type="button"
+          onclick="toggleOwnerTheme()" 
+          class="p-1.5 sm:px-2.5 sm:py-1.5 bg-slate-800/90 hover:bg-slate-700 text-amber-300 hover:text-amber-200 rounded-xl text-xs font-bold border border-slate-700/80 flex items-center gap-1 transition-all shadow-xs active:scale-95 cursor-pointer"
+          title="Ubah Tema (Terang / Gelap)"
+        >
+          <span id="theme-toggle-icon" class="text-xs">☀️</span>
+          <span id="theme-toggle-text" class="hidden sm:inline text-[11px]">Terang</span>
+        </button>
+
         <!-- Fullscreen Button (Hanya tampil di Desktop) -->
         <button 
           id="btn-toggle-fullscreen"
@@ -3830,6 +4057,8 @@
         revenueChartInstance.destroy();
       }
 
+      const isLightMode = document.documentElement.classList.contains("theme-light");
+
       revenueChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -3837,12 +4066,12 @@
           datasets: [{
             label: 'Omzet Harian (Rp)',
             data: dataValues,
-            borderColor: '#ffcc00',
-            backgroundColor: 'rgba(255, 204, 0, 0.12)',
+            borderColor: isLightMode ? '#d61823' : '#ffcc00',
+            backgroundColor: isLightMode ? 'rgba(214, 24, 35, 0.08)' : 'rgba(255, 204, 0, 0.12)',
             borderWidth: 2.5,
             fill: true,
             tension: 0.35,
-            pointBackgroundColor: '#d61823',
+            pointBackgroundColor: isLightMode ? '#d61823' : '#ffcc00',
             pointRadius: 4
           }]
         },
@@ -3859,13 +4088,13 @@
           },
           scales: {
             x: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } }
+              grid: { color: isLightMode ? '#e2e8f0' : 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: isLightMode ? '#475569' : '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } }
             },
             y: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              grid: { color: isLightMode ? '#e2e8f0' : 'rgba(255, 255, 255, 0.05)' },
               ticks: {
-                color: '#94a3b8',
+                color: isLightMode ? '#475569' : '#94a3b8',
                 font: { family: 'JetBrains Mono', size: 10 },
                 callback: (val) => formatRupiah(val).replace(',00', '')
               }
@@ -3898,6 +4127,8 @@
         paymentChartInstance.destroy();
       }
 
+      const isLightMode = document.documentElement.classList.contains("theme-light");
+
       paymentChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -3905,7 +4136,7 @@
           datasets: [{
             data: [cash, qris, transfer],
             backgroundColor: ['#10b981', '#3b82f6', '#a855f7'],
-            borderColor: '#0f172a',
+            borderColor: isLightMode ? '#ffffff' : '#0f172a',
             borderWidth: 2
           }]
         },
@@ -4018,6 +4249,50 @@
     function closeModal(id) {
       const el = document.getElementById(id);
       if (el) el.classList.add("hidden");
+    }
+
+    // ==========================================
+    // SISTEM TEMA DUAL MODE (TERANG / GELAP - DEFAULT GELAP)
+    // ==========================================
+    function initOwnerTheme() {
+      let savedTheme = "dark";
+      try {
+        savedTheme = localStorage.getItem("snack_pos_owner_theme") || "dark";
+      } catch (e) {}
+      applyOwnerTheme(savedTheme, false);
+    }
+
+    function toggleOwnerTheme() {
+      const currentTheme = document.documentElement.classList.contains("theme-light") ? "light" : "dark";
+      const newTheme = currentTheme === "light" ? "dark" : "light";
+      applyOwnerTheme(newTheme, true);
+    }
+
+    function applyOwnerTheme(theme, updateCharts = true) {
+      const htmlEl = document.documentElement;
+      const iconEl = document.getElementById("theme-toggle-icon");
+      const textEl = document.getElementById("theme-toggle-text");
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
+
+      if (theme === "light") {
+        htmlEl.classList.add("theme-light");
+        if (iconEl) iconEl.textContent = "🌙";
+        if (textEl) textEl.textContent = "Gelap";
+        if (themeMeta) themeMeta.setAttribute("content", "#f8fafc");
+      } else {
+        htmlEl.classList.remove("theme-light");
+        if (iconEl) iconEl.textContent = "☀️";
+        if (textEl) textEl.textContent = "Terang";
+        if (themeMeta) themeMeta.setAttribute("content", "#0b1120");
+      }
+      try {
+        localStorage.setItem("snack_pos_owner_theme", theme);
+      } catch (e) {}
+
+      if (updateCharts) {
+        if (typeof renderRevenueChart === "function") renderRevenueChart();
+        if (typeof renderPaymentMethodChart === "function") renderPaymentMethodChart();
+      }
     }
 
     function scrollToSection(id) {
@@ -4349,6 +4624,7 @@
 
     // Inisialisasi Saat Dokumen Dimuat
     document.addEventListener("DOMContentLoaded", () => {
+      initOwnerTheme();
       setInterval(updateClock, 1000);
       updateClock();
 
