@@ -898,7 +898,7 @@
               <span class="text-base sm:text-lg flex-shrink-0">⏳</span>
             </div>
             <div id="kpi-store-dsi" class="text-lg sm:text-2xl font-black font-mono text-cyan-400 mt-1.5 sm:mt-2 truncate">
-              - Hari
+              0.0 Hari
             </div>
           </div>
           <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
@@ -3267,9 +3267,19 @@
         dsiDaysCount = Math.max(1, distinctDates);
       }
 
+      // Map modal/HPP produk untuk menghitung HPP penjualan transaksi jika item.costPrice tidak tersimpan
+      const productCostMap = {};
+      (dashboardData.products || []).forEach(p => {
+        const cost = Number(p.costPrice) || Number(p.buyPrice) || 0;
+        if (p.id) productCostMap[p.id] = cost;
+        if (p.barcode) productCostMap[p.barcode] = cost;
+        if (p.name) productCostMap[p.name] = cost;
+      });
+
       const totalSalesCost = activeTrxForDsi.reduce((sum, t) => {
         const costTrx = (t.items || []).reduce((itemSum, item) => {
-          const cost = Number(item.costPrice) || 0;
+          const key = item.id || item.barcode || item.name;
+          const cost = Number(item.costPrice) || Number(item.buyPrice) || productCostMap[key] || 0;
           return itemSum + ((Number(item.qty) || 0) * cost);
         }, 0);
         return sum + costTrx;
@@ -3280,26 +3290,67 @@
       const storeDsiStatusEl = document.getElementById("kpi-dsi-status");
 
       if (storeDsiEl) {
+        const totalStoreStock = (dashboardData.products || []).reduce((sum, p) => sum + Math.max(0, Number(p.stock) || 0), 0);
+        const productDsiList = typeof calculateProductDSI === 'function' ? calculateProductDSI() : [];
+        const totalDailySold = productDsiList.reduce((sum, p) => sum + (Number(p.dailyRate) || 0), 0);
+
+        let storeDsiDays = null;
+
+        // 1. Prioritas Keuangan (HPP Modal / Rata-rata HPP Terjual per Hari)
         if (dailyAvgSalesCost > 0 && totalInventoryCost > 0) {
-          const storeDsiDays = totalInventoryCost / dailyAvgSalesCost;
+          storeDsiDays = totalInventoryCost / dailyAvgSalesCost;
+        }
+
+        // 2. Prioritas Volume Fisik (Total Unit Stok / Unit Terjual per Hari)
+        if ((storeDsiDays === null || !isFinite(storeDsiDays)) && totalDailySold > 0 && totalStoreStock > 0) {
+          storeDsiDays = totalStoreStock / totalDailySold;
+        }
+
+        // 3. Prioritas Rata-rata Terbobot Produk Aktif
+        if (storeDsiDays === null || !isFinite(storeDsiDays)) {
+          const activeSold = productDsiList.filter(p => isFinite(p.dsiDays) && p.dailyRate > 0 && p.stock > 0);
+          if (activeSold.length > 0) {
+            const sumWeighted = activeSold.reduce((sum, p) => sum + (p.dsiDays * p.stock), 0);
+            const sumStock = activeSold.reduce((sum, p) => sum + p.stock, 0);
+            if (sumStock > 0) storeDsiDays = sumWeighted / sumStock;
+          }
+        }
+
+        // 4. Fallback Riwayat Transaksi Global (jika filter saat ini belum ada transaksi)
+        if ((storeDsiDays === null || !isFinite(storeDsiDays)) && (dashboardData.transactions || []).length > 0 && totalStoreStock > 0) {
+          const allTrx = dashboardData.transactions;
+          const distinctDates = Math.max(1, new Set(allTrx.map(t => t.date || (t.createdAt ? t.createdAt.split('T')[0] : ''))).size);
+          const totalSoldAll = allTrx.reduce((sum, t) => sum + (t.items || []).reduce((s, i) => s + (Number(i.qty) || 0), 0), 0);
+          const historicalRate = totalSoldAll / distinctDates;
+          if (historicalRate > 0) {
+            storeDsiDays = totalStoreStock / historicalRate;
+          }
+        }
+
+        // Render Angka DSI
+        if (storeDsiDays !== null && isFinite(storeDsiDays) && storeDsiDays >= 0) {
           storeDsiEl.textContent = `${storeDsiDays.toFixed(1)} Hari`;
           if (storeDsiDays <= 3) {
-            storeDsiEl.className = "text-xl sm:text-2xl font-black font-mono text-rose-400 mt-2";
+            storeDsiEl.className = "text-lg sm:text-2xl font-black font-mono text-rose-400 mt-1.5 sm:mt-2 truncate";
             if (storeDsiStatusEl) storeDsiStatusEl.innerHTML = `<span class="text-rose-400 font-bold">🚨 Kritis (&le;3 Hr)</span>`;
           } else if (storeDsiDays <= 7) {
-            storeDsiEl.className = "text-xl sm:text-2xl font-black font-mono text-amber-400 mt-2";
+            storeDsiEl.className = "text-lg sm:text-2xl font-black font-mono text-amber-400 mt-1.5 sm:mt-2 truncate";
             if (storeDsiStatusEl) storeDsiStatusEl.innerHTML = `<span class="text-amber-400 font-bold">⚠️ Menipis (4-7 Hr)</span>`;
           } else if (storeDsiDays <= 21) {
-            storeDsiEl.className = "text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-2";
+            storeDsiEl.className = "text-lg sm:text-2xl font-black font-mono text-emerald-400 mt-1.5 sm:mt-2 truncate";
             if (storeDsiStatusEl) storeDsiStatusEl.innerHTML = `<span class="text-emerald-400 font-bold">✅ Optimal (8-21 Hr)</span>`;
           } else {
-            storeDsiEl.className = "text-xl sm:text-2xl font-black font-mono text-blue-400 mt-2";
+            storeDsiEl.className = "text-lg sm:text-2xl font-black font-mono text-blue-400 mt-1.5 sm:mt-2 truncate";
             if (storeDsiStatusEl) storeDsiStatusEl.innerHTML = `<span class="text-blue-400 font-bold">📦 Overstock (&gt;21 Hr)</span>`;
           }
+        } else if (totalStoreStock <= 0) {
+          storeDsiEl.textContent = "0.0 Hari";
+          storeDsiEl.className = "text-lg sm:text-2xl font-black font-mono text-rose-400 mt-1.5 sm:mt-2 truncate";
+          if (storeDsiStatusEl) storeDsiStatusEl.innerHTML = `<span class="text-rose-400 font-bold">⛔ Stok Habis</span>`;
         } else {
-          storeDsiEl.textContent = "Aman";
-          storeDsiEl.className = "text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-2";
-          if (storeDsiStatusEl) storeDsiStatusEl.textContent = "Ketahanan Stok";
+          storeDsiEl.textContent = "0.0 Hari";
+          storeDsiEl.className = "text-lg sm:text-2xl font-black font-mono text-cyan-400 mt-1.5 sm:mt-2 truncate";
+          if (storeDsiStatusEl) storeDsiStatusEl.innerHTML = `<span class="text-slate-400 font-semibold text-[10px]">Belum Ada Penjualan</span>`;
         }
       }
 
