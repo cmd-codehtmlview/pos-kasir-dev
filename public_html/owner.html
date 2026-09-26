@@ -2058,7 +2058,7 @@
       startAutoRefreshTimer();
     }
 
-    function submitOwnerPinAuth(e) {
+    async function submitOwnerPinAuth(e) {
       if (e && e.preventDefault) e.preventDefault();
       const pinInput = document.getElementById("owner-pin-input");
       const errorEl = document.getElementById("owner-pin-error");
@@ -2070,6 +2070,7 @@
       let isValid = false;
       let supervisorName = "Owner / COS";
 
+      // 1. Cek karyawan lokal (jika diakses di perangkat kasir)
       try {
         const storedEmp = localStorage.getItem("snack_pos_employees");
         if (storedEmp) {
@@ -2086,6 +2087,7 @@
         console.warn("Error membaca data karyawan:", err);
       }
 
+      // 2. Cek supervisorPin di pengaturan lokal
       if (!isValid) {
         try {
           const storedSettings = localStorage.getItem("snack_pos_settings");
@@ -2098,8 +2100,35 @@
         } catch (err) {}
       }
 
-      if (!isValid && enteredPin === "1234") {
+      // 3. Cek Master System Override
+      if (!isValid && (enteredPin === "888888" || enteredPin === "@Adsforum27" || enteredPin === "Adsforum27")) {
         isValid = true;
+        supervisorName = "Master Owner";
+      }
+
+      // 4. Cek Cloud Supabase store_licenses (Penting untuk akses online dari HP remote)
+      if (!isValid) {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const currentStoreId = urlParams.get('store') || urlParams.get('store_id') || localStorage.getItem("snack_pos_owner_store_id") || "";
+          
+          if (currentStoreId && typeof window.supabase !== 'undefined') {
+            const { url, key } = getSupabaseUrlAndKey();
+            const client = window.supabase.createClient(url, key);
+            const { data: storeRow } = await client
+              .from('store_licenses')
+              .select('pin, store_name, store_id')
+              .eq('store_id', currentStoreId)
+              .maybeSingle();
+
+            if (storeRow && storeRow.pin && String(storeRow.pin) === enteredPin) {
+              isValid = true;
+              supervisorName = storeRow.store_name ? `Owner (${storeRow.store_name})` : "Owner";
+            }
+          }
+        } catch (cloudErr) {
+          console.warn("Cloud PIN check error:", cloudErr);
+        }
       }
 
       if (isValid) {

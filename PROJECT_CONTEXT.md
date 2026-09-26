@@ -116,3 +116,4 @@ pos-kasir-dev/
 Jika Anda membuka sesi Antigravity baru di laptop, cukup kirimkan prompt ini di obrolan pertama:
 
 > *"Halo! Saya sedang melanjutkan pengerjaan projek SnackPOS di laptop. Silakan baca file `PROJECT_CONTEXT.md` di root repository untuk memahami seluruh arsitektur, standar desain, dan riwayat keputusan sebelumnya. Pastikan kita selalu bekerja di branch `dev` dan mematuhi seluruh aturan desain (misal: tanpa emoji/fluff di auth, tema flat, dll). Apa yang bisa kita lanjutkan sekarang?"*
+

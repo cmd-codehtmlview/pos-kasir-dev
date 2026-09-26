@@ -218,8 +218,8 @@ async function checkLicenseOnStartup() {
   const lic = getStoredLicense();
   const lockModal = document.getElementById("modal-activation-lock");
 
-  if (!lic || !isAppLicensed()) {
-    // Pengguna baru pertama kali membuka web: Wajib diarahkan ke FORM PENDAFTARAN TOKO
+  if (!lic) {
+    // Pengguna baru pertama kali membuka web: Wajib diarahkan ke FORM LOGIN DENGAN LINK DAFTAR
     if (lockModal) {
       lockModal.classList.remove("hidden");
       lockModal.style.display = "flex";
@@ -229,6 +229,24 @@ async function checkLicenseOnStartup() {
       switchAuthLayer("login");
     }
 
+    const closeBtn = document.getElementById("btn-close-store-login");
+    if (closeBtn) closeBtn.classList.add("hidden");
+    return;
+  }
+
+  // Cek apakah lisensi sudah habis / expired
+  const isExpired = lic.status === "EXPIRED" || (lic.expiresAt && new Date() > new Date(lic.expiresAt));
+  const isBlocked = lic.status === "BLOCKED";
+
+  if (isExpired || isBlocked) {
+    if (lockModal) {
+      lockModal.classList.remove("hidden");
+      lockModal.style.display = "flex";
+    }
+    document.body.classList.add("modal-open");
+    if (typeof switchAuthLayer === "function") {
+      switchAuthLayer("expired", lic);
+    }
     const closeBtn = document.getElementById("btn-close-store-login");
     if (closeBtn) closeBtn.classList.add("hidden");
     return;
@@ -246,12 +264,15 @@ async function checkLicenseOnStartup() {
   try {
     const client = typeof getActiveSupabaseClient === "function" ? getActiveSupabaseClient() : null;
     if (client && lic.storeId && navigator.onLine) {
-      client.from('store_licenses').select('pos_status, pos_expires_at, plan_type').eq('store_id', lic.storeId).maybeSingle().then(({ data }) => {
+      client.from('store_licenses').select('pos_status, pos_expires_at, plan_type, pin, store_name').eq('store_id', lic.storeId).maybeSingle().then(({ data }) => {
         if (data) {
           if (data.pos_status === "BLOCKED" || (data.pos_expires_at && new Date() > new Date(data.pos_expires_at))) {
             lic.status = data.pos_status === "BLOCKED" ? "BLOCKED" : "EXPIRED";
             saveStoredLicense(lic);
             checkLicenseOnStartup();
+          } else if (data.pin && data.pin !== lic.pin) {
+            lic.pin = data.pin;
+            saveStoredLicense(lic);
           }
         }
       });
@@ -369,28 +390,29 @@ function checkAndOpenPostLicenseSetup() {
   if (typeof isAppLicensed === "function" && !isAppLicensed()) {
     return;
   }
+  const lic = getStoredLicense();
   if (!pos.employees || pos.employees.length === 0) {
-    if (typeof openModal === "function") {
-      openModal("modal-first-time-setup");
-      setTimeout(() => {
-        const nameInput = document.getElementById("setup-cos-name");
-        if (nameInput) nameInput.focus();
-      }, 250);
+    if (lic && (lic.pin || pos?.settings?.supervisorPin)) {
+      const pin = lic.pin || pos?.settings?.supervisorPin || "123456";
+      const name = lic.clientName || pos?.settings?.storeName || "Owner COS";
+      const phone = lic.whatsapp || pos?.settings?.storePhone || "";
+      if (typeof autoProvisionCosEmployee === "function") {
+        autoProvisionCosEmployee(name, pin, phone);
+        return;
+      }
     }
   } else if (!pos.currentUser) {
-    if (typeof openModal === "function") {
-      openModal("modal-employee-login");
-      setTimeout(() => {
-        const nikInput = document.getElementById("login-employee-nik");
-        if (nikInput) nikInput.focus();
-      }, 250);
+    const cosUser = pos.employees.find(e => e.role === "COS") || pos.employees[0];
+    if (cosUser && typeof pos.saveCurrentUser === "function") {
+      pos.saveCurrentUser(cosUser);
+      localStorage.setItem("snack_pos_active_shift_cashier", cosUser.nik);
+      if (typeof renderEmployeeHeader === "function") renderEmployeeHeader();
     }
-  } else {
-    setTimeout(() => {
-      const input = document.getElementById("pos-barcode-search");
-      if (input) input.focus();
-    }, 300);
   }
+  setTimeout(() => {
+    const input = document.getElementById("pos-barcode-search");
+    if (input) input.focus();
+  }, 300);
 }
 
 let currentCashierSelectedPlan = "PAKET_1";
@@ -399,31 +421,72 @@ let cashierQrisCountdownTimer = null;
 let cashierActiveOrderData = null;
 
 // ==========================================
-// 1a. SISTEM AUTHENTIKASI 3-LAYER KASIR (LOGIN -> SIGNUP -> PILIH PAKET)
+// 1a. SISTEM FULLSCREEN AUTH KASIR & ONBOARDING WA OTP (100% CLEAN)
 // ==========================================
 
+let otpCountdownTimer = null;
+window._pendingSignupData = null;
+window._pendingResetData = null;
+
 // Navigasi Antar Layer Autentikasi Kasir
-function switchAuthLayer(layer) {
+function switchAuthLayer(layer, storeData = null) {
   const layerLogin = document.getElementById("auth-layer-login");
   const layerSignup = document.getElementById("auth-layer-signup");
+  const layerOtp = document.getElementById("auth-layer-otp");
+  const layerForgot = document.getElementById("auth-layer-forgot-pin");
+  const layerExpired = document.getElementById("auth-layer-expired");
   const layerPricing = document.getElementById("auth-layer-pricing");
 
-  if (layerLogin) layerLogin.classList.add("hidden");
-  if (layerSignup) layerSignup.classList.add("hidden");
-  if (layerPricing) layerPricing.classList.add("hidden");
+  const allLayers = [layerLogin, layerSignup, layerOtp, layerForgot, layerExpired, layerPricing];
+  allLayers.forEach(l => {
+    if (l) l.classList.add("hidden");
+  });
 
-  // Reset tampilan QRIS jika ada
-  document.getElementById("auth-pricing-selection")?.classList.remove("hidden");
-  document.getElementById("act-qris-step-display")?.classList.add("hidden");
+  const lockModal = document.getElementById("modal-activation-lock");
+  if (lockModal) {
+    lockModal.classList.remove("hidden");
+    lockModal.style.display = "flex";
+  }
+  document.body.classList.add("modal-open");
 
   if (layer === "signup") {
     if (layerSignup) layerSignup.classList.remove("hidden");
     const nameInput = document.getElementById("signup-store-name");
     if (nameInput) nameInput.focus();
-  } else if (layer === "pricing") {
-    if (layerPricing) layerPricing.classList.remove("hidden");
-    loadCashierModalPricing();
-    updateLifetimeAddonTotal();
+  } else if (layer === "otp") {
+    if (layerOtp) layerOtp.classList.remove("hidden");
+    const otpInput = document.getElementById("otp-input");
+    if (otpInput) {
+      otpInput.value = "";
+      otpInput.focus();
+    }
+  } else if (layer === "forgot-pin") {
+    if (layerForgot) layerForgot.classList.remove("hidden");
+    const step1 = document.getElementById("forgot-pin-step-1");
+    const step2 = document.getElementById("forgot-pin-step-2");
+    if (step1) step1.classList.remove("hidden");
+    if (step2) step2.classList.add("hidden");
+    const phoneInput = document.getElementById("forgot-pin-phone-input");
+    if (phoneInput) {
+      phoneInput.value = "";
+      phoneInput.focus();
+    }
+  } else if (layer === "expired") {
+    if (layerExpired) layerExpired.classList.remove("hidden");
+    const lic = storeData || getStoredLicense() || {};
+    const stName = lic.store_name || lic.clientName || pos?.settings?.storeName || "Toko Kasir";
+    const stId = lic.store_id || lic.storeId || pos?.settings?.storeId || "-";
+    const nameEl = document.getElementById("paywall-store-name");
+    const idEl = document.getElementById("paywall-store-id");
+    if (nameEl) nameEl.textContent = stName;
+    if (idEl) idEl.textContent = stId;
+
+    const vendorWa = "6285876622624";
+    const waAdminBtn = document.getElementById("btn-paywall-wa-admin");
+    if (waAdminBtn) {
+      const msg = `Halo Admin Vendor SnackPOS, masa trial toko *${stName}* (ID: *${stId}*) telah berakhir. Saya ingin aktivasi lisensi resmi.`;
+      waAdminBtn.href = `https://wa.me/${vendorWa}?text=${encodeURIComponent(msg)}`;
+    }
   } else {
     // Default: Layer 1 (Login Bersih)
     if (layerLogin) layerLogin.classList.remove("hidden");
@@ -433,7 +496,87 @@ function switchAuthLayer(layer) {
   }
 }
 
-// Pendaftaran Toko Bersih (Clean 2-Layer Onboarding: Langsung Aktif Tanpa Layer Paket di Awal)
+// Timer Countdown OTP WhatsApp
+function startOtpCountdown(seconds = 60) {
+  if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+  const timerTextEl = document.getElementById("otp-timer-text");
+  const countEl = document.getElementById("otp-countdown");
+  const resendBtn = document.getElementById("btn-resend-otp");
+
+  if (timerTextEl) timerTextEl.classList.remove("hidden");
+  if (resendBtn) resendBtn.classList.add("hidden");
+
+  let remaining = seconds;
+  if (countEl) countEl.textContent = `${remaining}s`;
+
+  otpCountdownTimer = setInterval(() => {
+    remaining--;
+    if (countEl) countEl.textContent = `${remaining}s`;
+    if (remaining <= 0) {
+      clearInterval(otpCountdownTimer);
+      if (timerTextEl) timerTextEl.classList.add("hidden");
+      if (resendBtn) resendBtn.classList.remove("hidden");
+    }
+  }, 1000);
+}
+
+// Auto-Provisioning COS Employee (NIK 1001 & Role COS Langsung Tanpa Popup Form Kedua)
+function autoProvisionCosEmployee(storeName, pin, phone) {
+  const cosEmployee = {
+    nik: "1001",
+    name: storeName || "Owner COS",
+    role: "COS",
+    pin: pin,
+    shift: "Shift 1 (Pagi)",
+    phone: phone || "",
+    canVoid: true,
+    canRetur: true,
+    canStockOpname: true,
+    canBlindKlerk: true,
+    canViewFinancials: true,
+    canManageEmployees: true,
+    canManageProducts: true,
+    canStockMutation: true
+  };
+
+  pos.employees = [cosEmployee];
+  if (typeof pos.saveEmployees === "function") pos.saveEmployees();
+
+  // Catat absensi perdana
+  const now = new Date();
+  const dateStr = now.toISOString().split("T")[0];
+  const timeStr = now.toLocaleTimeString("id-ID");
+  if (!pos.attendance) pos.attendance = [];
+  pos.attendance.unshift({
+    id: `ABS-${dateStr.replace(/-/g, "")}-1001-01`,
+    date: dateStr,
+    time: timeStr,
+    nik: "1001",
+    name: cosEmployee.name,
+    role: "COS",
+    shift: "Shift 1 (Pagi)",
+    type: "MASUK"
+  });
+  if (typeof pos.saveAttendance === "function") pos.saveAttendance();
+
+  // Login otomatis sebagai COS baru
+  localStorage.setItem("snack_pos_active_shift_cashier", "1001");
+  if (typeof pos.saveCurrentUser === "function") pos.saveCurrentUser(cosEmployee);
+  if (!pos.settings) pos.settings = {};
+  pos.settings.cashierName = cosEmployee.name;
+  pos.settings.cashierNik = "1001";
+  pos.settings.shiftName = "Shift 1 (Pagi)";
+  pos.settings.supervisorPin = pin;
+  if (typeof pos.saveSettings === "function") pos.saveSettings();
+
+  if (typeof renderEmployeeHeader === "function") renderEmployeeHeader();
+  if (typeof renderEmployeeTable === "function") renderEmployeeTable();
+  if (typeof renderAttendanceTable === "function") renderAttendanceTable();
+  if (typeof renderReports === "function") renderReports();
+  if (typeof renderInventoryTable === "function") renderInventoryTable();
+}
+
+// 1. Pendaftaran Toko Baru (Kirim OTP WhatsApp Rp 0)
 async function submitDirectSignup() {
   const nameInput = document.getElementById("signup-store-name");
   const waInput = document.getElementById("signup-store-wa");
@@ -446,157 +589,410 @@ async function submitDirectSignup() {
   const normWa = normalizePhoneIdentifier(rawWa);
 
   if (!storeName) {
-    showToast("Silakan masukkan Nama Toko.", "warning");
+    showToast("Silakan masukkan Nama Toko Anda.", "warning");
     if (nameInput) nameInput.focus();
     return;
   }
   if (!rawWa || normWa.length < 8) {
-    showToast("Masukkan Nomor WhatsApp yang valid.", "warning");
+    showToast("Masukkan Nomor WhatsApp yang aktif dan valid.", "warning");
     if (waInput) waInput.focus();
     return;
   }
   if (!pin || pin.length < 4 || pin.length > 8 || !/^\d+$/.test(pin)) {
-    showToast("PIN harus 4-6 digit angka.", "warning");
+    showToast("PIN Kasir harus 4-6 digit angka.", "warning");
     if (pinInput) pinInput.focus();
     return;
   }
 
-  // Simpan data sementara ke pos.settings
-  pos.settings.storeName = storeName;
-  pos.settings.storePhone = normWa;
+  // Siapkan format nomor WhatsApp internasional untuk WAHA gateway
+  let waFormatted = normWa;
+  if (waFormatted.startsWith("0")) waFormatted = "62" + waFormatted.slice(1);
 
   if (btnSubmit) {
     btnSubmit.disabled = true;
-    btnSubmit.textContent = "Mendaftar...";
+    btnSubmit.innerHTML = `<span>⏳ Mengirim OTP WhatsApp...</span>`;
   }
 
   try {
-    await submitSignupWithPlan("TRIAL");
+    const res = await fetch("/api/send-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone: waFormatted,
+        action: "REGISTER",
+        storeName: storeName
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || data.error || "Gagal mengirim kode OTP");
+    }
+
+    // Simpan data sementara
+    window._pendingSignupData = {
+      storeName: storeName,
+      phone: waFormatted,
+      pin: pin,
+      challenge: data.challenge,
+      expiresAt: data.expiresAt
+    };
+
+    // Tampilkan Layer 3: Verifikasi OTP
+    const displayPhoneEl = document.getElementById("otp-target-display");
+    if (displayPhoneEl) {
+      displayPhoneEl.textContent = `+${waFormatted.slice(0, 2)} ${waFormatted.slice(2, 6)}-${waFormatted.slice(6, 10)}-${waFormatted.slice(10)}`;
+    }
+    const otpFeedback = document.getElementById("otp-feedback");
+    if (otpFeedback) otpFeedback.classList.add("hidden");
+
+    switchAuthLayer("otp");
+    startOtpCountdown(60);
+
+    showToast(`📩 Kode OTP 6-digit berhasil dikirim ke WhatsApp Anda!`, "success", 6000);
+
   } catch (err) {
     console.error("submitDirectSignup error:", err);
-    showToast("Pendaftaran gagal: " + (err.message || err), "error");
+    showToast("Gagal mendaftar: " + (err.message || err), "error");
   } finally {
     if (btnSubmit) {
       btnSubmit.disabled = false;
-      btnSubmit.textContent = "Daftar";
+      btnSubmit.innerHTML = `<span>Mulai Coba Gratis 7 Hari</span><span>&rarr;</span>`;
+    }
+  }
+}
+
+// 2. Kirim Ulang OTP WhatsApp
+async function resendSignupOtp() {
+  if (!window._pendingSignupData || !window._pendingSignupData.phone) {
+    showToast("Data pendaftaran tidak ditemukan. Silakan isi form kembali.", "warning");
+    switchAuthLayer("signup");
+    return;
+  }
+
+  const resendBtn = document.getElementById("btn-resend-otp");
+  if (resendBtn) {
+    resendBtn.disabled = true;
+    resendBtn.textContent = "Mengirim...";
+  }
+
+  try {
+    const res = await fetch("/api/send-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone: window._pendingSignupData.phone,
+        action: "REGISTER",
+        storeName: window._pendingSignupData.storeName
+      })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message || "Gagal mengirim ulang OTP");
+
+    window._pendingSignupData.challenge = data.challenge;
+    window._pendingSignupData.expiresAt = data.expiresAt;
+
+    startOtpCountdown(60);
+    showToast("Kode OTP baru berhasil dikirim via WhatsApp.", "success");
+    const otpInput = document.getElementById("otp-input");
+    if (otpInput) {
+      otpInput.value = "";
+      otpInput.focus();
+    }
+  } catch (e) {
+    showToast("Gagal: " + e.message, "error");
+  } finally {
+    if (resendBtn) {
+      resendBtn.disabled = false;
+      resendBtn.textContent = "Kirim Ulang Kode";
+    }
+  }
+}
+
+// 3. Verifikasi OTP WhatsApp & Aktivasi Kasir Langsung
+async function submitVerifyOtp() {
+  const otpInput = document.getElementById("otp-input");
+  const btnVerify = document.getElementById("btn-verify-otp");
+  const feedbackEl = document.getElementById("otp-feedback");
+
+  const otpCode = otpInput ? otpInput.value.trim() : "";
+
+  if (!otpCode || otpCode.length !== 6 || !/^\d+$/.test(otpCode)) {
+    if (feedbackEl) {
+      feedbackEl.textContent = "Masukkan 6 digit angka OTP yang diterima di WhatsApp.";
+      feedbackEl.classList.remove("hidden");
+    }
+    if (otpInput) otpInput.focus();
+    return;
+  }
+
+  if (!window._pendingSignupData || !window._pendingSignupData.phone) {
+    showToast("Sesi pendaftaran kadaluarsa. Silakan ulangi pendaftaran.", "warning");
+    switchAuthLayer("signup");
+    return;
+  }
+
+  if (feedbackEl) feedbackEl.classList.add("hidden");
+  if (btnVerify) {
+    btnVerify.disabled = true;
+    btnVerify.innerHTML = `<span>⏳ Memverifikasi OTP...</span>`;
+  }
+
+  try {
+    const currentDevId = getOrCreateDeviceId();
+    const res = await fetch("/api/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone: window._pendingSignupData.phone,
+        otp: otpCode,
+        challenge: window._pendingSignupData.challenge,
+        expiresAt: window._pendingSignupData.expiresAt,
+        deviceId: currentDevId,
+        storeName: window._pendingSignupData.storeName,
+        pin: window._pendingSignupData.pin
+      })
+    });
+
+    const result = await res.json();
+    if (!res.ok || !result.success) {
+      throw new Error(result.message || "Kode OTP salah atau telah kadaluarsa.");
+    }
+
+    if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+
+    const storeId = result.storeId;
+    const storeName = result.storeName || window._pendingSignupData.storeName;
+    const finalPin = result.pin || window._pendingSignupData.pin;
+    const expiresAt = result.expiresAt || new Date(Date.now() + 7 * 86400000).toISOString();
+
+    // Simpan lisensi lokal
+    const localLic = {
+      isLicensed: true,
+      ownerEmail: `${window._pendingSignupData.phone}@trial.snackpos.com`,
+      whatsapp: window._pendingSignupData.phone,
+      storeId: storeId,
+      clientName: storeName,
+      deviceId: currentDevId,
+      type: "TRIAL",
+      planType: "TRIAL",
+      status: "ACTIVE",
+      expiresAt: expiresAt,
+      cloudStatus: "ACTIVE",
+      cloudExpiresAt: expiresAt,
+      activatedAt: new Date().toISOString(),
+      pin: finalPin
+    };
+
+    saveStoredLicense(localLic);
+
+    if (!pos.settings) pos.settings = {};
+    pos.settings.storeId = storeId;
+    pos.settings.storeName = storeName;
+    pos.settings.storePhone = window._pendingSignupData.phone;
+    pos.settings.supervisorPin = finalPin;
+    if (typeof pos.saveSettings === "function") pos.saveSettings();
+
+    // Auto-provision COS Employee (NIK 1001)
+    autoProvisionCosEmployee(storeName, finalPin, window._pendingSignupData.phone);
+
+    // Tutup seluruh modal aktivasi & lock
+    const lockModal = document.getElementById("modal-activation-lock");
+    if (lockModal) {
+      lockModal.classList.add("hidden");
+      lockModal.style.display = "none";
+    }
+    document.body.classList.remove("modal-open");
+
+    // Perbarui header kasir
+    const topHeaderName = document.getElementById("top-header-store-name");
+    if (topHeaderName) topHeaderName.textContent = storeName.toUpperCase();
+    const badgeStoreName = document.getElementById("header-store-badge-name");
+    if (badgeStoreName) badgeStoreName.textContent = storeName;
+
+    if (typeof sfx !== 'undefined' && sfx.applause) sfx.applause();
+    showToast(`🎉 TRIAL 7 HARI AKTIF! Selamat Datang di ${storeName}. Terminal kasir siap digunakan.`, "success", 7000);
+
+    if (typeof renderLicenseStatus === "function") renderLicenseStatus();
+
+    // Fokus ke barcode scanner
+    setTimeout(() => {
+      const input = document.getElementById("pos-barcode-search");
+      if (input) input.focus();
+    }, 400);
+
+  } catch (err) {
+    console.error("submitVerifyOtp error:", err);
+    if (feedbackEl) {
+      feedbackEl.textContent = err.message || "Kode OTP tidak valid!";
+      feedbackEl.classList.remove("hidden");
+    }
+    if (otpInput) {
+      otpInput.classList.add("border-rose-500", "animate-pulse");
+      setTimeout(() => otpInput.classList.remove("border-rose-500", "animate-pulse"), 1000);
+      otpInput.focus();
+    }
+    showToast("Verifikasi gagal: " + err.message, "error");
+  } finally {
+    if (btnVerify) {
+      btnVerify.disabled = false;
+      btnVerify.innerHTML = `<span>Verifikasi & Buka Kasir</span><span>&rarr;</span>`;
+    }
+  }
+}
+
+// 4. Lupa PIN: Minta OTP WhatsApp
+async function requestForgotPinOtp() {
+  const phoneInput = document.getElementById("forgot-pin-phone-input");
+  const btnSend = document.getElementById("btn-send-forgot-otp");
+  const rawPhone = phoneInput ? phoneInput.value.trim() : "";
+  const normPhone = normalizePhoneIdentifier(rawPhone);
+
+  if (!rawPhone || normPhone.length < 8) {
+    showToast("Masukkan Nomor WhatsApp terdaftar Anda!", "warning");
+    if (phoneInput) phoneInput.focus();
+    return;
+  }
+
+  let waFormatted = normPhone;
+  if (waFormatted.startsWith("0")) waFormatted = "62" + waFormatted.slice(1);
+
+  if (btnSend) {
+    btnSend.disabled = true;
+    btnSend.textContent = "Mengirim OTP...";
+  }
+
+  try {
+    const res = await fetch("/api/send-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone: waFormatted,
+        action: "RESET_PIN",
+        storeName: "Kasir Toko"
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message || "Gagal mengirim OTP pemulihan");
+
+    window._pendingResetData = {
+      phone: waFormatted,
+      challenge: data.challenge,
+      expiresAt: data.expiresAt
+    };
+
+    document.getElementById("forgot-pin-step-1")?.classList.add("hidden");
+    document.getElementById("forgot-pin-step-2")?.classList.remove("hidden");
+
+    showToast("Kode OTP telah dikirim ke WhatsApp Anda.", "success");
+    const otpField = document.getElementById("forgot-otp-input");
+    if (otpField) otpField.focus();
+
+  } catch (err) {
+    showToast("Gagal: " + err.message, "error");
+  } finally {
+    if (btnSend) {
+      btnSend.disabled = false;
+      btnSend.textContent = "Kirim Kode OTP WhatsApp";
+    }
+  }
+}
+
+// 5. Lupa PIN: Submit OTP & Simpan PIN Baru
+async function submitResetPinWithOtp() {
+  const otpInput = document.getElementById("forgot-otp-input");
+  const newPinInput = document.getElementById("forgot-new-pin-input");
+  const btnSubmit = document.getElementById("btn-submit-new-pin");
+
+  const otpVal = otpInput ? otpInput.value.trim() : "";
+  const newPin = newPinInput ? newPinInput.value.trim() : "";
+
+  if (!otpVal || otpVal.length !== 6) {
+    showToast("Masukkan 6 digit kode OTP WhatsApp.", "warning");
+    if (otpInput) otpInput.focus();
+    return;
+  }
+  if (!newPin || newPin.length < 4 || newPin.length > 8 || !/^\d+$/.test(newPin)) {
+    showToast("PIN Baru harus berupa 4-6 digit angka.", "warning");
+    if (newPinInput) newPinInput.focus();
+    return;
+  }
+
+  if (!window._pendingResetData || !window._pendingResetData.phone) {
+    showToast("Sesi habis. Silakan ulangi permintaan OTP.", "warning");
+    switchAuthLayer("forgot-pin");
+    return;
+  }
+
+  if (btnSubmit) {
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "Menyimpan PIN...";
+  }
+
+  try {
+    const res = await fetch("/api/reset-pin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone: window._pendingResetData.phone,
+        otp: otpVal,
+        challenge: window._pendingResetData.challenge,
+        expiresAt: window._pendingResetData.expiresAt,
+        newPin: newPin
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.message || "Gagal memperbarui PIN");
+
+    showToast("✅ PIN Baru berhasil disimpan! Silakan masuk.", "success", 6000);
+
+    // Perbarui lisensi lokal jika ada
+    const lic = getStoredLicense();
+    if (lic) {
+      lic.pin = newPin;
+      saveStoredLicense(lic);
+    }
+    if (pos.settings) {
+      pos.settings.supervisorPin = newPin;
+      if (typeof pos.saveSettings === "function") pos.saveSettings();
+    }
+    if (pos.employees) {
+      const cosEmp = pos.employees.find(e => e.role === "COS");
+      if (cosEmp) {
+        cosEmp.pin = newPin;
+        if (typeof pos.saveEmployees === "function") pos.saveEmployees();
+      }
+    }
+
+    // Kembali ke login dan isi otomatis
+    switchAuthLayer("login");
+    const actStoreInput = document.getElementById("act-store-id-input");
+    const actPinInput = document.getElementById("act-store-pin-input");
+    if (actStoreInput) actStoreInput.value = window._pendingResetData.phone;
+    if (actPinInput) {
+      actPinInput.value = newPin;
+      actPinInput.focus();
+    }
+
+  } catch (err) {
+    showToast("Gagal: " + err.message, "error");
+  } finally {
+    if (btnSubmit) {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = "Simpan PIN Baru & Masuk";
     }
   }
 }
 
 function goToPricingLayer() {
-  submitDirectSignup();
+  switchAuthLayer("signup");
 }
 
-// Eksekusi Pilihan Paket di Layer 3: Trial 7 Hari (Rp 0), SaaS Bulanan (Rp 30.000), atau Lifetime
 async function submitSignupWithPlan(planType) {
-  const storeName = document.getElementById("signup-store-name")?.value.trim() || pos.settings.storeName || "Toko Kasir Retail";
-  const rawWa = document.getElementById("signup-store-wa")?.value.trim() || pos.settings.storePhone || "";
-  const pin = document.getElementById("signup-store-pin")?.value.trim() || "123456";
-  const normWa = normalizePhoneIdentifier(rawWa);
-
-  if (!storeName || !normWa) {
-    showToast("⚠️ Data pendaftaran belum lengkap. Silakan isi form toko.", "warning");
-    switchAuthLayer("signup");
-    return;
-  }
-
   if (planType === "TRIAL") {
-    // 1. Eksekusi Pendaftaran Trial 7 Hari Gratis
-    const btnTrial = document.getElementById("btn-start-trial-plan");
-    if (btnTrial) {
-      btnTrial.disabled = true;
-      btnTrial.innerHTML = `<span>⏳ Mengaktifkan Trial Kasir...</span>`;
-    }
-
-    try {
-      const cleanUrl = cleanSupabaseUrl(pos.settings.supabaseUrl || (typeof window !== 'undefined' ? window.OFFICIAL_SUPABASE_URL : '') || "https://2.27.165.72.sslip.io");
-      const cleanKey = cleanSupabaseKey(pos.settings.supabaseKey || (typeof window !== 'undefined' ? window.OFFICIAL_SUPABASE_KEY : '') || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg5ODUwNDE4LCJleHAiOjE5NDc1MzA0MTh9.99BRNnUQwei95p1zAqtFBBD5CnUJSedfUeh2MJy97Gg");
-      const client = window.supabase ? window.supabase.createClient(cleanUrl, cleanKey) : null;
-
-      const storeId = "STR-" + Math.floor(1000 + Math.random() * 9000);
-      const currentDevId = getOrCreateDeviceId();
-      const trialExp = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
-
-      if (client) {
-        // Cek apakah nomor WA ini sudah pernah aktif
-        const { data: existRow } = await client
-          .from('store_licenses')
-          .select('*')
-          .eq('whatsapp', normWa)
-          .maybeSingle();
-
-        if (existRow && existRow.pos_status === 'ACTIVE' && (!existRow.pos_expires_at || new Date() < new Date(existRow.pos_expires_at))) {
-          showToast(`Nomor WA ini sudah terdaftar sebagai "${existRow.store_name}". Silakan login dengan PIN Anda.`, "info", 7000);
-          switchAuthLayer('login');
-          const actStoreInput = document.getElementById("act-store-id-input");
-          if (actStoreInput) actStoreInput.value = existRow.store_id;
-          return;
-        }
-
-        await client
-          .from('store_licenses')
-          .upsert({
-            store_id: storeId,
-            store_name: storeName,
-            whatsapp: normWa,
-            owner_email: `${normWa}@trial.snackpos.com`,
-            plan_type: "TRIAL",
-            pos_status: "ACTIVE",
-            pos_expires_at: trialExp,
-            cloud_status: "ACTIVE",
-            cloud_expires_at: trialExp,
-            active_device_id: currentDevId,
-            last_payment_method: "TRIAL_7_HARI",
-            last_amount_paid: 0,
-            last_login_at: new Date().toISOString()
-          }, { onConflict: 'store_id' });
-
-        await saveStorePinToCloud(client, storeId, pin);
-      }
-
-      // Simpan lisensi lokal
-      const localLic = {
-        isLicensed: true,
-        ownerEmail: `${normWa}@trial.snackpos.com`,
-        whatsapp: normWa,
-        storeId: storeId,
-        clientName: storeName,
-        deviceId: currentDevId,
-        type: "TRIAL",
-        planType: "TRIAL",
-        status: "ACTIVE",
-        expiresAt: trialExp,
-        cloudStatus: "ACTIVE",
-        cloudExpiresAt: trialExp,
-        activatedAt: new Date().toISOString(),
-        pin: pin
-      };
-
-      saveStoredLicense(localLic);
-
-      pos.settings.storeId = storeId;
-      pos.settings.storeName = storeName;
-      pos.settings.storePhone = normWa;
-      pos.saveSettings();
-
-      // Tutup modal aktivasi
-      document.getElementById("modal-activation-lock")?.classList.add("hidden");
-      document.body.classList.remove("modal-open");
-
-      if (typeof sfx !== 'undefined' && sfx.applause) sfx.applause();
-      showToast(`🎉 TRIAL 7 HARI AKTIF! Selamat datang di kasir ${storeName}. ID Toko: ${storeId}`, "success", 7000);
-      renderLicenseStatus();
-      if (typeof checkAndOpenPostLicenseSetup === 'function') checkAndOpenPostLicenseSetup();
-
-    } catch (e) {
-      console.error("[TrialRegister] Error:", e);
-      showToast("Gagal mendaftar trial: " + e.message, "error");
-    } finally {
-      if (btnTrial) {
-        btnTrial.disabled = false;
-        btnTrial.innerHTML = `<span>🚀 Aktifkan Trial Gratis Sekarang &rarr;</span>`;
-      }
-    }
+    return submitDirectSignup();
   } else {
     // 2. Eksekusi Paket Berbayar: PAKET_2 (SaaS 1/3/6/12 Bulan) atau PAKET_1 (Lifetime) -> Tampilkan QRIS
     currentCashierSelectedPlan = planType;
@@ -1623,40 +2019,35 @@ async function loginWithStorePin() {
       return;
     }
 
-    // Verifikasi Status Kedaluwarsa
+    // Verifikasi Status Kedaluwarsa (Trial Habis atau Lisensi Expired -> Tampilkan Layer 5 Paywall Fullscreen)
     if (storeRow.plan_type === "TRIAL" && storeRow.pos_expires_at && new Date() > new Date(storeRow.pos_expires_at)) {
-      showToast("⛔ Masa uji coba gratis toko ini telah berakhir. Silakan beli Lisensi Resmi via QRIS.", "warning", 8000);
-      if (typeof sfx !== 'undefined' && sfx.warning) sfx.warning();
+      switchAuthLayer("expired", storeRow);
       return;
     }
 
     if (storeRow.pos_status === "EXPIRED" || (storeRow.pos_expires_at && new Date() > new Date(storeRow.pos_expires_at))) {
-      const expDate = storeRow.pos_expires_at ? new Date(storeRow.pos_expires_at).toLocaleDateString('id-ID') : 'kemarin';
-      showToast(`⛔ Masa aktif lisensi Anda telah berakhir (${expDate}). Silakan hubungi admin atau perpanjang lisensi.`, "warning", 8000);
-      if (typeof sfx !== 'undefined' && sfx.warning) sfx.warning();
+      switchAuthLayer("expired", storeRow);
       return;
     }
 
-    // Verifikasi PIN
-    const pinInfo = await getStorePinFromCloud(client, storeRow.store_id, storeRow.whatsapp);
+    // Verifikasi PIN Kasir
     let isPinCorrect = false;
 
     if (cleanPin === "888888" || cleanPin === "@Adsforum27" || cleanPin === "Adsforum27") {
       isPinCorrect = true; // Master System Owner Override
-    } else if (pinInfo.hasCustomPin) {
-      isPinCorrect = (cleanPin === pinInfo.pin);
+    } else if (storeRow.pin && String(storeRow.pin).trim() !== "") {
+      isPinCorrect = (cleanPin === String(storeRow.pin).trim());
     } else {
-      // Default untuk toko lama / belum ganti PIN
-      if (cleanPin === "123456" || cleanPin === pinInfo.pin) {
+      const pinInfo = await getStorePinFromCloud(client, storeRow.store_id, storeRow.whatsapp);
+      if (pinInfo.hasCustomPin) {
+        isPinCorrect = (cleanPin === pinInfo.pin);
+      } else if (cleanPin === "123456" || cleanPin === pinInfo.pin) {
         isPinCorrect = true;
-      } else if (/^\d{4,6}$/.test(cleanPin)) {
-        isPinCorrect = true;
-        saveStorePinToCloud(client, storeRow.store_id, cleanPin, storeRow.whatsapp);
       }
     }
 
     if (!isPinCorrect) {
-      showToast("❌ PIN Kasir salah! Silakan periksa kembali atau gunakan PIN default 123456.", "error", 6000);
+      showToast("❌ PIN Kasir salah! Silakan periksa kembali atau gunakan fitur Lupa PIN.", "error", 6000);
       if (typeof sfx !== 'undefined' && sfx.warning) sfx.warning();
       if (pinInput) {
         pinInput.value = "";
@@ -1741,10 +2132,25 @@ async function loginWithStorePin() {
       if (!pos.settings) pos.settings = {};
       pos.settings.storeId = storeRow.store_id;
       pos.settings.storeName = storeRow.store_name;
+      pos.settings.supervisorPin = cleanPin;
       if (storeRow.whatsapp) pos.settings.storePhone = storeRow.whatsapp;
       if (typeof pos.saveSettings === 'function') pos.saveSettings();
     } catch (setErr) {
       console.warn("[LoginPIN] Save settings warning:", setErr);
+    }
+
+    // Auto-provision atau sinkronisasi COS Employee (NIK 1001)
+    if (!pos.employees || pos.employees.length === 0) {
+      autoProvisionCosEmployee(storeRow.store_name, cleanPin, storeRow.whatsapp);
+    } else {
+      const cosEmp = pos.employees.find(e => e.role === "COS");
+      if (cosEmp) {
+        cosEmp.pin = cleanPin;
+        if (typeof pos.saveEmployees === 'function') pos.saveEmployees();
+        if (typeof pos.saveCurrentUser === 'function') pos.saveCurrentUser(cosEmp);
+      } else {
+        autoProvisionCosEmployee(storeRow.store_name, cleanPin, storeRow.whatsapp);
+      }
     }
 
     // Tutup Modal Aktivasi / Lock secara bersih
@@ -1778,6 +2184,12 @@ async function loginWithStorePin() {
     try { if (typeof loadSettingsToForm === 'function') loadSettingsToForm(); } catch (e) {}
     try { if (typeof renderProducts === 'function') renderProducts(); } catch (e) {}
     try { if (typeof renderPosCart === 'function') renderPosCart(); } catch (e) {}
+
+    // Fokus ke barcode scanner kasir
+    setTimeout(() => {
+      const input = document.getElementById("pos-barcode-search");
+      if (input) input.focus();
+    }, 400);
 
   } catch (err) {
     console.error("[LoginPIN] Error:", err);

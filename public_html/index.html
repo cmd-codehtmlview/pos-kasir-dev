@@ -6619,39 +6619,63 @@
 
   </div>
 
-  <!-- MODAL 9: KUNCI AKTIVASI LISENSI RESMI (CLEAN 3-LAYER ONBOARDING & LOGIN) -->
-  <div id="modal-activation-lock" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[9999] no-print">
-    <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col">
-      
-      <!-- LAYER 1: LOGIN -->
-      <div id="auth-layer-login" class="p-6 space-y-4">
-        <!-- Top Bar with Close Button -->
-        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-          <h2 class="text-base font-bold text-slate-900">Login</h2>
-          <button type="button" id="btn-close-store-login" onclick="closeStoreLoginModal()" class="text-xs font-semibold text-slate-400 hover:text-slate-700 cursor-pointer">Tutup</button>
+  <!-- ============================================================ -->
+  <!-- SISTEM FULLSCREEN AUTH & LISENSI KASIR (100% CLEAN EDGE-TO-EDGE) -->
+  <!-- ============================================================ -->
+  <div id="modal-activation-lock" class="hidden fixed inset-0 w-full h-full min-h-screen bg-slate-950 text-slate-100 z-[99999] flex flex-col justify-between p-4 sm:p-8 no-print overflow-y-auto selection:bg-emerald-500 selection:text-white">
+    
+    <!-- Top Branding Bar -->
+    <div class="w-full max-w-md mx-auto pt-2 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-base">
+          🏪
+        </div>
+        <span class="font-black text-sm tracking-tight text-white">Snack<span class="text-emerald-400">POS</span></span>
+      </div>
+      <button type="button" id="btn-close-store-login" onclick="closeStoreLoginModal()" class="hidden text-xs font-semibold text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 cursor-pointer">Tutup</button>
+    </div>
+
+    <!-- MAIN BODY CONTAINER -->
+    <div class="w-full max-w-md mx-auto my-auto py-6">
+
+      <!-- ========================================== -->
+      <!-- LAYER 1: SAMBUTAN & LOGIN KASIR (DEFAULT) -->
+      <!-- ========================================== -->
+      <div id="auth-layer-login" class="space-y-6">
+        
+        <!-- Sambutan Header -->
+        <div class="text-left space-y-1">
+          <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Selamat Datang 👋</h1>
+          <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Masuk ke akun toko Anda untuk memulai transaksi kasir hari ini.
+          </p>
         </div>
 
         <!-- Form Login -->
-        <div class="space-y-3">
+        <div class="space-y-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">ID Toko / No. HP</label>
-            <input type="text" id="act-store-id-input" placeholder="ID Toko atau No. HP"
-              onkeydown="if(event.key==='Enter'){ const p = document.getElementById('act-store-pin-input'); if(p && !p.value) p.focus(); else loginWithStorePin(); }"
-              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-lg text-xs font-medium text-slate-900 focus:outline-none transition">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">No. WhatsApp / ID Toko</label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm">📱</span>
+              <input type="text" id="act-store-id-input" placeholder="081234567890 atau STR-4821"
+                onkeydown="if(event.key==='Enter'){ const p = document.getElementById('act-store-pin-input'); if(p && !p.value) p.focus(); else loginWithStorePin(); }"
+                class="w-full pl-10 pr-3.5 py-3 bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-2xl text-xs sm:text-sm font-medium text-white focus:outline-none transition shadow-inner">
+            </div>
           </div>
 
           <div>
-            <div class="flex items-center justify-between mb-1">
-              <label class="text-xs font-semibold text-slate-700">PIN</label>
-              <button type="button" onclick="toggleForgotPinForm(true)" class="text-xs text-slate-500 hover:text-slate-800 cursor-pointer">
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="text-xs font-bold text-slate-300 uppercase tracking-wider">PIN Kasir (6 Digit)</label>
+              <button type="button" onclick="switchAuthLayer('forgot-pin')" class="text-xs text-emerald-400 hover:text-emerald-300 font-medium cursor-pointer">
                 Lupa PIN?
               </button>
             </div>
             <div class="relative">
-              <input type="password" id="act-store-pin-input" maxlength="6" placeholder="PIN"
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm">🔐</span>
+              <input type="password" id="act-store-pin-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="••••••"
                 onkeydown="if(event.key==='Enter'){ loginWithStorePin(); }"
-                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-lg font-mono text-center text-sm tracking-widest text-slate-900 focus:outline-none transition pr-16">
-              <button type="button" onclick="toggleStorePinVisibility()" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-800 px-1 py-0.5 cursor-pointer">
+                class="w-full pl-10 pr-16 py-3 bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-2xl font-mono text-center text-base tracking-[0.3em] text-white focus:outline-none transition shadow-inner">
+              <button type="button" onclick="toggleStorePinVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white px-2 py-1 rounded-lg bg-slate-800 cursor-pointer">
                 <span id="pin-toggle-icon">Lihat</span>
                 <span id="btn-toggle-pin-text" class="hidden">Lihat</span>
               </button>
@@ -6659,94 +6683,250 @@
           </div>
 
           <button type="button" id="btn-submit-pin-login" onclick="loginWithStorePin()"
-            class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition cursor-pointer">
-            Masuk
+            class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm rounded-2xl transition shadow-lg shadow-emerald-950/60 active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2">
+            <span>Masuk ke Kasir</span>
+            <span>&rarr;</span>
           </button>
         </div>
 
-        <!-- Form Pemulihan Lupa PIN -->
-        <div id="form-store-reset-pin-pane" class="hidden p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2.5">
-          <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
-            <span class="text-xs font-semibold text-slate-800">Pemulihan PIN</span>
-            <button type="button" onclick="toggleForgotPinForm(false)" class="text-xs text-slate-500 hover:text-slate-800 cursor-pointer">Tutup</button>
-          </div>
-          <div>
-            <label class="block text-[11px] font-medium text-slate-600 mb-0.5">ID Toko</label>
-            <input type="text" id="reset-store-id-input" placeholder="ID Toko"
-              class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-xs text-slate-900 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Nomor WhatsApp</label>
-            <input type="tel" id="reset-store-wa-input" placeholder="Nomor WhatsApp"
-              class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-xs text-slate-900 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-[11px] font-medium text-slate-600 mb-0.5">PIN Baru</label>
-            <input type="password" id="reset-store-new-pin-input" maxlength="6" placeholder="PIN Baru"
-              class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md font-mono text-center text-xs tracking-widest text-slate-900 focus:outline-none">
-          </div>
-          <button type="button" id="btn-submit-reset-pin" onclick="submitResetStorePin()"
-            class="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-md transition cursor-pointer">
-            Simpan PIN Baru
-          </button>
+        <!-- Footer: Daftar Switch -->
+        <div class="pt-4 border-t border-slate-900 text-center">
+          <p class="text-xs text-slate-400">
+            Belum punya akun toko? 
+            <button type="button" onclick="switchAuthLayer('signup')" class="text-emerald-400 hover:text-emerald-300 font-bold ml-1 cursor-pointer underline">
+              Daftar Sekarang
+            </button>
+          </p>
         </div>
 
-        <!-- Footer: Sign Up Switch -->
-        <div class="pt-3 border-t border-slate-100 text-center">
-          <button type="button" onclick="switchAuthLayer('signup')"
-            class="text-xs text-slate-600 hover:text-slate-900 font-medium cursor-pointer">
-            Belum punya akun? Daftar
-          </button>
-        </div>
       </div>
 
-      <!-- LAYER 2: DAFTAR -->
-      <div id="auth-layer-signup" class="hidden p-6 space-y-4">
-        <!-- Top Bar with Back Button -->
-        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-          <h2 class="text-base font-bold text-slate-900">Daftar</h2>
-          <button type="button" onclick="switchAuthLayer('login')" class="text-xs font-semibold text-slate-500 hover:text-slate-800 cursor-pointer">
-            Masuk
+      <!-- ========================================== -->
+      <!-- LAYER 2: PENDAFTARAN TRIAL 7 HARI FULLSCREEN -->
+      <!-- ========================================== -->
+      <div id="auth-layer-signup" class="space-y-6 hidden">
+        
+        <!-- Header Daftar -->
+        <div class="space-y-2">
+          <button type="button" onclick="switchAuthLayer('login')" class="text-xs font-semibold text-slate-400 hover:text-white inline-flex items-center gap-1.5 transition cursor-pointer">
+            <span>&larr;</span>
+            <span>Sudah punya akun? Masuk</span>
           </button>
+          
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-bold">
+            <span>🎉</span>
+            <span>Uji Coba Gratis 7 Hari (Akses Penuh)</span>
+          </div>
+
+          <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Daftar Toko Baru</h2>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Coba seluruh fitur kasir tanpa biaya di 7 hari pertama. Tanpa kartu kredit.
+          </p>
         </div>
 
-        <div class="space-y-3">
+        <!-- Form Pendaftaran -->
+        <div class="space-y-3.5">
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Toko</label>
-            <input type="text" id="signup-store-name" placeholder="Nama Toko"
-              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-lg text-xs font-medium text-slate-900 focus:outline-none transition">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Nama Toko</label>
+            <input type="text" id="signup-store-name" placeholder="Contoh: Kedai Kopi Bahagia"
+              class="w-full px-4 py-3 bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-2xl text-xs sm:text-sm font-medium text-white focus:outline-none transition shadow-inner">
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp</label>
-            <input type="tel" id="signup-store-wa" placeholder="Nomor WhatsApp"
-              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-lg text-xs font-medium text-slate-900 focus:outline-none transition">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Nomor WhatsApp Owner</label>
+            <input type="tel" id="signup-store-wa" placeholder="Contoh: 081234567890"
+              class="w-full px-4 py-3 bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-2xl text-xs sm:text-sm font-mono text-white focus:outline-none transition shadow-inner">
+            <p class="text-[10px] text-slate-500 mt-1">Kode OTP verifikasi aktivasi kasir akan dikirim ke nomor ini.</p>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">PIN</label>
-            <input type="password" id="signup-store-pin" maxlength="6" placeholder="PIN"
-              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-lg font-mono text-center text-sm tracking-widest text-slate-900 focus:outline-none transition">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Buat PIN Kasir (6 Digit Angka)</label>
+            <input type="password" id="signup-store-pin" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="••••••"
+              class="w-full px-4 py-3 bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-2xl font-mono text-center text-base tracking-[0.3em] text-white focus:outline-none transition shadow-inner">
+            <p class="text-[10px] text-slate-500 mt-1">PIN ini digunakan untuk login kasir sehari-hari dan membuka Portal Owner.</p>
           </div>
 
           <button type="button" id="btn-submit-signup" onclick="submitDirectSignup()"
-            class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition cursor-pointer">
-            Daftar
+            class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm rounded-2xl transition shadow-lg shadow-emerald-950/60 active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2 mt-2">
+            <span>Mulai Coba Gratis 7 Hari</span>
+            <span>&rarr;</span>
           </button>
         </div>
 
-        <div class="pt-3 border-t border-slate-100 text-center">
-          <button type="button" onclick="switchAuthLayer('login')"
-            class="text-xs text-slate-600 hover:text-slate-900 font-medium cursor-pointer">
-            Sudah punya akun? Masuk
+        <div class="pt-3 border-t border-slate-900 text-center">
+          <p class="text-xs text-slate-400">
+            Sudah memiliki akun? 
+            <button type="button" onclick="switchAuthLayer('login')" class="text-emerald-400 hover:text-emerald-300 font-bold ml-1 cursor-pointer underline">
+              Masuk di sini
+            </button>
+          </p>
+        </div>
+
+      </div>
+
+      <!-- ========================================== -->
+      <!-- LAYER 3: VERIFIKASI OTP WHATSAPP FULLSCREEN -->
+      <!-- ========================================== -->
+      <div id="auth-layer-otp" class="space-y-6 text-center hidden">
+        
+        <div class="w-16 h-16 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-3xl mx-auto flex items-center justify-center shadow-inner">
+          💬
+        </div>
+
+        <div class="space-y-1.5">
+          <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Verifikasi WhatsApp</h2>
+          <p class="text-xs text-slate-400">
+            Masukkan 6 digit kode OTP yang telah dikirim ke:
+          </p>
+          <p id="otp-target-display" class="text-sm font-mono font-bold text-emerald-400">+62 812-xxxx-xxxx</p>
+        </div>
+
+        <!-- Input 6 Digit OTP -->
+        <div class="space-y-3">
+          <div class="flex justify-center">
+            <input type="text" id="otp-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="••••••" autofocus
+              onkeydown="if(event.key==='Enter') submitVerifyOtp();"
+              class="w-56 py-3.5 bg-slate-900 border-2 border-emerald-500/60 focus:border-emerald-400 rounded-2xl font-mono text-center text-2xl tracking-[0.4em] text-white focus:outline-none transition shadow-2xl">
+          </div>
+          <p id="otp-feedback" class="text-xs font-semibold text-rose-400 hidden"></p>
+        </div>
+
+        <!-- Tombol Verifikasi -->
+        <div class="space-y-3 pt-2">
+          <button type="button" id="btn-verify-otp" onclick="submitVerifyOtp()"
+            class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm rounded-2xl transition shadow-lg shadow-emerald-950/60 active:scale-[0.99] cursor-pointer flex items-center justify-center gap-2">
+            <span>Verifikasi & Buka Kasir</span>
+            <span>&rarr;</span>
+          </button>
+
+          <div class="flex items-center justify-between text-xs text-slate-400 px-2 font-medium">
+            <span id="otp-timer-text">Kirim ulang dalam <b id="otp-countdown" class="text-white font-mono">60s</b></span>
+            <button type="button" id="btn-resend-otp" onclick="resendSignupOtp()" class="text-emerald-400 hover:text-emerald-300 disabled:opacity-40 cursor-pointer hidden">
+              Kirim Ulang Kode
+            </button>
+            <button type="button" onclick="switchAuthLayer('signup')" class="text-slate-400 hover:text-white cursor-pointer">
+              Ganti Nomor
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========================================== -->
+      <!-- LAYER 4: LUPA PIN / PEMULIHAN PIN FULLSCREEN -->
+      <!-- ========================================== -->
+      <div id="auth-layer-forgot-pin" class="space-y-5 hidden">
+        
+        <div class="space-y-2">
+          <button type="button" onclick="switchAuthLayer('login')" class="text-xs font-semibold text-slate-400 hover:text-white inline-flex items-center gap-1.5 transition cursor-pointer">
+            <span>&larr;</span>
+            <span>Kembali ke Login</span>
+          </button>
+          <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Pemulihan PIN Kasir</h2>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Masukkan nomor WhatsApp toko Anda untuk menerima kode OTP keamanan pembuatan PIN baru.
+          </p>
+        </div>
+
+        <!-- Step 1: Input Nomor WhatsApp -->
+        <div id="forgot-pin-step-1" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Nomor WhatsApp Toko</label>
+            <input type="tel" id="forgot-pin-phone-input" placeholder="081234567890"
+              class="w-full px-4 py-3 bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-2xl text-xs sm:text-sm font-mono text-white focus:outline-none transition shadow-inner">
+          </div>
+          <button type="button" id="btn-send-forgot-otp" onclick="requestForgotPinOtp()"
+            class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-2xl transition cursor-pointer">
+            Kirim Kode OTP WhatsApp
           </button>
         </div>
+
+        <!-- Step 2: Input OTP & PIN Baru -->
+        <div id="forgot-pin-step-2" class="space-y-3 hidden">
+          <div class="p-3 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-xs text-emerald-300">
+            Kode OTP telah dikirim ke WhatsApp Anda.
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Kode OTP 6-Digit</label>
+            <input type="text" id="forgot-otp-input" maxlength="6" inputmode="numeric" placeholder="••••••"
+              class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl font-mono text-center text-lg tracking-[0.3em] text-white focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">PIN Baru (6 Digit Angka)</label>
+            <input type="password" id="forgot-new-pin-input" maxlength="6" inputmode="numeric" placeholder="••••••"
+              class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl font-mono text-center text-lg tracking-[0.3em] text-white focus:outline-none">
+          </div>
+          <button type="button" id="btn-submit-new-pin" onclick="submitResetPinWithOtp()"
+            class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-2xl transition cursor-pointer">
+            Simpan PIN Baru & Masuk
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ========================================== -->
+      <!-- LAYER 5: PAYWALL KUNCI TRIAL HABIS FULLSCREEN -->
+      <!-- ========================================== -->
+      <div id="auth-layer-expired" class="space-y-6 text-center hidden">
+        
+        <div class="w-16 h-16 rounded-3xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-3xl mx-auto flex items-center justify-center shadow-inner">
+          ⭐
+        </div>
+
+        <div class="space-y-1.5">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] font-bold">
+            <span>⏳</span>
+            <span>Masa Uji Coba Selesai</span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Masa Trial 7 Hari Telah Selesai</h2>
+          <p class="text-xs text-slate-400">
+            Toko: <b id="paywall-store-name" class="text-white">-</b> (<span id="paywall-store-id" class="font-mono text-slate-400">-</span>)
+          </p>
+        </div>
+
+        <!-- Safe Data Notice Card -->
+        <div class="p-4 bg-slate-900/90 border border-slate-800 rounded-2xl text-left space-y-1.5">
+          <p class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+            <span>✓</span> Data Anda Tersimpan Aman
+          </p>
+          <p class="text-[11px] text-slate-400 leading-relaxed">
+            Seluruh data produk, riwayat penjualan kasir, dan master data toko Anda selama masa uji coba tetap tersimpan aman di cloud.
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-2.5 pt-1">
+          <a id="btn-paywall-wa-admin" href="#" target="_blank"
+            class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm rounded-2xl transition shadow-lg shadow-emerald-950/60 active:scale-[0.99] flex items-center justify-center gap-2">
+            <span>💬</span>
+            <span>Hubungi WhatsApp Admin (Aktivasi)</span>
+          </a>
+
+          <a id="btn-paywall-qris-order" href="order.html"
+            class="w-full py-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 font-bold text-xs rounded-2xl transition flex items-center justify-center gap-2">
+            <span>💳</span>
+            <span>Beli / Perpanjang via QRIS Instan</span>
+          </a>
+
+          <div class="pt-3 border-t border-slate-900">
+            <button type="button" onclick="switchAuthLayer('login')" class="text-xs text-slate-500 hover:text-slate-300 font-medium cursor-pointer">
+              Masuk dengan Akun Toko Lain
+            </button>
+          </div>
+        </div>
+
       </div>
 
       <!-- Hidden Pricing Layer (Compatibility Fallback) -->
       <div id="auth-layer-pricing" class="hidden"></div>
 
     </div>
+
+    <!-- Bottom Footer Safe Area -->
+    <div class="w-full max-w-md mx-auto text-center pb-2">
+      <span class="text-[10px] text-slate-600 font-mono tracking-wider">SNACKPOS &bull; SECURE CLOUD GATEWAY</span>
+    </div>
+
   </div>
 
   <!-- ============================================================ -->
