@@ -940,17 +940,20 @@
         </div>
 
         <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800 text-center text-xs">
-          <div class="p-2 bg-slate-950 rounded-xl">
-            <span class="text-[10px] text-emerald-400 font-bold block">TUNAI</span>
-            <span id="payment-cash-pct" class="font-mono font-bold text-white text-xs">0%</span>
+          <div class="p-2 bg-slate-950 rounded-xl flex flex-col justify-between min-w-0">
+            <span class="text-[10px] text-emerald-400 font-bold block uppercase tracking-wider">TUNAI</span>
+            <span id="payment-cash-nominal" class="font-mono font-black text-white text-[11px] sm:text-xs my-0.5 truncate" title="Rp 0">Rp 0</span>
+            <span id="payment-cash-pct" class="text-[10px] text-slate-400 font-mono block">0%</span>
           </div>
-          <div class="p-2 bg-slate-950 rounded-xl">
-            <span class="text-[10px] text-blue-400 font-bold block">QRIS</span>
-            <span id="payment-qris-pct" class="font-mono font-bold text-white text-xs">0%</span>
+          <div class="p-2 bg-slate-950 rounded-xl flex flex-col justify-between min-w-0">
+            <span class="text-[10px] text-blue-400 font-bold block uppercase tracking-wider">QRIS</span>
+            <span id="payment-qris-nominal" class="font-mono font-black text-white text-[11px] sm:text-xs my-0.5 truncate" title="Rp 0">Rp 0</span>
+            <span id="payment-qris-pct" class="text-[10px] text-slate-400 font-mono block">0%</span>
           </div>
-          <div class="p-2 bg-slate-950 rounded-xl">
-            <span class="text-[10px] text-purple-400 font-bold block">TRANSFER</span>
-            <span id="payment-transfer-pct" class="font-mono font-bold text-white text-xs">0%</span>
+          <div class="p-2 bg-slate-950 rounded-xl flex flex-col justify-between min-w-0">
+            <span class="text-[10px] text-purple-400 font-bold block uppercase tracking-wider">TRANSFER</span>
+            <span id="payment-transfer-nominal" class="font-mono font-black text-white text-[11px] sm:text-xs my-0.5 truncate" title="Rp 0">Rp 0</span>
+            <span id="payment-transfer-pct" class="text-[10px] text-slate-400 font-mono block">0%</span>
           </div>
         </div>
       </div>
@@ -4308,42 +4311,112 @@
       if (!ctx) return;
 
       const transactions = getFilteredTransactions();
-      let cash = 0, qris = 0, transfer = 0;
+      let cashNominal = 0, qrisNominal = 0, transferNominal = 0;
+      let cashCount = 0, qrisCount = 0, transferCount = 0;
 
       transactions.forEach(t => {
         const method = (t.paymentMethod || 'cash').toLowerCase();
-        if (method === 'cash') cash++;
-        else if (method === 'qris') qris++;
-        else transfer++;
+        const amt = Number(t.grandTotal) || 0;
+        if (method === 'cash') {
+          cashNominal += amt;
+          cashCount++;
+        } else if (method === 'qris') {
+          qrisNominal += amt;
+          qrisCount++;
+        } else {
+          transferNominal += amt;
+          transferCount++;
+        }
       });
 
-      const total = cash + qris + transfer || 1;
-      document.getElementById("payment-cash-pct").textContent = `${Math.round((cash / total) * 100)}%`;
-      document.getElementById("payment-qris-pct").textContent = `${Math.round((qris / total) * 100)}%`;
-      document.getElementById("payment-transfer-pct").textContent = `${Math.round((transfer / total) * 100)}%`;
+      const totalNominal = cashNominal + qrisNominal + transferNominal;
+      const cashPct = totalNominal > 0 ? Math.round((cashNominal / totalNominal) * 100) : 0;
+      const qrisPct = totalNominal > 0 ? Math.round((qrisNominal / totalNominal) * 100) : 0;
+      const transferPct = totalNominal > 0 ? Math.max(0, 100 - cashPct - qrisPct) : 0;
+
+      // Update informasi di bawah lingkaran grafik (Nominal Rupiah & Persentase)
+      const elCashNom = document.getElementById("payment-cash-nominal");
+      const elCashPct = document.getElementById("payment-cash-pct");
+      if (elCashNom) {
+        elCashNom.textContent = formatRupiah(cashNominal);
+        elCashNom.title = `${formatRupiah(cashNominal)} (${cashCount} transaksi)`;
+      }
+      if (elCashPct) {
+        elCashPct.textContent = `${cashPct}% (${cashCount} trx)`;
+      }
+
+      const elQrisNom = document.getElementById("payment-qris-nominal");
+      const elQrisPct = document.getElementById("payment-qris-pct");
+      if (elQrisNom) {
+        elQrisNom.textContent = formatRupiah(qrisNominal);
+        elQrisNom.title = `${formatRupiah(qrisNominal)} (${qrisCount} transaksi)`;
+      }
+      if (elQrisPct) {
+        elQrisPct.textContent = `${qrisPct}% (${qrisCount} trx)`;
+      }
+
+      const elTrfNom = document.getElementById("payment-transfer-nominal");
+      const elTrfPct = document.getElementById("payment-transfer-pct");
+      if (elTrfNom) {
+        elTrfNom.textContent = formatRupiah(transferNominal);
+        elTrfNom.title = `${formatRupiah(transferNominal)} (${transferCount} transaksi)`;
+      }
+      if (elTrfPct) {
+        elTrfPct.textContent = `${transferPct}% (${transferCount} trx)`;
+      }
 
       if (paymentChartInstance) {
         paymentChartInstance.destroy();
       }
 
       const isLightMode = document.documentElement.classList.contains("theme-light");
+      const hasData = totalNominal > 0;
 
       paymentChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
           labels: ['Tunai', 'QRIS', 'Transfer'],
           datasets: [{
-            data: [cash, qris, transfer],
-            backgroundColor: ['#10b981', '#3b82f6', '#a855f7'],
+            data: hasData ? [cashNominal, qrisNominal, transferNominal] : [1],
+            backgroundColor: hasData ? ['#10b981', '#3b82f6', '#a855f7'] : [isLightMode ? '#e2e8f0' : '#1e293b'],
             borderColor: isLightMode ? '#ffffff' : '#0f172a',
-            borderWidth: 2
+            borderWidth: 2,
+            hoverOffset: hasData ? 6 : 0
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            tooltip: {
+              enabled: hasData,
+              backgroundColor: isLightMode ? 'rgba(255, 255, 255, 0.98)' : 'rgba(15, 23, 42, 0.96)',
+              titleColor: isLightMode ? '#0f172a' : '#ffffff',
+              bodyColor: isLightMode ? '#334155' : '#e2e8f0',
+              borderColor: isLightMode ? '#cbd5e1' : '#334155',
+              borderWidth: 1,
+              padding: 10,
+              boxPadding: 4,
+              cornerRadius: 12,
+              callbacks: {
+                title: function(items) {
+                  return items && items[0] ? `Metode: ${items[0].label}` : '';
+                },
+                label: function(context) {
+                  const val = context.raw || 0;
+                  const total = totalNominal || 1;
+                  const pct = totalNominal > 0 ? Math.round((val / total) * 100) : 0;
+                  return ` Nominal: ${formatRupiah(val)} (${pct}%)`;
+                },
+                afterLabel: function(context) {
+                  const idx = context.dataIndex;
+                  const counts = [cashCount, qrisCount, transferCount];
+                  const count = counts[idx] || 0;
+                  return ` Frekuensi: ${formatAngka(count)} transaksi`;
+                }
+              }
+            }
           },
           cutout: '70%'
         }
