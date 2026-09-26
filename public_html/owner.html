@@ -415,6 +415,41 @@
       color: #64748b !important;
     }
 
+    /* 7b. Tombol Aksi WhatsApp (PO WA & Chat WA Member) di Mode Light (Cerah, Fresh, Kontras Tinggi) */
+    html.theme-light .btn-po-wa,
+    html.theme-light a.btn-po-wa,
+    html.theme-light table td a.btn-po-wa,
+    html.theme-light table td a[class*="bg-emerald-"],
+    html.theme-light #owner-checkout-wa-btn {
+      background-color: #10b981 !important;
+      background: #10b981 !important;
+      color: #ffffff !important;
+      border: 1px solid #059669 !important;
+      box-shadow: 0 1px 3px 0 rgba(16, 185, 129, 0.25) !important;
+    }
+    html.theme-light .btn-po-wa:hover,
+    html.theme-light a.btn-po-wa:hover,
+    html.theme-light table td a.btn-po-wa:hover,
+    html.theme-light table td a[class*="bg-emerald-"]:hover,
+    html.theme-light #owner-checkout-wa-btn:hover {
+      background-color: #059669 !important;
+      background: #059669 !important;
+      color: #ffffff !important;
+    }
+    html.theme-light .btn-po-wa *,
+    html.theme-light a.btn-po-wa *,
+    html.theme-light table td a.btn-po-wa *,
+    html.theme-light table td a[class*="bg-emerald-"] *,
+    html.theme-light #owner-checkout-wa-btn * {
+      color: #ffffff !important;
+    }
+
+    /* Pastikan tombol berwarna merah / hijau primer tetap berteks putih di mode light */
+    html.theme-light .bg-alfa-red,
+    html.theme-light .bg-alfa-red * {
+      color: #ffffff !important;
+    }
+
     /* 8. Tables */
     html.theme-light table thead,
     html.theme-light table thead tr,
@@ -3432,7 +3467,7 @@
               <a 
                 href="https://wa.me/?text=${waText}" 
                 target="_blank" 
-                class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-[11px] font-bold shadow-xs transition-all"
+                class="btn-po-wa inline-flex items-center gap-1 px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[11px] font-bold shadow-xs transition-all cursor-pointer"
               >
                 <span>💬 PO WA</span>
               </a>
@@ -3610,7 +3645,7 @@
             <a 
               href="https://wa.me/?text=${waText}" 
               target="_blank" 
-              class="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-[10px] font-bold shadow-xs transition-all whitespace-nowrap"
+              class="btn-po-wa inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold shadow-xs transition-all whitespace-nowrap cursor-pointer"
             >
               <span>💬 PO WA</span>
             </a>
@@ -4227,8 +4262,8 @@
             </td>
             <td class="py-2.5 px-3 text-center whitespace-nowrap">
               ${waLink ? `
-                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-[10px] rounded-lg inline-flex items-center gap-1 transition shadow-xs cursor-pointer" title="Kirim Pesan WhatsApp">
-                  <span>WA</span>
+                <a href="${waLink}" target="_blank" rel="noopener noreferrer" class="btn-po-wa px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] rounded-lg inline-flex items-center gap-1 transition shadow-xs cursor-pointer" title="Kirim Pesan WhatsApp">
+                  <span>💬 WA</span>
                 </a>
               ` : `
                 <span class="text-slate-600 text-[10px]">-</span>
