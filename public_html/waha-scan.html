@@ -66,6 +66,33 @@
         <span id="countdown-text">Auto-refresh: 10s</span>
       </div>
 
+      <!-- Tombol Restart QR Manual jika perlu -->
+      <div class="pt-1">
+        <button type="button" onclick="restartSession()" id="btn-force-restart" class="text-xs text-slate-400 hover:text-emerald-400 font-medium transition inline-flex items-center gap-1.5 cursor-pointer">
+          <span>🔄</span>
+          <span>QR tidak terbaca? Buat QR Baru</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Container State: Failed / Expired -->
+    <div id="state-failed" class="py-6 text-center space-y-4 hidden">
+      <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-400 text-3xl mx-auto flex items-center justify-center border border-amber-500/20">
+        ⏱️
+      </div>
+      <div class="space-y-1">
+        <h2 class="text-base font-bold text-white">Waktu Scan Habis / Belum Sempat Scan</h2>
+        <p class="text-xs text-slate-400 max-w-xs mx-auto">
+          WhatsApp membatasi durasi aktif QR Code demi keamanan. Klik tombol di bawah untuk menampilkan QR Code baru.
+        </p>
+      </div>
+      <div>
+        <button type="button" onclick="restartSession()" id="btn-restart-expired" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition inline-flex items-center gap-2 shadow-lg shadow-emerald-950/50 cursor-pointer">
+          <span>🔄</span>
+          <span>Buat QR Code Baru Sekarang</span>
+        </button>
+      </div>
     </div>
 
     <!-- Container State: Connected / Working -->
@@ -107,17 +134,19 @@
     <!-- Container State: Starting / Loading -->
     <div id="state-starting" class="py-12 text-center space-y-3 hidden">
       <div class="w-10 h-10 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-      <p class="text-xs text-slate-300 font-medium">Sedang menyiapkan koneksi WhatsApp...</p>
+      <p id="starting-text" class="text-xs text-slate-300 font-medium">Sedang menyiapkan koneksi WhatsApp...</p>
     </div>
 
   </div>
 
   <script>
-    let countdown = 10;
+    let countdown = 20;
     let refreshInterval = null;
     let pollInterval = null;
+    let isRestarting = false;
 
     async function checkStatus() {
+      if (isRestarting) return;
       try {
         const res = await fetch('/api/waha/status');
         const data = await res.json();
@@ -125,10 +154,12 @@
         const stateScan = document.getElementById('state-scan-qr');
         const stateConnected = document.getElementById('state-connected');
         const stateStarting = document.getElementById('state-starting');
+        const stateFailed = document.getElementById('state-failed');
 
         if (data.status === 'WORKING') {
           stateScan.classList.add('hidden');
           stateStarting.classList.add('hidden');
+          stateFailed.classList.add('hidden');
           stateConnected.classList.remove('hidden');
 
           const phoneEl = document.getElementById('connected-phone');
@@ -140,15 +171,46 @@
         } else if (data.status === 'SCAN_QR_CODE') {
           stateStarting.classList.add('hidden');
           stateConnected.classList.add('hidden');
+          stateFailed.classList.add('hidden');
           stateScan.classList.remove('hidden');
+        } else if (data.status === 'FAILED' || data.status === 'STOPPED') {
+          stateStarting.classList.add('hidden');
+          stateConnected.classList.add('hidden');
+          stateScan.classList.add('hidden');
+          stateFailed.classList.remove('hidden');
         } else {
-          // STARTING / STOPPED
+          // STARTING
           stateScan.classList.add('hidden');
           stateConnected.classList.add('hidden');
+          stateFailed.classList.add('hidden');
           stateStarting.classList.remove('hidden');
         }
       } catch (e) {
         console.warn('Gagal cek status WAHA:', e);
+      }
+    }
+
+    async function restartSession() {
+      isRestarting = true;
+      const stateScan = document.getElementById('state-scan-qr');
+      const stateStarting = document.getElementById('state-starting');
+      const stateFailed = document.getElementById('state-failed');
+      const startText = document.getElementById('starting-text');
+
+      stateScan.classList.add('hidden');
+      stateFailed.classList.add('hidden');
+      stateStarting.classList.remove('hidden');
+      if (startText) startText.textContent = 'Membuat QR Code WhatsApp baru... Mohon tunggu...';
+
+      try {
+        await fetch('/api/waha/restart', { method: 'POST' });
+        await new Promise(r => setTimeout(r, 2000));
+        refreshQR();
+      } catch (err) {
+        console.error('Gagal restart sesi:', err);
+      } finally {
+        isRestarting = false;
+        checkStatus();
       }
     }
 
@@ -168,7 +230,7 @@
         };
         newImg.src = '/api/waha/qr?t=' + Date.now();
       }
-      countdown = 10;
+      countdown = 20;
     }
 
     function startTimers() {
@@ -234,3 +296,4 @@
   </script>
 </body>
 </html>
+
