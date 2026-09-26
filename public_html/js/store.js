@@ -767,31 +767,36 @@ function formatAngka(number) {
   return new Intl.NumberFormat("id-ID").format(number);
 }
 
-// Toast Notifikasi
-function showToast(message, type = "success") {
+// Toast Notifikasi (Opsi 2: Dynamic Pill - Minimalist & Non-Intrusive)
+function showToast(message, type = "success", duration = null) {
   const container = document.getElementById("toast-container");
   if (!container) return;
 
-  const toast = document.createElement("div");
-  const bgColors = {
-    success: "bg-emerald-600 text-white",
-    error: "bg-rose-600 text-white",
-    info: "bg-blue-600 text-white",
-    warning: "bg-amber-500 text-white"
+  const dotColors = {
+    success: "bg-emerald-400",
+    error: "bg-rose-400",
+    info: "bg-blue-400",
+    warning: "bg-amber-400"
   };
 
-  toast.className = `flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl text-xs font-bold transition-all duration-300 transform translate-y-2 opacity-0 z-50 ${bgColors[type] || bgColors.info}`;
-  toast.innerHTML = `<span>${message}</span>`;
+  const dot = dotColors[type] || dotColors.info;
+  const toast = document.createElement("div");
+  toast.className = "inline-flex items-center gap-2.5 px-4 py-2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl border border-slate-700/80 text-xs font-bold transition-all duration-300 transform -translate-y-3 opacity-0 pointer-events-auto select-none max-w-full truncate";
+  toast.innerHTML = `<span class="w-2 h-2 rounded-full ${dot} shrink-0 animate-pulse"></span><span class="leading-snug truncate">${message}</span>`;
 
   container.appendChild(toast);
   requestAnimationFrame(() => {
-    toast.classList.remove("translate-y-2", "opacity-0");
+    toast.classList.remove("-translate-y-3", "opacity-0");
   });
 
+  const displayTime = typeof duration === 'number' && duration > 0 
+    ? duration 
+    : (type === 'error' || type === 'warning' ? 3800 : 2500);
+
   setTimeout(() => {
-    toast.classList.add("opacity-0", "translate-y-2");
+    toast.classList.add("opacity-0", "-translate-y-3");
     setTimeout(() => toast.remove(), 300);
-  }, 2500);
+  }, displayTime);
 }
 
 function openModal(modalId) {

@@ -1906,8 +1906,8 @@
 
 
 
-  <!-- TOAST CONTAINER -->
-  <div id="owner-toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <!-- TOAST CONTAINER (DYNAMIC PILL TOP-CENTER) -->
+  <div id="owner-toast-container" class="fixed top-5 inset-x-0 mx-auto z-[999999] flex flex-col items-center gap-2 pointer-events-none w-full max-w-sm px-4"></div>
 
   <!-- ========================================== -->
   <!-- LOGIKA DASHBOARD OWNER JAVASCRIPT -->
@@ -1985,20 +1985,33 @@
       return new Intl.NumberFormat("id-ID").format(Number(num) || 0);
     }
 
-    function showToast(msg, type = "success") {
+    function showToast(msg, type = "success", duration = null) {
       const container = document.getElementById("owner-toast-container");
       if (!container) return;
+
+      const dotColors = {
+        success: "bg-emerald-400",
+        error: "bg-rose-400",
+        info: "bg-blue-400",
+        warning: "bg-amber-400"
+      };
+
+      const dot = dotColors[type] || dotColors.info;
       const toast = document.createElement("div");
-      toast.className = `px-4 py-2.5 rounded-xl text-xs font-bold shadow-xl text-white transition-all transform duration-300 translate-y-2 opacity-0 ${
-        type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-blue-600'
-      }`;
-      toast.textContent = msg;
+      toast.className = "inline-flex items-center gap-2.5 px-4 py-2 bg-slate-900/95 backdrop-blur-md text-white rounded-full shadow-2xl border border-slate-700/80 text-xs font-bold transition-all duration-300 transform -translate-y-3 opacity-0 pointer-events-auto select-none max-w-full truncate";
+      toast.innerHTML = `<span class="w-2 h-2 rounded-full ${dot} shrink-0 animate-pulse"></span><span class="leading-snug truncate">${msg}</span>`;
+
       container.appendChild(toast);
-      requestAnimationFrame(() => toast.classList.remove("translate-y-2", "opacity-0"));
+      requestAnimationFrame(() => toast.classList.remove("-translate-y-3", "opacity-0"));
+
+      const displayTime = typeof duration === 'number' && duration > 0 
+        ? duration 
+        : (type === 'error' || type === 'warning' ? 3800 : 2500);
+
       setTimeout(() => {
-        toast.classList.add("opacity-0", "translate-y-2");
+        toast.classList.add("opacity-0", "-translate-y-3");
         setTimeout(() => toast.remove(), 300);
-      }, 2500);
+      }, displayTime);
     }
 
     // ==========================================
