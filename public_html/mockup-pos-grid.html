@@ -1920,26 +1920,39 @@
       }
     }
 
-    // Toast Notifikasi Kasir Mockup
+    // Toast Notifikasi Kasir & Menu SIS (Opsi 1: Clean Floating Card)
     function showMockupToast(msg, type = "success") {
-      const existing = document.getElementById("mockup-pos-toast");
-      if (existing) existing.remove();
+      const typeConfig = {
+        success: { icon: "✓", bgIcon: "bg-emerald-50 text-emerald-600 border-emerald-200", border: "border-slate-200/90" },
+        error: { icon: "✕", bgIcon: "bg-rose-50 text-rose-600 border-rose-200", border: "border-rose-200" },
+        warning: { icon: "⚠️", bgIcon: "bg-amber-50 text-amber-700 border-amber-200", border: "border-amber-200" },
+        info: { icon: "ℹ️", bgIcon: "bg-blue-50 text-blue-600 border-blue-200", border: "border-blue-200" }
+      };
+      const cfg = typeConfig[type] || typeConfig.info;
+      const cleanMsg = typeof msg === 'string' ? msg : String(msg);
+
+      let container = document.getElementById("toast-container");
+      if (!container) {
+        container = document.createElement("div");
+        container.id = "toast-container";
+        container.className = "fixed top-5 inset-x-0 mx-auto z-[999999] flex flex-col items-center gap-2 pointer-events-none no-print w-full max-w-sm px-4";
+        document.body.appendChild(container);
+      }
 
       const toast = document.createElement("div");
-      toast.id = "mockup-pos-toast";
-      const bgClass = type === "success" 
-        ? "bg-slate-900 text-emerald-300 border-slate-700" 
-        : type === "info"
-        ? "bg-slate-900 text-slate-100 border-slate-700"
-        : "bg-rose-950 text-rose-200 border-rose-500/50";
-      const icon = type === "success" ? "🟢" : type === "info" ? "⏳" : "⚠️";
-
-      toast.className = `fixed top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-2xl shadow-xl border text-xs font-bold flex items-center gap-2 transition-all duration-300 animate-bounce ${bgClass}`;
-      toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
-      document.body.appendChild(toast);
-
+      toast.className = `flex items-center gap-3 px-4 py-3 bg-white/95 backdrop-blur-md border ${cfg.border} rounded-2xl shadow-xl shadow-slate-900/10 min-w-[280px] max-w-sm transition-all duration-300 transform -translate-y-3 opacity-0 pointer-events-auto select-none`;
+      toast.innerHTML = `
+        <div class="w-7 h-7 rounded-xl ${cfg.bgIcon} border flex items-center justify-center font-black text-xs shrink-0 shadow-2xs">
+          ${cfg.icon}
+        </div>
+        <div class="text-xs font-bold text-slate-800 leading-snug">
+          ${cleanMsg}
+        </div>
+      `;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.remove("-translate-y-3", "opacity-0"));
       setTimeout(() => {
-        toast.style.opacity = "0";
+        toast.classList.add("opacity-0", "-translate-y-3");
         setTimeout(() => toast.remove(), 300);
       }, 3000);
     }
