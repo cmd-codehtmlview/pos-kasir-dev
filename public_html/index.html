@@ -6620,445 +6620,131 @@
   </div>
 
   <!-- MODAL 9: KUNCI AKTIVASI LISENSI RESMI (CLEAN 3-LAYER ONBOARDING & LOGIN) -->
-  <div id="modal-activation-lock" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 z-[9999] no-print">
-    <div class="bg-white w-full max-w-md sm:max-w-lg rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+  <div id="modal-activation-lock" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[9999] no-print">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl border border-slate-200 overflow-hidden flex flex-col">
       
-      <!-- LAYER 1: LOGIN KASIR (BERSIH, MINIMALIS, PROFESIONAL) -->
-      <div id="auth-layer-login" class="p-6 sm:p-7 space-y-4">
-                <!-- Top Bar with Close Button -->
-        <div class="flex items-center justify-between border-b border-slate-100 pb-2 -mt-1">
-          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Masuk Akun Toko</span>
-          <button type="button" id="btn-close-store-login" onclick="closeStoreLoginModal()" class="text-slate-400 hover:text-slate-700 text-sm font-black p-1 cursor-pointer" title="Tutup">✕</button>
-        </div>
-<!-- Minimal Header -->
-        <div class="text-center pt-1 pb-1">
-          <div class="w-12 h-12 bg-gradient-to-tr from-indigo-600 to-blue-600 text-white rounded-2xl mx-auto flex items-center justify-center text-2xl shadow-lg shadow-indigo-600/25 mb-3">
-            ⚡
-          </div>
-          <h2 class="font-black text-xl text-slate-900 tracking-tight">Masuk ke Kasir</h2>
-          <p class="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
-            Gunakan ID Toko, Nama Toko, atau No. WhatsApp Anda untuk mulai transaksi kasir.
-          </p>
+      <!-- LAYER 1: LOGIN -->
+      <div id="auth-layer-login" class="p-6 space-y-4">
+        <!-- Top Bar with Close Button -->
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+          <h2 class="text-base font-bold text-slate-900">Login</h2>
+          <button type="button" id="btn-close-store-login" onclick="closeStoreLoginModal()" class="text-xs font-semibold text-slate-400 hover:text-slate-700 cursor-pointer">Tutup</button>
         </div>
 
         <!-- Form Login -->
         <div class="space-y-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">ID Toko / Nama Toko / No. WhatsApp *</label>
-            <input type="text" id="act-store-id-input" placeholder="Contoh: gadaiantam atau 081234567890"
+            <label class="block text-xs font-semibold text-slate-700 mb-1">ID Toko / No. HP</label>
+            <input type="text" id="act-store-id-input" placeholder="ID Toko atau No. HP"
               onkeydown="if(event.key==='Enter'){ const p = document.getElementById('act-store-pin-input'); if(p && !p.value) p.focus(); else loginWithStorePin(); }"
-              class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-200 focus:border-indigo-600 rounded-xl font-bold text-xs text-slate-900 focus:outline-none transition">
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-lg text-xs font-medium text-slate-900 focus:outline-none transition">
           </div>
 
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="text-xs font-bold text-slate-700">PIN Kasir (6 Digit) *</label>
-              <button type="button" onclick="toggleForgotPinForm(true)" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 underline cursor-pointer">
-                Lupa PIN Kasir?
+              <label class="text-xs font-semibold text-slate-700">PIN</label>
+              <button type="button" onclick="toggleForgotPinForm(true)" class="text-xs text-slate-500 hover:text-slate-800 cursor-pointer">
+                Lupa PIN?
               </button>
             </div>
             <div class="relative">
-              <input type="password" id="act-store-pin-input" maxlength="6" placeholder="• • • • • •"
+              <input type="password" id="act-store-pin-input" maxlength="6" placeholder="PIN"
                 onkeydown="if(event.key==='Enter'){ loginWithStorePin(); }"
-                class="w-full px-3.5 py-2.5 bg-white border-2 border-slate-300 focus:border-indigo-600 rounded-xl font-mono font-black text-center text-xl tracking-widest text-slate-900 focus:outline-none transition pr-10">
-              <button type="button" onclick="toggleStorePinVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-sm p-1 cursor-pointer" title="Lihat/Sembunyikan PIN">
-                <span id="pin-toggle-icon">👁️</span>
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-lg font-mono text-center text-sm tracking-widest text-slate-900 focus:outline-none transition pr-16">
+              <button type="button" onclick="toggleStorePinVisibility()" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-800 px-1 py-0.5 cursor-pointer">
+                <span id="pin-toggle-icon">Lihat</span>
+                <span id="btn-toggle-pin-text" class="hidden">Lihat</span>
               </button>
             </div>
           </div>
 
           <button type="button" id="btn-submit-pin-login" onclick="loginWithStorePin()"
-            class="w-full py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition shadow-lg shadow-indigo-600/25 cursor-pointer flex items-center justify-center gap-2">
-            <span>⚡ Masuk ke Kasir Sekarang &rarr;</span>
+            class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition cursor-pointer">
+            Masuk
           </button>
         </div>
 
-        <!-- Expandable Form Pemulihan Lupa PIN -->
-        <div id="form-store-reset-pin-pane" class="hidden p-3.5 bg-amber-50 border-2 border-amber-300 rounded-2xl space-y-2.5 animate-in fade-in duration-200">
-          <div class="flex items-center justify-between border-b border-amber-200 pb-2">
-            <div class="flex items-center gap-1.5 text-xs font-black text-amber-900">
-              <span>🔐</span>
-              <span>Pemulihan PIN Kasir Mandiri</span>
-            </div>
-            <button type="button" onclick="toggleForgotPinForm(false)" class="text-amber-800 hover:text-amber-950 text-xs font-bold cursor-pointer">✕ Tutup</button>
-          </div>
-          <p class="text-[11px] text-amber-800 leading-snug">
-            Masukkan ID Toko/Nama Toko & No WhatsApp terdaftar untuk membuat PIN baru.
-          </p>
-          <div>
-            <label class="block text-[10px] font-bold uppercase text-amber-900 mb-0.5">ID Toko atau Nama Toko *</label>
-            <input type="text" id="reset-store-id-input" placeholder="Contoh: gadaiantam atau STR-1234"
-              class="w-full px-2.5 py-1.5 bg-white border border-amber-300 rounded-lg font-bold text-xs text-slate-900 focus:outline-none">
+        <!-- Form Pemulihan Lupa PIN -->
+        <div id="form-store-reset-pin-pane" class="hidden p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2.5">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+            <span class="text-xs font-semibold text-slate-800">Pemulihan PIN</span>
+            <button type="button" onclick="toggleForgotPinForm(false)" class="text-xs text-slate-500 hover:text-slate-800 cursor-pointer">Tutup</button>
           </div>
           <div>
-            <label class="block text-[10px] font-bold uppercase text-amber-900 mb-0.5">Nomor WhatsApp Terdaftar *</label>
-            <input type="tel" id="reset-store-wa-input" placeholder="Contoh: 081234567890"
-              class="w-full px-2.5 py-1.5 bg-white border border-amber-300 rounded-lg font-bold text-xs text-slate-900 focus:outline-none">
+            <label class="block text-[11px] font-medium text-slate-600 mb-0.5">ID Toko</label>
+            <input type="text" id="reset-store-id-input" placeholder="ID Toko"
+              class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-xs text-slate-900 focus:outline-none">
           </div>
           <div>
-            <label class="block text-[10px] font-bold uppercase text-amber-900 mb-0.5">PIN Baru (6 Digit Angka) *</label>
-            <input type="password" id="reset-store-new-pin-input" maxlength="6" placeholder="Contoh: 123456"
-              class="w-full px-2.5 py-1.5 bg-white border border-amber-300 rounded-lg font-mono font-black text-center text-sm tracking-widest text-slate-900 focus:outline-none">
+            <label class="block text-[11px] font-medium text-slate-600 mb-0.5">Nomor WhatsApp</label>
+            <input type="tel" id="reset-store-wa-input" placeholder="Nomor WhatsApp"
+              class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md text-xs text-slate-900 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-[11px] font-medium text-slate-600 mb-0.5">PIN Baru</label>
+            <input type="password" id="reset-store-new-pin-input" maxlength="6" placeholder="PIN Baru"
+              class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-md font-mono text-center text-xs tracking-widest text-slate-900 focus:outline-none">
           </div>
           <button type="button" id="btn-submit-reset-pin" onclick="submitResetStorePin()"
-            class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white font-black text-xs uppercase tracking-wider rounded-lg transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5">
-            <span>💾 Simpan PIN Baru & Masuk Kasir</span>
+            class="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-md transition cursor-pointer">
+            Simpan PIN Baru
           </button>
         </div>
 
         <!-- Footer: Sign Up Switch -->
-        <div class="pt-3 border-t border-slate-100 text-center space-y-2">
-          <p class="text-xs text-slate-500">Belum memiliki akun toko kasir?</p>
+        <div class="pt-3 border-t border-slate-100 text-center">
           <button type="button" onclick="switchAuthLayer('signup')"
-            class="w-full py-2.5 bg-slate-100 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 text-indigo-700 font-bold text-xs rounded-xl transition cursor-pointer flex items-center justify-center gap-1.5">
-            <span>✨ Daftar Akun Toko Baru &rarr;</span>
+            class="text-xs text-slate-600 hover:text-slate-900 font-medium cursor-pointer">
+            Belum punya akun? Daftar
           </button>
-        </div>
-
-        <!-- Footer Bantuan -->
-        <div class="pt-2 text-center">
-          <a id="activation-wa-link" href="https://wa.me/6285156379786?text=Halo%20Vendor,%20saya%20butuh%20bantuan%20login%20SnackPOS" target="_blank"
-            class="text-xs text-slate-500 hover:text-indigo-600 font-medium inline-flex items-center gap-1.5 transition underline cursor-pointer">
-            <span>💬 Butuh bantuan atau kendala akun? Hubungi Admin via WhatsApp</span>
-          </a>
         </div>
       </div>
 
-      <!-- LAYER 2: PENDAFTARAN DATA TOKO (SIGN UP) -->
-      <div id="auth-layer-signup" class="hidden p-6 sm:p-7 space-y-4">
-        <!-- Header dengan tombol kembali -->
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <button type="button" onclick="switchAuthLayer('login')" class="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer">
-            <span>&larr;</span> <span>Sudah punya akun? Masuk</span>
+      <!-- LAYER 2: DAFTAR -->
+      <div id="auth-layer-signup" class="hidden p-6 space-y-4">
+        <!-- Top Bar with Back Button -->
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+          <h2 class="text-base font-bold text-slate-900">Daftar</h2>
+          <button type="button" onclick="switchAuthLayer('login')" class="text-xs font-semibold text-slate-500 hover:text-slate-800 cursor-pointer">
+            Masuk
           </button>
-          <span class="text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full border border-indigo-200">Langkah 1 dari 2</span>
-        </div>
-
-        <div class="text-center">
-          <h3 class="font-black text-lg text-slate-900">Daftar Akun Toko Baru</h3>
-          <p class="text-xs text-slate-500 mt-0.5">Hanya butuh 10 detik untuk menyiapkan kasir toko Anda.</p>
         </div>
 
         <div class="space-y-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Nama Toko / Minimarket Anda *</label>
-            <input type="text" id="signup-store-name" placeholder="Contoh: Toko Snack Berkah"
-              class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-200 focus:border-indigo-600 rounded-xl font-bold text-xs text-slate-900 focus:outline-none transition">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Toko</label>
+            <input type="text" id="signup-store-name" placeholder="Nama Toko"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-lg text-xs font-medium text-slate-900 focus:outline-none transition">
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp Pemilik *</label>
-            <input type="tel" id="signup-store-wa" placeholder="Contoh: 081234567890"
-              class="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-slate-200 focus:border-indigo-600 rounded-xl font-bold text-xs text-slate-900 focus:outline-none transition">
-            <p class="text-[10px] text-slate-400 mt-1">Digunakan sebagai identitas toko & pengiriman arsip kwitansi.</p>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp</label>
+            <input type="tel" id="signup-store-wa" placeholder="Nomor WhatsApp"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-lg text-xs font-medium text-slate-900 focus:outline-none transition">
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Buat PIN Kasir Toko (4-6 Digit Angka) *</label>
-            <input type="password" id="signup-store-pin" maxlength="6" placeholder="Contoh: 123456"
-              class="w-full px-3.5 py-2.5 bg-white border-2 border-slate-200 focus:border-indigo-600 rounded-xl font-mono font-black text-center text-lg tracking-widest text-slate-900 focus:outline-none transition">
-            <p class="text-[10px] text-slate-400 mt-1">PIN rahasia ini digunakan untuk membuka kasir Anda sehari-hari.</p>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">PIN</label>
+            <input type="password" id="signup-store-pin" maxlength="6" placeholder="PIN"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-slate-400 rounded-lg font-mono text-center text-sm tracking-widest text-slate-900 focus:outline-none transition">
           </div>
 
-          <button type="button" onclick="goToPricingLayer()"
-            class="w-full py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition shadow-md shadow-indigo-600/20 cursor-pointer flex items-center justify-center gap-2">
-            <span>Lanjut: Pilih Paket Layanan &rarr;</span>
+          <button type="button" id="btn-submit-signup" onclick="submitDirectSignup()"
+            class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-lg transition cursor-pointer">
+            Daftar
+          </button>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 text-center">
+          <button type="button" onclick="switchAuthLayer('login')"
+            class="text-xs text-slate-600 hover:text-slate-900 font-medium cursor-pointer">
+            Sudah punya akun? Masuk
           </button>
         </div>
       </div>
 
-      <!-- LAYER 3: PILIH PAKET LAYANAN (MENONJOLKAN TERMURAH DULU) -->
-      <div id="auth-layer-pricing" class="hidden p-6 sm:p-7 space-y-4 max-h-[85vh] overflow-y-auto custom-scrollbar">
-        <!-- Header dengan tombol kembali -->
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <button type="button" onclick="switchAuthLayer('signup')" class="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer">
-            <span>&larr;</span> <span>Ubah Data Toko</span>
-          </button>
-          <span class="text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">Langkah 2 dari 2</span>
-        </div>
-
-        <!-- Daftar Pilihan Paket (Semua Tampil Terbuka Tanpa Expand Manual, Urut Termurah) -->
-        <div id="auth-pricing-selection" class="space-y-3.5">
-          <div class="text-center">
-            <h3 class="font-black text-lg text-slate-900">Pilih Paket Kasir Anda</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Semua pilihan paket tampil lengkap di bawah ini, urut dari yang paling hemat.</p>
-          </div>
-
-          <!-- OPSI 1: TRIAL 7 HARI (TERATAS & TERMURAH - RP 0) -->
-          <div class="p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/70 transition shadow-xs relative">
-            <div class="flex items-start justify-between gap-2">
-              <div>
-                <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-emerald-600 text-white">
-                  🎉 Uji Coba Gratis
-                </span>
-                <h4 class="font-black text-sm text-slate-900 mt-1">Trial Kasir 7 Hari</h4>
-                <p class="text-[11px] text-slate-600 mt-0.5 leading-snug">
-                  Coba semua fitur kasir tanpa bayar apapun sekarang (10 SKU & 15 Trx/hari).
-                </p>
-              </div>
-              <div class="text-right whitespace-nowrap">
-                <span class="text-base font-black font-mono text-emerald-700 block">Rp 0</span>
-                <span class="text-[9px] text-emerald-600 font-bold">Langsung Aktif</span>
-              </div>
-            </div>
-            <button type="button" id="btn-start-trial-plan" onclick="submitSignupWithPlan('TRIAL')"
-              class="w-full mt-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5">
-              <span>🚀 Aktifkan Trial Gratis Sekarang &rarr;</span>
-            </button>
-          </div>
-
-          <!-- OPSI 2: PAKET SAAS POS + CLOUD (BUNDLING LENGKAP: 1 BLN KOLOM BESAR, 3, 6, 12 BLN BERJAJAR) -->
-          <div class="p-4 rounded-2xl border-2 border-indigo-200 hover:border-indigo-400 bg-white transition shadow-xs space-y-3">
-            <!-- Kolom Besar: 1 Bulan (Termurah & Paling Populer) -->
-            <div class="p-3.5 rounded-xl bg-indigo-50/60 border border-indigo-100">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-indigo-600 text-white">
-                    ⭐ Paling Populer (1 Bulan)
-                  </span>
-                  <h4 class="font-black text-sm text-slate-900 mt-1">Paket SaaS POS + Cloud Sync</h4>
-                  <p class="text-[11px] text-slate-600 mt-0.5 leading-snug">
-                    Kasir Unlimited SKU & Transaksi + Pantau Laporan Omset Realtime dari HP.
-                  </p>
-                </div>
-                <div class="text-right whitespace-nowrap">
-                  <span class="text-base font-black font-mono text-indigo-700 block" id="signup-price-display-p2">Rp 30.000</span>
-                  <span class="text-[9px] text-slate-500 font-bold">/ 1 bulan</span>
-                </div>
-              </div>
-              <button type="button" onclick="submitSignupWithPlan('PAKET_2')"
-                class="w-full mt-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5">
-                <span>⚡ Bayar QRIS 1 Bulan &rarr;</span>
-              </button>
-            </div>
-
-            <!-- Satu Baris di Bawahnya: 3 Kolom Pilihan Durasi (3, 6, 12 Bulan) Berjajar dengan Kolom Lebih Kecil -->
-            <div>
-              <div class="flex items-center justify-between mb-1.5 px-0.5">
-                <span class="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1">
-                  <span>📅</span> <span>Opsi Durasi Bundling Lebih Hemat:</span>
-                </span>
-                <span class="text-[9px] text-indigo-600 font-bold">Diskon Bundling</span>
-              </div>
-              
-              <div class="grid grid-cols-3 gap-2">
-                <!-- Kolom Kecil 1: 3 Bulan -->
-                <div class="p-2.5 rounded-xl border border-slate-200 hover:border-indigo-300 bg-slate-50 hover:bg-white transition flex flex-col justify-between text-center">
-                  <div>
-                    <span class="text-[9px] font-bold text-slate-500 block uppercase tracking-tight">3 Bulan</span>
-                    <span class="text-xs sm:text-sm font-black font-mono text-indigo-700 block mt-0.5" id="signup-price-display-p2-3m">Rp 85.000</span>
-                    <span class="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded block mt-0.5">Hemat Rp 5rb</span>
-                  </div>
-                  <button type="button" onclick="submitSignupWithPlan('PAKET_2_3M')"
-                    class="w-full mt-2 py-1 bg-white hover:bg-indigo-600 hover:text-white border border-indigo-200 text-indigo-700 font-bold text-[10px] rounded-lg transition cursor-pointer shadow-2xs">
-                    Pilih 3 Bln
-                  </button>
-                </div>
-
-                <!-- Kolom Kecil 2: 6 Bulan -->
-                <div class="p-2.5 rounded-xl border border-slate-200 hover:border-indigo-300 bg-slate-50 hover:bg-white transition flex flex-col justify-between text-center">
-                  <div>
-                    <span class="text-[9px] font-bold text-slate-500 block uppercase tracking-tight">6 Bulan</span>
-                    <span class="text-xs sm:text-sm font-black font-mono text-indigo-700 block mt-0.5" id="signup-price-display-p2-6m">Rp 160.000</span>
-                    <span class="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded block mt-0.5">Hemat Rp 20rb</span>
-                  </div>
-                  <button type="button" onclick="submitSignupWithPlan('PAKET_2_6M')"
-                    class="w-full mt-2 py-1 bg-white hover:bg-indigo-600 hover:text-white border border-indigo-200 text-indigo-700 font-bold text-[10px] rounded-lg transition cursor-pointer shadow-2xs">
-                    Pilih 6 Bln
-                  </button>
-                </div>
-
-                <!-- Kolom Kecil 3: 12 Bulan (1 Tahun) -->
-                <div class="p-2.5 rounded-xl border border-indigo-300 hover:border-indigo-500 bg-indigo-50/40 hover:bg-indigo-50/70 transition flex flex-col justify-between text-center relative">
-                  <div class="absolute -top-1.5 right-1">
-                    <span class="text-[8px] font-black uppercase tracking-wider bg-amber-500 text-white px-1 py-0.2 rounded-full shadow-2xs">Best</span>
-                  </div>
-                  <div>
-                    <span class="text-[9px] font-bold text-indigo-900 block uppercase tracking-tight">12 Bulan</span>
-                    <span class="text-xs sm:text-sm font-black font-mono text-indigo-700 block mt-0.5" id="signup-price-display-p2-1y">Rp 300.000</span>
-                    <span class="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded block mt-0.5">Hemat Rp 60rb</span>
-                  </div>
-                  <button type="button" onclick="submitSignupWithPlan('PAKET_2_1Y')"
-                    class="w-full mt-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] rounded-lg transition cursor-pointer shadow-2xs">
-                    Pilih 1 Thn
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- OPSI 3: OFFLINE LIFETIME (BELI PUTUS) + MENU ADD-ON -->
-          <div class="p-4 rounded-2xl border-2 border-slate-200 hover:border-slate-400 bg-slate-50 transition shadow-xs space-y-3">
-            <div class="flex items-start justify-between gap-2">
-              <div>
-                <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-slate-800 text-white">
-                  💎 Beli Putus Selamanya
-                </span>
-                <h4 class="font-black text-sm text-slate-900 mt-1">Paket Offline Lifetime</h4>
-                <p class="text-[11px] text-slate-600 mt-0.5 leading-snug">
-                  Kasir offline aktif selamanya tanpa kuota transaksi & tanpa biaya langganan.
-                </p>
-              </div>
-              <div class="text-right whitespace-nowrap">
-                <span class="text-base font-black font-mono text-slate-900 block" id="signup-price-display-p1">Rp 99.000</span>
-                <span class="text-[9px] text-slate-500 font-bold">sekali bayar</span>
-              </div>
-            </div>
-
-            <!-- MENU ADD-ON KASIR OFFLINE LIFETIME (TAMPIL TERBUKA 4 PILIHAN DURASI) -->
-            <div class="p-3 bg-white rounded-xl border border-slate-200 space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1">
-                  <span>🧩</span> <span>Add-On 1: Cloud Dashboard & Sync HP:</span>
-                </span>
-                <span class="text-[9px] text-amber-700 font-bold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200" id="addon-cloud-status-badge">Aktif: 1 Tahun</span>
-              </div>
-
-              <!-- Pilihan 4 Durasi Cloud Sync HP Terbuka -->
-              <div class="space-y-1.5">
-                <!-- Durasi 1 Bulan (Kolom Fleksibel) -->
-                <label id="card-addon-cloud-1m" onclick="selectAddonCloudDuration('1m')"
-                  class="flex items-center justify-between p-2.5 rounded-xl border transition cursor-pointer bg-slate-50 border-slate-200 hover:border-amber-400">
-                  <div class="flex items-center gap-2">
-                    <input type="radio" name="addon_cloud_duration" id="radio-cloud-1m" value="1m" class="text-amber-500 focus:ring-amber-400 w-4 h-4 cursor-pointer">
-                    <div>
-                      <div class="text-xs font-bold text-slate-800">1 Bulan Cloud Sync HP</div>
-                      <div class="text-[10px] text-slate-500">Coba pantau omzet toko dari HP</div>
-                    </div>
-                  </div>
-                  <span class="text-xs font-black font-mono text-amber-600" id="label-addon-cloud-1m">+Rp 25.000</span>
-                </label>
-
-                <!-- Grid 3 Kolom Durasi Lainnya (3, 6, 12 Bulan Berjajar) -->
-                <div class="grid grid-cols-3 gap-1.5">
-                  <!-- 3 Bulan -->
-                  <div id="card-addon-cloud-3m" onclick="selectAddonCloudDuration('3m')"
-                    class="flex flex-col justify-between p-2 rounded-xl border transition cursor-pointer text-center bg-slate-50 border-slate-200 hover:border-amber-400 relative">
-                    <div class="flex items-center justify-center gap-1">
-                      <input type="radio" name="addon_cloud_duration" id="radio-cloud-3m" value="3m" class="text-amber-500 focus:ring-amber-400 w-3.5 h-3.5 cursor-pointer">
-                      <span class="text-[11px] font-bold text-slate-800">3 Bulan</span>
-                    </div>
-                    <span class="text-[10px] font-black font-mono text-amber-600 mt-1" id="label-addon-cloud-3m">+Rp 65.000</span>
-                    <span class="text-[8px] text-emerald-600 font-bold">Hemat 10rb</span>
-                  </div>
-
-                  <!-- 6 Bulan -->
-                  <div id="card-addon-cloud-6m" onclick="selectAddonCloudDuration('6m')"
-                    class="flex flex-col justify-between p-2 rounded-xl border transition cursor-pointer text-center bg-slate-50 border-slate-200 hover:border-amber-400 relative">
-                    <div class="flex items-center justify-center gap-1">
-                      <input type="radio" name="addon_cloud_duration" id="radio-cloud-6m" value="6m" class="text-amber-500 focus:ring-amber-400 w-3.5 h-3.5 cursor-pointer">
-                      <span class="text-[11px] font-bold text-slate-800">6 Bulan</span>
-                    </div>
-                    <span class="text-[10px] font-black font-mono text-amber-600 mt-1" id="label-addon-cloud-6m">+Rp 120.000</span>
-                    <span class="text-[8px] text-emerald-600 font-bold">Hemat 30rb</span>
-                  </div>
-
-                  <!-- 1 Tahun -->
-                  <div id="card-addon-cloud-1y" onclick="selectAddonCloudDuration('1y')"
-                    class="flex flex-col justify-between p-2 rounded-xl border-2 transition cursor-pointer text-center bg-amber-50/70 border-amber-500 relative shadow-xs">
-                    <span class="absolute -top-2 right-1 text-[7px] font-black bg-amber-500 text-slate-950 px-1 rounded shadow-xs">POPULER</span>
-                    <div class="flex items-center justify-center gap-1">
-                      <input type="radio" name="addon_cloud_duration" id="radio-cloud-1y" value="1y" checked class="text-amber-500 focus:ring-amber-400 w-3.5 h-3.5 cursor-pointer">
-                      <span class="text-[11px] font-bold text-slate-800">1 Tahun</span>
-                    </div>
-                    <span class="text-[10px] font-black font-mono text-amber-700 mt-1" id="label-addon-cloud-1y">+Rp 200.000</span>
-                    <span class="text-[8px] text-emerald-600 font-bold">Hemat 100rb</span>
-                  </div>
-                </div>
-
-                <!-- Tombol Batal / Tanpa Cloud -->
-                <div class="pt-1 flex items-center justify-between px-1">
-                  <button type="button" onclick="clearAddonCloudDuration()" class="text-[10px] text-slate-400 hover:text-rose-600 underline font-medium cursor-pointer">
-                    ✕ Tidak Butuh Cloud (Murni Kasir Offline Rp 99.000)
-                  </button>
-                  <span class="text-[9px] text-slate-400">Live Sync HP</span>
-                </div>
-              </div>
-
-              <!-- Divider Add-On 2 Multi-Kasir -->
-              <div class="border-t border-slate-100 pt-2">
-                <div class="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1">
-                  <span>🖥️</span> <span>Add-On 2: Lisensi Kasir Tambahan:</span>
-                </div>
-                <label class="flex items-start gap-2.5 p-2 rounded-lg hover:bg-indigo-50/50 border border-slate-100 hover:border-indigo-200 cursor-pointer transition">
-                  <input type="checkbox" id="addon-multi-kasir" onchange="updateLifetimeAddonTotal()"
-                    class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer">
-                  <div class="flex-1">
-                    <div class="flex items-center justify-between">
-                      <span class="text-xs font-bold text-slate-800">Add-On Multi-Kasir (+1 Perangkat)</span>
-                      <span id="label-addon-multi-kasir" class="text-xs font-black font-mono text-indigo-700">+Rp 40.000</span>
-                    </div>
-                    <p class="text-[10px] text-slate-500 leading-snug mt-0.5">
-                      Gunakan 1 akun toko di perangkat kasir kedua / meja kasir cabang tambahan.
-                    </p>
-                  </div>
-                </label>
-              </div>
-            </div>
-
-            <!-- Total Lifetime + Add-on & Tombol Eksekusi -->
-            <div class="pt-1">
-              <div class="flex items-center justify-between mb-2 px-1">
-                <span class="text-xs font-bold text-slate-600">Total Pembayaran Lifetime:</span>
-                <span class="text-sm font-black font-mono text-slate-900" id="lifetime-total-display">Rp 99.000</span>
-              </div>
-              <button type="button" onclick="submitSignupWithPlan('PAKET_1')"
-                class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs uppercase tracking-wider rounded-xl transition shadow-xs cursor-pointer flex items-center justify-center gap-1.5">
-                <span>⚡ Bayar QRIS & Aktifkan Lifetime &rarr;</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Footer Bantuan WhatsApp Vendor di Layer 3 -->
-          <div class="pt-2 text-center border-t border-slate-100">
-            <a id="pricing-wa-help-link" href="https://wa.me/6285156379786?text=Halo%20Vendor,%20saya%20butuh%20bantuan%20konsultasi%20paket%20SnackPOS" target="_blank"
-              class="text-xs text-slate-500 hover:text-indigo-600 font-medium inline-flex items-center gap-1.5 transition underline cursor-pointer">
-              <span>💬 Butuh bantuan memilih paket? Hubungi Vendor via WhatsApp</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Step QRIS Display (Hanya muncul jika memilih Paket 2 atau Paket 1) -->
-        <div id="act-qris-step-display" class="hidden space-y-3 text-center">
-          <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center justify-between text-xs">
-            <div class="text-left">
-              <span class="text-[10px] text-indigo-600 font-bold block" id="act-qris-plan-label">Paket 2: SaaS POS + Cloud</span>
-              <span class="font-black text-slate-900 font-mono text-sm" id="act-qris-nominal-label">Rp 30.000</span>
-            </div>
-            <div class="text-right">
-              <span class="text-[10px] text-slate-500 font-bold block">Sisa Waktu:</span>
-              <span class="font-mono font-black text-rose-600 text-xs" id="act-qris-timer">15:00</span>
-            </div>
-          </div>
-
-          <!-- Box Gambar QRIS Dinamis -->
-          <div class="p-4 bg-white border-2 border-slate-200 rounded-2xl shadow-inner flex flex-col items-center justify-center space-y-2">
-            <div class="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1">
-              <span>📱</span>
-              <span>Scan dengan BCA Mobile, Livin, GoPay, OVO, Dana, ShopeePay</span>
-            </div>
-            <div id="act-qris-img-container" class="p-2 bg-white border border-slate-200 rounded-xl shadow-xs">
-              <img id="act-qris-img" src="" alt="QRIS Dinamis" class="w-44 h-44 object-contain rounded-lg">
-            </div>
-            <div class="flex items-center gap-1.5 text-[11px] font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 animate-pulse">
-              <span>⏳</span>
-              <span>Menunggu Pembayaran... (Aktif Otomatis)</span>
-            </div>
-          </div>
-
-          <div class="pt-1 space-y-2">
-            <button type="button" id="btn-confirm-qris-paid" onclick="confirmCashierPaidAndActivate()"
-              class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition shadow-md shadow-emerald-600/20 cursor-pointer flex items-center justify-center gap-2">
-              <span>✅ Saya Sudah Transfer / Bayar QRIS</span>
-            </button>
-            <button type="button" onclick="cancelCashierQrisCheckout()"
-              class="w-full py-2 text-slate-500 hover:text-slate-800 text-xs font-bold rounded-xl transition bg-slate-100 hover:bg-slate-200 cursor-pointer">
-              &larr; Batalkan & Ganti Paket
-            </button>
-          </div>
-        </div>
-
-      </div>
+      <!-- Hidden Pricing Layer (Compatibility Fallback) -->
+      <div id="auth-layer-pricing" class="hidden"></div>
 
     </div>
   </div>

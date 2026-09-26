@@ -226,7 +226,7 @@ async function checkLicenseOnStartup() {
     }
     document.body.classList.add("modal-open");
     if (typeof switchAuthLayer === "function") {
-      switchAuthLayer("signup");
+      switchAuthLayer("login");
     }
 
     const closeBtn = document.getElementById("btn-close-store-login");
@@ -433,11 +433,12 @@ function switchAuthLayer(layer) {
   }
 }
 
-// Validasi Data Toko di Layer 2 & Lanjut ke Layer 3 (Pilih Paket)
-function goToPricingLayer() {
+// Pendaftaran Toko Bersih (Clean 2-Layer Onboarding: Langsung Aktif Tanpa Layer Paket di Awal)
+async function submitDirectSignup() {
   const nameInput = document.getElementById("signup-store-name");
   const waInput = document.getElementById("signup-store-wa");
   const pinInput = document.getElementById("signup-store-pin");
+  const btnSubmit = document.getElementById("btn-submit-signup");
 
   const storeName = nameInput ? nameInput.value.trim() : "";
   const rawWa = waInput ? waInput.value.trim() : "";
@@ -445,17 +446,17 @@ function goToPricingLayer() {
   const normWa = normalizePhoneIdentifier(rawWa);
 
   if (!storeName) {
-    showToast("⚠️ Silakan masukkan Nama Toko / Usaha Anda!", "warning");
+    showToast("Silakan masukkan Nama Toko.", "warning");
     if (nameInput) nameInput.focus();
     return;
   }
   if (!rawWa || normWa.length < 8) {
-    showToast("⚠️ Masukkan Nomor WhatsApp aktif (contoh: 081234567890)!", "warning");
+    showToast("Masukkan Nomor WhatsApp yang valid.", "warning");
     if (waInput) waInput.focus();
     return;
   }
   if (!pin || pin.length < 4 || pin.length > 8 || !/^\d+$/.test(pin)) {
-    showToast("⚠️ Buat PIN Kasir berupa 4-6 digit angka!", "warning");
+    showToast("PIN harus 4-6 digit angka.", "warning");
     if (pinInput) pinInput.focus();
     return;
   }
@@ -464,9 +465,26 @@ function goToPricingLayer() {
   pos.settings.storeName = storeName;
   pos.settings.storePhone = normWa;
 
-  switchAuthLayer("pricing");
-  updateLifetimeAddonTotal();
-  updateVendorWhatsAppLinks();
+  if (btnSubmit) {
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "Mendaftar...";
+  }
+
+  try {
+    await submitSignupWithPlan("TRIAL");
+  } catch (err) {
+    console.error("submitDirectSignup error:", err);
+    showToast("Pendaftaran gagal: " + (err.message || err), "error");
+  } finally {
+    if (btnSubmit) {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = "Daftar";
+    }
+  }
+}
+
+function goToPricingLayer() {
+  submitDirectSignup();
 }
 
 // Eksekusi Pilihan Paket di Layer 3: Trial 7 Hari (Rp 0), SaaS Bulanan (Rp 30.000), atau Lifetime
@@ -1478,13 +1496,16 @@ async function saveStorePinToCloud(client, storeId, pin, extraWa = "") {
 function toggleStorePinVisibility() {
   const pinInput = document.getElementById("act-store-pin-input");
   const icon = document.getElementById("pin-toggle-icon");
+  const textBtn = document.getElementById("btn-toggle-pin-text");
   if (!pinInput) return;
   if (pinInput.type === "password") {
     pinInput.type = "text";
-    if (icon) icon.textContent = "🙈";
+    if (icon) icon.textContent = "Sembunyi";
+    if (textBtn) textBtn.textContent = "Sembunyi";
   } else {
     pinInput.type = "password";
-    if (icon) icon.textContent = "👁️";
+    if (icon) icon.textContent = "Lihat";
+    if (textBtn) textBtn.textContent = "Lihat";
   }
 }
 
@@ -1525,7 +1546,7 @@ async function loginWithStorePin() {
   const originalBtnHtml = btnLogin ? btnLogin.innerHTML : "";
   if (btnLogin) {
     btnLogin.disabled = true;
-    btnLogin.innerHTML = `<span>⏳ Memverifikasi Akun Toko...</span>`;
+    btnLogin.innerHTML = `<span>Memverifikasi...</span>`;
   }
 
   try {
@@ -1764,7 +1785,7 @@ async function loginWithStorePin() {
   } finally {
     if (btnLogin) {
       btnLogin.disabled = false;
-      btnLogin.innerHTML = originalBtnHtml || `<span>⚡ Masuk ke Kasir Sekarang &rarr;</span>`;
+      btnLogin.innerHTML = originalBtnHtml || `<span>Masuk</span>`;
     }
   }
 }
@@ -1845,7 +1866,7 @@ async function submitResetStorePin() {
 
   if (btnSubmit) {
     btnSubmit.disabled = true;
-    btnSubmit.innerHTML = `<span>⏳ Memverifikasi & Mereset PIN...</span>`;
+    btnSubmit.innerHTML = `<span>Memproses...</span>`;
   }
 
   try {
@@ -1932,7 +1953,7 @@ async function submitResetStorePin() {
   } finally {
     if (btnSubmit) {
       btnSubmit.disabled = false;
-      btnSubmit.innerHTML = `<span>💾 Simpan PIN Baru & Masuk Kasir</span>`;
+      btnSubmit.innerHTML = `<span>Simpan PIN Baru</span>`;
     }
   }
 }
