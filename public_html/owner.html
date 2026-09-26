@@ -98,14 +98,14 @@
     }
 
     /* ========================================================= */
-    /* THEME LIGHT: FLAT CLEAN MINIMALIST (ALA TIKTOK SELLER CENTER) */
+    /* THEME LIGHT: FLAT CLEAN MINIMALIST (TIKTOK SELLER CENTER) */
     /* ========================================================= */
     html.theme-light body {
       background-color: #f8fafc !important;
       color: #0f172a !important;
     }
 
-    /* Header Nav */
+    /* 1. Header Navigation */
     html.theme-light header {
       background-color: rgba(255, 255, 255, 0.96) !important;
       border-color: #e2e8f0 !important;
@@ -136,15 +136,18 @@
       color: #0f172a !important;
     }
 
-    /* Bar Filter Periode */
+    /* Preserve Header Brand Icon */
+    html.theme-light header .bg-gradient-to-br {
+      background: linear-gradient(to bottom right, #d61823, #ea580c) !important;
+      color: #ffffff !important;
+      border-color: transparent !important;
+    }
+
+    /* 2. Filter Bar & Date Inputs */
     html.theme-light .bg-slate-900\/60 {
       background-color: #ffffff !important;
       border-color: #e2e8f0 !important;
       box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
-    }
-    html.theme-light .bg-slate-950 {
-      background-color: #f1f5f9 !important;
-      border-color: #e2e8f0 !important;
     }
     html.theme-light #filter-btn-7days,
     html.theme-light #filter-btn-30days,
@@ -167,79 +170,190 @@
       border-color: #cbd5e1 !important;
     }
 
-    /* Cards & Containers (Pure Flat White) */
-    html.theme-light .bg-slate-900 {
+    /* 3. ALL CARDS & CONTAINERS: 100% UNIFORM FLAT WHITE */
+    html.theme-light .bg-slate-900,
+    html.theme-light .stat-card-glow,
+    html.theme-light section[id^="section-"],
+    html.theme-light div[id^="section-"],
+    html.theme-light [class*="bg-gradient-to-br"]:not(header *):not(#modal-owner-pin-gate .w-16),
+    html.theme-light [class*="from-slate-900"],
+    html.theme-light [class*="from-emerald-950"],
+    html.theme-light [class*="from-indigo-950"],
+    html.theme-light [class*="from-cyan-950"],
+    html.theme-light [class*="from-amber-950"] {
+      background: #ffffff !important;
+      background-image: none !important;
       background-color: #ffffff !important;
       border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.03) !important;
       color: #0f172a !important;
     }
-    html.theme-light .stat-card-glow {
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
-    }
+
+    /* Subtle hover effect on cards */
     html.theme-light .stat-card-glow:hover {
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04) !important;
     }
 
-    /* Hero Card (Omzet) */
+    /* Hero Omzet Card - Crisp subtle emerald border */
     html.theme-light .col-span-2.sm\:col-span-1.bg-gradient-to-br {
       background: #ffffff !important;
+      background-image: none !important;
       border-color: #10b981 !important;
-      box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.12) !important;
+      box-shadow: 0 2px 8px -1px rgba(16, 185, 129, 0.15) !important;
     }
 
-    /* Text & Headings */
-    html.theme-light .text-white {
-      color: #0f172a !important;
-    }
-    html.theme-light .text-slate-400 {
-      color: #64748b !important;
-    }
-    html.theme-light .text-slate-300 {
-      color: #475569 !important;
-    }
-    html.theme-light .text-slate-200 {
-      color: #334155 !important;
-    }
-    html.theme-light .text-slate-500 {
-      color: #64748b !important;
-    }
-    html.theme-light .border-slate-800,
-    html.theme-light .border-slate-800\/60,
-    html.theme-light .border-slate-800\/80,
-    html.theme-light .border-slate-800\/90,
-    html.theme-light .border-slate-700,
-    html.theme-light .border-slate-700\/60,
-    html.theme-light .border-slate-700\/80 {
-      border-color: #e2e8f0 !important;
-    }
-
-    /* Sub-containers & Inner Badges */
+    /* 4. Sub-containers & Inner Boxes (Soft Slate #f8fafc) */
+    html.theme-light .bg-slate-950,
     html.theme-light .bg-slate-950\/40,
     html.theme-light .bg-slate-950\/60,
     html.theme-light .bg-slate-950\/80,
     html.theme-light .bg-slate-950\/90,
     html.theme-light .bg-slate-800,
+    html.theme-light .bg-slate-800\/40,
+    html.theme-light .bg-slate-800\/50,
     html.theme-light .bg-slate-800\/60,
     html.theme-light .bg-slate-800\/80,
     html.theme-light .bg-slate-800\/90 {
       background-color: #f8fafc !important;
+      background-image: none !important;
       border-color: #e2e8f0 !important;
     }
 
-    /* Tables */
+    /* 5. Borders */
+    html.theme-light .border-slate-800,
+    html.theme-light .border-slate-800\/40,
+    html.theme-light .border-slate-800\/50,
+    html.theme-light .border-slate-800\/60,
+    html.theme-light .border-slate-800\/80,
+    html.theme-light .border-slate-800\/90,
+    html.theme-light .border-slate-700,
+    html.theme-light .border-slate-700\/60,
+    html.theme-light .border-slate-700\/80,
+    html.theme-light .border-emerald-900\/50,
+    html.theme-light .border-emerald-900\/40,
+    html.theme-light .border-emerald-800,
+    html.theme-light .border-emerald-500\/30,
+    html.theme-light .border-indigo-900\/50,
+    html.theme-light .border-indigo-900\/40,
+    html.theme-light .border-indigo-800,
+    html.theme-light .border-indigo-500\/30,
+    html.theme-light .border-cyan-900\/40,
+    html.theme-light .border-cyan-800,
+    html.theme-light .border-cyan-500\/30,
+    html.theme-light .border-amber-900\/50,
+    html.theme-light .border-amber-800,
+    html.theme-light .border-amber-500\/30,
+    html.theme-light .border-rose-900\/50,
+    html.theme-light .border-rose-800 {
+      border-color: #e2e8f0 !important;
+    }
+
+    /* 6. Typography & Headings */
+    html.theme-light .text-white {
+      color: #0f172a !important;
+    }
+    html.theme-light .text-slate-200 {
+      color: #1e293b !important;
+    }
+    html.theme-light .text-slate-300 {
+      color: #334155 !important;
+    }
+    html.theme-light .text-slate-400 {
+      color: #64748b !important;
+    }
+    html.theme-light .text-slate-500 {
+      color: #64748b !important;
+    }
+
+    /* High-contrast metrics on light background */
+    html.theme-light .text-emerald-400,
+    html.theme-light .text-emerald-300 {
+      color: #059669 !important;
+    }
+    html.theme-light .text-blue-400,
+    html.theme-light .text-blue-300 {
+      color: #2563eb !important;
+    }
+    html.theme-light .text-purple-400,
+    html.theme-light .text-purple-300 {
+      color: #7c3aed !important;
+    }
+    html.theme-light .text-rose-400,
+    html.theme-light .text-rose-300 {
+      color: #e11d48 !important;
+    }
+    html.theme-light .text-amber-400,
+    html.theme-light .text-amber-300 {
+      color: #d97706 !important;
+    }
+    html.theme-light .text-cyan-400,
+    html.theme-light .text-cyan-300 {
+      color: #0891b2 !important;
+    }
+    html.theme-light .text-indigo-400,
+    html.theme-light .text-indigo-300 {
+      color: #4f46e5 !important;
+    }
+    html.theme-light .text-yellow-400 {
+      color: #ca8a04 !important;
+    }
+
+    /* 7. Badges (Convert dark backgrounds to soft pastel pill badges) */
+    html.theme-light .bg-emerald-950 {
+      background-color: #ecfdf5 !important;
+      border-color: #a7f3d0 !important;
+      color: #065f46 !important;
+    }
+    html.theme-light .bg-rose-950 {
+      background-color: #fff1f2 !important;
+      border-color: #fecdd3 !important;
+      color: #9f1239 !important;
+    }
+    html.theme-light .bg-amber-950 {
+      background-color: #fffbeb !important;
+      border-color: #fde68a !important;
+      color: #92400e !important;
+    }
+    html.theme-light .bg-indigo-950 {
+      background-color: #eef2ff !important;
+      border-color: #c7d2fe !important;
+      color: #3730a3 !important;
+    }
+    html.theme-light .bg-blue-950 {
+      background-color: #eff6ff !important;
+      border-color: #bfdbfe !important;
+      color: #1e40af !important;
+    }
+    html.theme-light .bg-purple-950 {
+      background-color: #faf5ff !important;
+      border-color: #e9d5ff !important;
+      color: #6b21a8 !important;
+    }
+    html.theme-light .bg-cyan-950 {
+      background-color: #ecfeff !important;
+      border-color: #a5f3fc !important;
+      color: #155e75 !important;
+    }
+
+    /* 8. Tables */
     html.theme-light table thead,
-    html.theme-light table thead tr {
+    html.theme-light table thead tr,
+    html.theme-light table thead.bg-slate-950 {
       background-color: #f1f5f9 !important;
+      background: #f1f5f9 !important;
       color: #475569 !important;
     }
     html.theme-light table thead th {
+      background-color: #f1f5f9 !important;
       color: #475569 !important;
       border-bottom: 1px solid #e2e8f0 !important;
     }
     html.theme-light table tbody tr {
       border-bottom: 1px solid #f1f5f9 !important;
     }
-    html.theme-light table tbody tr:hover {
+    html.theme-light table tbody tr:hover,
+    html.theme-light table tbody tr.hover\:bg-slate-800\/50:hover,
+    html.theme-light table tbody tr.hover\:bg-slate-800\/40:hover {
       background-color: #f8fafc !important;
     }
     html.theme-light table tbody td {
@@ -250,7 +364,7 @@
       border-color: #e2e8f0 !important;
     }
 
-    /* Form Inputs & Selects */
+    /* 9. Form Inputs & Selects */
     html.theme-light input[type="text"],
     html.theme-light input[type="search"],
     html.theme-light input[type="password"],
@@ -262,8 +376,13 @@
     html.theme-light input::placeholder {
       color: #94a3b8 !important;
     }
+    html.theme-light #owner-pin-input {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
 
-    /* Custom Scrollbar in Light */
+    /* 10. Scrollbar */
     html.theme-light .custom-scrollbar::-webkit-scrollbar-track {
       background: #f1f5f9 !important;
     }
@@ -271,7 +390,7 @@
       background: #cbd5e1 !important;
     }
 
-    /* Bottom Navigation Bar Mobile */
+    /* 11. Mobile Bottom Navigation */
     html.theme-light #owner-mobile-bottom-nav {
       background-color: rgba(255, 255, 255, 0.96) !important;
       border-color: #e2e8f0 !important;
@@ -284,7 +403,7 @@
       color: #059669 !important;
     }
 
-    /* Modals in Light */
+    /* 12. Modals */
     html.theme-light #modal-receipt-detail > div,
     html.theme-light #modal-owner-settings > div,
     html.theme-light #modal-owner-pin-gate > div {
