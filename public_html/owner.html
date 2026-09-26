@@ -741,161 +741,171 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- 9 KARTU KPI UTAMA PENJUALAN (TIKTOK SELLER CENTER STYLE) -->
+    <!-- 9 KARTU KPI UTAMA PENJUALAN (TIKTOK SELLER CENTER STYLE - 2 BARIS) -->
     <!-- ========================================== -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-9 gap-2.5 sm:gap-4">
+    <div class="space-y-2.5 sm:space-y-4">
       
-      <!-- KPI 1: TOTAL OMZET (HERO HIGHLIGHT CARD) -->
-      <div class="col-span-2 sm:col-span-1 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/50 p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-500/50 stat-card-glow flex flex-col justify-between min-w-0 shadow-lg shadow-emerald-950/20">
-        <div class="min-w-0">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-black uppercase tracking-wider text-[10px] text-emerald-400 truncate">Total Omzet Penjualan</span>
-            <span class="text-base sm:text-lg flex-shrink-0">💰</span>
+      <!-- BARIS 1: METRIK FINANSIAL & KASIR (5 KOLOM DI DESKTOP) -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
+        
+        <!-- KPI 1: TOTAL OMZET (HERO HIGHLIGHT CARD) -->
+        <div class="col-span-2 sm:col-span-1 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/50 p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-500/50 stat-card-glow flex flex-col justify-between min-w-0 shadow-lg shadow-emerald-950/20">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-black uppercase tracking-wider text-[10px] text-emerald-400 truncate">Total Omzet Penjualan</span>
+              <span class="text-base sm:text-lg flex-shrink-0">💰</span>
+            </div>
+            <div id="kpi-omzet" class="text-xl sm:text-2xl font-black font-mono text-emerald-400 mt-1 sm:mt-2 truncate">
+              Rp 0
+            </div>
           </div>
-          <div id="kpi-omzet" class="text-xl sm:text-2xl xl:text-lg 2xl:text-xl font-black font-mono text-emerald-400 mt-1 sm:mt-2 truncate">
-            Rp 0
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span class="truncate">Gross Revenue</span>
+            <span id="kpi-omzet-sub" class="text-emerald-400 font-bold flex-shrink-0">Tercatat</span>
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-          <span class="truncate">Gross Revenue</span>
-          <span id="kpi-omzet-sub" class="text-emerald-400 font-bold flex-shrink-0">Tercatat</span>
+
+        <!-- KPI 2: LABA BERSIH TOKO -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Laba Bersih</span>
+              <span class="text-base sm:text-lg flex-shrink-0">📈</span>
+            </div>
+            <div id="kpi-profit" class="text-lg sm:text-2xl font-black font-mono text-blue-400 mt-1.5 sm:mt-2 truncate">
+              Rp 0
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span class="truncate">Margin Bersih</span>
+            <span id="kpi-margin-pct" class="font-bold text-blue-400 flex-shrink-0">0%</span>
+          </div>
         </div>
+
+        <!-- KPI 4: STRUK TRANSAKSI & PCS -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Struk Belanja</span>
+              <span class="text-base sm:text-lg flex-shrink-0">🧾</span>
+            </div>
+            <div id="kpi-transactions" class="text-lg sm:text-2xl font-black font-mono text-white mt-1.5 sm:mt-2 truncate">
+              0 Struk
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span class="truncate">Item Terjual</span>
+            <span id="kpi-items-sold" class="font-bold text-yellow-400 flex-shrink-0">0 pcs</span>
+          </div>
+        </div>
+
+        <!-- KPI 6: TOTAL RETUR PELANGGAN -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Retur Barang</span>
+              <span class="text-base sm:text-lg flex-shrink-0">🔄</span>
+            </div>
+            <div id="kpi-refund-amount" class="text-lg sm:text-2xl font-black font-mono text-amber-400 mt-1.5 sm:mt-2 truncate">
+              Rp 0
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span class="truncate">Total Refund</span>
+            <span id="kpi-retur-count" class="font-bold text-amber-400 flex-shrink-0">0 retur</span>
+          </div>
+        </div>
+
+        <!-- KPI 3: SELISIH STOK OPNAME -->
+        <div class="col-span-2 sm:col-span-1 bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Selisih SO</span>
+              <span class="text-base sm:text-lg flex-shrink-0">⚖️</span>
+            </div>
+            <div id="kpi-so-diff-amount" class="text-lg sm:text-2xl font-black font-mono text-purple-400 mt-1.5 sm:mt-2 truncate">
+              Rp 0
+            </div>
+          </div>
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span id="kpi-so-unit-diff" class="text-slate-400 font-semibold text-[10px] truncate">Audit (0 SO)</span>
+            <button onclick="scrollToSection('section-so-history')" class="text-purple-400 font-bold hover:underline flex-shrink-0">Audit &rarr;</button>
+          </div>
+        </div>
+
       </div>
 
-      <!-- KPI 2: LABA BERSIH TOKO -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
-        <div class="min-w-0">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Laba Bersih</span>
-            <span class="text-base sm:text-lg flex-shrink-0">📈</span>
+      <!-- BARIS 2: METRIK OPERASIONAL, STOK & CRM (4 KOLOM DI DESKTOP) -->
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        
+        <!-- KPI 5: STOK KRITIS / MENIPIS -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">Perlu Kulakan</span>
+              <span class="text-base sm:text-lg flex-shrink-0">⚠️</span>
+            </div>
+            <div id="kpi-low-stock-count" class="text-lg sm:text-2xl font-black font-mono text-rose-400 mt-1.5 sm:mt-2 truncate">
+              0 Produk
+            </div>
           </div>
-          <div id="kpi-profit" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-blue-400 mt-1.5 sm:mt-2 truncate">
-            Rp 0
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span class="truncate">Stok &le; 5</span>
+            <button onclick="scrollToSection('section-low-stock')" class="text-rose-400 font-bold hover:underline flex-shrink-0">Lihat &rarr;</button>
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-          <span class="truncate">Margin Bersih</span>
-          <span id="kpi-margin-pct" class="font-bold text-blue-400 flex-shrink-0">0%</span>
-        </div>
-      </div>
 
-      <!-- KPI 3: SELISIH STOK OPNAME -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
-        <div class="min-w-0">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Selisih SO</span>
-            <span class="text-base sm:text-lg flex-shrink-0">⚖️</span>
+        <!-- KPI 7: DAY SALES INVENTORY (DSI) -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] truncate">DSI Rata-rata</span>
+              <span class="text-base sm:text-lg flex-shrink-0">⏳</span>
+            </div>
+            <div id="kpi-store-dsi" class="text-lg sm:text-2xl font-black font-mono text-cyan-400 mt-1.5 sm:mt-2 truncate">
+              - Hari
+            </div>
           </div>
-          <div id="kpi-so-diff-amount" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-purple-400 mt-1.5 sm:mt-2 truncate">
-            Rp 0
+          <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span id="kpi-dsi-status" class="text-slate-400 font-semibold text-[10px] truncate">Ketahanan</span>
+            <button onclick="scrollToSection('section-dsi-analysis')" class="text-cyan-400 font-bold hover:underline flex-shrink-0">Analisis &rarr;</button>
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-          <span id="kpi-so-unit-diff" class="text-slate-400 font-semibold text-[10px] truncate">Audit (0 SO)</span>
-          <button onclick="scrollToSection('section-so-history')" class="text-purple-400 font-bold hover:underline flex-shrink-0">Audit &rarr;</button>
-        </div>
-      </div>
 
-      <!-- KPI 4: STRUK TRANSAKSI & PCS -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
-        <div class="min-w-0">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Struk Belanja</span>
-            <span class="text-base sm:text-lg flex-shrink-0">🧾</span>
+        <!-- KPI 8: TOTAL PENERIMAAN BARANG (LPB) -->
+        <div class="bg-gradient-to-br from-emerald-950 to-slate-950 p-3 sm:p-4 rounded-2xl border border-emerald-900/50 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] text-emerald-400 truncate">Terima Barang</span>
+              <span class="text-base sm:text-lg flex-shrink-0">📦</span>
+            </div>
+            <div id="kpi-lpb-count" class="text-lg sm:text-2xl font-black font-mono text-emerald-400 mt-1.5 sm:mt-2 truncate">
+              0 LPB
+            </div>
           </div>
-          <div id="kpi-transactions" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-white mt-1.5 sm:mt-2 truncate">
-            0 Struk
+          <div class="pt-2 mt-2 border-t border-emerald-900/50 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span id="kpi-lpb-value" class="font-bold text-emerald-300 font-mono truncate">Rp 0</span>
+            <button onclick="scrollToSection('section-lpb-history')" class="text-emerald-400 font-bold hover:underline flex-shrink-0">LPB &rarr;</button>
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-          <span class="truncate">Item Terjual</span>
-          <span id="kpi-items-sold" class="font-bold text-yellow-400 flex-shrink-0">0 pcs</span>
-        </div>
-      </div>
 
-      <!-- KPI 5: STOK KRITIS / MENIPIS -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
-        <div class="min-w-0">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Perlu Kulakan</span>
-            <span class="text-base sm:text-lg flex-shrink-0">⚠️</span>
+        <!-- KPI 9: TOTAL MEMBER & LOYALITAS -->
+        <div class="bg-gradient-to-br from-indigo-950 to-slate-950 p-3 sm:p-4 rounded-2xl border border-indigo-900/50 stat-card-glow flex flex-col justify-between min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-bold uppercase tracking-wider text-[10px] text-indigo-400 truncate">Member Toko</span>
+              <span class="text-base sm:text-lg flex-shrink-0">👤</span>
+            </div>
+            <div id="kpi-member-count" class="text-lg sm:text-2xl font-black font-mono text-indigo-400 mt-1.5 sm:mt-2 truncate">
+              0 Member
+            </div>
           </div>
-          <div id="kpi-low-stock-count" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-rose-400 mt-1.5 sm:mt-2 truncate">
-            0 Produk
+          <div class="pt-2 mt-2 border-t border-indigo-900/50 text-[10px] text-slate-400 flex items-center justify-between gap-1">
+            <span id="kpi-member-points" class="font-bold text-indigo-300 font-mono truncate">0 Poin</span>
+            <button onclick="scrollToSection('section-members-management')" class="text-indigo-400 font-bold hover:underline flex-shrink-0">Member &rarr;</button>
           </div>
         </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-          <span class="truncate">Stok &le; 5</span>
-          <button onclick="scrollToSection('section-low-stock')" class="text-rose-400 font-bold hover:underline flex-shrink-0">Lihat &rarr;</button>
-        </div>
-      </div>
 
-      <!-- KPI 6: TOTAL RETUR PELANGGAN -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
-        <div class="min-w-0">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px] truncate">Retur Barang</span>
-            <span class="text-base sm:text-lg flex-shrink-0">🔄</span>
-          </div>
-          <div id="kpi-refund-amount" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-amber-400 mt-1.5 sm:mt-2 truncate">
-            Rp 0
-          </div>
-        </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-          <span class="truncate">Total Refund</span>
-          <span id="kpi-retur-count" class="font-bold text-amber-400 flex-shrink-0">0 retur</span>
-        </div>
-      </div>
-
-      <!-- KPI 7: DAY SALES INVENTORY (DSI) -->
-      <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 stat-card-glow flex flex-col justify-between min-w-0">
-        <div class="min-w-0">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px] truncate">DSI Rata-rata</span>
-            <span class="text-base sm:text-lg flex-shrink-0">⏳</span>
-          </div>
-          <div id="kpi-store-dsi" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-cyan-400 mt-1.5 sm:mt-2 truncate">
-            - Hari
-          </div>
-        </div>
-        <div class="pt-2 mt-2 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-          <span id="kpi-dsi-status" class="text-slate-400 font-semibold text-[10px] truncate">Ketahanan</span>
-          <button onclick="scrollToSection('section-dsi-analysis')" class="text-cyan-400 font-bold hover:underline flex-shrink-0">Analisis &rarr;</button>
-        </div>
-      </div>
-
-      <!-- KPI 8: TOTAL PENERIMAAN BARANG (LPB) -->
-      <div class="bg-gradient-to-br from-emerald-950 to-slate-950 p-3 sm:p-4 rounded-2xl border border-emerald-900/50 stat-card-glow flex flex-col justify-between min-w-0">
-        <div class="min-w-0">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px] text-emerald-400 truncate">Terima Barang</span>
-            <span class="text-base sm:text-lg flex-shrink-0">📦</span>
-          </div>
-          <div id="kpi-lpb-count" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-emerald-400 mt-1.5 sm:mt-2 truncate">
-            0 LPB
-          </div>
-        </div>
-        <div class="pt-2 mt-2 border-t border-emerald-900/50 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-          <span id="kpi-lpb-value" class="font-bold text-emerald-300 font-mono truncate">Rp 0</span>
-          <button onclick="scrollToSection('section-lpb-history')" class="text-emerald-400 font-bold hover:underline flex-shrink-0">LPB &rarr;</button>
-        </div>
-      </div>
-
-      <!-- KPI 9: TOTAL MEMBER & LOYALITAS -->
-      <div class="bg-gradient-to-br from-indigo-950 to-slate-950 p-3 sm:p-4 rounded-2xl border border-indigo-900/50 stat-card-glow flex flex-col justify-between min-w-0">
-        <div class="min-w-0">
-          <div class="flex items-center justify-between text-slate-400 text-xs">
-            <span class="font-bold uppercase tracking-wider text-[10px] text-indigo-400 truncate">Member Toko</span>
-            <span class="text-base sm:text-lg flex-shrink-0">👤</span>
-          </div>
-          <div id="kpi-member-count" class="text-base sm:text-xl xl:text-lg 2xl:text-xl font-black font-mono text-indigo-400 mt-1.5 sm:mt-2 truncate">
-            0 Member
-          </div>
-        </div>
-        <div class="pt-2 mt-2 border-t border-indigo-900/50 text-[10px] text-slate-400 flex items-center justify-between gap-1">
-          <span id="kpi-member-points" class="font-bold text-indigo-300 font-mono truncate">0 Poin</span>
-          <button onclick="scrollToSection('section-members-management')" class="text-indigo-400 font-bold hover:underline flex-shrink-0">Member &rarr;</button>
-        </div>
       </div>
 
     </div>
