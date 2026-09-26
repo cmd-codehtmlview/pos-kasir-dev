@@ -298,41 +298,121 @@
       color: #ca8a04 !important;
     }
 
-    /* 7. Badges (Convert dark backgrounds to soft pastel pill badges) */
-    html.theme-light .bg-emerald-950 {
+    /* 7. Badges (Convert dark backgrounds & opacity variants to soft pastel pill badges) */
+    html.theme-light .bg-emerald-950,
+    html.theme-light [class*="bg-emerald-950"] {
       background-color: #ecfdf5 !important;
+      background: #ecfdf5 !important;
       border-color: #a7f3d0 !important;
       color: #065f46 !important;
     }
-    html.theme-light .bg-rose-950 {
+    html.theme-light .bg-rose-950,
+    html.theme-light [class*="bg-rose-950"] {
       background-color: #fff1f2 !important;
+      background: #fff1f2 !important;
       border-color: #fecdd3 !important;
       color: #9f1239 !important;
     }
-    html.theme-light .bg-amber-950 {
+    html.theme-light .bg-amber-950,
+    html.theme-light [class*="bg-amber-950"] {
       background-color: #fffbeb !important;
+      background: #fffbeb !important;
       border-color: #fde68a !important;
       color: #92400e !important;
     }
-    html.theme-light .bg-indigo-950 {
+    html.theme-light .bg-indigo-950,
+    html.theme-light [class*="bg-indigo-950"] {
       background-color: #eef2ff !important;
+      background: #eef2ff !important;
       border-color: #c7d2fe !important;
-      color: #3730a3 !important;
+      color: #4338ca !important;
     }
-    html.theme-light .bg-blue-950 {
+    html.theme-light .bg-blue-950,
+    html.theme-light [class*="bg-blue-950"] {
       background-color: #eff6ff !important;
+      background: #eff6ff !important;
       border-color: #bfdbfe !important;
       color: #1e40af !important;
     }
-    html.theme-light .bg-purple-950 {
+    html.theme-light .bg-purple-950,
+    html.theme-light [class*="bg-purple-950"] {
       background-color: #faf5ff !important;
+      background: #faf5ff !important;
       border-color: #e9d5ff !important;
       color: #6b21a8 !important;
     }
-    html.theme-light .bg-cyan-950 {
+    html.theme-light .bg-cyan-950,
+    html.theme-light [class*="bg-cyan-950"] {
       background-color: #ecfeff !important;
+      background: #ecfeff !important;
       border-color: #a5f3fc !important;
-      color: #155e75 !important;
+      color: #0891b2 !important;
+    }
+    html.theme-light .bg-yellow-950,
+    html.theme-light [class*="bg-yellow-950"] {
+      background-color: #fefce8 !important;
+      background: #fefce8 !important;
+      border-color: #fef08a !important;
+      color: #854d0e !important;
+    }
+
+    /* Aksen Spesifik: Indikator Detik Sync di Header */
+    html.theme-light #owner-cloud-indicator,
+    html.theme-light #owner-cloud-indicator.bg-emerald-950\/60,
+    html.theme-light #owner-cloud-indicator[class*="bg-emerald-950"] {
+      background-color: #ecfdf5 !important;
+      background: #ecfdf5 !important;
+      border-color: #a7f3d0 !important;
+      color: #059669 !important;
+    }
+    html.theme-light #owner-cloud-indicator:hover {
+      background-color: #d1fae5 !important;
+      background: #d1fae5 !important;
+      border-color: #6ee7b7 !important;
+    }
+    html.theme-light #owner-cloud-indicator #refresh-timer {
+      color: #059669 !important;
+    }
+    html.theme-light #owner-cloud-indicator #owner-cloud-dot {
+      background-color: #10b981 !important;
+    }
+
+    /* Aksen Spesifik: Badge Produk Dianalisis (DSI) */
+    html.theme-light #dsi-badge-count,
+    html.theme-light #dsi-badge-count[class*="bg-cyan-950"] {
+      background-color: #ecfeff !important;
+      background: #ecfeff !important;
+      border-color: #a5f3fc !important;
+      color: #0891b2 !important;
+    }
+
+    /* Aksen Spesifik: Tabel Member - No urut, ID Member, & Poin */
+    html.theme-light #members-badge-count {
+      background-color: #eef2ff !important;
+      background: #eef2ff !important;
+      border-color: #c7d2fe !important;
+      color: #4338ca !important;
+    }
+    html.theme-light #owner-members-tbody tr:hover,
+    html.theme-light #owner-members-tbody tr.hover\:bg-indigo-950\/20:hover {
+      background-color: #f8fafc !important;
+    }
+    html.theme-light #owner-members-tbody td span.font-mono.text-slate-500,
+    html.theme-light #owner-members-tbody td .text-slate-500 {
+      color: #475569 !important;
+      font-weight: 700 !important;
+    }
+    html.theme-light #owner-members-tbody [class*="bg-indigo-950"] {
+      background-color: #eef2ff !important;
+      background: #eef2ff !important;
+      border-color: #c7d2fe !important;
+      color: #4338ca !important;
+    }
+    html.theme-light #owner-members-tbody [class*="bg-slate-950"] {
+      background-color: #f1f5f9 !important;
+      background: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+      color: #64748b !important;
     }
 
     /* 8. Tables */
