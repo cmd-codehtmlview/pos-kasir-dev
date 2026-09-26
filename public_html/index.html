@@ -10546,6 +10546,38 @@
       renderMockupLiveDropdown(currentCatalogItems, currentCatalogLabel);
     }
 
+    function initMockCatalogSwipe() {
+      const dropdown = document.getElementById("mock-live-search-dropdown");
+      if (!dropdown || dropdown._swipeInitialized) return;
+      dropdown._swipeInitialized = true;
+
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+
+      dropdown.addEventListener("touchstart", function(e) {
+        if (!e.touches || e.touches.length !== 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+      }, { passive: true });
+
+      dropdown.addEventListener("touchend", function(e) {
+        if (!e.changedTouches || e.changedTouches.length !== 1) return;
+        const diffX = e.changedTouches[0].clientX - touchStartX;
+        const diffY = e.changedTouches[0].clientY - touchStartY;
+        const elapsed = Date.now() - touchStartTime;
+
+        if (Math.abs(diffX) >= 45 && Math.abs(diffX) > Math.abs(diffY) * 1.25 && elapsed < 650) {
+          if (diffX < 0 && catalogViewMode !== 'grid') {
+            setCatalogViewMode('grid');
+          } else if (diffX > 0 && catalogViewMode !== 'list') {
+            setCatalogViewMode('list');
+          }
+        }
+      }, { passive: true });
+    }
+
     // Live Search Otomatis (Ketik Langsung Muncul Hasil)
     function handleMockupLiveSearch(query) {
       const dropdown = document.getElementById('mock-live-search-dropdown');
@@ -10733,6 +10765,7 @@
 
       dropdown.innerHTML = headerHtml + contentHtml;
       dropdown.classList.remove('hidden');
+      initMockCatalogSwipe();
     }
 
     // Tambah Produk dari Katalog ke Tabel Kasir (Mendukung Multi-Harga A/B/C)
@@ -10981,6 +11014,82 @@
       renderPosLiveSearchDropdown(currentPosLiveItems, currentPosLiveQuery);
     }
 
+    // Setup Touch Gesture (Swipe Kiri ⇄ Kanan untuk Ganti Mode List / Grid)
+    function initPosCatalogSwipe() {
+      const dropdown = document.getElementById("pos-live-search-dropdown");
+      if (!dropdown || dropdown._swipeInitialized) return;
+      dropdown._swipeInitialized = true;
+
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+
+      dropdown.addEventListener("touchstart", function(e) {
+        if (!e.touches || e.touches.length !== 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+      }, { passive: true });
+
+      dropdown.addEventListener("touchend", function(e) {
+        if (!e.changedTouches || e.changedTouches.length !== 1) return;
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+        const diffX = endX - touchStartX;
+        const diffY = endY - touchStartY;
+        const elapsed = Date.now() - touchStartTime;
+
+        // Validasi geseran: minimal 45px, dominan horizontal (> 1.25x vertikal), durasi wajar (< 650ms)
+        if (Math.abs(diffX) >= 45 && Math.abs(diffX) > Math.abs(diffY) * 1.25 && elapsed < 650) {
+          if (diffX < 0 && posCatalogViewMode !== 'grid') {
+            // Geser ke Kiri (Swipe Left) -> Pindah ke Grid
+            setPosCatalogViewMode('grid');
+            if (typeof showToast === 'function') {
+              showToast("⊞ Tampilan Grid (Geser Kanan untuk List)", "info", 1800);
+            }
+          } else if (diffX > 0 && posCatalogViewMode !== 'list') {
+            // Geser ke Kanan (Swipe Right) -> Pindah ke List
+            setPosCatalogViewMode('list');
+            if (typeof showToast === 'function') {
+              showToast("☰ Tampilan List (Geser Kiri untuk Grid)", "info", 1800);
+            }
+          }
+        }
+      }, { passive: true });
+
+      // Mouse Drag support untuk PC / Laptop Trackpad
+      let mouseStartX = 0;
+      let mouseStartY = 0;
+      let isMouseDown = false;
+      let mouseStartTime = 0;
+
+      dropdown.addEventListener("mousedown", function(e) {
+        if (e.target.closest("button") || e.target.closest("input") || e.target.closest("a")) return;
+        isMouseDown = true;
+        mouseStartX = e.clientX;
+        mouseStartY = e.clientY;
+        mouseStartTime = Date.now();
+      });
+
+      dropdown.addEventListener("mouseup", function(e) {
+        if (!isMouseDown) return;
+        isMouseDown = false;
+        const diffX = e.clientX - mouseStartX;
+        const diffY = e.clientY - mouseStartY;
+        const elapsed = Date.now() - mouseStartTime;
+
+        if (Math.abs(diffX) >= 50 && Math.abs(diffX) > Math.abs(diffY) * 1.25 && elapsed < 650) {
+          if (diffX < 0 && posCatalogViewMode !== 'grid') {
+            setPosCatalogViewMode('grid');
+            if (typeof showToast === 'function') showToast("⊞ Tampilan Grid", "info", 1600);
+          } else if (diffX > 0 && posCatalogViewMode !== 'list') {
+            setPosCatalogViewMode('list');
+            if (typeof showToast === 'function') showToast("☰ Tampilan List", "info", 1600);
+          }
+        }
+      });
+    }
+
     function renderPosLiveSearchDropdown(items, queryLabel) {
       const dropdown = document.getElementById("pos-live-search-dropdown");
       if (!dropdown) return;
@@ -10998,9 +11107,9 @@
         return;
       }
 
-      // Header dengan Tab Switcher Dual-View (List & Grid)
+      // Header dengan Tab Switcher Dual-View (List & Grid) & Petunjuk Swipe
       const headerHtml = `
-        <div class="p-2.5 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between border-b border-slate-100 flex-wrap gap-2">
+        <div class="p-2.5 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between border-b border-slate-100 flex-wrap gap-2 select-none">
           <div class="flex items-center gap-2">
             <span>Pilih Manual (${items.length} Item)</span>
             <div class="inline-flex bg-slate-200/80 p-0.5 rounded-lg text-[10px] font-black">
@@ -11008,6 +11117,7 @@
                 type="button" 
                 onclick="setPosCatalogViewMode('list')" 
                 class="px-2 py-0.5 rounded-md transition ${posCatalogViewMode === 'list' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500 hover:text-slate-800'}"
+                title="Tampilan List (Geser Kanan ➔)"
               >
                 ☰ List
               </button>
@@ -11015,10 +11125,14 @@
                 type="button" 
                 onclick="setPosCatalogViewMode('grid')" 
                 class="px-2 py-0.5 rounded-md transition ${posCatalogViewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs font-black' : 'text-slate-500 hover:text-slate-800'}"
+                title="Tampilan Grid (Geser Kiri ⬅)"
               >
                 ⊞ Grid
               </button>
             </div>
+            <span class="text-[9px] text-slate-500 font-semibold hidden xs:inline flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/80">
+              <span>⇄</span> Geser / Swipe
+            </span>
           </div>
           <button onclick="hidePosLiveSearch()" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-[10px] font-black cursor-pointer transition">✕ Selesai</button>
         </div>
@@ -11027,7 +11141,7 @@
       let contentHtml = '';
       if (posCatalogViewMode === 'grid') {
         contentHtml = `
-          <div class="p-2.5 grid grid-cols-2 sm:grid-cols-3 gap-2 overflow-y-auto max-h-[380px] bg-slate-50/50">
+          <div class="p-2.5 grid grid-cols-2 sm:grid-cols-3 gap-2 overflow-y-auto max-h-[380px] bg-slate-50/50 animate-in fade-in slide-in-from-right-3 duration-200">
             ${items.map(p => `
               <div 
                 onclick="addToCart('${p.id}'); showToast('⚡ +1 ${(p.name || '').replace(/'/g, "\\'")}', 'success');" 
@@ -11058,7 +11172,7 @@
         `;
       } else {
         contentHtml = `
-          <div class="divide-y divide-slate-100 overflow-y-auto max-h-[380px]">
+          <div class="divide-y divide-slate-100 overflow-y-auto max-h-[380px] animate-in fade-in slide-in-from-left-3 duration-200">
             ${items.map(p => `
               <div onclick="addToCart('${p.id}'); showToast('⚡ +1 ${(p.name || '').replace(/'/g, "\\'")}', 'success');" class="p-2.5 hover:bg-emerald-50/50 active:bg-emerald-100/50 transition-colors flex items-center justify-between gap-2.5 cursor-pointer group">
                 <div class="flex items-center gap-2.5 min-w-0 flex-1">
@@ -11094,6 +11208,7 @@
 
       dropdown.innerHTML = headerHtml + contentHtml;
       dropdown.classList.remove("hidden");
+      initPosCatalogSwipe();
     }
 
     // Tutup live search saat klik di luar
